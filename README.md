@@ -1,2 +1,9 @@
 # F8Framework
-UnityF8Framework核心，根据自己需要选择组件
+The Unity F8Framework Core
+
+## Prerequisites
+### Unity 2021.3
+Or higher
+
+## Getting Started
+The F8Framework [here](https://github.com/TippingGame/F8Framework.git).
