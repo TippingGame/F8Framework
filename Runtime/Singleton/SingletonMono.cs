@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace F8Framework.Core
 {
-    public class MonoSingleton<T> : MonoBehaviour where T : Component
+    public class SingletonMono<T> : MonoBehaviour where T : Component
     {
         private static T m_instace;
         private static readonly object lockObj = new object();
@@ -27,6 +27,30 @@ namespace F8Framework.Core
 
                 return m_instace;
             }
+        }
+        private void Awake()
+        {
+            Init();
+        }
+        protected virtual void Init()
+        {
+
+        }
+        
+        public virtual void OnEnterGame()
+        {
+
+        }
+
+        public virtual void OnQuitGame()
+        {
+
+        }
+        
+        private void OnDestroy()
+        {
+            OnQuitGame();
+            m_instace = null;
         }
     }
 }
