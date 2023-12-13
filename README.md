@@ -16,7 +16,7 @@ Unity F8Framework核心，根据自己需要选择组件，支持Win/Android/iOS
 ---2、资源加载：待添加  
 ---3、UI界面管理：待添加  
 ---4、热更新版本号管理：待添加  
----5、日志管理：https://github.com/TippingGame/F8Log.git  
+---5、日志管理（内置）：https://github.com/TippingGame/F8Framework/blob/main/Tests/Log/README.md  
 ---6、声音管理：待添加  
 ---7、事件管理：待添加  
 ---8、实体组件：待添加  
