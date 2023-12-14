@@ -19,8 +19,8 @@ namespace F8Framework.Core.Editor
 
             // 自定义函数，用来获取log中的stacktrace，定义在后面。
             string stack_trace = GetStackTrace();
-            // 通过stacktrace来定位是否是自定义的log，log中有Runtime/LogF8.cs，很好识别
-            if (!string.IsNullOrEmpty(stack_trace) && stack_trace.Contains("Runtime/LogF8.cs"))
+            // 通过stacktrace来定位是否是自定义的log，log中有LogF8.cs，很好识别
+            if (!string.IsNullOrEmpty(stack_trace) && stack_trace.Contains("LogF8.cs"))
             {
                 // 正则匹配at xxx，在第几行
                 Match matches = Regex.Match(stack_trace, @"\(at (.+)\)", RegexOptions.IgnoreCase);
@@ -30,7 +30,7 @@ namespace F8Framework.Core.Editor
                     pathline = matches.Groups[1].Value;
 
                     // 找到不是我们自定义log文件的那行，重新整理文件路径，手动打开
-                    if (!pathline.Contains("Runtime/LogF8.cs") && !string.IsNullOrEmpty(pathline))
+                    if (!pathline.Contains("LogF8.cs") && !string.IsNullOrEmpty(pathline))
                     {
                         int split_index = pathline.LastIndexOf(":");
                         string path = pathline.Substring(0, split_index);

@@ -283,7 +283,18 @@ namespace F8Framework.Core
             Debug.LogError((p != null && p.Length > 0 ? string.Format(s, p) : s));
 #endif
         }
-
+        
+        public static void LogError(object o)
+        {
+            if (!EnableLog)
+            {
+                return;
+            }
+#if UNITY_EDITOR
+            Debug.LogError(o);
+#endif
+        }
+        
         public static void LogErrorToMainThread(string s, params object[] p)
         {
             if (!EnableLog)
@@ -405,11 +416,11 @@ namespace F8Framework.Core
             {
 #if UNITY_EDITOR
             #if UNITY_5_6_OR_NEWER
-                return (UnityEngine.Profiling.Profiler.usedHeapSizeLong / 1024 / 1024).ToString() + " mb";
+                return (UnityEngine.Profiling.Profiler.usedHeapSizeLong / 1024).ToString() + " kb";
             #elif UNITY_5_5_OR_NEWER
-                return (UnityEngine.Profiling.Profiler.usedHeapSize / 1024 / 1024).ToString() + " mb";
+                return (UnityEngine.Profiling.Profiler.usedHeapSize / 1024).ToString() + " kb";
             #else
-                return (Profiler.usedHeapSize / 1024 / 1024).ToString() + " mb";
+                return (Profiler.usedHeapSize / 1024).ToString() + " kb";
             #endif
 #else
             return "0";
