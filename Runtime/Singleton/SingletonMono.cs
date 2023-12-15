@@ -20,7 +20,6 @@ namespace F8Framework.Core
                         {
                             GameObject obj = new GameObject(typeof(T).Name, typeof(T));
                             m_instace = obj.GetComponent<T>();
-                            DontDestroyOnLoad(obj);
                         }
                     }
                 }
@@ -30,6 +29,13 @@ namespace F8Framework.Core
         }
         private void Awake()
         {
+            //防止创建多余单例
+            if (m_instace)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            DontDestroyOnLoad(gameObject);
             Init();
         }
         protected virtual void Init()
@@ -44,7 +50,7 @@ namespace F8Framework.Core
 
         public virtual void OnQuitGame()
         {
-
+            
         }
         
         private void OnDestroy()

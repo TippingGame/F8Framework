@@ -6,7 +6,7 @@ namespace F8Framework.Core
 {
     public class TimerManager : SingletonMono<TimerManager>
     {
-         private Dictionary<string, Timer> times = new Dictionary<string, Timer>(); // 存储计时器的字典
+        private Dictionary<string, Timer> times = new Dictionary<string, Timer>(); // 存储计时器的字典
         private HashSet<string> deleteTimes = new HashSet<string>(); // 存储要删除的计时器ID的哈希集合
         private long initTime; // 初始化时间
         private long serverTime; // 服务器时间
@@ -66,6 +66,11 @@ namespace F8Framework.Core
             foreach (var delete in deleteTimes) // 删除已完成的计时器
             {
                 times.Remove(delete);
+            }
+
+            if (deleteTimes.Count > 0)
+            {
+                deleteTimes.Clear();
             }
         }
 

@@ -1,4 +1,4 @@
-# F8Log
+# F8Timer
 
 [![license](http://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT) 
 [![Unity Version](https://img.shields.io/badge/unity-2021.3.15f1-blue)](https://unity.com) 
@@ -14,7 +14,7 @@ Unity Timer组件，提供普通Timer、FrameTimer，暂停恢复（时间不会
 
 ### 代码使用方法
 ```C#
-         //普通Timer,传入自身this，每1秒执行一次，延迟0秒后开始，执行3次
+         //普通Timer,传入自身this，每1秒执行一次，延迟0秒后开始，执行3次(-1表示循环)
         timeid = TimerManager.Instance.Register(this,1f,0,3, () =>
         {
             LogF8.Log("tick");
@@ -23,8 +23,8 @@ Unity Timer组件，提供普通Timer、FrameTimer，暂停恢复（时间不会
             LogF8.Log("完成");
         });
         
-        //FrameTimer,传入自身this，每1帧执行一次，延迟0帧后开始，执行12次
-        timeid = TimerManager.Instance.RegisterFrame(this,1f,0,12, () =>
+        //FrameTimer,传入自身this，每1帧执行一次，延迟0帧后开始，循环执行(-1表示循环)
+        timeid = TimerManager.Instance.RegisterFrame(this,1f,0,-1, () =>
         {
             LogF8.Log("tick");
         }, () =>

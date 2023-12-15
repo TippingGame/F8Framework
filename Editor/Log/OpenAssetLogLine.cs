@@ -2,48 +2,66 @@ using System;
 using UnityEditor;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using UnityEditor.Callbacks;
+using UnityEditorInternal;
+using UnityEngine;
 
 namespace F8Framework.Core.Editor
 {
-     // * 参考: https://zhuanlan.zhihu.com/p/92291084
-    // 感谢 https://github.com/clksaaa 提供的 issue 反馈 和 解决方案
     public static class OpenAssetLogLine
     {
         private static bool m_hasForceMono = false;
 
-        // 处理asset打开的callback函数
-        [UnityEditor.Callbacks.OnOpenAssetAttribute(-1)]
-        static bool OnOpenAsset(int instance, int line)
+        [OnOpenAsset(0)]
+        private static bool OnOpenAsset(int instanceID, int line)
         {
-            if (m_hasForceMono) return false;
-
-            // 自定义函数，用来获取log中的stacktrace，定义在后面。
-            string stack_trace = GetStackTrace();
-            // 通过stacktrace来定位是否是自定义的log，log中有LogF8.cs，很好识别
-            if (!string.IsNullOrEmpty(stack_trace) && stack_trace.Contains("LogF8.cs"))
+            if (line <= 0)
             {
-                // 正则匹配at xxx，在第几行
-                Match matches = Regex.Match(stack_trace, @"\(at (.+)\)", RegexOptions.IgnoreCase);
-                string pathline = "";
+                return false;
+            }
+            // 获取资源路径
+            string assetPath = AssetDatabase.GetAssetPath(instanceID);
+            
+            // 判断资源类型
+            if (!assetPath.EndsWith(".cs"))
+            {
+                return false;
+            }
+
+            bool autoFirstMatch = assetPath.Contains("LogF8.cs");
+            
+            var stackTrace = GetStackTrace();
+            if (!string.IsNullOrEmpty(stackTrace) && stackTrace.Contains("LogF8.cs"))
+                                            
+            {
+                if (!autoFirstMatch)
+                {
+                    var fullPath = UnityEngine.Application.dataPath.Substring(0, UnityEngine.Application.dataPath.LastIndexOf("Assets", StringComparison.Ordinal));
+                    fullPath = $"{fullPath}{assetPath}";
+                    // 跳转到目标代码的特定行
+                    InternalEditorUtility.OpenFileAtLineExternal(fullPath.Replace('/', '\\'), line);
+                    return true;
+                }
+                
+                // 使用正则表达式匹配at的哪个脚本的哪一行
+                var matches = Regex.Match(stackTrace, @"\(at (.+)\)",
+                    RegexOptions.IgnoreCase);
                 while (matches.Success)
                 {
-                    pathline = matches.Groups[1].Value;
+                    var pathLine = matches.Groups[1].Value;
 
-                    // 找到不是我们自定义log文件的那行，重新整理文件路径，手动打开
-                    if (!pathline.Contains("LogF8.cs") && !string.IsNullOrEmpty(pathline))
+                    if (!pathLine.Contains("LogF8.cs"))
                     {
-                        int split_index = pathline.LastIndexOf(":");
-                        string path = pathline.Substring(0, split_index);
-                        line = Convert.ToInt32(pathline.Substring(split_index + 1));
-                        m_hasForceMono = true;
-                        //方式一
-                        AssetDatabase.OpenAsset(AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(path), line);
-                        m_hasForceMono = false;
-                        //方式二
-                        //string fullpath = Application.dataPath.Substring(0, Application.dataPath.LastIndexOf("Assets"));
-                        // fullpath = fullpath + path;
-                        //  UnityEditorInternal.InternalEditorUtility.OpenFileAtLineExternal(fullpath.Replace('/', '\\'), line);
-                        return true;
+                        var splitIndex = pathLine.LastIndexOf(":", StringComparison.Ordinal);
+                        // 脚本路径
+                        var path = pathLine.Substring(0, splitIndex);
+                        // 行号
+                        line = Convert.ToInt32(pathLine.Substring(splitIndex + 1));
+                        var fullPath = UnityEngine.Application.dataPath.Substring(0, UnityEngine.Application.dataPath.LastIndexOf("Assets", StringComparison.Ordinal));
+                        fullPath = $"{fullPath}{path}";
+                        // 跳转到目标代码的特定行
+                        InternalEditorUtility.OpenFileAtLineExternal(fullPath.Replace('/', '\\'), line);
+                        break;
                     }
 
                     matches = matches.NextMatch();
@@ -55,25 +73,37 @@ namespace F8Framework.Core.Editor
             return false;
         }
 
-        static string GetStackTrace()
+        /// <summary>
+        /// 获取当前日志窗口选中的日志的堆栈信息。
+        /// </summary>
+        /// <returns>选中日志的堆栈信息实例。</returns>
+        private static string GetStackTrace()
         {
-            // 找到类UnityEditor.ConsoleWindow
-            var type_console_window = typeof(EditorWindow).Assembly.GetType("UnityEditor.ConsoleWindow");
-            // 找到UnityEditor.ConsoleWindow中的成员ms_ConsoleWindow
-            var filedInfo = type_console_window.GetField("ms_ConsoleWindow", BindingFlags.Static | BindingFlags.NonPublic);
-            // 获取ms_ConsoleWindow的值
-            var ConsoleWindowInstance = filedInfo.GetValue(null);
-            if (ConsoleWindowInstance != null)
+            // 通过反射获取ConsoleWindow类
+            var consoleWindowType = typeof(EditorWindow).Assembly.GetType("UnityEditor.ConsoleWindow");
+            // 获取窗口实例
+            var fieldInfo = consoleWindowType.GetField("ms_ConsoleWindow",
+                BindingFlags.Static |
+                BindingFlags.NonPublic);
+            if (fieldInfo != null)
             {
-                if ((object)EditorWindow.focusedWindow == ConsoleWindowInstance)
-                {
-                    // 找到类UnityEditor.ConsoleWindow中的成员m_ActiveText
-                    filedInfo = type_console_window.GetField("m_ActiveText",
-                        BindingFlags.Instance | BindingFlags.NonPublic);
-                    string activeText = filedInfo.GetValue(ConsoleWindowInstance).ToString();
-                    return activeText;
-                }
+                var consoleInstance = fieldInfo.GetValue(null);
+                if (consoleInstance != null)
+                    if (EditorWindow.focusedWindow == (EditorWindow)consoleInstance)
+                    {
+                        // 获取m_ActiveText成员
+                        fieldInfo = consoleWindowType.GetField("m_ActiveText",
+                            BindingFlags.Instance |
+                            BindingFlags.NonPublic);
+                        // 获取m_ActiveText的值
+                        if (fieldInfo != null)
+                        {
+                            var activeText = fieldInfo.GetValue(consoleInstance).ToString();
+                            return activeText;
+                        }
+                    }
             }
+
             return null;
         }
     }

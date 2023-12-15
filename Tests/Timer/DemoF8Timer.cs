@@ -7,7 +7,7 @@ public class DemoF8Timer : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //普通Timer,传入自身this，每1秒执行一次，延迟0秒后开始，执行3次
+        //普通Timer,传入自身this，每1秒执行一次，延迟0秒后开始，执行3次(-1表示循环)
         timeid = TimerManager.Instance.Register(this,1f,0,3, () =>
         {
             LogF8.Log("tick");
@@ -16,8 +16,8 @@ public class DemoF8Timer : MonoBehaviour
             LogF8.Log("完成");
         });
         
-        //FrameTimer,传入自身this，每1帧执行一次，延迟0帧后开始，执行12次
-        timeid = TimerManager.Instance.RegisterFrame(this,1f,0,12, () =>
+        //FrameTimer,传入自身this，每1帧执行一次，延迟0帧后开始，循环执行(-1表示循环)
+        timeid = TimerManager.Instance.RegisterFrame(this,1f,0,-1, () =>
         {
             LogF8.Log("tick");
         }, () =>
