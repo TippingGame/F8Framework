@@ -8,6 +8,7 @@ namespace F8Framework.Core
     {
         private Dictionary<string, Timer> times = new Dictionary<string, Timer>(); // 存储计时器的字典
         private HashSet<string> deleteTimes = new HashSet<string>(); // 存储要删除的计时器ID的哈希集合
+        private Dictionary<string, Timer> addTimes = new Dictionary<string, Timer>(); // 存储要添加的计时器
         private long initTime; // 初始化时间
         private long serverTime; // 服务器时间
         private long tempTime; // 临时时间
@@ -23,6 +24,15 @@ namespace F8Framework.Core
 
         private void Update()
         {
+            foreach (var add in addTimes) //待添加字典
+            {
+                times.Add(add.Key, add.Value);
+            }
+            if (addTimes.Count > 0)
+            {
+                addTimes.Clear();
+            }
+            
             if (isFocus == false || times.Count <= 0) // 如果失去焦点或者计时器数量为0，则返回
             {
                 return;
@@ -35,31 +45,30 @@ namespace F8Framework.Core
 
                 if (pair.Value.IsFrameTimer ? pair.Value.Update(frameTime) : pair.Value.Update(dt)) // 根据计时器类型更新计时器
                 {
-                    if (pair.Value.Obj == null || pair.Value.Obj.Equals(null)) // 若对象为空，标记计时器为完成，并将其ID添加到待删除列表
+                    if (pair.Value.IsFinish || pair.Value.Obj == null || pair.Value.Obj.Equals(null)) // 若计时器已经完成，若对象为空，标记计时器为完成，并将其ID添加到待删除列表
                     {
-                        pair.Value.IsFinish = true;
                         deleteTimes.Add(pair.Key);
-                        continue;
-                    }
-                    if (pair.Value.IsFinish) // 若计时器已经完成，继续下一个
-                    {
                         continue;
                     }
                     int field = pair.Value.Field; // 获取计时器剩余字段值
                     field = field > 0 ? field - 1 : field; // 减少计时器字段值
                     if (field == 0) // 若字段值为0，触发onSecond事件，并执行OnTimerComplete
                     {
+                        pair.Value.Field = field; // 更新计时器剩余字段值
                         if (pair.Value.OnSecond is { } onSecond)
                         {
                             onSecond.Invoke();
                         }
                         OnTimerComplete(id);
                     }
-                    else if (pair.Value.OnSecond is { } onSecond) // 若onSecond事件存在，触发事件
+                    else
                     {
-                        onSecond.Invoke();
+                        pair.Value.Field = field; // 更新计时器剩余字段值
+                        if (pair.Value.OnSecond is { } onSecond)
+                        {
+                            onSecond.Invoke();
+                        }
                     }
-                    pair.Value.Field = field; // 更新计时器剩余字段值
                 }
             }
 
@@ -67,7 +76,7 @@ namespace F8Framework.Core
             {
                 times.Remove(delete);
             }
-
+            
             if (deleteTimes.Count > 0)
             {
                 deleteTimes.Clear();
@@ -83,7 +92,10 @@ namespace F8Framework.Core
                     onComplete.Invoke();
                 }
                 timer.IsFinish = true;
-                deleteTimes.Add(id);
+            }
+            if (addTimes.TryGetValue(id, out Timer addtimer)) //有可能在待添加里
+            {
+                addtimer.IsFinish = true;
             }
         }
 
@@ -92,7 +104,7 @@ namespace F8Framework.Core
         {
             string id = Guid.NewGuid().ToString(); // 生成一个唯一的ID
             Timer timer = new Timer(obj, id, step, delay, field, onSecond, onComplete, false); // 创建一个计时器对象
-            times.Add(id, timer);
+            addTimes.Add(id, timer);
             return id;
         }
 
@@ -101,17 +113,24 @@ namespace F8Framework.Core
         {
             string id = Guid.NewGuid().ToString(); // 生成一个唯一的ID
             Timer timer = new Timer(obj, id, step, delay, field, onSecond, onComplete, true); // 创建一个以帧为单位的计时器对象
-            times.Add(id, timer);
+            addTimes.Add(id, timer);
             return id;
         }
 
         // 根据ID注销计时器
         public void UnRegister(string id)
         {
-            if (id != null && times.TryGetValue(id, out Timer timer)) // 根据ID获取计时器并标记为完成，将其ID添加到待删除列表
+            if (id == null)
+            {
+                return;
+            }
+            if (times.TryGetValue(id, out Timer timer)) // 根据ID获取计时器并标记为完成，将其ID添加到待删除列表
             {
                 timer.IsFinish = true;
-                deleteTimes.Add(id);
+            }
+            if (addTimes.TryGetValue(id, out Timer addtimer)) //有可能在待添加里
+            {
+                addtimer.IsFinish = true;
             }
         }
 
@@ -195,10 +214,13 @@ namespace F8Framework.Core
                         if (field < 0) // 如果字段值小于0，将其置为0，并执行OnTimerComplete
                         {
                             field = 0;
+                            pair.Value.Field = field; // 更新计时器字段值
                             OnTimerComplete(pair.Value.ID);
                         }
-
-                        pair.Value.Field = field; // 更新计时器字段值
+                        else
+                        {
+                            pair.Value.Field = field; // 更新计时器字段值
+                        }
                     }
                 }
             }
