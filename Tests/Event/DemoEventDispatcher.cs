@@ -56,12 +56,12 @@ public class DemoEventDispatcher : MonoBehaviour
     
     public void RemoveEventListener<T>(T eventName,Action listener) where T : struct, Enum, IConvertible
     {
-        _eventDispatcher.RemoveEventListener(eventName, listener, this);
+        EventDispatcher.RemoveEventListener(eventName, listener, this);
     }
     
     public void RemoveEventListener<T>(T eventName,Action<object[]> listener) where T : struct, Enum, IConvertible
     {
-        _eventDispatcher.RemoveEventListener(eventName, listener, this);
+        EventDispatcher.RemoveEventListener(eventName, listener, this);
     }
     
     public void DispatchEvent<T>(T eventName) where T : struct, Enum, IConvertible

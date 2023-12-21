@@ -5,41 +5,41 @@ namespace F8Framework.Core
 {
     public class EventDispatcher : MessageInterface
     {
-        private Dictionary<Int16, HashSet<object>> events = new Dictionary<Int16, HashSet<object>>();
-        public void AddEventListener<T>(T eventName, Action listener, object obj = null) where T : Enum, IConvertible
+        private Dictionary<int, HashSet<IEventDataBase>> events = new Dictionary<int, HashSet<IEventDataBase>>();
+        public void AddEventListener<T>(T eventName, Action listener, object handle = null) where T : Enum, IConvertible
         {
-            Int16 tempName = Convert.ToInt16(eventName);
+            int tempName = (int)(object)eventName;
             if (!events.ContainsKey(tempName))
             {
-                events[tempName] = new HashSet<object>();
+                events[tempName] = new HashSet<IEventDataBase>();
             }
-            EventData<T> eventData = new EventData<T>(eventName, listener, obj);
+            EventData<T> eventData = new EventData<T>(eventName, listener, handle);
             events[tempName].Add(eventData);
             
-            MessageManager.Instance.AddEventListener(eventName, listener, obj);
+            MessageManager.Instance.AddEventListener(eventName, listener, handle);
         }
 
-        public void AddEventListener<T>(T eventName, Action<object[]> listener, object obj = null) where T : Enum, IConvertible
+        public void AddEventListener<T>(T eventName, Action<object[]> listener, object handle = null) where T : Enum, IConvertible
         {
-            Int16 tempName = Convert.ToInt16(eventName);
+            int tempName = (int)(object)eventName;
             if (!events.ContainsKey(tempName))
             {
-                events[tempName] = new HashSet<object>();
+                events[tempName] = new HashSet<IEventDataBase>();
             }
-            EventData<T,object[]> eventData = new EventData<T,object[]>(eventName, listener, obj);
+            EventData<T,object[]> eventData = new EventData<T,object[]>(eventName, listener, handle);
             events[tempName].Add(eventData);
             
-            MessageManager.Instance.AddEventListener(eventName, listener, obj);
+            MessageManager.Instance.AddEventListener(eventName, listener, handle);
         }
 
-        public void RemoveEventListener<T>(T eventName, Action listener, object obj = null) where T : Enum, IConvertible
+        public void RemoveEventListener<T>(T eventName, Action listener, object handle = null) where T : Enum, IConvertible
         {
-            Int16 tempName = Convert.ToInt16(eventName);
+            int tempName = (int)(object)eventName;
             if (events.ContainsKey(tempName))
             {
                 if (events[tempName].Count > 0)
                 {
-                    HashSet<object> ebs = events[tempName];
+                    HashSet<IEventDataBase> ebs = events[tempName];
                     if (ebs.Count < 0) {
                         return;
                     }
@@ -48,7 +48,7 @@ namespace F8Framework.Core
                     {
                         if (item is EventData<T> eb)
                         {
-                            MessageManager.Instance.RemoveEventListener(eventName, eb.Listener, eb.Object);
+                            MessageManager.Instance.RemoveEventListener(eventName, eb.Listener, eb.Handle);
                         }
                     }
                     events.Remove(tempName);
@@ -56,14 +56,14 @@ namespace F8Framework.Core
             }
         }
 
-        public void RemoveEventListener<T>(T eventName, Action<object[]> listener, object obj = null) where T : Enum, IConvertible
+        public void RemoveEventListener<T>(T eventName, Action<object[]> listener, object handle = null) where T : Enum, IConvertible
         {
-            Int16 tempName = Convert.ToInt16(eventName);
+            int tempName = (int)(object)eventName;
             if (events.ContainsKey(tempName))
             {
                 if (events[tempName].Count > 0)
                 {
-                    HashSet<object> ebs = events[tempName];
+                    HashSet<IEventDataBase> ebs = events[tempName];
                     if (ebs.Count < 0) {
                         return;
                     }
@@ -72,7 +72,7 @@ namespace F8Framework.Core
                     {
                         if (item is EventData<T,object[]> eb)
                         {
-                            MessageManager.Instance.RemoveEventListener(eventName, eb.Listener, eb.Object);
+                            MessageManager.Instance.RemoveEventListener(eventName, eb.Listener, eb.Handle);
                         }
                     }
                     events.Remove(tempName);
@@ -100,11 +100,11 @@ namespace F8Framework.Core
                     {
                         if (eventData is IEventData typedEventData)
                         {
-                            MessageManager.Instance.RemoveEventListener(typedEventData.GetEvent(), typedEventData.Listener,typedEventData.Object);
+                            MessageManager.Instance.RemoveEventListener(typedEventData.GetEvent(), typedEventData.Listener,typedEventData.Handle);
                         }
                         else if (eventData is IEventData<object[]> typedEventData1)
                         {
-                            MessageManager.Instance.RemoveEventListener(typedEventData1.GetEvent(), typedEventData1.Listener,typedEventData1.Object);
+                            MessageManager.Instance.RemoveEventListener(typedEventData1.GetEvent(), typedEventData1.Listener,typedEventData1.Handle);
                         }
                     }
                 }

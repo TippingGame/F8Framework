@@ -1,70 +1,84 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace F8Framework.Core
 {
     public class MessageManager : Singleton<MessageManager>,MessageInterface 
     {
-        private Dictionary<Int16, HashSet<object>> events = new Dictionary<Int16, HashSet<object>>();
-        private HashSet<object> delects = new HashSet<object>();
-        private void NotActionLog(string actionName)
+        private Dictionary<int, HashSet<IEventDataBase>> events = new Dictionary<int, HashSet<IEventDataBase>>();
+        private HashSet<IEventDataBase> delects = new HashSet<IEventDataBase>();
+        private List<IEventDataBase> callStack = new List<IEventDataBase>(); // 检测死循环调用
+        
+        private void MessageLoop(string debugInfo)
         {
-            LogF8.LogEvent("函数:【{0}】不存在",actionName);
+            LogF8.LogEvent("消息死循环:{0}",debugInfo);
         }
-        private void NotListenerLog(string actionName)
+        private void NotActionLog(string eventName, string actionName)
         {
-            LogF8.LogEvent("监听者:【{0}】不存在",actionName);
+            LogF8.LogEvent("函数不存在:【{0}】【{1}】",eventName,actionName);
+        }
+        private void NotListenerLog(string debugInfo)
+        {
+            LogF8.LogEvent("监听者不存在:【{0}】【{1}】",debugInfo);
         }
         private void NotEventLog(string eventName)
         {
-            LogF8.LogEvent("名为【{0}】的事件不存在",eventName);
+            LogF8.LogEvent("事件不存在:【{0}】",eventName);
         }
-        public void AddEventListener<T>(T eventName,  Action listener, object obj = null) where T : Enum, IConvertible
+        private void ClearCallStack()
         {
-            Int16 tempName = Convert.ToInt16(eventName);
+            callStack.Clear();
+        }
+
+        private bool IsInCallStack(IEventDataBase eventData)
+        {
+            return callStack.Contains(eventData);
+        }
+        public void AddEventListener<T>(T eventName,  Action listener, object handle = null) where T : Enum, IConvertible
+        {
+            int tempName = (int)(object)eventName;
             if (!events.ContainsKey(tempName))
             {
-                events[tempName] = new HashSet<object>();
+                events[tempName] = new HashSet<IEventDataBase>();
             }
-            EventData<T> eventData = new EventData<T>(eventName, listener, obj);
+            IEventDataBase eventData = new EventData<T>(eventName, listener, handle);
             events[tempName].Add(eventData);
         }
 
-        public void AddEventListener<T>(T eventName, Action<object[]> listener, object obj = null) where T : Enum, IConvertible
+        public void AddEventListener<T>(T eventName, Action<object[]> listener, object handle = null) where T : Enum, IConvertible
         {
-            Int16 tempName = Convert.ToInt16(eventName);
+            int tempName = (int)(object)eventName;
             if (!events.ContainsKey(tempName))
             {
-                events[tempName] = new HashSet<object>();
+                events[tempName] = new HashSet<IEventDataBase>();
             }
-            EventData<T,object[]> eventData = new EventData<T,object[]>(eventName, listener, obj);
+            IEventDataBase eventData = new EventData<T,object[]>(eventName, listener, handle);
             events[tempName].Add(eventData);
         }
         
-        public void RemoveEventListener<T>(T eventName, Action listener, object obj = null) where T : Enum, IConvertible
+        public void RemoveEventListener<T>(T eventName, Action listener, object handle = null) where T : Enum, IConvertible
         {
-            Int16 tempName = Convert.ToInt16(eventName);
+            int tempName = (int)(object)eventName;
             if (events.ContainsKey(tempName))
             {
                 if (events[tempName].Count == 0)
                 {
-                    NotActionLog(eventName.ToString());
+                    NotActionLog(eventName.ToString(), listener.Method.Name);
                 }
                 else
                 {
-                    foreach (object itemObj in events[tempName])
+                    foreach (IEventDataBase itemObj in events[tempName])
                     {
                         if (itemObj is EventData<T> eventData)
                         {
-                            if (eventData.Listener == listener && eventData.Object == obj)
+                            if (eventData.Listener == listener && eventData.Handle == handle)
                             {
-                                eventData.Object = null;
+                                eventData.Handle = null;
                                 delects.Add(eventData);
                             }
                         }
                     }
-
+                    
                     foreach (var delect in delects)
                     {
                         events[tempName].Remove(delect);
@@ -77,25 +91,25 @@ namespace F8Framework.Core
             }
         }
         
-        public void RemoveEventListener<T>(T eventName, Action<object[]> listener, object obj = null) where T : Enum, IConvertible
+        public void RemoveEventListener<T>(T eventName, Action<object[]> listener, object handle = null) where T : Enum, IConvertible
         {
-            Int16 tempName = Convert.ToInt16(eventName);
+            int tempName = (int)(object)eventName;
             if (events.ContainsKey(tempName))
             {
                 if (events[tempName].Count == 0)
                 {
-                    NotActionLog(eventName.ToString());
+                    NotActionLog(eventName.ToString(), listener.Method.Name);
                 }
                 else
                 {
-                    foreach (object itemObj in events[tempName])
+                    foreach (IEventDataBase itemObj in events[tempName])
                     {
                         if (itemObj is EventData<T,object[]> eventData)
                         {
-                            if (eventData.Listener == listener && eventData.Object == obj)
+                            if (eventData.Listener == listener && eventData.Handle == handle)
                             {
-                                eventData.Object = null;
-                                delects.Add(eventData);
+                                eventData.Handle = null;
+                                delects.Add(itemObj);
                             }
                         }
                     }
@@ -114,59 +128,75 @@ namespace F8Framework.Core
 
         public void DispatchEvent<T>(T eventName) where T : Enum, IConvertible
         {
-            Int16 tempName = Convert.ToInt16(eventName);
-            if (events.TryGetValue(tempName, out HashSet<object> eventDatas))
+            int tempName = (int)(object)eventName;
+            if (events.TryGetValue(tempName, out HashSet<IEventDataBase> eventDatas))
             {
-                foreach (object obj in eventDatas)
+                foreach (IEventDataBase obj in eventDatas)
                 {
+                    if (IsInCallStack(obj))
+                    {
+                        MessageLoop(obj.LogDebugInfo());
+                        continue;
+                    }
+                    callStack.Add(obj);
                     if (obj is EventData<T> eventData)
                     {
-                        if (eventData.Object == null || eventData.Object.Equals(null))
+                        if (eventData.Handle == null || eventData.Handle.Equals(null))
                         {
-                            NotListenerLog(eventData.Listener.GetMethodInfo().ToString());
+                            NotListenerLog(obj.LogDebugInfo());
                             continue;
                         }
                         eventData.Listener.Invoke();
                     }
                     else if (obj is EventData<T,object[]> eventData1)
                     {
-                        if (eventData1.Object == null || eventData1.Object.Equals(null))
+                        if (eventData1.Handle == null || eventData1.Handle.Equals(null))
                         {
-                            NotListenerLog(eventData1.Listener.GetMethodInfo().ToString());
+                            NotListenerLog(obj.LogDebugInfo());
                             continue;
                         }
                         eventData1.Listener.Invoke(null);
                     }
+                    callStack.Remove(obj);
                 }
+                ClearCallStack(); // 清除调用栈
             }
         }
 
         public void DispatchEvent<T>(T eventName, object[] arg1) where T : Enum, IConvertible
         {
-            Int16 tempName = Convert.ToInt16(eventName);
-            if (events.TryGetValue(tempName, out HashSet<object> eventDatas))
+            int tempName = (int)(object)eventName;
+            if (events.TryGetValue(tempName, out HashSet<IEventDataBase> eventDatas))
             {
-                foreach (object obj in eventDatas)
+                foreach (IEventDataBase obj in eventDatas)
                 {
+                    if (IsInCallStack(obj))
+                    {
+                        MessageLoop(obj.LogDebugInfo());
+                        continue;
+                    }
+                    callStack.Add(obj);
                     if (obj is EventData<T,object[]> eventData)
                     {
-                        if (eventData.Object == null || eventData.Object.Equals(null))
+                        if (eventData.Handle == null || eventData.Handle.Equals(null))
                         {
-                            NotListenerLog(eventData.Listener.GetMethodInfo().ToString());
+                            NotListenerLog(obj.LogDebugInfo());
                             continue;
                         }
                         eventData.Listener.Invoke(arg1);
                     }
                     else if (obj is EventData<T> eventData1)
                     {
-                        if (eventData1.Object == null || eventData1.Object.Equals(null))
+                        if (eventData1.Handle == null || eventData1.Handle.Equals(null))
                         {
-                            NotListenerLog(eventData1.Listener.GetMethodInfo().ToString());
+                            NotListenerLog(obj.LogDebugInfo());
                             continue;
                         }
                         eventData1.Listener.Invoke();
                     }
+                    callStack.Remove(obj);
                 }
+                ClearCallStack(); // 清除调用栈
             }
         }
 
@@ -174,6 +204,7 @@ namespace F8Framework.Core
         {
             events.Clear();
             delects.Clear();
+            callStack.Clear();
         }
     }
 }
