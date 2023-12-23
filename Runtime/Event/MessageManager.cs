@@ -7,7 +7,7 @@ namespace F8Framework.Core
     {
         private Dictionary<int, HashSet<IEventDataBase>> events = new Dictionary<int, HashSet<IEventDataBase>>();
         private HashSet<IEventDataBase> delects = new HashSet<IEventDataBase>();
-        private List<IEventDataBase> callStack = new List<IEventDataBase>(); // 检测死循环调用
+        private HashSet<IEventDataBase> callStack = new HashSet<IEventDataBase>(); // 检测死循环调用
         
         private void MessageLoop(string debugInfo)
         {
@@ -34,7 +34,7 @@ namespace F8Framework.Core
         {
             return callStack.Contains(eventData);
         }
-        public void AddEventListener<T>(T eventName,  Action listener, object handle = null) where T : Enum, IConvertible
+        public void AddEventListener<T>(T eventName,  Action listener, object handle) where T : Enum, IConvertible
         {
             int tempName = (int)(object)eventName;
             if (!events.ContainsKey(tempName))
@@ -45,7 +45,7 @@ namespace F8Framework.Core
             events[tempName].Add(eventData);
         }
 
-        public void AddEventListener<T>(T eventName, Action<object[]> listener, object handle = null) where T : Enum, IConvertible
+        public void AddEventListener<T>(T eventName, Action<object[]> listener, object handle) where T : Enum, IConvertible
         {
             int tempName = (int)(object)eventName;
             if (!events.ContainsKey(tempName))

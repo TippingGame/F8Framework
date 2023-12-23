@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System;
 using System.IO;
 using System.Text;
-using F8Framework.Core;
 
 namespace F8Framework.Core
 {
     public class F8LogHelper : SingletonMono<F8LogHelper>
     {
-        private static int MAX_LOG_FILE_CNT = 7;
-        private static float LOG_TIME = 0.5f;
+        private int MAX_LOG_FILE_CNT = 7;
+        private float LOG_TIME = 0.5f;
         private bool isEnableLog = false;
 
         struct log_info

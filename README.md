@@ -11,17 +11,19 @@
 系统支持：Win/Android/iOS/Mac/Linux  
 
 ## 文档快速预览 - 5分钟
-* [01_配置表：](https://github.com/TippingGame/F8ExcelTool.git)配置表模块文档。https://github.com/TippingGame/F8ExcelTool.git  
-* [02_资源加载：]待添加  
-* [03_UI界面管理：]待添加  
-* [04_热更新版本号管理：]待添加  
-* [05_日志管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Log/README.md)日志模块文档。[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Log/README.md)  
-* [06_声音管理：]待添加  
-* [07_事件管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Event/README.md)事件模块文档。[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Event/README.md)  
-* [08_实体组件：]待添加  
-* [09_网络连接与通信：]待添加  
-* [10_SDK接入：]待添加  
-* [11_时间管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Timer/README.md)时间模块文档。[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Timer/README.md)  
+### ----------可选功能----------  
+* [1.配置表：](https://github.com/TippingGame/F8ExcelTool.git)配置表模块文档。https://github.com/TippingGame/F8ExcelTool.git  
+* [2.资源加载：]待添加  
+* [3.热更新版本号管理：]待添加  
+### ----------核心功能----------
+* [1.UI界面管理：]待添加  
+* [2.日志管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Log/README.md)日志模块文档。[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Log/README.md)  
+* [3.声音管理：]待添加  
+* [4.事件管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Event/README.md)事件模块文档。[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Event/README.md)  
+* [5.实体组件：]待添加  
+* [6.网络连接与通信：]待添加  
+* [7.SDK接入：]待添加  
+* [8.时间管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Timer/README.md)时间模块文档。[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Timer/README.md)  
 
 ## 使用步骤
 

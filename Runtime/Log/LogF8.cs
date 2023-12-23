@@ -9,9 +9,9 @@ using Debug = UnityEngine.Debug;
 
 namespace F8Framework.Core
 {
-    public class LogF8
+    public static class LogF8
     {
-        static protected Stopwatch watch = new Stopwatch();
+        private static Stopwatch watch = new Stopwatch();
         private static WebClient m_webClient = new WebClient();
         private static List<string> m_errorList = new List<string>();
         private static bool m_canTakeError = true;
@@ -385,7 +385,7 @@ namespace F8Framework.Core
             }
         }
 
-        static void OnUploadStringCompleted(object sender, UploadStringCompletedEventArgs e)
+        private static void OnUploadStringCompleted(object sender, UploadStringCompletedEventArgs e)
         {
             m_canTakeError = true;
         }
