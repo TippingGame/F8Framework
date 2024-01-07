@@ -8,7 +8,7 @@ namespace F8Framework.Core
     {
         private Dictionary<string, AudioClip> _effects = new Dictionary<string, AudioClip>();
 
-        public bool Load(string url, Vector3 position, float volume = 1f, Action callback = null)
+        public void Load(string url, Vector3 position, float volume = 1f, Action callback = null)
         {
             if (_effects != null && _effects.ContainsKey(url))
             {
@@ -17,29 +17,23 @@ namespace F8Framework.Core
             }
             else
             {
-                AudioClip audioClip = Resources.Load<AudioClip>(url);
-                
-                if (audioClip == null)
+                AssetManager.Instance.LoadAsync<AudioClip>(url, (audioClip) =>
                 {
-                    LogF8.LogError("Failed to load AudioClip at path: " + url);
-                    return false;
-                }
-                
-                if (_effects != null && !_effects.ContainsKey(url))
-                {
-                    _effects.Add(url, audioClip);
-                    AudioSource.PlayClipAtPoint(audioClip, position, volume);
-                    callback?.Invoke();
-                }
+                    if (_effects != null && !_effects.ContainsKey(url))
+                    {
+                        _effects.Add(url, audioClip);
+                        AudioSource.PlayClipAtPoint(audioClip, position, volume);
+                        callback?.Invoke();
+                    }
+                });
             }
-            return true;
         }
 
         public void Release()
         {
             foreach (var item in _effects)
             {
-                Resources.UnloadAsset(item.Value);
+                AssetManager.Instance.Unload(item.Key);
             }
             _effects.Clear();
         }

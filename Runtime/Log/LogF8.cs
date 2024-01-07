@@ -126,7 +126,7 @@ namespace F8Framework.Core
                 return;
             }
             sb.Clear();
-            sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.green));
+            sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.magenta));
             sb.Append(DateTime.Now);
             sb.Append("[视图日志]");
             if (p != null && p.Length > 0)
@@ -144,7 +144,7 @@ namespace F8Framework.Core
                 return;
             }
             sb.Clear();
-            sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.green));
+            sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.magenta));
             sb.Append(DateTime.Now);
             sb.Append("[视图日志]");
             sb.Append(o);
@@ -213,6 +213,39 @@ namespace F8Framework.Core
             sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.white));
             sb.Append(DateTime.Now);
             sb.Append("[实体日志]");
+            sb.Append(o);
+            sb.Append("</color>");
+            Debug.Log(sb.ToString());
+        }
+        
+        public static void LogAsset(string s, params object[] p)
+        {
+            if (!EnableLog)
+            {
+                return;
+            }
+            sb.Clear();
+            sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.green));
+            sb.Append(DateTime.Now);
+            sb.Append("[资产日志]");
+            if (p != null && p.Length > 0)
+                sb.AppendFormat(s, p);
+            else
+                sb.Append(s);
+            sb.Append("</color>");
+            Debug.Log(sb.ToString());
+        }
+        
+        public static void LogAsset(object o)
+        {
+            if (!EnableLog)
+            {
+                return;
+            }
+            sb.Clear();
+            sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.green));
+            sb.Append(DateTime.Now);
+            sb.Append("[资产日志]");
             sb.Append(o);
             sb.Append("</color>");
             Debug.Log(sb.ToString());

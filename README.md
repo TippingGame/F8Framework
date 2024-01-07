@@ -10,20 +10,20 @@
 #### F8Framework是一个优雅的，符合直觉的Unity框架全平台解决方案，可根据自己需要选择组件，组件围绕F8一键启动。  
 系统支持：Win/Android/iOS/Mac/Linux  
 
-## 文档快速预览 - 5分钟
+## 文档快速预览 - 3分钟
 ### ----------可选功能----------  
 * [1.配置表：](https://github.com/TippingGame/F8ExcelTool.git)配置表模块文档。https://github.com/TippingGame/F8ExcelTool.git  
-* [2.资源加载：]待添加  
-* [3.热更新版本号管理：]待添加  
+* [2.热更新版本号管理：]待添加  
 ### ----------核心功能----------
-* [1.UI界面管理：]待添加  
-* [2.日志管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Log/README.md)日志模块文档。[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Log/README.md)  
-* [3.声音管理：]待添加  
-* [4.事件管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Event/README.md)事件模块文档。[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Event/README.md)  
-* [5.实体组件：]待添加  
-* [6.网络连接与通信：]待添加  
-* [7.SDK接入：]待添加  
-* [8.时间管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Timer/README.md)时间模块文档。[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Timer/README.md)  
+* [1.资源加载（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/AssetManager/README.md)资源模块文档。[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/AssetManager/README.md)  
+* [2.UI界面管理（内置）：]待添加  
+* [3.日志管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Log/README.md)日志模块文档。[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Log/README.md)  
+* [4.声音管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Audio/README.md)音频模块文档。[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Audio/README.md)  
+* [5.事件管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Event/README.md)事件模块文档。[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Event/README.md)  
+* [6.实体组件（内置）：]待添加  
+* [7.网络连接与通信（内置）：]待添加  
+* [8.SDK接入（内置）：]待添加  
+* [9.时间管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Timer/README.md)时间模块文档。[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Timer/README.md)  
 
 ## 使用步骤
 
@@ -42,3 +42,9 @@
 #### 网络问题
 
 若您的网络不佳，也可以下载核心包文件，直接修改 package.json 并放入 Packages 文件夹。
+
+## 新手指南
+
+* [游戏启动器：](https://github.com/TippingGame/F8Framework/blob/main/Runtime/Launcher/GameLauncher.cs)游戏启动器。[GameLauncher.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/Launcher/GameLauncher.cs)  
+* [模块自定义改名：](https://github.com/TippingGame/F8Framework/blob/main/Runtime/Launcher/FF8.cs)模块自定义改名。[FF8.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/Launcher/FF8.cs)  
+

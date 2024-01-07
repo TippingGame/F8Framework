@@ -35,6 +35,7 @@ namespace F8Framework.Core
                 Destroy(gameObject);
                 return;
             }
+            m_instace = this as T;
             DontDestroyOnLoad(gameObject);
             Init();
         }

@@ -13,7 +13,18 @@ namespace F8Framework.Core
             if (pIndex > pMax)
                 pIndex = pMin;
         }
-
+        
+        public static bool IsLegalURI(string uri)
+        {
+            return !string.IsNullOrEmpty(uri) && uri.Contains("://");
+        }
+        
+        public static bool IsLegalHTTPURI(string uri)
+        {
+            uri = uri.ToLower();
+            return !string.IsNullOrEmpty(uri) && (uri.StartsWith("http://") || uri.StartsWith("https://"));
+        }
+        
         public static string FormatToUnityPath(string path)
         {
             return path.Replace("\\", "/");

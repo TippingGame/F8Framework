@@ -5,12 +5,12 @@ namespace F8Framework.Core
     public class AudioMusic
     {
         // 背景音乐播放完成回调
-        public System.Action OnComplete { get; set; }
+        public System.Action OnComplete;
         private float _progress = 0;
         private string _url = null;
         private bool _isPlay = false;
-        public int Priority { get; set; }
-        public AudioSource MusicSource { get; set; }
+        public int Priority;
+        public AudioSource MusicSource;
 
         // 获取音乐播放进度
         public float Progress
@@ -31,31 +31,25 @@ namespace F8Framework.Core
         }
 
         // 加载音乐并播放
-        public bool Load(string url, System.Action callback = null)
+        public void Load(string url, System.Action callback = null)
         {
-            AudioClip audioClip = Resources.Load<AudioClip>(url);
-
-            if (audioClip == null)
+            AssetManager.Instance.LoadAsync<AudioClip>(url, (audioClip) =>
             {
-                LogF8.LogError("Failed to load AudioClip at path: " + url);
-                return false;
-            }
+                if (MusicSource.isPlaying)
+                {
+                    _isPlay = false;
+                    MusicSource.Stop();
+                    OnComplete?.Invoke();
+                }
 
-            if (MusicSource.isPlaying)
-            {
-                _isPlay = false;
-                MusicSource.Stop();
-                OnComplete?.Invoke();
-            }
+                MusicSource.clip = audioClip;
 
-            MusicSource.clip = audioClip;
+                OnComplete = callback;
 
-            OnComplete = callback;
-
-            MusicSource.Play();
-
-            _url = url;
-            return true;
+                MusicSource.Play();
+            
+                _url = url;
+            });
         }
 
         public void Tick()
@@ -76,7 +70,7 @@ namespace F8Framework.Core
         {
             if (!string.IsNullOrEmpty(_url))
             {
-                Resources.UnloadAsset(MusicSource.clip);
+                AssetManager.Instance.Unload(_url);
                 _url = null;
             }
         }

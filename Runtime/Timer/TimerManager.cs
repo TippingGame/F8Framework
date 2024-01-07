@@ -45,7 +45,7 @@ namespace F8Framework.Core
 
                 if (pair.Value.IsFrameTimer ? pair.Value.Update(frameTime) : pair.Value.Update(dt)) // 根据计时器类型更新计时器
                 {
-                    if (pair.Value.IsFinish || pair.Value.Obj == null || pair.Value.Obj.Equals(null)) // 若计时器已经完成，若对象为空，标记计时器为完成，并将其ID添加到待删除列表
+                    if (pair.Value.IsFinish || pair.Value.Handle == null || pair.Value.Handle.Equals(null)) // 若计时器已经完成，若对象为空，标记计时器为完成，并将其ID添加到待删除列表
                     {
                         deleteTimes.Add(pair.Key);
                         continue;
@@ -100,19 +100,19 @@ namespace F8Framework.Core
         }
 
         // 注册一个计时器并返回其ID
-        public string Register(object obj, float step = 1f, float delay = 0f, int field = 0, Action onSecond = null, Action onComplete = null)
+        public string Register(object handle, float step = 1f, float delay = 0f, int field = 0, Action onSecond = null, Action onComplete = null)
         {
             string id = Guid.NewGuid().ToString(); // 生成一个唯一的ID
-            Timer timer = new Timer(obj, id, step, delay, field, onSecond, onComplete, false); // 创建一个计时器对象
+            Timer timer = new Timer(handle, id, step, delay, field, onSecond, onComplete, false); // 创建一个计时器对象
             addTimes.Add(id, timer);
             return id;
         }
 
         // 注册一个以帧为单位的计时器并返回其ID
-        public string RegisterFrame(object obj, float step = 1f, float delay = 0f, int field = 0, Action onSecond = null, Action onComplete = null)
+        public string RegisterFrame(object handle, float step = 1f, float delay = 0f, int field = 0, Action onSecond = null, Action onComplete = null)
         {
             string id = Guid.NewGuid().ToString(); // 生成一个唯一的ID
-            Timer timer = new Timer(obj, id, step, delay, field, onSecond, onComplete, true); // 创建一个以帧为单位的计时器对象
+            Timer timer = new Timer(handle, id, step, delay, field, onSecond, onComplete, true); // 创建一个以帧为单位的计时器对象
             addTimes.Add(id, timer);
             return id;
         }
@@ -176,19 +176,19 @@ namespace F8Framework.Core
         }
 
         // 当应用程序获得或失去焦点时调用
-        void OnApplicationFocus(bool hasFocus)
-        {
-            if (hasFocus) // 如果应用程序获得焦点，重新开始所有计时器
-            {
-                Restart();
-                isFocus = true;
-            }
-            else // 如果应用程序失去焦点，暂停所有计时器
-            {
-                isFocus = false;
-                Pause();
-            }
-        }
+        // void OnApplicationFocus(bool hasFocus)
+        // {
+        //     if (hasFocus) // 如果应用程序获得焦点，重新开始所有计时器
+        //     {
+        //         Restart();
+        //         isFocus = true;
+        //     }
+        //     else // 如果应用程序失去焦点，暂停所有计时器
+        //     {
+        //         isFocus = false;
+        //         Pause();
+        //     }
+        // }
 
         // 重新启动所有计时器
         public void Restart()

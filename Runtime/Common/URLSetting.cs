@@ -1,9 +1,45 @@
-﻿using UnityEngine;
+﻿using System.IO;
+using UnityEngine;
 
 namespace F8Framework.Core
 {
     public class URLSetting
     {
+            public static string REMOTE_ADDRESS = "http://127.0.0.1:6789/remote"; //不为空就会优先加载远程资源
+            
+            public const string AssetBundlesName = "AssetBundles";  // AB包名
+            public const string AssetBundlesPath = "Assets/AssetBundles/"; // 打包AB包根路径
+            public const string ResourcesPath = "Resources/"; // Resources根路径
+            
+            public static string GetAssetBundlesFolder()
+            {
+                    return Application.dataPath + "/" + AssetBundlesName;
+            }
+            
+            public static string GetAssetBundlesOutPath()
+            {
+                    return Application.dataPath + "/StreamingAssets/" + AssetBundlesName + "/" + GetPlatformName();
+            }
+            
+            public static string GetPlatformName()
+            {
+ 
+#if UNITY_STANDALONE_WIN
+                string strReturenPlatformName = "Windows";
+#elif UNITY_STANDALONE_OSX
+                string strReturenPlatformName = "macOS";
+#elif UNITY_STANDALONE_LINUX
+                string strReturenPlatformName = "Linux";
+#elif UNITY_IPHONE
+                string strReturenPlatformName = "iOS";
+#elif UNITY_ANDROID
+                string strReturenPlatformName = "Android";
+#else
+                string strReturenPlatformName = "Unknown";
+#endif
+                    return strReturenPlatformName;
+            }
+            
         //读取资源的路径
 #if UNITY_EDITOR || UNITY_STANDALONE
         public static string STREAMINGASSETS_URL = "file://" + Application.streamingAssetsPath + "/";
@@ -11,6 +47,8 @@ namespace F8Framework.Core
         //public static string STREAMINGASSETS_URL = "jar:file://" + Application.dataPath + "!/assets/";
         public static string STREAMINGASSETS_URL = Application.streamingAssetsPath + "/";
 #elif UNITY_IPHONE || UNITY_IOS
+        public static string STREAMINGASSETS_URL = "file://" + Application.streamingAssetsPath + "/";
+#else
         public static string STREAMINGASSETS_URL = "file://" + Application.streamingAssetsPath + "/";
 #endif
 
@@ -21,13 +59,18 @@ namespace F8Framework.Core
         public static string CS_STREAMINGASSETS_URL = "null";
 #elif UNITY_IPHONE || UNITY_IOS
         public static string CS_STREAMINGASSETS_URL = Application.streamingAssetsPath + "/";
+#else
+        public static string CS_STREAMINGASSETS_URL = Application.streamingAssetsPath + "/";
 #endif
+            
         //上报错误地址
 #if UNITY_EDITOR || UNITY_STANDALONE
         public static string REPORT_ERROR_URL = "";
 #elif UNITY_ANDROID
         public static string REPORT_ERROR_URL = "";
 #elif UNITY_IPHONE || UNITY_IOS
+        public static string REPORT_ERROR_URL = "";
+#else
         public static string REPORT_ERROR_URL = "";
 #endif   
             

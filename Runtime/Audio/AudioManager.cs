@@ -83,23 +83,19 @@ namespace F8Framework.Core
         }
 
         // 播放背景音乐
-        public AudioMusic PlayMusic(string assetName, Action callback = null, bool loop = false, int priority = 0)
+        public void PlayMusic(string assetName, Action callback = null, bool loop = false, int priority = 0)
         {
             if (!_switchMusic)
             {
-                return null;
+                return;
             }
             if (priority < _audioMusic.Priority)
             {
-                return null;
+                return;
             }
-            if (_audioMusic.Load(assetName, callback))
-            {
-                _audioMusic.MusicSource.loop = loop;
-                _audioMusic.Priority = priority;
-                return _audioMusic;
-            }
-            return null;
+            _audioMusic.Load(assetName, callback);
+            _audioMusic.MusicSource.loop = loop;
+            _audioMusic.Priority = priority;
         }
         
         // 设置背景乐播放进度
@@ -153,23 +149,19 @@ namespace F8Framework.Core
         }
 
         // 播放人声
-        public AudioMusic PlayVoice(string assetName, Action callback = null, bool loop = false, int priority = 0)
+        public void PlayVoice(string assetName, Action callback = null, bool loop = false, int priority = 0)
         {
             if (!_switchVoice)
             {
-                return null;
+                return;
             }
             if (priority < _audioMusicVoice.Priority)
             {
-                return null;
+                return;
             }
-            if (_audioMusicVoice.Load(assetName, callback))
-            {
-                _audioMusicVoice.MusicSource.loop = loop;
-                _audioMusicVoice.Priority = priority;
-                return _audioMusicVoice;
-            }
-            return null;
+            _audioMusicVoice.Load(assetName, callback);
+            _audioMusicVoice.MusicSource.loop = loop;
+            _audioMusicVoice.Priority = priority;
         }
         
         // 设置人声播放进度
@@ -260,23 +252,19 @@ namespace F8Framework.Core
         }
 
         // 播放按钮音效
-        public AudioMusic PlayBtnClick(string assetName, Action callback = null, bool loop = false, int priority = 0)
+        public void PlayBtnClick(string assetName, Action callback = null, bool loop = false, int priority = 0)
         {
             if (!_switchAudioEffect)
             {
-                return null;
+                return;
             }
             if (priority < _audioMusicBtnClick.Priority)
             {
-                return null;
+                return;
             }
-            if (_audioMusicBtnClick.Load(assetName, callback))
-            {
-                _audioMusicBtnClick.MusicSource.loop = loop;
-                _audioMusicBtnClick.Priority = priority;
-                return _audioMusicBtnClick;
-            }
-            return null;
+            _audioMusicBtnClick.Load(assetName, callback);
+            _audioMusicBtnClick.MusicSource.loop = loop;
+            _audioMusicBtnClick.Priority = priority;
         }
         
         /*----------UI音效特效----------*/
@@ -288,23 +276,19 @@ namespace F8Framework.Core
         }
 
         // 播放UI音效
-        public AudioMusic PlayUISound(string assetName, Action callback = null, bool loop = false, int priority = 0)
+        public void PlayUISound(string assetName, Action callback = null, bool loop = false, int priority = 0)
         {
             if (!_switchAudioEffect)
             {
-                return null;
+                return;
             }
             if (priority < _audioMusicUISound.Priority)
             {
-                return null;
+                return;
             }
-            if (_audioMusicUISound.Load(assetName, callback))
-            {
-                _audioMusicUISound.MusicSource.loop = loop;
-                _audioMusicUISound.Priority = priority;
-                return _audioMusicUISound;
-            }
-            return null;
+            _audioMusicUISound.Load(assetName, callback);
+            _audioMusicUISound.MusicSource.loop = loop;
+            _audioMusicUISound.Priority = priority;
         }
         
         /*----------3D音效特效----------*/
