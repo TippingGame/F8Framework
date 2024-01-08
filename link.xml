@@ -2,4 +2,5 @@
 <linker>
   <assembly fullname="Assembly-CSharp" preserve="all" />
     <assembly fullname="F8Framework.Core" preserve="all" />
+      <assembly fullname="F8Framework.AssetMap" preserve="all" />
 </linker>

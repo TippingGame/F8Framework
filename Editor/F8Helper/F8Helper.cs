@@ -20,7 +20,7 @@ namespace F8Framework.Core.Editor
         [MenuItem("开发工具/打包AssetBundles目录资源-F8", false, 102)]
         public static void BuildAssetBundles()
         {
-            FileTools.SafeDeleteDir(FileTools.FormatToUnityPath(TruncatePath(GetScriptPath(), 3)) + "/AssetMap");
+            FileTools.SafeDeleteDir(FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/AssetMap");
             LogF8.LogAsset("生成AssetBundleMap.cs，生成ResourceMap.cs，生成F8Framework.AssetMap.asmdef");
             ABBuildTool.GenerateAssetNames();
             ABBuildTool.GenerateResourceNames();
@@ -43,23 +43,7 @@ namespace F8Framework.Core.Editor
 
             return scriptPath;
         }
-        
-        private static string TruncatePath(string fullPath, int levels)
-        {
-            // 获取规范化的路径
-            string normalizedPath = Path.GetFullPath(fullPath);
 
-            // 从路径的末尾向前截取指定级别的目录
-            for (int i = 0; i < levels; i++)
-            {
-                normalizedPath = Path.GetDirectoryName(normalizedPath);
-                if (string.IsNullOrEmpty(normalizedPath))
-                    break;
-            }
-
-            return normalizedPath;
-        }
-        
         [InitializeOnLoadMethod]
         private static void ProjectKeyDownSpace()
         {

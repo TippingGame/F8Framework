@@ -2,7 +2,7 @@
     "name": "F8Framework.Core.Editor",
     "rootNamespace": "",
     "references": [
-        "GUID:f774ecce4920052458871f649ea9fc50"
+        "F8Framework.Core"
     ],
     "includePlatforms": [
         "Editor"

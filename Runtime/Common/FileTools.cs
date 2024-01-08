@@ -14,6 +14,22 @@ namespace F8Framework.Core
                 pIndex = pMin;
         }
         
+        public static string TruncatePath(string fullPath, int levels)
+        {
+            // 获取规范化的路径
+            string normalizedPath = Path.GetFullPath(fullPath);
+
+            // 从路径的末尾向前截取指定级别的目录
+            for (int i = 0; i < levels; i++)
+            {
+                normalizedPath = Path.GetDirectoryName(normalizedPath);
+                if (string.IsNullOrEmpty(normalizedPath))
+                    break;
+            }
+
+            return normalizedPath;
+        }
+        
         public static bool IsLegalURI(string uri)
         {
             return !string.IsNullOrEmpty(uri) && uri.Contains("://");
