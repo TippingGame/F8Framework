@@ -19,18 +19,24 @@ namespace F8Framework.Core
         /// 如果重复加载资产，则将直接从资源池中提供。
         /// </summary>
         /// <param name="assetName">资产名称。</param>
-        /// <param name="assetBundlePath">资产捆绑包的路径。</param>
+        /// <param name="info">资产信息。</param>
         /// <param name="preloadAssets">
         /// 如果设置为true，则将预加载所有资产对象，
         /// 否则将不会预加载任何资产对象。
         /// </param>
         /// <returns>要完成扩展的对象列表。</returns>
-        public AssetBundle Load(string assetName, string assetBundlePath, bool preloadAssets = true)
+        public AssetBundle Load(string assetName, AssetManager.AssetInfo info, bool preloadAssets = true)
         {
             AssetBundle result;
 
-            List<string> bundleNames = new List<string>(GetDependenciedAssetBundles(assetBundlePath));
-            bundleNames.Add(assetBundlePath);
+            List<string> bundleNames = new List<string>(GetDependenciedAssetBundles(info.AbName));
+            
+            for (int i = 0; i < bundleNames.Count; i++)
+            {
+                bundleNames[i] = info.AssetBundlePathWithoutAb + bundleNames[i];
+            }
+
+            bundleNames.Add(info.AssetBundlePath);
 
             foreach (string name in bundleNames)
             {
@@ -38,13 +44,13 @@ namespace F8Framework.Core
                 if (assetBundleLoaders.ContainsKey(name))
                 {
                     loader = assetBundleLoaders[name];
-                    loader.AddParentBundle(assetBundlePath);
+                    loader.AddParentBundle(info.AssetBundlePath);
                 }
                 else
                 {
                     loader = new AssetBundleLoader();
                     loader.Init(assetName, name);
-                    loader.AddParentBundle(assetBundlePath);
+                    loader.AddParentBundle(info.AssetBundlePath);
 
                     assetBundleLoaders.Add(name, loader);
                 }
@@ -54,7 +60,7 @@ namespace F8Framework.Core
                     loader.Expand();
             }
 
-            result = GetAssetBundle(assetBundlePath);
+            result = GetAssetBundle(info.AssetBundlePath);
             return result;
         }
 
@@ -63,7 +69,7 @@ namespace F8Framework.Core
         /// 如果重复加载资产，则将直接从资源池中提供。
         /// </summary>
         /// <param name="assetName">资产名称。</param>
-        /// <param name="assetBundlePath">资产捆绑包的路径。</param>
+        /// <param name="info">资产信息。</param>
         /// <param name="preloadAssets">
         /// 如果设置为true，则将预加载所有资产对象，
         /// 否则将不会预加载任何资产对象。
@@ -71,47 +77,55 @@ namespace F8Framework.Core
         /// <param name="loadCallback">异步加载完成的回调。</param>
         public void LoadAsync(
             string assetName,
-            string assetBundlePath,
+            AssetManager.AssetInfo info,
             bool preloadAssets = true,
             AssetBundleLoader.OnLoadFinished loadCallback = null)
         {
-            List<string> bundleNames = new List<string>(GetDependenciedAssetBundles(assetBundlePath));
-            bundleNames.Add(assetBundlePath);
-            int loadedCount = 0;
+            List<string> bundleNames = new List<string>(GetDependenciedAssetBundles(info.AbName));
 
+            for (int i = 0; i < bundleNames.Count; i++)
+            {
+                bundleNames[i] = info.AssetBundlePathWithoutAb + bundleNames[i];
+            }
+            AssetBundleLoader lastLoader = null;
+            bundleNames.Add(info.AssetBundlePath);
+            int loadedCount = 0;
             foreach (string name in bundleNames)
             {
                 AssetBundleLoader loader;
                 if (assetBundleLoaders.ContainsKey(name))
                 {
                     loader = assetBundleLoaders[name];
-                    loader.AddParentBundle(assetBundlePath);
+                    loader.AddParentBundle(info.AssetBundlePath);
                 }
                 else
                 {
                     loader = new AssetBundleLoader();
                     loader.Init(assetName, name);
-                    loader.AddParentBundle(assetBundlePath);
+                    loader.AddParentBundle(info.AssetBundlePath);
 
                     assetBundleLoaders.Add(name, loader);
                 }
-
+                lastLoader = loader; // 更新最后一个 loader
                 loader.LoadAsync(
                     (ab) => {
                         ++loadedCount;
                         if (loadedCount == bundleNames.Count)
                         {
+                            // 所有依赖项加载完成后，加载主资源
                             if (preloadAssets)
                             {
-                                loader.ExpandAsync(() => {
+                                lastLoader.ExpandAsync(() => {
+                                    // 主资源加载完成后，如果需要展开，则在展开完成后回调
                                     if (loadCallback != null)
-                                        loadCallback(GetAssetBundle(assetBundlePath));
+                                        loadCallback(GetAssetBundle(info.AssetBundlePath));
                                 });
                             }
                             else
                             {
+                                // 如果不需要展开，则直接回调
                                 if (loadCallback != null)
-                                    loadCallback(GetAssetBundle(assetBundlePath));
+                                    loadCallback(GetAssetBundle(info.AssetBundlePath));
                             }
                         }
                     }
@@ -774,7 +788,7 @@ namespace F8Framework.Core
             return allLoaderFinished;
         }
 
-        public static string GetAssetBundleCompletePath(string regPath)
+        public static string GetAssetBundleCompletePath(string regPath = "")
         {
             string persistentABFullPath
                 = AssetBundleHelper.GetAssetBundleFullName(regPath, AssetBundleHelper.SourceType.PERSISTENT_DATA_PATH);
@@ -785,7 +799,7 @@ namespace F8Framework.Core
                 return AssetBundleHelper.GetAssetBundleFullName(regPath, AssetBundleHelper.SourceType.STREAMING_ASSETS);
         }
         
-        public static string GetRemoteAssetBundleCompletePath(string regPath)
+        public static string GetRemoteAssetBundleCompletePath(string regPath = "")
         {
             if (!string.IsNullOrEmpty(URLSetting.REMOTE_ADDRESS))
             {
@@ -804,7 +818,6 @@ namespace F8Framework.Core
         {
             if (manifest == null)
                 return new string[] {};
-
             return manifest.GetAllDependencies(assetBundlePath);
         }
 

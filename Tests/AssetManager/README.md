@@ -24,8 +24,6 @@ Unity F8AssetManager资产加载组件，自动区分不同平台，同步/异�
 
 ### 代码使用方法
 ```C#
-    void Start()
-    {
         //同步加载资产，自动判断是Resources资产还是AssetBundle资产
         GameObject go = AssetManager.Instance.Load<GameObject>("Cube");
         GameObject go2 = AssetManager.Instance.Load("Cube")as GameObject;
@@ -64,7 +62,6 @@ Unity F8AssetManager资产加载组件，自动区分不同平台，同步/异�
         {
             //卸载资产完成
         });
-    }
 ```
 
 

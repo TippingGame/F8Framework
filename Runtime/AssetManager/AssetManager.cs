@@ -15,21 +15,30 @@ namespace F8Framework.Core
         {
             //目标资产类型
             public readonly AssetTypeEnum AssetType;
-
+            
             //直接资产请求路径相对路径，Assets开头的
             public readonly string AssetPath;
-
+            
             //直接资产捆绑请求路径（仅适用于资产捆绑类型），完全路径
             public readonly string AssetBundlePath;
+            
+            //AB名
+            public readonly string AbName;
+            
+            //AB资产路径不包含AB名
+            public readonly string AssetBundlePathWithoutAb;
             
             public AssetInfo(
                 AssetTypeEnum assetType,
                 string assetPath,
-                string assetBundlePath)
+                string assetBundlePathWithoutAb,
+                string abName)
             {
                 AssetType = assetType;
                 AssetPath = assetPath;
-                AssetBundlePath = assetBundlePath;
+                AssetBundlePath = assetBundlePathWithoutAb + abName;
+                AbName = abName;
+                AssetBundlePathWithoutAb = assetBundlePathWithoutAb;
             }
 
             //如果信息合法，则该值为真
@@ -74,35 +83,35 @@ namespace F8Framework.Core
             /// <summary>
             /// 根据提供的资产路径和访问选项推断资产类型。
             /// </summary>
-            /// <param name="assetPath">资产路径字符串。</param>
+            /// <param name="assetName">资产路径字符串。</param>
             /// <param name="accessMode">访问模式。</param>
             /// <returns>资产信息。</returns>
-            public AssetInfo GetAssetInfo(string assetPath,
+            public AssetInfo GetAssetInfo(string assetName,
                 AssetAccessMode accessMode = AssetAccessMode.UNKNOWN)
             {
                 if (accessMode.HasFlag(AssetAccessMode.RESOURCE))
                 {
-                    return GetAssetInfoFromResource(assetPath);
+                    return GetAssetInfoFromResource(assetName);
                 }
                 else if (accessMode.HasFlag(AssetAccessMode.ASSET_BUNDLE))
                 {
-                    return GetAssetInfoFromAssetBundle(assetPath);
+                    return GetAssetInfoFromAssetBundle(assetName);
                 }
                 else if (accessMode.HasFlag(AssetAccessMode.UNKNOWN))
                 {
-                    AssetInfo r = GetAssetInfoFromAssetBundle(assetPath);
+                    AssetInfo r = GetAssetInfoFromAssetBundle(assetName);
                     if (r != null && r.IsLegal)
                         return r;
                     else
-                        return GetAssetInfoFromResource(assetPath);
+                        return GetAssetInfoFromResource(assetName);
                 }
                 else if (accessMode.HasFlag(AssetAccessMode.REMOTE_ASSET_BUNDLE))
                 {
-                    AssetInfo r = GetAssetInfoFromAssetBundle(assetPath, true);
+                    AssetInfo r = GetAssetInfoFromAssetBundle(assetName, true);
                     if (r != null && r.IsLegal)
                         return r;
                     else
-                        return GetAssetInfoFromAssetBundle(assetPath);
+                        return GetAssetInfoFromAssetBundle(assetName);
                 }
                 return null;
             }
@@ -139,7 +148,7 @@ namespace F8Framework.Core
                     if (ab == null ||
                         ab.AssetBundleContent == null)
                     {
-                        AssetBundleManager.Instance.Load(assetName, info.AssetBundlePath, true);
+                        AssetBundleManager.Instance.Load(assetName, info, true);
                         ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePath);
                     }
                 
@@ -188,7 +197,7 @@ namespace F8Framework.Core
                     if (ab == null ||
                         ab.AssetBundleContent == null)
                     {
-                        AssetBundleManager.Instance.Load(assetName, info.AssetBundlePath, true);
+                        AssetBundleManager.Instance.Load(assetName, info, true);
                         ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePath);
                     }
             
@@ -235,7 +244,7 @@ namespace F8Framework.Core
                     if (ab == null ||
                         ab.AssetBundleContent == null)
                     {
-                        AssetBundleManager.Instance.Load(assetName, info.AssetBundlePath, true);
+                        AssetBundleManager.Instance.Load(assetName, info, true);
                         ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePath);
                     }
             
@@ -256,16 +265,16 @@ namespace F8Framework.Core
             /// 异步加载资产对象。
             /// </summary>
             /// <typeparam name="T">目标资产类型。</typeparam>
-            /// <param name="assetPath">资产路径字符串。</param>
+            /// <param name="assetName">资产路径字符串。</param>
             /// <param name="callback">异步加载完成时的回调函数。</param>
             /// <param name="mode">访问模式。</param>
             public void LoadAsync<T>(
-                string assetPath,
+                string assetName,
                 OnAssetObject<T> callback = null,
                 AssetAccessMode mode = AssetAccessMode.UNKNOWN)
                 where T : Object
             {
-                AssetInfo info = GetAssetInfo(assetPath, mode);
+                AssetInfo info = GetAssetInfo(assetName, mode);
                 if (info == null || !info.IsLegal)
                 {
                     End();
@@ -288,7 +297,7 @@ namespace F8Framework.Core
                     if (ab == null ||
                         ab.AssetBundleContent == null)
                     {
-                        AssetBundleManager.Instance.LoadAsync(assetPath, info.AssetBundlePath, true, (b) => {
+                        AssetBundleManager.Instance.LoadAsync(assetName, info, true, (b) => {
                             End(AssetBundleManager.Instance.GetAssetObject<T>(info.AssetPath));
                         });
                         return;
@@ -311,21 +320,21 @@ namespace F8Framework.Core
                     callback?.Invoke(o);
                 }
             }
-
+            
             /// <summary>
             /// 异步加载资产对象。
             /// </summary>
-            /// <param name="assetPath">资产路径字符串。</param>
+            /// <param name="assetName">资产路径字符串。</param>
             /// <param name="assetType">目标资产类型。</param>
             /// <param name="callback">异步加载完成时的回调函数。</param>
             /// <param name="mode">访问模式。</param>
             public void LoadAsync(
-                string assetPath,
+                string assetName,
                 System.Type assetType,
                 OnAssetObject<Object> callback = null,
                 AssetAccessMode mode = AssetAccessMode.UNKNOWN)
             {
-                AssetInfo info = GetAssetInfo(assetPath, mode);
+                AssetInfo info = GetAssetInfo(assetName, mode);
                 if (info == null || !info.IsLegal)
                 {
                     End();
@@ -348,7 +357,7 @@ namespace F8Framework.Core
                     if (ab == null ||
                         ab.AssetBundleContent == null)
                     {
-                        AssetBundleManager.Instance.LoadAsync(assetPath, info.AssetBundlePath, true, (b) => {
+                        AssetBundleManager.Instance.LoadAsync(assetName, info, true, (b) => {
                             End(AssetBundleManager.Instance.GetAssetObject(info.AssetPath, assetType));
                         });
                         return;
@@ -376,15 +385,15 @@ namespace F8Framework.Core
             /// <summary>
             /// 异步加载资产对象。
             /// </summary>
-            /// <param name="assetPath">资产路径字符串。</param>
+            /// <param name="assetName">资产路径字符串。</param>
             /// <param name="callback">异步加载完成时的回调函数。</param>
             /// <param name="mode">访问模式。</param>
             public void LoadAsync(
-                string assetPath,
+                string assetName,
                 OnAssetObject<Object> callback = null,
                 AssetAccessMode mode = AssetAccessMode.UNKNOWN)
             {
-                AssetInfo info = GetAssetInfo(assetPath, mode);
+                AssetInfo info = GetAssetInfo(assetName, mode);
                 if (info == null || !info.IsLegal)
                 {
                     End();
@@ -407,7 +416,7 @@ namespace F8Framework.Core
                     if (ab == null ||
                         ab.AssetBundleContent == null)
                     {
-                        AssetBundleManager.Instance.LoadAsync(assetPath, info.AssetBundlePath, true, (b) => {
+                        AssetBundleManager.Instance.LoadAsync(assetName, info, true, (b) => {
                             End(AssetBundleManager.Instance.GetAssetObject(info.AssetPath));
                         });
                         return;
@@ -437,7 +446,7 @@ namespace F8Framework.Core
             {
                 if (ResourceMap.Mappings.TryGetValue(path, out string value))
                 {
-                    return new AssetInfo(AssetTypeEnum.RESOURCE, value, null);
+                    return new AssetInfo(AssetTypeEnum.RESOURCE, value, null, null);
                 }
                 return null;
             }
@@ -448,11 +457,11 @@ namespace F8Framework.Core
                 {
                     if (remote)
                     {
-                        return new AssetInfo(AssetTypeEnum.ASSET_BUNDLE, assetmpping.AssetPath, AssetBundleManager.GetRemoteAssetBundleCompletePath(assetmpping.AbName));
+                        return new AssetInfo(AssetTypeEnum.ASSET_BUNDLE, assetmpping.AssetPath, AssetBundleManager.GetRemoteAssetBundleCompletePath(), assetmpping.AbName);
                     }
                     else
                     {
-                        return new AssetInfo(AssetTypeEnum.ASSET_BUNDLE, assetmpping.AssetPath, AssetBundleManager.GetAssetBundleCompletePath(assetmpping.AbName));
+                        return new AssetInfo(AssetTypeEnum.ASSET_BUNDLE, assetmpping.AssetPath, AssetBundleManager.GetAssetBundleCompletePath(), assetmpping.AbName);
                     }
                 }
                 return null;

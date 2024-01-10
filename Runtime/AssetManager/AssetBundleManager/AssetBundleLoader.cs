@@ -10,7 +10,7 @@ namespace F8Framework.Core
     /// </summary>
     public class AssetBundleLoader
     {
-        private string assetBundlePath = "";
+        public string assetBundlePath = "";
         private string assetName = "";
         private List<string> assetPaths = new List<string>();
         private AssetBundle assetBundleContent;
@@ -522,15 +522,6 @@ namespace F8Framework.Core
                         if (assetBundleUnloadRequest != null)
                         {
                             if (assetBundleUnloadRequest.isDone)
-                            {
-                                assetBundleUnloadState = LoaderState.FINISHED;
-                            }
-                        }
-                        break;
-                    case LoaderType.REMOTE_ASYNC:
-                        if (assetBundleDownloadRequest != null)
-                        {
-                            if (assetBundleDownloadRequest.IsFinished)
                             {
                                 assetBundleUnloadState = LoaderState.FINISHED;
                             }

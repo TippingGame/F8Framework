@@ -18,23 +18,32 @@ namespace F8Framework.Core
         private static bool m_isInit = false;
         private static int counter = 0;
         private static StringBuilder sb = new StringBuilder();
-        public static bool EnableLog = true;
+        
+        public static void EnabledLog()
+        {
+            UnityEngine.Debug.unityLogger.logEnabled = true;
+            Debug.unityLogger.filterLogType = LogType.Error | LogType.Assert | LogType.Warning | LogType.Log | LogType.Exception;
+        }
+
+        public static void DisableLog()
+        {
+            UnityEngine.Debug.unityLogger.logEnabled = false;
+            Debug.unityLogger.filterLogType = LogType.Error;
+        }
         
         public static void GetCrashErrorMessage()
         {
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         }
+        
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             string traceInfo = new StackTrace((Exception)(e.ExceptionObject)).ToString();
             AddError(traceInfo);
         }
+        
         public static void Log(string s, params object[] p)
         {
-            if (!EnableLog)
-            {
-                return;
-            }
             sb.Clear();
             if (p != null && p.Length > 0)
                 sb.AppendFormat(s, p);
@@ -46,258 +55,190 @@ namespace F8Framework.Core
         
         public static void Log(object o)
         {
-            if (!EnableLog)
-            {
-                return;
-            }
             Debug.Log(o);
         }
 
         public static void LogNet(string s, params object[] p)
         {
-            if (!EnableLog)
-            {
-                return;
-            }
             sb.Clear();
             sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.yellow));
             sb.Append(DateTime.Now);
             sb.Append("[网络日志]");
+            sb.Append("</color>");
             if (p != null && p.Length > 0)
                 sb.AppendFormat(s, p);
             else
                 sb.Append(s);
-            sb.Append("</color>");
             Debug.Log(sb.ToString());
         }
         
         public static void LogNet(object o)
         {
-            if (!EnableLog)
-            {
-                return;
-            }
             sb.Clear();
             sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.yellow));
             sb.Append(DateTime.Now);
             sb.Append("[网络日志]");
-            sb.Append(o);
             sb.Append("</color>");
+            sb.Append(o);
             Debug.Log(sb.ToString());
         }
         
         public static void LogConfig(string s, params object[] p)
         {
-            if (!EnableLog)
-            {
-                return;
-            }
             sb.Clear();
             sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.grey));
             sb.Append(DateTime.Now);
             sb.Append("[配置日志]");
+            sb.Append("</color>");
             if (p != null && p.Length > 0)
                 sb.AppendFormat(s, p);
             else
                 sb.Append(s);
-            sb.Append("</color>");
             Debug.Log(sb.ToString());
         }
         
         public static void LogConfig(object o)
         {
-            if (!EnableLog)
-            {
-                return;
-            }
             sb.Clear();
             sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.grey));
             sb.Append(DateTime.Now);
             sb.Append("[配置日志]");
-            sb.Append(o);
             sb.Append("</color>");
+            sb.Append(o);
             Debug.Log(sb.ToString());
         }
         
         public static void LogView(string s, params object[] p)
         {
-            if (!EnableLog)
-            {
-                return;
-            }
             sb.Clear();
             sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.magenta));
             sb.Append(DateTime.Now);
             sb.Append("[视图日志]");
+            sb.Append("</color>");
             if (p != null && p.Length > 0)
                 sb.AppendFormat(s, p);
             else
                 sb.Append(s);
-            sb.Append("</color>");
             Debug.Log(sb.ToString());
         }
         
         public static void LogView(object o)
         {
-            if (!EnableLog)
-            {
-                return;
-            }
             sb.Clear();
             sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.magenta));
             sb.Append(DateTime.Now);
             sb.Append("[视图日志]");
-            sb.Append(o);
             sb.Append("</color>");
+            sb.Append(o);
             Debug.Log(sb.ToString());
         }
         
         public static void LogEvent(string s, params object[] p)
         {
-            if (!EnableLog)
-            {
-                return;
-            }
             sb.Clear();
             sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.cyan));
             sb.Append(DateTime.Now);
             sb.Append("[事件日志]");
+            sb.Append("</color>");
             if (p != null && p.Length > 0)
                 sb.AppendFormat(s, p);
             else
                 sb.Append(s);
-            sb.Append("</color>");
             Debug.Log(sb.ToString());
         }
         
         public static void LogEvent(object o)
         {
-            if (!EnableLog)
-            {
-                return;
-            }
             sb.Clear();
             sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.cyan));
             sb.Append(DateTime.Now);
             sb.Append("[事件日志]");
-            sb.Append(o);
             sb.Append("</color>");
+            sb.Append(o);
             Debug.Log(sb.ToString());
         }
 
         public static void LogEntity(string s, params object[] p)
         {
-            if (!EnableLog)
-            {
-                return;
-            }
             sb.Clear();
             sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.white));
             sb.Append(DateTime.Now);
             sb.Append("[实体日志]");
+            sb.Append("</color>");
             if (p != null && p.Length > 0)
                 sb.AppendFormat(s, p);
             else
                 sb.Append(s);
-            sb.Append("</color>");
             Debug.Log(sb.ToString());
         }
         
         public static void LogEntity(object o)
         {
-            if (!EnableLog)
-            {
-                return;
-            }
             sb.Clear();
             sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.white));
             sb.Append(DateTime.Now);
             sb.Append("[实体日志]");
-            sb.Append(o);
             sb.Append("</color>");
+            sb.Append(o);
             Debug.Log(sb.ToString());
         }
         
         public static void LogAsset(string s, params object[] p)
         {
-            if (!EnableLog)
-            {
-                return;
-            }
             sb.Clear();
             sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.green));
             sb.Append(DateTime.Now);
             sb.Append("[资产日志]");
+            sb.Append("</color>");
             if (p != null && p.Length > 0)
                 sb.AppendFormat(s, p);
             else
                 sb.Append(s);
-            sb.Append("</color>");
             Debug.Log(sb.ToString());
         }
         
         public static void LogAsset(object o)
         {
-            if (!EnableLog)
-            {
-                return;
-            }
             sb.Clear();
             sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.green));
             sb.Append(DateTime.Now);
             sb.Append("[资产日志]");
-            sb.Append(o);
             sb.Append("</color>");
+            sb.Append(o);
             Debug.Log(sb.ToString());
         }
         
         public static void LogColor(Color color, string s, params object[] p)
         {
-            if (!EnableLog)
-            {
-                return;
-            }
             sb.Clear();
             sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(color));
             sb.Append(DateTime.Now);
             sb.Append("[颜色日志]");
+            sb.Append("</color>");
             if (p != null && p.Length > 0)
                 sb.AppendFormat(s, p);
             else
                 sb.Append(s);
-            sb.Append("</color>");
             Debug.Log(sb.ToString());
         }
         public static void LogColor(Color color, object o)
         {
-            if (!EnableLog)
-            {
-                return;
-            }
             sb.Clear();
             sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(color));
             sb.Append(DateTime.Now);
             sb.Append("[颜色日志]");
-            sb.Append(o);
             sb.Append("</color>");
+            sb.Append(o);
             Debug.Log(sb.ToString());
         }
         public static void LogToMainThread(string s, params object[] p)
         {
-            if (!EnableLog)
-            {
-                return;
-            }
             string msg = (p != null && p.Length > 0 ? string.Format(s, p) : s);
             F8LogHelper.Instance.LogToMainThread(LogType.Log, msg);
         }
 
         public static void Assert(bool condition, string s, params object[] p)
         {
-            if (!EnableLog)
-            {
-                return;
-            }
             if (condition)
             {
                 return;
@@ -308,10 +249,6 @@ namespace F8Framework.Core
 
         public static void LogError(string s, params object[] p)
         {
-            if (!EnableLog)
-            {
-                return;
-            }
 #if UNITY_EDITOR
             Debug.LogError((p != null && p.Length > 0 ? string.Format(s, p) : s));
 #endif
@@ -319,10 +256,6 @@ namespace F8Framework.Core
         
         public static void LogError(object o)
         {
-            if (!EnableLog)
-            {
-                return;
-            }
 #if UNITY_EDITOR
             Debug.LogError(o);
 #endif
@@ -330,10 +263,6 @@ namespace F8Framework.Core
         
         public static void LogErrorToMainThread(string s, params object[] p)
         {
-            if (!EnableLog)
-            {
-                return;
-            }
             string msg = (p != null && p.Length > 0 ? string.Format(s, p) : s);
             F8LogHelper.Instance.LogToMainThread(LogType.Error, msg);
         }
@@ -341,10 +270,6 @@ namespace F8Framework.Core
 
         public static void LogStackTrace(string str)
         {
-            if (!EnableLog)
-            {
-                return;
-            }
             StackFrame[] stacks = new StackTrace().GetFrames();
             string result = str + "\r\n";
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using UnityEditor;
@@ -12,17 +13,112 @@ namespace F8Framework.Core.Editor
     {
         public static void BuildAllAB()
         {
-            // 打包AB输出路径
-            string strABOutPAthDir = string.Empty;
- 
             // 获取“StreamingAssets”文件夹路径（不一定这个文件夹，可自定义）            
-            strABOutPAthDir = URLSetting.GetAssetBundlesOutPath();
-
+            string strABOutPAthDir = URLSetting.GetAssetBundlesOutPath();
+           
+            DeleteRemovedAssetBundles();
+            
+            DeleteEmptyFolders(strABOutPAthDir);
+            
             FileTools.CheckDirAndCreateWhenNeeded(strABOutPAthDir);
             
             // 打包生成AB包 (目标平台自动根据当前平台设置)
             BuildPipeline.BuildAssetBundles(strABOutPAthDir, BuildAssetBundleOptions.None, EditorUserBuildSettings.activeBuildTarget);
         }
+
+        public static void DeleteRemovedAssetBundles()
+        {
+            FileTools.CheckDirAndCreateWhenNeeded(URLSetting.GetAssetBundlesFolder());
+            List<string> assetPaths = new List<string>();
+            string assetBundlesPath = URLSetting.AssetBundlesPath;
+            RecordAssetsAndDirectories(assetBundlesPath, assetBundlesPath, assetPaths);
+            assetPaths.Add(URLSetting.GetPlatformName().ToLower());
+            // LogF8.LogAsset(string.Join("，" ,assetPaths));
+            
+            FileTools.CheckDirAndCreateWhenNeeded(URLSetting.GetAssetBundlesOutPath());
+            List<string> abPaths = new List<string>();
+            string abBundlesPath = "Assets/StreamingAssets/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
+            RecordAssetsAndDirectories(abBundlesPath, abBundlesPath, abPaths);
+            // LogF8.LogAsset(string.Join("，" ,abPaths));
+            
+            foreach (string ab in abPaths)
+            {
+                if (!assetPaths.Contains(ab))
+                {
+                    string abpath = URLSetting.GetAssetBundlesOutPath() + "/" + ab;
+                    if (File.Exists(abpath))
+                    {
+                        // It's a file, delete the file
+                        FileTools.SafeDeleteFile(abpath);
+                        FileTools.SafeDeleteFile(abpath + ".manifest");
+                    }
+                    else if (Directory.Exists(abpath))
+                    {
+                        // It's a folder, delete the folder
+                        FileTools.SafeDeleteDir(abpath);
+                    }
+                    else
+                    {
+                        LogF8.LogAsset("Path does not exist: " + abpath);
+                    }
+                }
+            }
+            AssetDatabase.Refresh();
+        }
+        public static void RecordAssetsAndDirectories(string basePath, string currentPath, List<string> assetPaths)
+        {
+            string[] entries = Directory.GetFileSystemEntries(currentPath);
+
+            foreach (string entry in entries)
+            {
+                string relativePath = entry.Replace(basePath, "");
+
+                if (Directory.Exists(entry))
+                {
+                    // It's a directory under AssetBundles, record as "Audio"
+                    assetPaths.Add(relativePath.ToLower());
+                    RecordAssetsAndDirectories(basePath, entry, assetPaths);
+                }
+                else if (File.Exists(entry))
+                {
+                    // Ignore files with specific extensions
+                    string extension = Path.GetExtension(entry).ToLower();
+                    if (extension != ".meta" && extension != ".manifest" && extension != ".ds_store")
+                    {
+                        // It's a file under AssetBundles, record as "Audio/click11"
+                        assetPaths.Add(Path.ChangeExtension(relativePath.ToLower(), null));
+                    }
+                }
+            }
+        }
+        
+        public static void DeleteEmptyFolders(string directory)
+        {
+            foreach (var subDirectory in Directory.EnumerateDirectories(directory))
+            {
+                DeleteEmptyFolders(subDirectory);
+
+                if (Directory.GetFiles(subDirectory).Length == 0 &&
+                    Directory.GetDirectories(subDirectory).Length == 0)
+                {
+                    try
+                    {
+                        Directory.Delete(subDirectory, true);
+                
+                        string metaFilePath = subDirectory + ".meta";
+                        if (File.Exists(metaFilePath))
+                        {
+                            FileTools.SafeDeleteFile(metaFilePath);
+                        }
+                    }
+                    catch (System.Exception e)
+                    {
+                        LogF8.LogError("Error deleting empty folder: " + subDirectory + "\n" + e.Message);
+                    }
+                }
+            }
+        }
+
         
         //设置资源AB名字
         public static string SetAssetBundleName(string path)
