@@ -45,5 +45,8 @@ public class DemoAssetManager : MonoBehaviour
         {
             //卸载资产完成
         });
+        
+        //编辑器模式，无需打包AB
+        AssetManager.Instance.IsEditorMode = true;
     }
 }

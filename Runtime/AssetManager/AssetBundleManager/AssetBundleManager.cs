@@ -20,12 +20,8 @@ namespace F8Framework.Core
         /// </summary>
         /// <param name="assetName">资产名称。</param>
         /// <param name="info">资产信息。</param>
-        /// <param name="preloadAssets">
-        /// 如果设置为true，则将预加载所有资产对象，
-        /// 否则将不会预加载任何资产对象。
-        /// </param>
         /// <returns>要完成扩展的对象列表。</returns>
-        public AssetBundle Load(string assetName, AssetManager.AssetInfo info, bool preloadAssets = true)
+        public AssetBundle Load(string assetName, AssetManager.AssetInfo info)
         {
             AssetBundle result;
 
@@ -54,10 +50,11 @@ namespace F8Framework.Core
 
                     assetBundleLoaders.Add(name, loader);
                 }
-
+                //同步清理异步
+                loader.AssetBundleLoadRequest?.assetBundle.Unload(false);
+                
                 loader.Load();
-                if (preloadAssets)
-                    loader.Expand();
+                loader.Expand();
             }
 
             result = GetAssetBundle(info.AssetBundlePath);
@@ -70,15 +67,10 @@ namespace F8Framework.Core
         /// </summary>
         /// <param name="assetName">资产名称。</param>
         /// <param name="info">资产信息。</param>
-        /// <param name="preloadAssets">
-        /// 如果设置为true，则将预加载所有资产对象，
-        /// 否则将不会预加载任何资产对象。
-        /// </param>
         /// <param name="loadCallback">异步加载完成的回调。</param>
         public void LoadAsync(
             string assetName,
             AssetManager.AssetInfo info,
-            bool preloadAssets = true,
             AssetBundleLoader.OnLoadFinished loadCallback = null)
         {
             List<string> bundleNames = new List<string>(GetDependenciedAssetBundles(info.AbName));
@@ -106,27 +98,26 @@ namespace F8Framework.Core
 
                     assetBundleLoaders.Add(name, loader);
                 }
-                lastLoader = loader; // 更新最后一个 loader
+                if (name == info.AssetBundlePath)
+                {
+                    for (int i = 0; i < bundleNames.Count; i++)
+                    {
+                        loader.AddDependentNames(bundleNames[i]);
+                    }
+                }
+                lastLoader = loader; // 获取最后一个 loader
                 loader.LoadAsync(
                     (ab) => {
                         ++loadedCount;
+                        lastLoader.AddDependentNames(name, true);
                         if (loadedCount == bundleNames.Count)
                         {
                             // 所有依赖项加载完成后，加载主资源
-                            if (preloadAssets)
-                            {
-                                lastLoader.ExpandAsync(() => {
-                                    // 主资源加载完成后，如果需要展开，则在展开完成后回调
-                                    if (loadCallback != null)
-                                        loadCallback(GetAssetBundle(info.AssetBundlePath));
-                                });
-                            }
-                            else
-                            {
-                                // 如果不需要展开，则直接回调
+                            lastLoader.ExpandAsync(() => {
+                                // 主资源加载完成后，如果需要展开，则在展开完成后回调
                                 if (loadCallback != null)
                                     loadCallback(GetAssetBundle(info.AssetBundlePath));
-                            }
+                            });
                         }
                     }
                 );
@@ -151,8 +142,9 @@ namespace F8Framework.Core
                 bool isClearNeeded = 
                     unloadAllRelated ||
                     loader.IsLastParentBundle(assetBundlePath);
-
+                
                 loader.RemoveParentBundle(assetBundlePath);
+                loader.RemoveDependentNames(assetBundlePath);
                 loader.Unload(isClearNeeded);
             }
         }
@@ -261,6 +253,7 @@ namespace F8Framework.Core
                             foreach (AssetBundleLoader l in bundleLoaders)
                             {
                                 l.RemoveParentBundle(assetBundlePath);
+                                l.RemoveDependentNames(assetBundlePath);
                             }
 
                             if (callback != null)
@@ -814,11 +807,11 @@ namespace F8Framework.Core
             }
         }
         
-        private string[] GetDependenciedAssetBundles(string assetBundlePath)
+        private string[] GetDependenciedAssetBundles(string abName)
         {
             if (manifest == null)
                 return new string[] {};
-            return manifest.GetAllDependencies(assetBundlePath);
+            return manifest.GetAllDependencies(abName);
         }
 
         private List<AssetBundleLoader> GetRelatedLoaders(string assetBundlePath)

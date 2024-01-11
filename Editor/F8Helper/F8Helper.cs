@@ -21,13 +21,9 @@ namespace F8Framework.Core.Editor
         public static void BuildAssetBundles()
         {
             FileTools.SafeDeleteDir(FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/AssetMap");
-            LogF8.LogAsset("生成AssetBundleMap.cs，生成ResourceMap.cs，生成F8Framework.AssetMap.asmdef");
-            ABBuildTool.GenerateAssetNames();
-            ABBuildTool.GenerateResourceNames();
-            ABBuildTool.CreateAsmdefFile();
-            LogF8.LogAsset("打包AssetBundle" + URLSetting.GetAssetBundlesOutPath());
+            
             ABBuildTool.BuildAllAB();
-
+            
             AssetDatabase.Refresh();
         }
         

@@ -10,7 +10,7 @@ namespace F8Framework.Core
     /// </summary>
     public class AssetBundleLoader
     {
-        public string assetBundlePath = "";
+        private string assetBundlePath = "";
         private string assetName = "";
         private List<string> assetPaths = new List<string>();
         private AssetBundle assetBundleContent;
@@ -33,6 +33,8 @@ namespace F8Framework.Core
         private event OnUnloadFinished onUnloadFinishedImpl;
 
         private List<string> parentBundleNames = new List<string>();
+
+        private Dictionary<string, bool> dependentNames = new Dictionary<string, bool>();
         
         /// <summary>
         /// 异步资产捆绑包加载完成的回调。
@@ -559,6 +561,7 @@ namespace F8Framework.Core
             assetBundleUnloadState = LoaderState.NONE;
 
             assetBundleLoadRequest = null;
+            assetBundleDownloadRequest?.Dispose();
             assetBundleDownloadRequest = null;
             assetBundleUnloadRequest = null;
             expandCount = 0;
@@ -569,9 +572,52 @@ namespace F8Framework.Core
 
             assetObjects.Clear();
             parentBundleNames.Clear();
+            dependentNames.Clear();
+        }
+        
+        public int GetDependentNamesLoadFinished()
+        {
+            int loadFinishedCount = 0;
+            foreach (var item in dependentNames)
+            {
+                if (item.Value == true)
+                {
+                    loadFinishedCount += 1;
+                }
+            }
+            
+            return loadFinishedCount;
+        }
+        
+        public int AddDependentNames(string name = null, bool loadFinished = false)
+        {
+            if (name == null)
+                return dependentNames.Count;
+
+            if (loadFinished && dependentNames.ContainsKey(name))
+            {
+                dependentNames[name] = loadFinished;
+            }
+            else
+            {
+                if (loadFinished == false)
+                {
+                    dependentNames.TryAdd(name, loadFinished);
+                }
+            }
+
+            return dependentNames.Count;
         }
 
-        public int AddParentBundle(string name)
+        public int RemoveDependentNames(string name)
+        {
+            if (dependentNames.TryGetValue(name, out bool loadFinished))
+                dependentNames.Remove(name);
+
+            return dependentNames.Count;
+        }
+        
+        public int AddParentBundle(string name = null)
         {
             if (name == null)
                 return parentBundleNames.Count;
@@ -609,6 +655,7 @@ namespace F8Framework.Core
             assetBundleContent = null;
             assetObjects.Clear();
             assetBundleLoadRequest = null;
+            assetBundleDownloadRequest?.Dispose();
             assetBundleDownloadRequest = null;
             expandCount = 0;
             onLoadFinishedImpl = null;
@@ -664,7 +711,15 @@ namespace F8Framework.Core
                 assetObjects.Add(assetPath, obj);
             }
         }
-
+        
+        /// <summary>
+        /// 异步加载请求。
+        /// </summary>
+        public AssetBundleCreateRequest AssetBundleLoadRequest
+        {
+            get => assetBundleLoadRequest;
+        }
+            
         /// <summary>
         /// 此加载程序的资产捆绑包路径。
         /// </summary>
