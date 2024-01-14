@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
 using F8Framework.AssetMap;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -17,7 +20,7 @@ namespace F8Framework.Core
             public readonly AssetTypeEnum AssetType;
             
             //直接资产请求路径相对路径，Assets开头的
-            public readonly string AssetPath;
+            public readonly string[] AssetPath;
             
             //直接资产捆绑请求路径（仅适用于资产捆绑类型），完全路径
             public readonly string AssetBundlePath;
@@ -30,7 +33,7 @@ namespace F8Framework.Core
             
             public AssetInfo(
                 AssetTypeEnum assetType,
-                string assetPath,
+                string[] assetPath,
                 string assetBundlePathWithoutAb,
                 string abName)
             {
@@ -151,13 +154,13 @@ namespace F8Framework.Core
                 
                 if (info.AssetType == AssetTypeEnum.RESOURCE)
                 {
-                    T o = ResourcesManager.Instance.GetResouceObject<T>(info.AssetPath);
+                    T o = ResourcesManager.Instance.GetResouceObject<T>(info.AssetPath[0]);
                     if (o != null)
                     {
                         return o;
                     }
                       
-                    return ResourcesManager.Instance.Load<T>(info.AssetPath);
+                    return ResourcesManager.Instance.Load<T>(info.AssetPath[0]);
                 }
                 else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
                 {
@@ -176,17 +179,55 @@ namespace F8Framework.Core
                         ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePath);
                     }
                 
-                    T o = AssetBundleManager.Instance.GetAssetObject<T>(info.AssetPath);
+                    T o = AssetBundleManager.Instance.GetAssetObject<T>(info.AssetPath[0]);
                     if (o != null)
                     {
                         return o;
                     }
                     
                     ab.Expand();
-                    return AssetBundleManager.Instance.GetAssetObject<T>(info.AssetPath);
+                    return AssetBundleManager.Instance.GetAssetObject<T>(info.AssetPath[0]);
                 }
 
                 return null;
+            }
+            
+            /// <summary>
+            /// 同步加载资源文件夹。
+            /// </summary>
+            /// <param name="assetName">资产路径字符串。</param>
+            /// <param name="mode">访问模式。</param>
+            public void LoadDir(
+                string assetName,
+                AssetAccessMode mode = AssetAccessMode.UNKNOWN)
+            {
+                AssetInfo info = GetAssetInfo(assetName, mode);
+                if (info == null || !info.IsLegal)
+                    return;
+                
+                if (info.AssetType == AssetTypeEnum.RESOURCE)
+                {
+                    LogF8.LogAsset("Resources不支持加载文件夹功能");
+                }
+                else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
+                {
+#if UNITY_EDITOR
+                    if (_isEditorMode)
+                    {
+                        return;
+                    }
+#endif
+                    foreach (var assetPath in info.AssetPath)
+                    {
+                        string abName = Path.ChangeExtension(assetPath, null).Replace(URLSetting.AssetBundlesPath, "").ToLower();
+                        AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePathWithoutAb + abName);
+                        if (ab == null || ab.AssetBundleContent == null)
+                        {
+                            AssetBundleManager.Instance.Load(Path.GetFileNameWithoutExtension(assetPath), 
+                                new AssetInfo(info.AssetType, new []{assetPath}, info.AssetBundlePathWithoutAb, abName));
+                        }
+                    }
+                }
             }
             
             /// <summary>
@@ -207,13 +248,13 @@ namespace F8Framework.Core
 
                 if (info.AssetType == AssetTypeEnum.RESOURCE)
                 {
-                    Object o = ResourcesManager.Instance.GetResouceObject(info.AssetPath, assetType);
+                    Object o = ResourcesManager.Instance.GetResouceObject(info.AssetPath[0], assetType);
                     if (o != null)
                     {
                         return o;
                     }
 
-                    return ResourcesManager.Instance.Load(info.AssetPath, assetType);
+                    return ResourcesManager.Instance.Load(info.AssetPath[0], assetType);
                 }
                 else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
                 {
@@ -232,14 +273,14 @@ namespace F8Framework.Core
                         ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePath);
                     }
             
-                    Object o = AssetBundleManager.Instance.GetAssetObject(info.AssetPath, assetType);
+                    Object o = AssetBundleManager.Instance.GetAssetObject(info.AssetPath[0], assetType);
                     if (o != null)
                     {
                         return o;
                     }
                 
                     ab.Expand();
-                    return AssetBundleManager.Instance.GetAssetObject(info.AssetPath, assetType);
+                    return AssetBundleManager.Instance.GetAssetObject(info.AssetPath[0], assetType);
                 }
 
                 return null;
@@ -261,13 +302,13 @@ namespace F8Framework.Core
 
                 if (info.AssetType == AssetTypeEnum.RESOURCE)
                 {
-                    Object o = ResourcesManager.Instance.GetResouceObject(info.AssetPath);
+                    Object o = ResourcesManager.Instance.GetResouceObject(info.AssetPath[0]);
                     if (o != null)
                     {
                         return o;
                     }
 
-                    return ResourcesManager.Instance.Load(info.AssetPath);
+                    return ResourcesManager.Instance.Load(info.AssetPath[0]);
                 }
                 else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
                 {
@@ -286,14 +327,14 @@ namespace F8Framework.Core
                         ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePath);
                     }
             
-                    Object o = AssetBundleManager.Instance.GetAssetObject(info.AssetPath);
+                    Object o = AssetBundleManager.Instance.GetAssetObject(info.AssetPath[0]);
                     if (o != null)
                     {
                         return o;
                     }
                 
                     ab.Expand();
-                    return AssetBundleManager.Instance.GetAssetObject(info.AssetPath);
+                    return AssetBundleManager.Instance.GetAssetObject(info.AssetPath[0]);
                 }
 
                 return null;
@@ -321,13 +362,13 @@ namespace F8Framework.Core
 
                 if (info.AssetType == AssetTypeEnum.RESOURCE)
                 {
-                    T o = ResourcesManager.Instance.GetResouceObject<T>(info.AssetPath);
+                    T o = ResourcesManager.Instance.GetResouceObject<T>(info.AssetPath[0]);
                     if (o != null)
                     {
                         End(o);
                         return;
                     }
-                    ResourcesManager.Instance.LoadAsync<T>(info.AssetPath, callback);
+                    ResourcesManager.Instance.LoadAsync<T>(info.AssetPath[0], callback);
                 }
                 else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
                 {
@@ -344,13 +385,13 @@ namespace F8Framework.Core
                     if (ab == null || ab.AssetBundleContent == null || ab.GetDependentNamesLoadFinished() < ab.AddDependentNames())
                     {
                         AssetBundleManager.Instance.LoadAsync(assetName, info, (b) => {
-                            End(AssetBundleManager.Instance.GetAssetObject<T>(info.AssetPath));
+                            End(AssetBundleManager.Instance.GetAssetObject<T>(info.AssetPath[0]));
                         });
                         return;
                     }
                     else
                     {
-                        T o = AssetBundleManager.Instance.GetAssetObject<T>(info.AssetPath);
+                        T o = AssetBundleManager.Instance.GetAssetObject<T>(info.AssetPath[0]);
                         if (o != null)
                         {
                             End(o);
@@ -358,13 +399,87 @@ namespace F8Framework.Core
                         }
                         
                         ab.Expand();
-                        End(AssetBundleManager.Instance.GetAssetObject<T>(info.AssetPath));
+                        End(AssetBundleManager.Instance.GetAssetObject<T>(info.AssetPath[0]));
                     }
                 }
 
                 void End(T o = null)
                 {
                     callback?.Invoke(o);
+                }
+            }
+                        
+            /// <summary>
+            /// 异步加载资产文件夹。
+            /// </summary>
+            /// <param name="assetName">资产路径字符串。</param>
+            /// <param name="callback">异步加载完成时的回调函数。</param>
+            /// <param name="mode">访问模式。</param>
+            public void LoadDirAsync(
+                string assetName,
+                Action callback = null,
+                AssetAccessMode mode = AssetAccessMode.UNKNOWN)
+            {
+                AssetInfo info = GetAssetInfo(assetName, mode);
+                if (info == null || !info.IsLegal)
+                {
+                    End();
+                    return;
+                }
+
+                if (info.AssetType == AssetTypeEnum.RESOURCE)
+                {
+                    LogF8.LogAsset("Resources不支持加载文件夹功能");
+                }
+                else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
+                {
+#if UNITY_EDITOR
+                    if (_isEditorMode)
+                    {
+                        End();
+                        return;
+                    }
+#endif
+                    int assetCount = 0;
+                    foreach (var assetPath in info.AssetPath)
+                    {
+                        string abName = Path.ChangeExtension(assetPath, null).Replace(URLSetting.AssetBundlesPath, "").ToLower();
+                        AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePathWithoutAb + abName);
+                        if (ab == null || ab.AssetBundleContent == null || ab.GetDependentNamesLoadFinished() < ab.AddDependentNames())
+                        {
+                            AssetBundleManager.Instance.LoadAsync(Path.GetFileNameWithoutExtension(assetPath), 
+                                new AssetInfo(info.AssetType, new []{assetPath}, info.AssetBundlePathWithoutAb, abName), (b) =>
+                            {
+                                if (++assetCount >= info.AssetPath.Length)
+                                {
+                                    End();
+                                }
+                            });
+                        }
+                        else
+                        {
+                            Object o = AssetBundleManager.Instance.GetAssetObject(assetPath);
+                            if (o != null)
+                            {
+                                if (++assetCount >= info.AssetPath.Length)
+                                {
+                                    End();
+                                }
+                                continue;
+                            }
+                            
+                            ab.Expand();
+                            if (++assetCount >= info.AssetPath.Length)
+                            {
+                                End();
+                            }
+                        }
+                    }
+                }
+
+                void End()
+                {
+                    callback?.Invoke();
                 }
             }
             
@@ -390,13 +505,13 @@ namespace F8Framework.Core
 
                 if (info.AssetType == AssetTypeEnum.RESOURCE)
                 {
-                    Object o = ResourcesManager.Instance.GetResouceObject(info.AssetPath, assetType);
+                    Object o = ResourcesManager.Instance.GetResouceObject(info.AssetPath[0], assetType);
                     if (o != null)
                     {
                         End(o);
                         return;
                     }
-                    ResourcesManager.Instance.LoadAsync(info.AssetPath, assetType, callback);
+                    ResourcesManager.Instance.LoadAsync(info.AssetPath[0], assetType, callback);
                 }
                 else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
                 {
@@ -414,13 +529,13 @@ namespace F8Framework.Core
                         ab.AssetBundleContent == null)
                     {
                         AssetBundleManager.Instance.LoadAsync(assetName, info, (b) => {
-                            End(AssetBundleManager.Instance.GetAssetObject(info.AssetPath, assetType));
+                            End(AssetBundleManager.Instance.GetAssetObject(info.AssetPath[0], assetType));
                         });
                         return;
                     }
                     else
                     {
-                        Object o = AssetBundleManager.Instance.GetAssetObject(info.AssetPath, assetType);
+                        Object o = AssetBundleManager.Instance.GetAssetObject(info.AssetPath[0], assetType);
                         if (o != null)
                         {
                             End(o);
@@ -428,7 +543,7 @@ namespace F8Framework.Core
                         }
             
                         ab.Expand();
-                        End(AssetBundleManager.Instance.GetAssetObject(info.AssetPath, assetType));
+                        End(AssetBundleManager.Instance.GetAssetObject(info.AssetPath[0], assetType));
                     }
                 }
 
@@ -458,13 +573,13 @@ namespace F8Framework.Core
 
                 if (info.AssetType == AssetTypeEnum.RESOURCE)
                 {
-                    Object o = ResourcesManager.Instance.GetResouceObject(info.AssetPath);
+                    Object o = ResourcesManager.Instance.GetResouceObject(info.AssetPath[0]);
                     if (o != null)
                     {
                         End(o);
                         return;
                     }
-                    ResourcesManager.Instance.LoadAsync(info.AssetPath, callback);
+                    ResourcesManager.Instance.LoadAsync(info.AssetPath[0], callback);
                 }
                 else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
                 {
@@ -482,13 +597,13 @@ namespace F8Framework.Core
                         ab.AssetBundleContent == null)
                     {
                         AssetBundleManager.Instance.LoadAsync(assetName, info, (b) => {
-                            End(AssetBundleManager.Instance.GetAssetObject(info.AssetPath));
+                            End(AssetBundleManager.Instance.GetAssetObject(info.AssetPath[0]));
                         });
                         return;
                     }
                     else
                     {
-                        Object o = AssetBundleManager.Instance.GetAssetObject(info.AssetPath);
+                        Object o = AssetBundleManager.Instance.GetAssetObject(info.AssetPath[0]);
                         if (o != null)
                         {
                             End(o);
@@ -496,7 +611,7 @@ namespace F8Framework.Core
                         }
             
                         ab.Expand();
-                        End(AssetBundleManager.Instance.GetAssetObject(info.AssetPath));
+                        End(AssetBundleManager.Instance.GetAssetObject(info.AssetPath[0]));
                     }
                 }
 
@@ -511,7 +626,7 @@ namespace F8Framework.Core
             {
                 if (ResourceMap.Mappings.TryGetValue(path, out string value))
                 {
-                    return new AssetInfo(AssetTypeEnum.RESOURCE, value, null, null);
+                    return new AssetInfo(AssetTypeEnum.RESOURCE, new []{value}, null, null);
                 }
                 return null;
             }
@@ -561,7 +676,7 @@ namespace F8Framework.Core
                 AssetInfo res = GetAssetInfoFromResource(assetName);
                 if (res != null && res.IsLegal)
                 {
-                    ResourcesManager.Instance.Unload(res.AssetPath);
+                    ResourcesManager.Instance.Unload(res.AssetPath[0]);
                 }
             }
             
@@ -610,38 +725,67 @@ namespace F8Framework.Core
                 }
 #endif
                 float progress = 2.1f;
-                
+
+                List<string> assetBundlePaths = new List<string>();
+
                 AssetInfo ab = GetAssetInfoFromAssetBundle(assetName);
                 if (ab != null && ab.IsLegal)
                 {
-                    float abProgress = AssetBundleManager.Instance.GetLoadProgress(ab.AssetBundlePath);
-                    if (abProgress > -1f)
+                    if (ab.AssetPath.Length > 1)
                     {
-                        progress = Mathf.Min(progress, abProgress);
+                        foreach (var assetPath in ab.AssetPath)
+                        {
+                            string abName = Path.ChangeExtension(assetPath, null).Replace(URLSetting.AssetBundlesPath, "").ToLower();
+                            assetBundlePaths.Add(ab.AssetBundlePathWithoutAb + abName);
+                        }
+                    }
+                    else
+                    {
+                        assetBundlePaths.Add(ab.AssetBundlePath);
                     }
                 }
+
                 AssetInfo abRemote = GetAssetInfoFromAssetBundle(assetName, true);
                 if (abRemote != null && abRemote.IsLegal)
-                { 
-                    float remoteProgress = AssetBundleManager.Instance.GetLoadProgress(abRemote.AssetBundlePath);
-                    if (remoteProgress > -1f)
+                {
+                    if (abRemote.AssetPath.Length > 1)
                     {
-                        progress = Mathf.Min(progress, remoteProgress);
+                        foreach (var assetPath in abRemote.AssetPath)
+                        {
+                            string abName = Path.ChangeExtension(assetPath, null).Replace(URLSetting.AssetBundlesPath, "").ToLower();
+                            assetBundlePaths.Add(abRemote.AssetBundlePathWithoutAb + abName);
+                        }
+                    }
+                    else
+                    {
+                        assetBundlePaths.Add(abRemote.AssetBundlePath);
                     }
                 }
+
                 AssetInfo res = GetAssetInfoFromResource(assetName);
                 if (res != null && res.IsLegal)
                 {
-                    float resProgress = ResourcesManager.Instance.GetLoadProgress(res.AssetPath);
+                    float resProgress = ResourcesManager.Instance.GetLoadProgress(res.AssetPath[0]);
                     if (resProgress > -1f)
                     {
                         progress = Mathf.Min(progress, resProgress);
                     }
                 }
+
+                foreach (string assetBundlePath in assetBundlePaths)
+                {
+                    float bundleProgress = AssetBundleManager.Instance.GetLoadProgress(assetBundlePath);
+                    if (bundleProgress > -1f)
+                    {
+                        progress = Mathf.Min(progress, bundleProgress);
+                    }
+                }
+
                 if (progress >= 2f)
                 {
                     progress = -1f;
                 }
+
                 return progress;
             }
             

@@ -690,7 +690,10 @@ namespace F8Framework.Core
             
             if (AssetBundleMap.Mappings.TryGetValue(assetName, out AssetBundleMap.AssetMapping assetmpping))
             {
-                paths.Add(assetmpping.AssetPath);
+                foreach (var assetPath in assetmpping.AssetPath)
+                {
+                    paths.Add(assetPath);
+                }
             }
             
             return paths;

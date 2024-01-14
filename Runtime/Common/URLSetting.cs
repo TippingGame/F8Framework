@@ -5,7 +5,7 @@ namespace F8Framework.Core
 {
     public class URLSetting
     {
-            public static string REMOTE_ADDRESS = "http://127.0.0.1:6789/remote"; //不为空就会优先加载远程资源
+            public static string REMOTE_ADDRESS = "http://127.0.0.1:6789/remote"; //加载远程资源地址
             
             public const string AssetBundlesName = "AssetBundles";  // AB包名
             public const string AssetBundlesPath = "Assets/AssetBundles/"; // 打包AB包根路径
@@ -64,15 +64,6 @@ namespace F8Framework.Core
 #endif
             
         //上报错误地址
-#if UNITY_EDITOR || UNITY_STANDALONE
         public static string REPORT_ERROR_URL = "";
-#elif UNITY_ANDROID
-        public static string REPORT_ERROR_URL = "";
-#elif UNITY_IPHONE || UNITY_IOS
-        public static string REPORT_ERROR_URL = "";
-#else
-        public static string REPORT_ERROR_URL = "";
-#endif   
-            
     }
 }

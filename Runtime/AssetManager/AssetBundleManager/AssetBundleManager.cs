@@ -25,30 +25,30 @@ namespace F8Framework.Core
         {
             AssetBundle result;
 
-            List<string> bundleNames = new List<string>(GetDependenciedAssetBundles(info.AbName));
+            List<string> assetBundlePaths = new List<string>(GetDependenciedAssetBundles(info.AbName));
             
-            for (int i = 0; i < bundleNames.Count; i++)
+            for (int i = 0; i < assetBundlePaths.Count; i++)
             {
-                bundleNames[i] = info.AssetBundlePathWithoutAb + bundleNames[i];
+                assetBundlePaths[i] = info.AssetBundlePathWithoutAb + assetBundlePaths[i];
             }
 
-            bundleNames.Add(info.AssetBundlePath);
+            assetBundlePaths.Add(info.AssetBundlePath);
 
-            foreach (string name in bundleNames)
+            foreach (string assetBundlePath in assetBundlePaths)
             {
                 AssetBundleLoader loader;
-                if (assetBundleLoaders.ContainsKey(name))
+                if (assetBundleLoaders.ContainsKey(assetBundlePath))
                 {
-                    loader = assetBundleLoaders[name];
+                    loader = assetBundleLoaders[assetBundlePath];
                     loader.AddParentBundle(info.AssetBundlePath);
                 }
                 else
                 {
                     loader = new AssetBundleLoader();
-                    loader.Init(assetName, name);
+                    loader.Init(assetName, assetBundlePath);
                     loader.AddParentBundle(info.AssetBundlePath);
 
-                    assetBundleLoaders.Add(name, loader);
+                    assetBundleLoaders.Add(assetBundlePath, loader);
                 }
                 //同步清理异步
                 loader.AssetBundleLoadRequest?.assetBundle.Unload(false);
@@ -73,44 +73,44 @@ namespace F8Framework.Core
             AssetManager.AssetInfo info,
             AssetBundleLoader.OnLoadFinished loadCallback = null)
         {
-            List<string> bundleNames = new List<string>(GetDependenciedAssetBundles(info.AbName));
+            List<string> assetBundlePaths = new List<string>(GetDependenciedAssetBundles(info.AbName));
 
-            for (int i = 0; i < bundleNames.Count; i++)
+            for (int i = 0; i < assetBundlePaths.Count; i++)
             {
-                bundleNames[i] = info.AssetBundlePathWithoutAb + bundleNames[i];
+                assetBundlePaths[i] = info.AssetBundlePathWithoutAb + assetBundlePaths[i];
             }
             AssetBundleLoader lastLoader = null;
-            bundleNames.Add(info.AssetBundlePath);
+            assetBundlePaths.Add(info.AssetBundlePath);
             int loadedCount = 0;
-            foreach (string name in bundleNames)
+            foreach (string assetBundlePath in assetBundlePaths)
             {
                 AssetBundleLoader loader;
-                if (assetBundleLoaders.ContainsKey(name))
+                if (assetBundleLoaders.ContainsKey(assetBundlePath))
                 {
-                    loader = assetBundleLoaders[name];
+                    loader = assetBundleLoaders[assetBundlePath];
                     loader.AddParentBundle(info.AssetBundlePath);
                 }
                 else
                 {
                     loader = new AssetBundleLoader();
-                    loader.Init(assetName, name);
+                    loader.Init(assetName, assetBundlePath);
                     loader.AddParentBundle(info.AssetBundlePath);
 
-                    assetBundleLoaders.Add(name, loader);
+                    assetBundleLoaders.Add(assetBundlePath, loader);
                 }
-                if (name == info.AssetBundlePath)
+                if (assetBundlePath == info.AssetBundlePath)
                 {
-                    for (int i = 0; i < bundleNames.Count; i++)
+                    for (int i = 0; i < assetBundlePaths.Count; i++)
                     {
-                        loader.AddDependentNames(bundleNames[i]);
+                        loader.AddDependentNames(assetBundlePaths[i]);
                     }
                 }
                 lastLoader = loader; // 获取最后一个 loader
                 loader.LoadAsync(
                     (ab) => {
                         ++loadedCount;
-                        lastLoader.AddDependentNames(name, true);
-                        if (loadedCount == bundleNames.Count)
+                        lastLoader.AddDependentNames(assetBundlePath, true);
+                        if (loadedCount == assetBundlePaths.Count)
                         {
                             // 所有依赖项加载完成后，加载主资源
                             lastLoader.ExpandAsync(() => {

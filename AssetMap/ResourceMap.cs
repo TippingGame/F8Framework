@@ -12,11 +12,6 @@ namespace F8Framework.AssetMap
        }
        
        private static Dictionary<string, string> mappings = new Dictionary<string, string> {
-          {"TImerGo", "TImerGo"},
-          {"Entities1", "BinConfigData/Entities1"},
-          {"Entities2", "BinConfigData/Entities2"},
-          {"table1", "BinConfigData/table1"},
-          {"table2", "BinConfigData/table2"},
        };
    }
 }
