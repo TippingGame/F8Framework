@@ -20,7 +20,10 @@ namespace F8Framework.Core
         //音频管理
         public static AudioManager Audio = AudioManager.Instance;
 
-
+        //UI界面管理
+        public static UIManager UI = UIManager.Instance;
+        
+        
         /* ---可选模块--- */
 
     }

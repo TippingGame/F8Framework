@@ -16,14 +16,15 @@
 * [2.热更新版本号管理：]待添加  
 ### ----------核心功能----------
 * [1.资源加载（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/AssetManager/README.md)资源模块文档。[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/AssetManager/README.md)  
-* [2.UI界面管理（内置）：]待添加  
-* [3.日志管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Log/README.md)日志模块文档。[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Log/README.md)  
-* [4.声音管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Audio/README.md)音频模块文档。[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Audio/README.md)  
-* [5.事件管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Event/README.md)事件模块文档。[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Event/README.md)  
-* [6.实体组件（内置）：]待添加  
-* [7.网络连接与通信（内置）：]待添加  
-* [8.SDK接入（内置）：]待添加  
-* [9.时间管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Timer/README.md)时间模块文档。[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Timer/README.md)  
+* [2.UI界面管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/UI/README.md)UI界面模块文档。[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/UI/README.md)  
+* [3.模块中心管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Module/README.md)模块中心文档。[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Module/README.md)  
+* [4.日志管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Log/README.md)日志模块文档。[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Log/README.md)  
+* [5.声音管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Audio/README.md)音频模块文档。[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Audio/README.md)  
+* [6.事件管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Event/README.md)事件模块文档。[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Event/README.md)  
+* [7.时间管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Timer/README.md)时间模块文档。[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Timer/README.md)  
+* [8.实体组件（内置）：]待添加  
+* [9.网络连接与通信（内置）：]待添加  
+* [10.SDK接入（内置）：]待添加  
 
 ## 使用步骤
 

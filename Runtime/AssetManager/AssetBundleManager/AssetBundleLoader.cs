@@ -473,7 +473,7 @@ namespace F8Framework.Core
                         {
                             if (assetBundleLoadRequest.isDone)
                             {
-                                if (assetBundleLoadRequest.assetBundle == null)
+                                if (!assetBundleLoadRequest.assetBundle)
                                 {
                                     assetBundleLoadState = LoaderState.FINISHED;
                                     string errMsg = string.Format("Load asset bundle {0} can't be loaded.", assetBundlePath);
@@ -492,7 +492,7 @@ namespace F8Framework.Core
                         {
                             if (assetBundleDownloadRequest.IsFinished)
                             {
-                                if (assetBundleDownloadRequest.DownloadedAssetBundle == null)
+                                if (!assetBundleDownloadRequest.DownloadedAssetBundle)
                                 {
                                     assetBundleLoadState = LoaderState.FINISHED;
                                     string errMsg = string.Format("Remote asset bundle {0} can't be loaded, try reload", assetBundlePath);

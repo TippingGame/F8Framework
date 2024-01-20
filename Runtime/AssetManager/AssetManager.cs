@@ -449,12 +449,12 @@ namespace F8Framework.Core
                         {
                             AssetBundleManager.Instance.LoadAsync(Path.GetFileNameWithoutExtension(assetPath), 
                                 new AssetInfo(info.AssetType, new []{assetPath}, info.AssetBundlePathWithoutAb, abName), (b) =>
-                            {
-                                if (++assetCount >= info.AssetPath.Length)
                                 {
-                                    End();
-                                }
-                            });
+                                    if (++assetCount >= info.AssetPath.Length)
+                                    {
+                                        End();
+                                    }
+                                });
                         }
                         else
                         {

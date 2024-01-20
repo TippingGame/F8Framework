@@ -8,6 +8,9 @@ namespace F8Framework.Core
     /// </summary>
     public static class AssetBundleHelper
     {
+        private static string _streamingAssetsPath = Application.streamingAssetsPath + "/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
+        private static string _persistentDataPath = Application.persistentDataPath + "/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
+        private static string _remoteAddress = URLSetting.REMOTE_ADDRESS + "/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
         /// <summary>
         /// 源类型的枚举。
         /// </summary>
@@ -30,19 +33,17 @@ namespace F8Framework.Core
             switch (type)
             {
                 case SourceType.STREAMING_ASSETS:
-                    assetBundlePath = Application.streamingAssetsPath;
+                    assetBundlePath = _streamingAssetsPath;
                     break;
                 case SourceType.PERSISTENT_DATA_PATH:
-                    assetBundlePath = Application.persistentDataPath;
+                    assetBundlePath = _persistentDataPath;
                     break;
                 case SourceType.REMOTE_ADDRESS:
-                    assetBundlePath = URLSetting.REMOTE_ADDRESS;
+                    assetBundlePath = _remoteAddress;
                     break;
                 default:
                     return null;
             }
-
-            assetBundlePath += "/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName();
             
             return assetBundlePath;
         }
@@ -57,7 +58,7 @@ namespace F8Framework.Core
             if (platformAssetBundlePath == null)
                 return null;
 
-            string manifestPath = platformAssetBundlePath + "/" + Path.GetFileName(platformAssetBundlePath);
+            string manifestPath = platformAssetBundlePath + URLSetting.GetPlatformName();
             return manifestPath;
         }
 
@@ -80,13 +81,13 @@ namespace F8Framework.Core
         /// <param name="assetBundleFileName">资产捆绑包的文件名。</param>
         /// <param name="type">源类型。</param>
         /// <returns>正确的路径。</returns>
-        public static string GetAssetBundleFullName(string assetBundleFileName, SourceType type = SourceType.STREAMING_ASSETS)
+        public static string GetAssetBundleFullName(string assetBundleFileName = null, SourceType type = SourceType.STREAMING_ASSETS)
         {
             string assetBundlePath = GetAssetBundlePath(type);
             if (assetBundlePath == null)
                 return null;
 
-            return assetBundlePath + "/" + assetBundleFileName;
+            return assetBundlePath + assetBundleFileName;
         }
 
         /// <summary>

@@ -51,7 +51,10 @@ namespace F8Framework.Core
                     assetBundleLoaders.Add(assetBundlePath, loader);
                 }
                 //同步清理异步
-                loader.AssetBundleLoadRequest?.assetBundle.Unload(false);
+                if (loader.AssetBundleLoadRequest?.assetBundle)
+                {
+                    loader.AssetBundleLoadRequest?.assetBundle.Unload(false);
+                }
                 
                 loader.Load();
                 loader.Expand();
@@ -781,7 +784,7 @@ namespace F8Framework.Core
             return allLoaderFinished;
         }
 
-        public static string GetAssetBundleCompletePath(string regPath = "")
+        public static string GetAssetBundleCompletePath(string regPath = null)
         {
             string persistentABFullPath
                 = AssetBundleHelper.GetAssetBundleFullName(regPath, AssetBundleHelper.SourceType.PERSISTENT_DATA_PATH);
@@ -792,7 +795,7 @@ namespace F8Framework.Core
                 return AssetBundleHelper.GetAssetBundleFullName(regPath, AssetBundleHelper.SourceType.STREAMING_ASSETS);
         }
         
-        public static string GetRemoteAssetBundleCompletePath(string regPath = "")
+        public static string GetRemoteAssetBundleCompletePath(string regPath = null)
         {
             if (!string.IsNullOrEmpty(URLSetting.REMOTE_ADDRESS))
             {
