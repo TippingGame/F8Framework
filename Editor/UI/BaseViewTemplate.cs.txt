@@ -1,0 +1,43 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using F8Framework.Core;
+
+public class #SCRIPTNAME# : BaseView
+{
+    // Awake
+    protected override void OnAwake()
+    {
+        
+    }
+    
+    // 参数传入
+    protected override void OnAdded(object[] args, string uuid)
+    {
+        
+    }
+    
+    // Start
+    protected override void OnStart()
+    {
+        object[] args = Args;
+        string uuid = Uuid;
+    }
+    
+    // 打开界面动画完成后
+    protected override void OnViewOpen()
+    {
+        
+    }
+    
+    // 删除之前
+    protected override void OnBeforeRemove(object[] args, string uuid){
+        
+    }
+    
+    // 删除
+    protected override void OnRemoved(object[] args, string uuid)
+    {
+        
+    }
+}

@@ -28,7 +28,7 @@ namespace F8Framework.Core
         {
             this.Args = args;
             this.Uuid = uuid;
-            OnBeforeRemove(args, uuid);
+            OnAdded(args, uuid);
         }
 
         protected virtual void OnAdded(object[] args, string uuid)
