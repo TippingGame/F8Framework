@@ -3,41 +3,43 @@ using System.Collections.Generic;
 using UnityEngine;
 using F8Framework.Core;
 
+    #ROOTNAMESPACEBEGIN#
 public class #SCRIPTNAME# : BaseView
 {
     // Awake
     protected override void OnAwake()
     {
-        
+        #NOTRIM#
     }
     
     // 参数传入
     protected override void OnAdded(object[] args, string uuid)
     {
-        
+        #NOTRIM#
     }
     
     // Start
     protected override void OnStart()
     {
-        object[] args = Args;
-        string uuid = Uuid;
+        #NOTRIM#
     }
     
     // 打开界面动画完成后
     protected override void OnViewOpen()
     {
-        
+        #NOTRIM#
     }
     
     // 删除之前
-    protected override void OnBeforeRemove(object[] args, string uuid){
-        
+    protected override void OnBeforeRemove(object[] args, string uuid)
+    {
+        #NOTRIM#
     }
     
     // 删除
     protected override void OnRemoved(object[] args, string uuid)
     {
-        
+        #NOTRIM#
     }
 }
+#ROOTNAMESPACEEND#
