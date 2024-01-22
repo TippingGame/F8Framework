@@ -143,7 +143,7 @@ namespace F8Framework.Core.Editor
                 // 获取文件的路径
                 string[] filePaths = Directory.GetFiles(URLSetting.GetAssetBundlesFolder(), "*", SearchOption.AllDirectories);
                 // 合并文件夹和文件的路径，可以根据需要调整顺序
-                string[] allPaths = folderPaths.Concat(filePaths).ToArray();
+                string[] allPaths = filePaths.Concat(folderPaths).ToArray();
                 
                 List<string> tempNames = new List<string>();
                 
@@ -197,7 +197,7 @@ namespace F8Framework.Core.Editor
                     
                         if (tempNames.Contains(fileNameWithoutExtension))
                         {
-                            LogF8.LogError("AssetName重复，请检查资源：" + filePath);
+                            LogF8.LogError("AssetName重复，请检查资源地址：" + filePath);
                             string id = Guid.NewGuid().ToString(); // 生成一个唯一的ID
                             fileNameWithoutExtension += id;
                         }
@@ -220,7 +220,7 @@ namespace F8Framework.Core.Editor
                         
                         if (tempNames.Contains(fileNameWithoutExtension))
                         {
-                            LogF8.LogError("AssetName重复，请检查资源：" + filePath);
+                            LogF8.LogError("AssetName重复，请检查文件夹地址：" + filePath);
                             string id = Guid.NewGuid().ToString(); // 生成一个唯一的ID
                             fileNameWithoutExtension += id;
                         }

@@ -219,6 +219,10 @@ namespace F8Framework.Core
 #endif
                     foreach (var assetPath in info.AssetPath)
                     {
+                        if (string.IsNullOrEmpty(assetPath))
+                        {
+                            continue;
+                        }
                         string abName = Path.ChangeExtension(assetPath, null).Replace(URLSetting.AssetBundlesPath, "").ToLower();
                         AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePathWithoutAb + abName);
                         if (ab == null || ab.AssetBundleContent == null)
@@ -443,6 +447,10 @@ namespace F8Framework.Core
                     int assetCount = 0;
                     foreach (var assetPath in info.AssetPath)
                     {
+                        if (string.IsNullOrEmpty(assetPath))
+                        {
+                            continue;
+                        }
                         string abName = Path.ChangeExtension(assetPath, null).Replace(URLSetting.AssetBundlesPath, "").ToLower();
                         AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePathWithoutAb + abName);
                         if (ab == null || ab.AssetBundleContent == null || ab.GetDependentNamesLoadFinished() < ab.AddDependentNames())
