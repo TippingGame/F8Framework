@@ -791,7 +791,7 @@ namespace F8Framework.Core
 
                 if (progress >= 2f)
                 {
-                    progress = -1f;
+                    progress = 0f;
                 }
 
                 return progress;
@@ -824,7 +824,7 @@ namespace F8Framework.Core
                 }
                 if (progress >= 2f)
                 {
-                    progress = -1f;
+                    progress = 0f;
                 }
                 return progress;
             }
