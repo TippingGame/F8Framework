@@ -12,15 +12,15 @@ namespace F8Framework.Core
             public UICallbacks callbacks;
         }
 
-        private Dictionary<string, Queue<DialogParam>> dialogParams = new Dictionary<string, Queue<DialogParam>>();
+        private Dictionary<int, Queue<DialogParam>> dialogParams = new Dictionary<int, Queue<DialogParam>>();
         
-        public new string Add(UIConfig config, object[] parameters = null, UICallbacks callbacks = null)
+        public new string Add(int uiId, UIConfig config, object[] parameters = null, UICallbacks callbacks = null)
         {
             string uuid = config.AssetName;
-            if (!dialogParams.TryGetValue(uuid, out Queue<DialogParam> dialogQueue))
+            if (!dialogParams.TryGetValue(uiId, out Queue<DialogParam> dialogQueue))
             {
                 dialogQueue = new Queue<DialogParam>();
-                dialogParams[uuid] = dialogQueue;
+                dialogParams[uiId] = dialogQueue;
             }
             dialogQueue.Enqueue(new DialogParam
             {
@@ -34,11 +34,11 @@ namespace F8Framework.Core
             }
             else
             {
-                return Show(config, parameters, callbacks);
+                return Show(uiId, config, parameters, callbacks);
             }
         }
 
-        private string Show(UIConfig config, object[] parameters = null, UICallbacks callbacks = null)
+        private string Show(int uiId, UIConfig config, object[] parameters = null, UICallbacks callbacks = null)
         {
             string prefabPath = config.AssetName;
             string uuid = prefabPath; // 暂时和prefabPath相同
@@ -47,6 +47,7 @@ namespace F8Framework.Core
             {
                 viewParams = new ViewParams
                 {
+                    UIid = uiId,
                     Uuid = uuid,
                     PrefabPath = prefabPath,
                     Valid = true
@@ -69,13 +70,13 @@ namespace F8Framework.Core
 
             return uuid;
         }
-        private IEnumerator DelayedNext(string id)
+        private IEnumerator DelayedNext(int id)
         {
             // 延迟一帧
             yield return null;
             Next(id);
         }
-        private void Next(string id)
+        private void Next(int id)
         {
             if (dialogParams[id] != null && dialogParams[id].Count > 0)
             {
@@ -83,16 +84,16 @@ namespace F8Framework.Core
                 if (dialogParams[id].Count > 0)
                 {
                     DialogParam nextParam = dialogParams[id].Peek();
-                    Show(nextParam.config, nextParam.parameters, nextParam.callbacks);
+                    Show(id, nextParam.config, nextParam.parameters, nextParam.callbacks);
                 }
             }
         }
         
-        public new void Close(string prefabPath, bool isDestroy)
+        public new void Close(int uiId, string prefabPath, bool isDestroy)
         {
             if (isDestroy)
             {
-                dialogParams.TryGetValue(prefabPath, out Queue<DialogParam> dialogQueue);
+                dialogParams.TryGetValue(uiId, out Queue<DialogParam> dialogQueue);
                 if (dialogQueue is { Count: > 0 })
                 {
                     dialogQueue.Dequeue();

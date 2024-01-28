@@ -8,7 +8,7 @@ namespace F8Framework.Core
         protected Dictionary<string, ViewParams> uiViews = new Dictionary<string, ViewParams>();
         protected Dictionary<string, ViewParams> uiCache = new Dictionary<string, ViewParams>();
 
-        public string Add(UIConfig config, object[] parameters = null, UICallbacks callbacks = null)
+        public string Add(int uiId, UIConfig config, object[] parameters = null, UICallbacks callbacks = null)
         {
             var prefabPath = config.AssetName;
             var uuid = prefabPath; // 暂时和prefabPath相同
@@ -35,6 +35,7 @@ namespace F8Framework.Core
                 }
             }
 
+            viewParams.UIid = uiId;
             viewParams.Params = parameters;
             viewParams.Callbacks = new UICallbacks();
             viewParams.Valid = true;

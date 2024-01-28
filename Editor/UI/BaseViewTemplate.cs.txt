@@ -13,13 +13,24 @@ public class #SCRIPTNAME# : BaseView
     }
     
     // 参数传入
-    protected override void OnAdded(object[] args, string uuid)
+    protected override void OnAdded(object[] args, int uiId)
     {
         #NOTRIM#
     }
     
     // Start
     protected override void OnStart()
+    {
+        #NOTRIM#
+    }
+    
+    protected override void OnViewTweenInit()
+    {
+        #NOTRIM#
+    }
+    
+    // 自定义打开界面动画
+    protected override void OnPlayViewTween()
     {
         #NOTRIM#
     }
@@ -31,13 +42,13 @@ public class #SCRIPTNAME# : BaseView
     }
     
     // 删除之前
-    protected override void OnBeforeRemove(object[] args, string uuid)
+    protected override void OnBeforeRemove(object[] args, int uiId)
     {
         #NOTRIM#
     }
     
     // 删除
-    protected override void OnRemoved(object[] args, string uuid)
+    protected override void OnRemoved(object[] args, int uiId)
     {
         #NOTRIM#
     }

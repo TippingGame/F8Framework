@@ -20,6 +20,13 @@ Unity F8UIManager界面管理组件，处理界面加载，打开，关闭，层
 
 ### 代码使用方法
 ```C#
+        private Dictionary<int, UIConfig> configs = new Dictionary<int, UIConfig>
+        {
+            { 1, new UIConfig(LayerType.UI, "UITip") },
+            // 手动添加UI配置
+        };
+        private object[] data = new object[] { 123123, "asdasd" };
+        
         /*----------UI管理功能----------*/
         
         // 初始化
@@ -39,39 +46,50 @@ Unity F8UIManager界面管理组件，处理界面加载，打开，关闭，层
         
         /*----------如何使用模板----------*/
         
-public class UIMain : BaseView
-{
-    protected override void OnAwake()
-    {
-        // Awake
-    }
-        
-    protected override void OnAdded(object[] args, string uuid)
-    {
-        // 参数传入
-    }
-    
-    protected override void OnStart()
-    {
-        // Start
-        object[] args = Args;
-        string uuid = Uuid;
-    }
-    
-    protected override void OnViewOpen()
-    {
-        // 打开界面动画完成后
-    }
-    
-    protected override void OnBeforeRemove(object[] args, string uuid){
-        // 删除之前
-    }
-    
-    protected override void OnRemoved(object[] args, string uuid)
-    {
-        // 删除
-    }
-}
+        public class UIMain : BaseView
+        {
+            protected override void OnAwake()
+            {
+                // Awake
+            }
+                
+            protected override void OnAdded(object[] args, int uiId)
+            {
+                // 参数传入
+            }
+            
+            protected override void OnStart()
+            {
+                // Start
+                object[] args = Args;
+                int uiId = UIid;
+            }
+            
+            protected override void OnViewTweenInit()
+            {
+                transform.localScale = Vector3.one * 0.7f;
+            }
+            
+            protected override void OnPlayViewTween()
+            {
+                // 打开界面动画，可自行添加关闭界面动画
+                transform.ScaleTween(Vector3.one, 0.1f).SetEase(Ease.Linear).SetOnComplete(OnViewOpen);
+            }
+            
+            protected override void OnViewOpen()
+            {
+                // 打开界面动画完成后
+            }
+            
+            protected override void OnBeforeRemove(object[] args, int uiId){
+                // 删除之前
+            }
+            
+            protected override void OnRemoved(object[] args, int uiId)
+            {
+                // 删除
+            }
+        }
 ```
 
 

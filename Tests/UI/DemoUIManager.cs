@@ -37,7 +37,7 @@ public class UIMain : BaseView
         // Awake
     }
         
-    protected override void OnAdded(object[] args, string uuid)
+    protected override void OnAdded(object[] args, int uiId)
     {
         // 参数传入
     }
@@ -46,7 +46,18 @@ public class UIMain : BaseView
     {
         // Start
         object[] args = Args;
-        string uuid = Uuid;
+        int uiId = UIid;
+    }
+    
+    protected override void OnViewTweenInit()
+    {
+        transform.localScale = Vector3.one * 0.7f;
+    }
+    
+    protected override void OnPlayViewTween()
+    {
+        // 打开界面动画，可自行添加关闭界面动画
+        transform.ScaleTween(Vector3.one, 0.1f).SetEase(Ease.Linear).SetOnComplete(OnViewOpen);
     }
     
     protected override void OnViewOpen()
@@ -54,11 +65,11 @@ public class UIMain : BaseView
         // 打开界面动画完成后
     }
     
-    protected override void OnBeforeRemove(object[] args, string uuid){
+    protected override void OnBeforeRemove(object[] args, int uiId){
         // 删除之前
     }
     
-    protected override void OnRemoved(object[] args, string uuid)
+    protected override void OnRemoved(object[] args, int uiId)
     {
         // 删除
     }

@@ -5,7 +5,7 @@ namespace F8Framework.Core
 {
     public class UICallbacks
     {
-        public delegate void NodeEventDelegate(object[] parameters, string id);
+        public delegate void NodeEventDelegate(object[] parameters, int uiId);
 
         public NodeEventDelegate OnAdded;
         public NodeEventDelegate OnRemoved;
@@ -27,6 +27,7 @@ namespace F8Framework.Core
     /// </summary>
     public class ViewParams
     {
+        public int UIid;
         public string Uuid;
         public string PrefabPath;
         public object[] Params;

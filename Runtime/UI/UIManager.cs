@@ -64,7 +64,7 @@ namespace F8Framework.Core
                 LogF8.LogView($"打开 ID 为 {uiId} 的 UI 失败，未找到配置。");
                 return;
             }
-            _layerNotify.Show(config, content);
+            _layerNotify.Show(uiId, config, content);
         }
 
         public List<string> GetCurrentUuids()
@@ -83,22 +83,22 @@ namespace F8Framework.Core
             switch (config.Layer)
             {
                 case LayerType.Game:
-                    _layerGame.Add(config, uiArgs, callbacks);
+                    _layerGame.Add(uiId, config, uiArgs, callbacks);
                     break;
                 case LayerType.UI:
-                    _layerUI.Add(config, uiArgs, callbacks);
+                    _layerUI.Add(uiId, config, uiArgs, callbacks);
                     break;
                 case LayerType.PopUp:
-                    _layerPopUp.Add(config, uiArgs, callbacks);
+                    _layerPopUp.Add(uiId, config, uiArgs, callbacks);
                     break;
                 case LayerType.Dialog:
-                    _layerDialog.Add(config, uiArgs, callbacks);
+                    _layerDialog.Add(uiId, config, uiArgs, callbacks);
                     break;
                 case LayerType.Notify:
                     LogF8.LogView($"请使用ShowNotify 打开 ID 为 {uiId} 的 UI");
                     break;
                 case LayerType.Guide:
-                    _layerGuide.Add(config, uiArgs, callbacks);
+                    _layerGuide.Add(uiId, config, uiArgs, callbacks);
                     break;
             }
         }
@@ -163,7 +163,7 @@ namespace F8Framework.Core
                     _layerPopUp.Close(config.AssetName, isDestroy);
                     break;
                 case LayerType.Dialog:
-                    _layerDialog.Close(config.AssetName, isDestroy);
+                    _layerDialog.Close(uiId, config.AssetName, isDestroy);
                     break;
                 case LayerType.Notify:
                     LogF8.LogView($"Notify 不能移除 ID 为 {uiId} 的 UI");

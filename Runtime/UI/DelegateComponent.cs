@@ -9,10 +9,10 @@ namespace F8Framework.Core
         public void Add()
         {
             // 触发窗口组件上添加到父节点后的事件
-            ApplyComponentsFunction("Added", ViewParams.Params, ViewParams.Uuid);
+            ApplyComponentsFunction("Added", ViewParams.Params, ViewParams.UIid);
             if (ViewParams.Callbacks != null && ViewParams.Callbacks.OnAdded != null)
             {
-                ViewParams.Callbacks.OnAdded(ViewParams.Params, ViewParams.Uuid);
+                ViewParams.Callbacks.OnAdded(ViewParams.Params, ViewParams.UIid);
             }
         }
 
@@ -22,7 +22,7 @@ namespace F8Framework.Core
             if (ViewParams.Valid)
             {
                 // 触发窗口组件上移除之前的事件
-                ApplyComponentsFunction("BeforeRemove", ViewParams.Params, ViewParams.Uuid);
+                ApplyComponentsFunction("BeforeRemove", ViewParams.Params, ViewParams.UIid);
 
                 // 通知外部对象窗口组件上移除之前的事件（关闭窗口前的关闭动画处理）
                 if (ViewParams.Callbacks != null && ViewParams.Callbacks.OnBeforeRemove != null)
@@ -43,7 +43,7 @@ namespace F8Framework.Core
             
             if (viewParams.Callbacks != null && viewParams.Callbacks.OnRemoved != null)
             {
-                viewParams.Callbacks.OnRemoved(viewParams.Params, viewParams.Uuid);
+                viewParams.Callbacks.OnRemoved(viewParams.Params, viewParams.UIid);
             }
 
             if (isDestroy)
@@ -61,19 +61,19 @@ namespace F8Framework.Core
         private void OnDestroy()
         {
             // 触发窗口组件上窗口移除之后的事件
-            ApplyComponentsFunction("Removed", ViewParams.Params, ViewParams.Uuid);
+            ApplyComponentsFunction("Removed", ViewParams.Params, ViewParams.UIid);
 
             ViewParams = null;
         }
 
-        private void ApplyComponentsFunction(string functionName, object parameters, string uuid)
+        private void ApplyComponentsFunction(string functionName, object parameters, int uiId)
         {
             foreach (var component in gameObject.GetComponents<MonoBehaviour>())
             {
                 var methodInfo = component.GetType().GetMethod(functionName);
                 if (methodInfo != null)
                 {
-                    methodInfo.Invoke(component, new object[] { parameters, uuid });
+                    methodInfo.Invoke(component, new object[] { parameters, uiId });
                 }
             }
         }
