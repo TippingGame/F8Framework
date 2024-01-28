@@ -82,6 +82,10 @@ namespace F8Framework.Core
             comp.Add();
             viewParams.Go.transform.SetParent(gameObject.transform, false);
             viewParams.Go.transform.localPosition = Vector3.zero;
+            if (viewParams.Go.activeSelf == false)
+            {
+                viewParams.Go.SetActive(true);
+            }
         }
 
         public void Close(string prefabPath, bool isDestroy)

@@ -636,6 +636,7 @@ namespace F8Framework.Core
                 {
                     return new AssetInfo(AssetTypeEnum.RESOURCE, new []{value}, null, null);
                 }
+                LogF8.LogError("ResourceMappings不存在");
                 return null;
             }
             
@@ -652,6 +653,7 @@ namespace F8Framework.Core
                         return new AssetInfo(AssetTypeEnum.ASSET_BUNDLE, assetmpping.AssetPath, AssetBundleManager.GetAssetBundleCompletePath(), assetmpping.AbName);
                     }
                 }
+                LogF8.LogError("AssetBundleMappings不存在");
                 return null;
             }
             

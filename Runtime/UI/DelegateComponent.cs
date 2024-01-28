@@ -55,6 +55,10 @@ namespace F8Framework.Core
             else
             {
                 gameObject.transform.SetParent(null, false);
+                if (gameObject.activeSelf)
+                {
+                    gameObject.SetActive(false);
+                }
             }
         }
 
