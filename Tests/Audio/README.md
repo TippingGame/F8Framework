@@ -5,7 +5,11 @@
 [![Platform](https://img.shields.io/badge/platform-Win%20%7C%20Android%20%7C%20iOS%20%7C%20Mac%20%7C%20Linux-orange)]() 
 
 ## 简介（希望自己点击F8，就能开始制作游戏，不想多余的事）
-Unity F8AudioManager组件，分离1.背景音乐 2.人声 3.特效声，进度控制，音量持久化保存，统一暂停/恢复
+Unity F8AudioManager组件，播放，暂停，停止，进度控制，音量控制/保存，全局暂停/恢复  
+Audio分为三大类：  
+1.背景音乐  
+2.人声  
+3.特效声  
 
 ## 导入插件（需要首先导入核心）
 注意！内置在->F8Framework核心：https://github.com/TippingGame/F8Framework.git  

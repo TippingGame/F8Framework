@@ -5,18 +5,23 @@
 [![Platform](https://img.shields.io/badge/platform-Win%20%7C%20Android%20%7C%20iOS%20%7C%20Mac%20%7C%20Linux-orange)]() 
 
 ## 简介（希望自己点击F8，就能开始制作游戏，不想多余的事）
-Unity F8UIManager界面管理组件，处理界面加载，打开，关闭，层级
+Unity F8UIManager界面管理组件，处理界面加载，打开，关闭，查询，层级控制，自定义动画。  
+UI界面分为三大类：  
+1.普通UI  
+2.模态弹窗（只显示最老的窗口，关闭后自动显示下一个新窗口）  
+3.非模态弹窗（老窗口和新窗口共存，新的显示在前，自己管理窗口关闭）
 
 ## 导入插件（需要首先导入核心）
 注意！内置在->F8Framework核心：https://github.com/TippingGame/F8Framework.git  
 方式一：直接下载文件，放入Unity  
 方式二：Unity->点击菜单栏->Window->Package Manager->点击+号->Add Package from git URL->输入：https://github.com/TippingGame/F8Framework.git  
 
-### 初始化，创建模板，创建UI
+### 初始化，创建UI，创建代码模板
 
-1. 找到UIRoot预制体，放入场景中（需要自行添加Camera）  
-2. 右键资源文件夹，看到（F8UI界面管理功能），创建模板  
-3. 脚本挂载到UI根层级上  
+1. 找到UIRoot预制体，放入场景中（或者用代码动态加载）  
+2. 制作UI预制体，放到AssetBundles文件夹下任意目录
+3. 右键资源文件夹，看到（F8UI界面管理功能），创建BaseView模板，挂载到UI根层级上  
+4. 按F8自动生成UI组件的索引  
 
 ### 代码使用方法
 ```C#
