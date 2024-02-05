@@ -2,16 +2,16 @@ using UnityEngine;
 
 namespace F8Framework.Core
 {
-    public class BaseView : MonoBehaviour
+    public class BaseView : ComponentBind
     {
         public enum WindowState
         {
             Awake,
             Animating,
-            Start,
+            Ready,
             Closed
         }
-
+        
         public object[] Args;
         public int UIid;
         public WindowState windowState = WindowState.Closed;
@@ -19,19 +19,21 @@ namespace F8Framework.Core
         private void Awake()
         {
             windowState = WindowState.Awake;
-            OnViewTweenInit();
             OnAwake();
         }
 
         protected virtual void OnAwake()
         {
         }
-        
+
         public void Added(object[] args, int uiId)
         {
             this.Args = args;
             this.UIid = uiId;
             OnAdded(args, uiId);
+            windowState = WindowState.Animating;
+            OnViewTweenInit();
+            OnPlayViewTween();
         }
 
         protected virtual void OnAdded(object[] args, int uiId)
@@ -40,10 +42,7 @@ namespace F8Framework.Core
 
         private void Start()
         {
-            windowState = WindowState.Animating;
-            OnPlayViewTween();
             OnStart();
-            windowState = WindowState.Start;
         }
 
         protected virtual void OnStart()
@@ -56,6 +55,7 @@ namespace F8Framework.Core
         
         protected virtual void OnPlayViewTween()
         {
+            windowState = WindowState.Ready;
             OnViewOpen();
         }
 
@@ -79,21 +79,21 @@ namespace F8Framework.Core
             UIManager.Instance.Close(UIid, isDestroy);
         }
 
-        public void BeforeRemove(object[] args, int uiId)
+        public void BeforeRemove()
         {
-            OnBeforeRemove(args, uiId);
+            OnBeforeRemove();
         }
 
-        protected virtual void OnBeforeRemove(object[] args, int uiId)
+        protected virtual void OnBeforeRemove()
         {
         }
 
-        public void Removed(object[] args, int uiId)
+        public void Removed()
         {
-            OnRemoved(args, uiId);
+            OnRemoved();
         }
 
-        protected virtual void OnRemoved(object[] args, int uiId)
+        protected virtual void OnRemoved()
         {
         }
     }

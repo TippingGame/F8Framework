@@ -10,8 +10,6 @@ namespace F8Framework.Core.Editor
 {
     public static class OpenAssetLogLine
     {
-        private static bool m_hasForceMono = false;
-
         [OnOpenAsset(0)]
         private static bool OnOpenAsset(int instanceID, int line)
         {

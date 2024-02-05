@@ -4,7 +4,7 @@ using UnityEngine;
 using F8Framework.Core;
 
     #ROOTNAMESPACEBEGIN#
-public class #SCRIPTNAME# : BaseView
+public partial class #SCRIPTNAME# : BaseView
 {
     // Awake
     protected override void OnAwake()
@@ -26,13 +26,13 @@ public class #SCRIPTNAME# : BaseView
     
     protected override void OnViewTweenInit()
     {
-        #NOTRIM#
+        //transform.localScale = Vector3.one * 0.7f;
     }
     
     // 自定义打开界面动画
     protected override void OnPlayViewTween()
     {
-        #NOTRIM#
+        //transform.ScaleTween(Vector3.one, 0.1f).SetEase(Ease.Linear).SetOnComplete(OnViewOpen);
     }
     
     // 打开界面动画完成后
@@ -42,15 +42,24 @@ public class #SCRIPTNAME# : BaseView
     }
     
     // 删除之前
-    protected override void OnBeforeRemove(object[] args, int uiId)
+    protected override void OnBeforeRemove()
     {
         #NOTRIM#
     }
     
     // 删除
-    protected override void OnRemoved(object[] args, int uiId)
+    protected override void OnRemoved()
     {
         #NOTRIM#
     }
 }
 #ROOTNAMESPACEEND#
+
+// 自动获取组件
+public partial class #SCRIPTNAME#
+{
+    // Auto Bind Components
+    
+    // Auto Bind Components
+}
+// 自动获取组件

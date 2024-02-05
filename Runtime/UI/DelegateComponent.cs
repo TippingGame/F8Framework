@@ -22,7 +22,7 @@ namespace F8Framework.Core
             if (ViewParams.Valid)
             {
                 // 触发窗口组件上移除之前的事件
-                ApplyComponentsFunction("BeforeRemove", ViewParams.Params, ViewParams.UIid);
+                ApplyComponentsFunction("BeforeRemove");
 
                 // 通知外部对象窗口组件上移除之前的事件（关闭窗口前的关闭动画处理）
                 if (ViewParams.Callbacks != null && ViewParams.Callbacks.OnBeforeRemove != null)
@@ -65,19 +65,26 @@ namespace F8Framework.Core
         private void OnDestroy()
         {
             // 触发窗口组件上窗口移除之后的事件
-            ApplyComponentsFunction("Removed", ViewParams.Params, ViewParams.UIid);
+            ApplyComponentsFunction("Removed");
 
             ViewParams = null;
         }
 
-        private void ApplyComponentsFunction(string functionName, object parameters, int uiId)
+        private void ApplyComponentsFunction(string functionName, object parameters = null, int uiId = 0)
         {
             foreach (var component in gameObject.GetComponents<MonoBehaviour>())
             {
                 var methodInfo = component.GetType().GetMethod(functionName);
                 if (methodInfo != null)
                 {
-                    methodInfo.Invoke(component, new object[] { parameters, uiId });
+                    if (parameters == null)
+                    {
+                        methodInfo.Invoke(component, null);
+                    }
+                    else
+                    {
+                        methodInfo.Invoke(component, new object[] { parameters, uiId });
+                    }
                 }
             }
         }

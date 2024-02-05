@@ -1,4 +1,3 @@
-using F8Framework.AssetMap;
 using F8Framework.Core;
 using UnityEngine;
 

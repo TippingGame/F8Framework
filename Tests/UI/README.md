@@ -5,7 +5,7 @@
 [![Platform](https://img.shields.io/badge/platform-Win%20%7C%20Android%20%7C%20iOS%20%7C%20Mac%20%7C%20Linux-orange)]() 
 
 ## 简介（希望自己点击F8，就能开始制作游戏，不想多余的事）
-Unity F8UIManager界面管理组件，处理界面加载，打开，关闭，查询，层级控制，自定义动画。  
+Unity F8UIManager界面管理组件，处理界面加载，打开，关闭，查询，层级控制，自定义动画，自动获取组件索引。  
 UI界面分为三大类：  
 1.普通UI  
 2.模态弹窗（只显示最老的窗口，关闭后自动显示下一个新窗口）  
@@ -19,10 +19,12 @@ UI界面分为三大类：
 ### 初始化，创建UI，创建代码模板
 
 1. 找到UIRoot预制体，放入场景中（或者用代码动态加载）  
-2. 制作UI预制体，放到AssetBundles文件夹下任意目录
+![image](ui_20240205224109.png)
+2. 制作UI预制体，放到AssetBundles或者Resources文件夹下任意目录  
 3. 右键资源文件夹，看到（F8UI界面管理功能），创建BaseView模板，挂载到UI根层级上  
-4. 按F8自动生成UI组件的索引  
-
+4. 点击按钮自动生成UI组件的索引
+![image](ui_20240205223438.png)
+![image](ui_20240205223604.png)
 ### 代码使用方法
 ```C#
         private Dictionary<int, UIConfig> configs = new Dictionary<int, UIConfig>
@@ -51,7 +53,16 @@ UI界面分为三大类：
         
         /*----------如何使用模板----------*/
         
-        public class UIMain : BaseView
+        // 自动获取组件
+        public partial class UIMain
+        {
+            // Auto Bind Components
+            
+            // Auto Bind Components
+        }
+        // 自动获取组件
+        
+        public partial class UIMain : BaseView
         {
             protected override void OnAwake()
             {
@@ -72,13 +83,13 @@ UI界面分为三大类：
             
             protected override void OnViewTweenInit()
             {
-                transform.localScale = Vector3.one * 0.7f;
+                //transform.localScale = Vector3.one * 0.7f;
             }
             
             protected override void OnPlayViewTween()
             {
                 // 打开界面动画，可自行添加关闭界面动画
-                transform.ScaleTween(Vector3.one, 0.1f).SetEase(Ease.Linear).SetOnComplete(OnViewOpen);
+                //transform.ScaleTween(Vector3.one, 0.1f).SetEase(Ease.Linear).SetOnComplete(OnViewOpen);
             }
             
             protected override void OnViewOpen()
@@ -86,11 +97,11 @@ UI界面分为三大类：
                 // 打开界面动画完成后
             }
             
-            protected override void OnBeforeRemove(object[] args, int uiId){
+            protected override void OnBeforeRemove(){
                 // 删除之前
             }
             
-            protected override void OnRemoved(object[] args, int uiId)
+            protected override void OnRemoved()
             {
                 // 删除
             }

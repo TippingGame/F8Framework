@@ -21,7 +21,7 @@ namespace F8Framework.Core
             Load(viewParams);
         }
 
-        protected void Load(ViewParams viewParams)
+        protected new void Load(ViewParams viewParams)
         {
             AssetManager.Instance.LoadAsync<GameObject>(viewParams.PrefabPath, (res) =>
             {
@@ -36,7 +36,7 @@ namespace F8Framework.Core
             });
         }
 
-        protected void CreateNode(ViewParams viewParams)
+        protected new void CreateNode(ViewParams viewParams)
         {
             viewParams.Valid = true;
 

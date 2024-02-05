@@ -161,7 +161,7 @@ namespace F8Framework.Core
         public static void LogEntity(string s, params object[] p)
         {
             sb.Clear();
-            sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.white));
+            sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.blue));
             sb.Append(DateTime.Now);
             sb.Append("[实体日志]");
             sb.Append("</color>");
@@ -175,7 +175,7 @@ namespace F8Framework.Core
         public static void LogEntity(object o)
         {
             sb.Clear();
-            sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.white));
+            sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.blue));
             sb.Append(DateTime.Now);
             sb.Append("[实体日志]");
             sb.Append("</color>");
@@ -271,13 +271,13 @@ namespace F8Framework.Core
         public static void LogStackTrace(string str)
         {
             StackFrame[] stacks = new StackTrace().GetFrames();
-            string result = str + "\r\n";
+            string result = str + "\n\n";
 
             if (stacks != null)
             {
                 for (int i = 0; i < stacks.Length; i++)
                 {
-                    result += string.Format("{0} {1}\r\n", stacks[i].GetFileName(), stacks[i].GetMethod().ToString());
+                    result += string.Format("{0} {1}\n\n", stacks[i].GetFileName(), stacks[i].GetMethod().ToString());
                 }
             }
 

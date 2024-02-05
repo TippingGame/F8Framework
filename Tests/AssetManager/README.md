@@ -17,11 +17,12 @@ Unity F8AssetManager资产加载组件。
 ### 初始化
 
 1. 点击F8，自动获取Resources下的所有资产，生成索引（注意：资产名称唯一）  
-          自动获取Assets/AssetBundles下的所有资产，生成索引（注意：资产名称唯一） 
+          自动获取Assets/AssetBundles下的所有资产，生成索引（注意：资产名称唯一）  
           自动生成索引文件Assets/F8Framework/AssetMap目录下面  
-          
+![image](ui_20240205225637.png)
+![image](ui_20240205230012.png)
 2. 生成AssetBundles目录，自动赋予资产AB名称，打包AssetBundle，目录StreamingAssets/AssetBundles/Windows（不同平台例如Windows/iOS）  
-          
+![image](ui_20240205225815.png)
 3. 假如没有报错，就可以愉快地使用了  
 
 ### 代码使用方法

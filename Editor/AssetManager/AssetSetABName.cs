@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace F8Framework.Core.Editor
 {
-    public class AssetSetABName : MonoBehaviour
+    public class AssetSetABName
     {
         [MenuItem("Assets/（F8资产功能）/（清空选中的所有资产AB名）", false , 1001)]
         private static void SetAssetBundleNameIsFolderName()

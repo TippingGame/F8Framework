@@ -30,7 +30,17 @@ public class DemoUIManager : MonoBehaviour
     }
 }
 // 提供UI界面基类，BaseView
-public class UIMain : BaseView
+
+// 自动获取组件
+public partial class UIMain
+{
+    // Auto Bind Components
+    
+    // Auto Bind Components
+}
+// 自动获取组件
+
+public partial class UIMain : BaseView
 {
     protected override void OnAwake()
     {
@@ -65,11 +75,11 @@ public class UIMain : BaseView
         // 打开界面动画完成后
     }
     
-    protected override void OnBeforeRemove(object[] args, int uiId){
+    protected override void OnBeforeRemove(){
         // 删除之前
     }
     
-    protected override void OnRemoved(object[] args, int uiId)
+    protected override void OnRemoved()
     {
         // 删除
     }

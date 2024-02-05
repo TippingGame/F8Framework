@@ -89,7 +89,7 @@ namespace F8Framework.Core
             }
         }
         
-        public new void Close(int uiId, string prefabPath, bool isDestroy)
+        public void Close(int uiId, string prefabPath, bool isDestroy)
         {
             if (isDestroy)
             {

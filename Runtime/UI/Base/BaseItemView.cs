@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace F8Framework.Core
 {
-    public class BaseItemView : MonoBehaviour
+    public class BaseItemView : ComponentBind
     {
         
     }
