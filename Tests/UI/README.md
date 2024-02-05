@@ -22,9 +22,8 @@ UI界面分为三大类：
 ![image](ui_20240205224109.png)
 2. 制作UI预制体，放到AssetBundles或者Resources文件夹下任意目录  
 3. 右键资源文件夹，看到（F8UI界面管理功能），创建BaseView模板，挂载到UI根层级上  
-4. 点击按钮自动生成UI组件的索引
+4. 点击按钮自动生成UI组件的索引  
 ![image](ui_20240205223438.png)
-![image](ui_20240205223604.png)
 ### 代码使用方法
 ```C#
         private Dictionary<int, UIConfig> configs = new Dictionary<int, UIConfig>
