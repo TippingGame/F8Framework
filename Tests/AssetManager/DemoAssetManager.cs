@@ -1,10 +1,10 @@
+using System.Collections;
 using F8Framework.Core;
 using UnityEngine;
 
 public class DemoAssetManager : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    IEnumerator Start()
     {
         /*----------所有加载均会自动判断是Resources资产还是AssetBundle资产----------*/
         
@@ -22,11 +22,18 @@ public class DemoAssetManager : MonoBehaviour
         {
             GameObject goo = Instantiate(go);
         });
+        //协程
+        var load = AssetManager.Instance.LoadAsyncCoroutine<GameObject>("Cube");
+        yield return load;
         //加载文件夹内资产
         AssetManager.Instance.LoadDirAsync("NewFolder", () =>
         {
             
         });
+        //协程
+        var loadDir = AssetManager.Instance.LoadDirAsyncCoroutine("NewFolder");
+        yield return loadDir;
+        
         
         /*----------其他功能----------*/
         //获取加载进度

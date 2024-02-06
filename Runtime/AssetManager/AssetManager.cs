@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using F8Framework.AssetMap;
@@ -110,27 +111,43 @@ namespace F8Framework.Core
             {
                 if (accessMode.HasFlag(AssetAccessMode.RESOURCE))
                 {
-                    return GetAssetInfoFromResource(assetName);
+                    return GetAssetInfoFromResource(assetName, showTip: true);
                 }
                 else if (accessMode.HasFlag(AssetAccessMode.ASSET_BUNDLE))
                 {
-                    return GetAssetInfoFromAssetBundle(assetName);
+                    return GetAssetInfoFromAssetBundle(assetName, showTip: true);
                 }
                 else if (accessMode.HasFlag(AssetAccessMode.UNKNOWN))
                 {
                     AssetInfo r = GetAssetInfoFromAssetBundle(assetName);
+                    if (r == null)
+                    {
+                        r = GetAssetInfoFromResource(assetName);
+                    }
+
                     if (r != null && r.IsLegal)
+                    {
                         return r;
+                    }
                     else
-                        return GetAssetInfoFromResource(assetName);
+                    {
+                        LogF8.LogError("AssetBundle和Resource都找不到指定资源可用的索引：" + assetName);
+                        return null;
+                    }
                 }
                 else if (accessMode.HasFlag(AssetAccessMode.REMOTE_ASSET_BUNDLE))
                 {
                     AssetInfo r = GetAssetInfoFromAssetBundle(assetName, true);
+
                     if (r != null && r.IsLegal)
+                    {
                         return r;
+                    }
                     else
-                        return GetAssetInfoFromAssetBundle(assetName);
+                    {
+                        LogF8.LogError("AssetBundle找不到指定远程资源可用的索引：" + assetName);
+                        return null;
+                    }
                 }
                 return null;
             }
@@ -412,7 +429,66 @@ namespace F8Framework.Core
                     callback?.Invoke(o);
                 }
             }
-                        
+            
+            /// <summary>
+            /// 协程加载资产对象。
+            /// </summary>
+            /// <typeparam name="T">目标资产类型。</typeparam>
+            /// <param name="assetName">资产路径字符串。</param>
+            /// <param name="mode">访问模式。</param>
+            public IEnumerator LoadAsyncCoroutine<T>(string assetName, AssetAccessMode mode = AssetAccessMode.UNKNOWN) where T : Object
+            {
+                AssetInfo info = GetAssetInfo(assetName, mode);
+                if (info == null || !info.IsLegal)
+                {
+                    yield break;
+                }
+
+                if (info.AssetType == AssetTypeEnum.RESOURCE)
+                {
+                    T o = ResourcesManager.Instance.GetResouceObject<T>(info.AssetPath[0]);
+                    if (o != null)
+                    {
+                        yield return o;
+                    }
+                    else
+                    {
+                        yield return ResourcesManager.Instance.LoadAsyncCoroutine<T>(info.AssetPath[0]);
+                    }
+                }
+                else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
+                {
+#if UNITY_EDITOR
+                    if (_isEditorMode)
+                    {
+                        var assetPaths = UnityEditor.AssetDatabase.GetAssetPathsFromAssetBundleAndAssetName(info.AbName, assetName);
+                        T o = UnityEditor.AssetDatabase.LoadAssetAtPath<T>(assetPaths[0]);
+                        yield return o;
+                        yield break;
+                    }
+#endif
+                    AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePath);
+                    if (ab == null || ab.AssetBundleContent == null || ab.GetDependentNamesLoadFinished() < ab.AddDependentNames())
+                    {
+                        yield return AssetBundleManager.Instance.LoadAsyncCoroutine(assetName, info);
+                        yield return AssetBundleManager.Instance.GetAssetObject<T>(info.AssetPath[0]);
+                    }
+                    else
+                    {
+                        T o = AssetBundleManager.Instance.GetAssetObject<T>(info.AssetPath[0]);
+                        if (o != null)
+                        {
+                            yield return o;
+                        }
+                        else
+                        {
+                            ab.Expand();
+                            yield return AssetBundleManager.Instance.GetAssetObject<T>(info.AssetPath[0]);
+                        }
+                    }
+                }
+            }
+            
             /// <summary>
             /// 异步加载资产文件夹。
             /// </summary>
@@ -440,6 +516,7 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                     if (_isEditorMode)
                     {
+                        LogF8.LogAsset("编辑器模式下无需加载文件夹");
                         End();
                         return;
                     }
@@ -491,6 +568,72 @@ namespace F8Framework.Core
                 }
             }
             
+            /// <summary>
+            /// 协程加载资产文件夹。
+            /// </summary>
+            /// <param name="assetName">资产路径字符串。</param>
+            /// <param name="mode">访问模式。</param>
+            public IEnumerator LoadDirAsyncCoroutine(string assetName, AssetAccessMode mode = AssetAccessMode.UNKNOWN)
+            {
+                AssetInfo info = GetAssetInfo(assetName, mode);
+                if (info == null || !info.IsLegal)
+                {
+                    yield break;
+                }
+
+                if (info.AssetType == AssetTypeEnum.RESOURCE)
+                {
+                    LogF8.LogAsset("Resources不支持加载文件夹功能");
+                }
+                else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
+                {
+#if UNITY_EDITOR
+                    if (_isEditorMode)
+                    {
+                        LogF8.LogAsset("编辑器模式下无需加载文件夹");
+                        yield break;
+                    }
+#endif
+                    int assetCount = 0;
+                    foreach (var assetPath in info.AssetPath)
+                    {
+                        if (string.IsNullOrEmpty(assetPath))
+                        {
+                            continue;
+                        }
+                        string abName = Path.ChangeExtension(assetPath, null).Replace(URLSetting.AssetBundlesPath, "").ToLower();
+                        AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePathWithoutAb + abName);
+                        if (ab == null || ab.AssetBundleContent == null || ab.GetDependentNamesLoadFinished() < ab.AddDependentNames())
+                        {
+                            yield return AssetBundleManager.Instance.LoadAsyncCoroutine(Path.GetFileNameWithoutExtension(assetPath),
+                                new AssetInfo(info.AssetType, new[] { assetPath }, info.AssetBundlePathWithoutAb, abName));
+                            if (++assetCount >= info.AssetPath.Length)
+                            {
+                                yield break;
+                            }
+                        }
+                        else
+                        {
+                            Object o = AssetBundleManager.Instance.GetAssetObject(assetPath);
+                            if (o != null)
+                            {
+                                if (++assetCount >= info.AssetPath.Length)
+                                {
+                                    yield break;
+                                }
+                                continue;
+                            }
+                            
+                            ab.Expand();
+                            if (++assetCount >= info.AssetPath.Length)
+                            {
+                                yield break;
+                            }
+                        }
+                    }
+                }
+            }
+
             /// <summary>
             /// 异步加载资产对象。
             /// </summary>
@@ -630,19 +773,23 @@ namespace F8Framework.Core
             }
             
             
-            private AssetInfo GetAssetInfoFromResource(string path)
+            private AssetInfo GetAssetInfoFromResource(string assetName, bool showTip = false)
             {
-                if (ResourceMap.Mappings.TryGetValue(path, out string value))
+                if (ResourceMap.Mappings.TryGetValue(assetName, out string value))
                 {
                     return new AssetInfo(AssetTypeEnum.RESOURCE, new []{value}, null, null);
                 }
-                LogF8.LogError("ResourceMappings不存在");
+
+                if (showTip)
+                {
+                    LogF8.LogError("Resource都找不到指定资源可用的索引：" + assetName);
+                }
                 return null;
             }
             
-            private AssetInfo GetAssetInfoFromAssetBundle(string path, bool remote = false)
+            private AssetInfo GetAssetInfoFromAssetBundle(string assetName, bool remote = false, bool showTip = false)
             {
-                if (AssetBundleMap.Mappings.TryGetValue(path, out AssetBundleMap.AssetMapping assetmpping))
+                if (AssetBundleMap.Mappings.TryGetValue(assetName, out AssetBundleMap.AssetMapping assetmpping))
                 {
                     if (remote)
                     {
@@ -653,7 +800,11 @@ namespace F8Framework.Core
                         return new AssetInfo(AssetTypeEnum.ASSET_BUNDLE, assetmpping.AssetPath, AssetBundleManager.GetAssetBundleCompletePath(), assetmpping.AbName);
                     }
                 }
-                LogF8.LogError("AssetBundleMappings不存在");
+
+                if (showTip)
+                {
+                    LogF8.LogError("AssetBundle都找不到指定资源可用的索引：" + assetName);
+                }
                 return null;
             }
             

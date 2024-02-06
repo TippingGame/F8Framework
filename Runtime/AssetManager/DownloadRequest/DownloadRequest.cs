@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -104,7 +105,41 @@ namespace F8Framework.Core
                 LoadFail();
             }
         }
+        
+        public IEnumerator SendAssetBundleDownloadRequestCoroutine(string uri, uint version = 0, uint crc = 0)
+        {
+            if (!FileTools.IsLegalURI(uri))
+            {
+                LogF8.LogError($"Failed to asset bundle download request for uri: {uri}. Invalid URI.");
+                LoadFail();
+                yield break;
+            }
 
+            try
+            {
+                if (version == 0)
+                    uwr = UnityWebRequestAssetBundle.GetAssetBundle(uri);
+                else
+                    uwr = UnityWebRequestAssetBundle.GetAssetBundle(uri, version, crc);
+            }
+            catch (Exception e)
+            {
+                LogF8.LogError($"Failed to create UnityWebRequest for uri: {uri}. Exception: {e.Message}");
+                LoadFail();
+                yield break;
+            }
+
+            // 发送请求并等待完成
+            yield return uwr.SendWebRequest();
+
+            // 请求完成后检查是否有错误
+            if (uwr.result != UnityWebRequest.Result.Success)
+            {
+                LogF8.LogError($"Failed to asset bundle download request for uri: {uri}. Error: {uwr.error}");
+                LoadFail();
+            }
+        }
+        
         private void LoadFail()
         {
             uwr?.Dispose();

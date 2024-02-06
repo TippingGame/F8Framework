@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -110,6 +111,23 @@ namespace F8Framework.Core
             loader.LoadAsync<T>(callback);
         }
 
+        public IEnumerator LoadAsyncCoroutine<T>(string resourcePath) where T : Object
+        {
+            ResourcesLoader loader;
+            if (resourceLoaders.ContainsKey(resourcePath))
+            {
+                loader = resourceLoaders[resourcePath];
+            }
+            else
+            {
+                loader = new ResourcesLoader();
+                loader.Init(resourcePath);
+                resourceLoaders.Add(resourcePath, loader);
+            }
+
+            yield return loader.LoadAsyncCoroutine<T>();
+        }
+        
         /// <summary>
         /// 通过相对资源名称异步加载。
         /// 如果资源重复加载，将直接从资源池提供。

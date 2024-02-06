@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 namespace F8Framework.Core
@@ -146,6 +147,25 @@ namespace F8Framework.Core
             }
         }
 
+        public virtual IEnumerator LoadAsyncCoroutine<T>() where T : Object
+        {
+            if (resourceLoadState == LoaderState.NONE)
+            {
+                loadType = LoaderType.ASYNC;
+                resourceLoadState = LoaderState.WORKING;
+                resourceLoadRequest = Resources.LoadAsync<T>(resourcePath);
+
+                // Wait until the resource is loaded
+                yield return resourceLoadRequest;
+
+                resouceObject = resourceLoadRequest.asset;
+                resourceLoadState = LoaderState.FINISHED;
+                
+                // 返回加载完成的资源对象
+                yield return resouceObject;
+            }
+        }
+        
         /// <summary>
         /// 异步加载资源。
         /// </summary>

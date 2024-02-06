@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using F8Framework.AssetMap;
 using UnityEngine;
@@ -155,6 +156,48 @@ namespace F8Framework.Core
             }
         }
 
+        public IEnumerator LoadAsyncCoroutine()
+        {
+            ClearUnloadData();
+            if (assetBundleLoadState == LoaderState.FINISHED && assetBundleContent == null)
+                assetBundleLoadState = LoaderState.NONE;
+
+            if (assetBundleLoadState == LoaderState.NONE)
+            {
+                assetBundleLoadState = LoaderState.WORKING;
+                if (FileTools.IsLegalHTTPURI(assetBundlePath))
+                {
+                    loadType = LoaderType.REMOTE_ASYNC;
+                    assetBundleDownloadRequest = new DownloadRequest(assetBundlePath, 0);
+                    if (assetBundleDownloadRequest == null)
+                    {
+                        assetBundleLoadState = LoaderState.FINISHED;
+                        string errMsg = string.Format("Remote asset bundle {0} can't be found, please check it", assetBundlePath);
+                        LogF8.LogError(errMsg);
+                    }
+                    else
+                    {
+                        yield return assetBundleDownloadRequest.SendAssetBundleDownloadRequestCoroutine(assetBundlePath, 0);
+                    }
+                }
+                else
+                {
+                    loadType = LoaderType.LOCAL_ASYNC;
+                    assetBundleLoadRequest = AssetBundle.LoadFromFileAsync(assetBundlePath);
+                    if (assetBundleLoadRequest == null)
+                    {
+                        assetBundleLoadState = LoaderState.FINISHED;
+                        string errMsg = string.Format("Local asset bundle {0} can't be found, please check it", assetBundlePath);
+                        LogF8.LogError(errMsg);
+                    }
+                    else
+                    {
+                        yield return assetBundleLoadRequest;
+                    }
+                }
+            }
+        }
+        
         /// <summary>
         /// 同步扩展资产。
         /// 对于Unity中无法扩展的流场景资产包类型，
@@ -216,6 +259,28 @@ namespace F8Framework.Core
             }
         }
 
+        public IEnumerator ExpandAsyncCoroutine()
+        {
+            if (!assetBundleContent)
+            {
+                assetBundleExpandState = LoaderState.NONE;
+                yield break;
+            }
+
+            if (assetBundleExpandState == LoaderState.FINISHED && assetObjects.Count != assetPaths.Count)
+                assetBundleExpandState = LoaderState.NONE;
+
+            if (assetBundleExpandState == LoaderState.NONE)
+            {
+                expandCount = 0;
+                assetBundleExpandState = LoaderState.WORKING;
+                foreach (string path in assetPaths)
+                {
+                    yield return LoadAssetObjectAsyncCoroutine(path);
+                }
+            }
+        }
+        
         /// <summary>
         /// 同步卸载资产。
         /// </summary>
@@ -459,6 +524,22 @@ namespace F8Framework.Core
             }
         }
 
+        public IEnumerator LoadAssetObjectAsyncCoroutine(string assetPath)
+        {
+            // 流化场景资产包不需要扩展，
+            // 但必须通过UnityEngine进行访问。场景管理。场景管理器。
+            if (!assetBundleContent || assetBundleContent.isStreamedSceneAssetBundle)
+            {
+                yield break;
+            }
+
+            AssetBundleRequest rq = assetBundleContent.LoadAssetAsync(assetPath);
+            yield return rq;
+
+            Object o = rq.asset;
+            SetAssetObject(assetPath, o);
+        }
+        
         /// <summary>
         /// 派生类型的更新行为可以通过重写来实现。
         /// </summary>

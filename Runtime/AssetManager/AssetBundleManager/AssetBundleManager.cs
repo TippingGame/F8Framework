@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -127,6 +128,53 @@ namespace F8Framework.Core
             }
         }
 
+        public IEnumerator LoadAsyncCoroutine(string assetName, AssetManager.AssetInfo info)
+        {
+            List<string> assetBundlePaths = new List<string>(GetDependenciedAssetBundles(info.AbName));
+
+            for (int i = 0; i < assetBundlePaths.Count; i++)
+            {
+                assetBundlePaths[i] = info.AssetBundlePathWithoutAb + assetBundlePaths[i];
+            }
+            AssetBundleLoader lastLoader = null;
+            assetBundlePaths.Add(info.AssetBundlePath);
+            int loadedCount = 0;
+            foreach (string assetBundlePath in assetBundlePaths)
+            {
+                AssetBundleLoader loader;
+                if (assetBundleLoaders.ContainsKey(assetBundlePath))
+                {
+                    loader = assetBundleLoaders[assetBundlePath];
+                    loader.AddParentBundle(info.AssetBundlePath);
+                }
+                else
+                {
+                    loader = new AssetBundleLoader();
+                    loader.Init(assetName, assetBundlePath);
+                    loader.AddParentBundle(info.AssetBundlePath);
+
+                    assetBundleLoaders.Add(assetBundlePath, loader);
+                }
+                if (assetBundlePath == info.AssetBundlePath)
+                {
+                    for (int i = 0; i < assetBundlePaths.Count; i++)
+                    {
+                        loader.AddDependentNames(assetBundlePaths[i]);
+                    }
+                }
+                lastLoader = loader; // 获取最后一个 loader
+                yield return loader.LoadAsyncCoroutine();
+                ++loadedCount;
+                lastLoader.AddDependentNames(assetBundlePath, true);
+                if (loadedCount == assetBundlePaths.Count)
+                {
+                    // 所有依赖项加载完成后，加载主资源
+                    yield return lastLoader.ExpandAsyncCoroutine();
+                    yield break;
+                }
+            }
+        }
+        
         /// <summary>
         /// 通过资源包路径同步卸载。
         /// </summary>

@@ -43,11 +43,17 @@ Unity F8AssetManager资产加载组件。
         {
             GameObject goo = Instantiate(go);
         });
+        //协程
+        var load = AssetManager.Instance.LoadAsyncCoroutine<GameObject>("Cube");
+        yield return load;
         //加载文件夹内资产
         AssetManager.Instance.LoadDirAsync("NewFolder", () =>
         {
             
         });
+        //协程
+        var loadDir = AssetManager.Instance.LoadDirAsyncCoroutine("NewFolder");
+        yield return loadDir;
         
         /*----------其他功能----------*/
         //获取加载进度
