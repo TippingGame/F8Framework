@@ -1,4 +1,4 @@
-# <strong>F8Framework
+# F8Framework
 
 [![license](http://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT) [![Unity Version](https://img.shields.io/badge/unity-2021.3.15f1-blue)](https://unity.com) [![Platform](https://img.shields.io/badge/platform-Win%20%7C%20Android%20%7C%20iOS%20%7C%20Mac%20%7C%20Linux-orange)]() 
 
@@ -7,27 +7,30 @@
 > F8 Framework original intention: Just click F8 and start making the game, don't want to be redundant.
 
 ## 简介
-#### F8Framework是一个优雅的，符合直觉的Unity框架全平台解决方案，可根据自己需要选择组件，组件围绕F8一键启动。  
-系统支持：Win/Android/iOS/Mac/Linux  
+F8Framework是一个**优雅，轻量，符合直觉的**基于Unity引擎的游戏框架，组件围绕F8一键启动，框架整体遵循以**极少的使用成本**开发游戏。  
+
+## 支持版本
+Unity 2021.3.15f1+  
+系统支持：Win/Android/iOS/Mac/Linux
 
 ## 文档快速预览 - 3分钟
 ### ----------可选功能----------  
-* [1.配置表：](https://github.com/TippingGame/F8ExcelTool.git)配置表模块文档。https://github.com/TippingGame/F8ExcelTool.git  
-* [2.热更新版本号管理：]待添加  
+* [1. 配置表](https://github.com/TippingGame/F8ExcelTool.git) - 使用Excel作为配置表，兼顾**高性能、高适应性**，点击F8加载手动生成的 Excel 二进制缓存，运行时自动读取最新 Excel，无需频繁导表。https://github.com/TippingGame/F8ExcelTool.git   
+* [2. 热更新版本管理](https://github.com/TippingGame/F8ExcelTool.git) - 待添加  
 ### ----------核心功能----------
-* [1.资源加载（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/AssetManager/README.md)资源模块文档：[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/AssetManager/README.md)  
-* [2.UI界面管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/UI/README.md)UI界面模块文档：[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/UI/README.md)  
-* [3.模块中心管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Module/README.md)模块中心文档：[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Module/README.md)  
-* [4.日志管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Log/README.md)日志模块文档：[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Log/README.md)  
-* [5.声音管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Audio/README.md)音频模块文档：[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Audio/README.md)  
-* [6.事件管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Event/README.md)事件模块文档：[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Event/README.md)  
-* [7.时间管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Timer/README.md)时间模块文档：[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Timer/README.md)  
-* [8.引用池（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/ReferencePool/README.md)/[对象池（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/GameObjectPool/README.md)引用池文档：[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/ReferencePool/README.md) 对象池文档：[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/GameObjectPool/README.md)  
-* [9.补间动画（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Tween/README.md)补间动画文档。[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Tween/README.md)  
-* [10.本地数据存储（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Storage/README.md)本地数据存储文档。[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Storage/README.md)  
-* [11.实体组件（内置）：]待添加  
-* [12.网络连接与通信（内置）：]待添加  
-* [13.SDK接入（内置）：]待添加  
+* [1. 资源加载（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/AssetManager/README.md) - **编辑器下**：点击F8自动生成资产索引，AB名称，清理多余AB和文件夹。**运行时**：自动区分不同平台，同步/异步加载资产，自动判断是Resources/AssetBundle资产，加载Remote远程资产，获取加载进度，同步打断异步加载，相同资源同时加载。
+* [2. 模块中心（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Module/README.md) - 模块中心可以获取所有模块的实例，自由控制生命周期。
+* [3. 日志管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Log/README.md) - 打印日志，写入文件，上报错误。
+* [4. 声音管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Audio/README.md) - 声音的播放，暂停，停止，进度控制，音量控制/保存，全局暂停/恢复。Audio分为三大类：**背景音乐、人声、特效声**。
+* [5. 事件管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Event/README.md) - 发送消息事件，事件监听，防止消息死循环，自动释放事件。
+* [6. 时间管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Timer/README.md) - 提供Timer、FrameTimer两种计时器，暂停/恢复，自动释放Timer。
+* [7. 补间动画（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Tween/README.md) - 播放/终止动画，有旋转/位移/缩放/渐变/填充动画，为UI设计的相对布局位移动画。
+* [8. 实体组件（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/AssetManager/README.md)待添加
+* [9. UI界面管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/UI/README.md)处理界面加载，打开，关闭，查询，层级控制，自定义动画，自动获取组件索引。UI界面分为三大类：**普通UI、模态弹窗、非模态弹窗**。
+* [10. 本地数据存储（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Storage/README.md) - 本地数据存储/读取。
+* [11. SDK接入管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/AssetManager/README.md)待添加
+* [12. 网络连接与通信（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/AssetManager/README.md)待添加
+* [13. 引用池（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/ReferencePool/README.md)/ [对象池（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/GameObjectPool/README.md) - 引用池管理，C# 对象，入池/取出/回收/清空。对象池管理，Unity GameObject 预加载，生成/销毁/延迟销毁，生命周期事件监听。
 
 ## 使用步骤
 
@@ -49,6 +52,6 @@
 
 ## 新手指南
 
-* [游戏启动器：](https://github.com/TippingGame/F8Framework/blob/main/Runtime/Launcher/GameLauncher.cs)游戏启动器。[GameLauncher.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/Launcher/GameLauncher.cs)  
+* [游戏启动器：](https://github.com/TippingGame/F8Framework/blob/main/Runtime/Launcher/GameLauncher.cs)游戏启动器示例。[GameLauncher.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/Launcher/GameLauncher.cs)  
 * [模块自定义改名：](https://github.com/TippingGame/F8Framework/blob/main/Runtime/Launcher/FF8.cs)模块自定义改名。[FF8.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/Launcher/FF8.cs)  
 
