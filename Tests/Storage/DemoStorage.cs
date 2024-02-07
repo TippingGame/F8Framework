@@ -30,7 +30,7 @@ public class DemoStorage : MonoBehaviour
         
         FF8.Storage.SetObject("Key5", Info);
         
-        //取出数据
+        // 取出数据
         StructInfo info2 = FF8.Storage.GetObject<StructInfo>("Key5");
         LogF8.Log(info2.Initial);
         

@@ -3,12 +3,10 @@ using UnityEngine;
 
 public class DemoF8Timer : MonoBehaviour
 {
-    private string timeid;
-    // Start is called before the first frame update
     void Start()
     {
         //普通Timer,传入自身this，每1秒执行一次，延迟0秒后开始，执行3次(-1表示循环)
-        timeid = FF8.Timer.Register(this,1f,0,3, () =>
+        string timeid = FF8.Timer.Register(this,1f,0,3, () =>
         {
             LogF8.Log("tick");
         }, () =>

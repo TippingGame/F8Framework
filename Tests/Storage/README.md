@@ -30,22 +30,22 @@ Unity F8StorageManager组件，本地数据存储/读取
     void Start()
     {
         // 设置UserId，用户私有的Key
-        StorageManager.Instance.SetUser("12345");
-        StorageManager.Instance.SetString("Key1", "value", user: true);
+        FF8.Storage.SetUser("12345");
+        FF8.Storage.SetString("Key1", "value", user: true);
         
         // 使用
-        StorageManager.Instance.SetInt("Key2", 1);
-        StorageManager.Instance.SetBool("Key3", true);
-        StorageManager.Instance.SetFloat("Key4", 1.1f);
+        FF8.Storage.SetInt("Key2", 1);
+        FF8.Storage.SetBool("Key3", true);
+        FF8.Storage.SetFloat("Key4", 1.1f);
         
-        StorageManager.Instance.SetObject("Key5", Info);
+        FF8.Storage.SetObject("Key5", Info);
         
-        //取出数据
-        StructInfo info2 = StorageManager.Instance.GetObject<StructInfo>("Key5");
+        // 取出数据
+        StructInfo info2 = FF8.Storage.GetObject<StructInfo>("Key5");
         LogF8.Log(info2.Initial);
         
-        StorageManager.Instance.Save();
-        StorageManager.Instance.Clear();
+        FF8.Storage.Save();
+        FF8.Storage.Clear();
     }
 ```
 
