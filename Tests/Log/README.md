@@ -14,22 +14,27 @@ Unity F8Log组件，打印日志，写入文件，上报错误
 
 ### 代码使用方法
 ```C#
-        LogF8.GetCrashErrorMessage();//开启错误上报，需要配置url
-        LogF8.Log(LogF8.UseMemory);//打印当前使用堆内存
-        LogF8.Watch();//开始耗时计时
-        LogF8.Log(111);//常规打印
-        LogF8.LogColor(Color.green, "打印颜色");
-        LogF8.LogError("打印错误");
-        LogF8.Log(LogF8.UseTime);//打印耗时
+        /*----------Log基础功能----------*/
+        LogF8.Log(this);
+        LogF8.Log("测试{0}",1);
+        LogF8.Log("3123测试", this);
+        LogF8.LogNet("1123{0}", "测试");
+        LogF8.LogEvent(this);
+        LogF8.LogConfig(this);
+        LogF8.LogColor(Color.red, this);
+        LogF8.LogView(this);
+        LogF8.LogEntity(this);
         
-        LogF8.LogNet("222{0}", "测试");//打印网络日志，带时间和标识
-        LogF8.LogEvent(333);//打印事件日志，带时间和标识
-        LogF8.LogConfig(this);//打印配置日志，带时间和标识
-        LogF8.LogView(this);//打印视图日志，带时间和标识
-        LogF8.LogEntity(this);//打印视图日志，带时间和标识
         
-        F8LogHelper.Instance.OnEnterGame();//开启日志写入
-        F8LogHelper.Instance.OnQuitGame();//关闭日志写入
+        /*----------Log其他功能----------*/
+        // 开启写入log文件
+        F8LogHelper.Instance.OnEnterGame();
+        // 开启捕获错误日志
+        LogF8.GetCrashErrorMessage();
+        // 开始监视代码使用情况
+        LogF8.Watch();
+        LogF8.Log(LogF8.UseMemory);
+        LogF8.Log(LogF8.UseTime);
 ```
 
 ## F8DebugConsole使用方法（游戏界面显示log）

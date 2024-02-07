@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace F8Framework.Core
 {
-    public class PlayerPrefsManager : Singleton<PlayerPrefsManager>
+    public class StorageManager : Singleton<StorageManager>
     {
         private string _id = "";
 
@@ -91,6 +91,7 @@ namespace F8Framework.Core
             PlayerPrefs.DeleteKey(GetKeywords(key, user));
         }
         
+        // 保存到硬盘
         public bool Save()
         {
             PlayerPrefs.Save();

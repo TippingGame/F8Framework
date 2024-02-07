@@ -15,16 +15,19 @@
 * [1.配置表：](https://github.com/TippingGame/F8ExcelTool.git)配置表模块文档。https://github.com/TippingGame/F8ExcelTool.git  
 * [2.热更新版本号管理：]待添加  
 ### ----------核心功能----------
-* [1.资源加载（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/AssetManager/README.md)资源模块文档。[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/AssetManager/README.md)  
-* [2.UI界面管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/UI/README.md)UI界面模块文档。[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/UI/README.md)  
-* [3.模块中心管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Module/README.md)模块中心文档。[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Module/README.md)  
-* [4.日志管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Log/README.md)日志模块文档。[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Log/README.md)  
-* [5.声音管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Audio/README.md)音频模块文档。[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Audio/README.md)  
-* [6.事件管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Event/README.md)事件模块文档。[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Event/README.md)  
-* [7.时间管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Timer/README.md)时间模块文档。[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Timer/README.md)  
-* [8.实体组件（内置）：]待添加  
-* [9.网络连接与通信（内置）：]待添加  
-* [10.SDK接入（内置）：]待添加  
+* [1.资源加载（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/AssetManager/README.md)资源模块文档：[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/AssetManager/README.md)  
+* [2.UI界面管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/UI/README.md)UI界面模块文档：[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/UI/README.md)  
+* [3.模块中心管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Module/README.md)模块中心文档：[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Module/README.md)  
+* [4.日志管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Log/README.md)日志模块文档：[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Log/README.md)  
+* [5.声音管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Audio/README.md)音频模块文档：[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Audio/README.md)  
+* [6.事件管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Event/README.md)事件模块文档：[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Event/README.md)  
+* [7.时间管理（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Timer/README.md)时间模块文档：[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Timer/README.md)  
+* [8.引用池（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/ReferencePool/README.md)/[对象池（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/GameObjectPool/README.md)引用池文档：[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/ReferencePool/README.md) 对象池文档：[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/GameObjectPool/README.md)  
+* [9.补间动画（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Tween/README.md)补间动画文档。[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Tween/README.md)  
+* [10.本地数据存储（内置）：](https://github.com/TippingGame/F8Framework/blob/main/Tests/Storage/README.md)本地数据存储文档。[README.md](https://github.com/TippingGame/F8Framework/blob/main/Tests/Storage/README.md)  
+* [11.实体组件（内置）：]待添加  
+* [12.网络连接与通信（内置）：]待添加  
+* [13.SDK接入（内置）：]待添加  
 
 ## 使用步骤
 

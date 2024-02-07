@@ -29,7 +29,8 @@ Unity F8AssetManager资产加载组件。
 ```C#
         /*----------所有加载均会自动判断是Resources资产还是AssetBundle资产----------*/
         
-        /*----------同步加载----------*/
+        /*-------------------------------------同步加载-------------------------------------*/
+        
         GameObject go = AssetManager.Instance.Load<GameObject>("Cube");
         GameObject go2 = AssetManager.Instance.Load("Cube")as GameObject;
         GameObject go3 = AssetManager.Instance.Load("Cube", typeof(GameObject))as GameObject;
@@ -38,7 +39,8 @@ Unity F8AssetManager资产加载组件。
         //加载文件夹内资产
         AssetManager.Instance.LoadDir("NewFolder");
         
-        /*----------异步加载----------*/
+        /*-------------------------------------异步加载-------------------------------------*/
+        
         AssetManager.Instance.LoadAsync<GameObject>("Cube", (go) =>
         {
             GameObject goo = Instantiate(go);
@@ -55,7 +57,8 @@ Unity F8AssetManager资产加载组件。
         var loadDir = AssetManager.Instance.LoadDirAsyncCoroutine("NewFolder");
         yield return loadDir;
         
-        /*----------其他功能----------*/
+        /*-------------------------------------其他功能-------------------------------------*/
+        
         //获取加载进度
         float loadProgress = AssetManager.Instance.GetLoadProgress("Cube");
         //获取所有加载器的进度

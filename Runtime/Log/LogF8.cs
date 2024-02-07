@@ -4,8 +4,8 @@ using System.Net;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using F8Framework.Core;
 using Debug = UnityEngine.Debug;
+using Object = UnityEngine.Object;
 
 namespace F8Framework.Core
 {
@@ -42,6 +42,14 @@ namespace F8Framework.Core
             AddError(traceInfo);
         }
         
+        public static void Log(string s, Object context)
+        {
+            sb.Clear();
+            sb.Append(s);
+
+            Debug.Log(sb.ToString(), context);
+        }
+        
         public static void Log(string s, params object[] p)
         {
             sb.Clear();
@@ -58,6 +66,17 @@ namespace F8Framework.Core
             Debug.Log(o);
         }
 
+        public static void LogNet(string s, Object context)
+        {
+            sb.Clear();
+            sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.yellow));
+            sb.Append(DateTime.Now);
+            sb.Append("[网络日志]");
+            sb.Append("</color>");
+            sb.Append(s);
+            Debug.Log(sb.ToString(), context);
+        }
+        
         public static void LogNet(string s, params object[] p)
         {
             sb.Clear();
@@ -81,6 +100,17 @@ namespace F8Framework.Core
             sb.Append("</color>");
             sb.Append(o);
             Debug.Log(sb.ToString());
+        }
+        
+        public static void LogConfig(string s, Object context)
+        {
+            sb.Clear();
+            sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.grey));
+            sb.Append(DateTime.Now);
+            sb.Append("[配置日志]");
+            sb.Append("</color>");
+            sb.Append(s);
+            Debug.Log(sb.ToString(), context);
         }
         
         public static void LogConfig(string s, params object[] p)
@@ -108,6 +138,17 @@ namespace F8Framework.Core
             Debug.Log(sb.ToString());
         }
         
+        public static void LogView(string s, Object context)
+        {
+            sb.Clear();
+            sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.magenta));
+            sb.Append(DateTime.Now);
+            sb.Append("[视图日志]");
+            sb.Append("</color>");
+            sb.Append(s);
+            Debug.Log(sb.ToString(), context);
+        }
+        
         public static void LogView(string s, params object[] p)
         {
             sb.Clear();
@@ -131,6 +172,17 @@ namespace F8Framework.Core
             sb.Append("</color>");
             sb.Append(o);
             Debug.Log(sb.ToString());
+        }
+        
+        public static void LogEvent(string s, Object context)
+        {
+            sb.Clear();
+            sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.cyan));
+            sb.Append(DateTime.Now);
+            sb.Append("[事件日志]");
+            sb.Append("</color>");
+            sb.Append(s);
+            Debug.Log(sb.ToString(), context);
         }
         
         public static void LogEvent(string s, params object[] p)
@@ -158,6 +210,17 @@ namespace F8Framework.Core
             Debug.Log(sb.ToString());
         }
 
+        public static void LogEntity(string s, Object context)
+        {
+            sb.Clear();
+            sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.blue));
+            sb.Append(DateTime.Now);
+            sb.Append("[实体日志]");
+            sb.Append("</color>");
+            sb.Append(s);
+            Debug.Log(sb.ToString(), context);
+        }
+        
         public static void LogEntity(string s, params object[] p)
         {
             sb.Clear();
@@ -181,6 +244,17 @@ namespace F8Framework.Core
             sb.Append("</color>");
             sb.Append(o);
             Debug.Log(sb.ToString());
+        }
+        
+        public static void LogAsset(string s, Object context)
+        {
+            sb.Clear();
+            sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.green));
+            sb.Append(DateTime.Now);
+            sb.Append("[资产日志]");
+            sb.Append("</color>");
+            sb.Append(s);
+            Debug.Log(sb.ToString(), context);
         }
         
         public static void LogAsset(string s, params object[] p)
@@ -208,6 +282,17 @@ namespace F8Framework.Core
             Debug.Log(sb.ToString());
         }
         
+        public static void LogColor(Color color, string s, Object context)
+        {
+            sb.Clear();
+            sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(color));
+            sb.Append(DateTime.Now);
+            sb.Append("[颜色日志]");
+            sb.Append("</color>");
+            sb.Append(s);
+            Debug.Log(sb.ToString(), context);
+        }
+        
         public static void LogColor(Color color, string s, params object[] p)
         {
             sb.Clear();
@@ -221,6 +306,7 @@ namespace F8Framework.Core
                 sb.Append(s);
             Debug.Log(sb.ToString());
         }
+        
         public static void LogColor(Color color, object o)
         {
             sb.Clear();
@@ -231,6 +317,7 @@ namespace F8Framework.Core
             sb.Append(o);
             Debug.Log(sb.ToString());
         }
+        
         public static void LogToMainThread(string s, params object[] p)
         {
             string msg = (p != null && p.Length > 0 ? string.Format(s, p) : s);
@@ -247,18 +334,19 @@ namespace F8Framework.Core
             LogError("Assert failed! Message:\n" + s, p);
         }
 
+        public static void LogError(string s, Object context)
+        {
+            Debug.LogError(s, context);
+        }
+        
         public static void LogError(string s, params object[] p)
         {
-#if UNITY_EDITOR
             Debug.LogError((p != null && p.Length > 0 ? string.Format(s, p) : s));
-#endif
         }
         
         public static void LogError(object o)
         {
-#if UNITY_EDITOR
             Debug.LogError(o);
-#endif
         }
         
         public static void LogErrorToMainThread(string s, params object[] p)

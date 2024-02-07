@@ -57,14 +57,14 @@ namespace F8Framework.Core
             
             _audioMusicAudioEffect = new AudioEffect();
 
-            _volumeMusic = PlayerPrefsManager.Instance.GetFloat("_volumeMusic", 1f);
-            _switchMusic = PlayerPrefsManager.Instance.GetBool("_switchMusic", true);
+            _volumeMusic = StorageManager.Instance.GetFloat("_volumeMusic", 1f);
+            _switchMusic = StorageManager.Instance.GetBool("_switchMusic", true);
             
-            _volumeVoice = PlayerPrefsManager.Instance.GetFloat("_volumeVoice", 1f);
-            _switchVoice = PlayerPrefsManager.Instance.GetBool("_switchVoice", true);
+            _volumeVoice = StorageManager.Instance.GetFloat("_volumeVoice", 1f);
+            _switchVoice = StorageManager.Instance.GetBool("_switchVoice", true);
             
-            _volumeAudioEffect = PlayerPrefsManager.Instance.GetFloat("_volumeAudioEffect", 1f);
-            _switchAudioEffect = PlayerPrefsManager.Instance.GetBool("_switchAudioEffect", true);
+            _volumeAudioEffect = StorageManager.Instance.GetFloat("_volumeAudioEffect", 1f);
+            _switchAudioEffect = StorageManager.Instance.GetBool("_switchAudioEffect", true);
         }
 
         private void Update()
@@ -114,7 +114,7 @@ namespace F8Framework.Core
             set
             {
                 _volumeMusic = value;
-                PlayerPrefsManager.Instance.SetFloat("_volumeMusic", value);
+                StorageManager.Instance.SetFloat("_volumeMusic", value);
                 _audioMusic.MusicSource.volume = value;
             }
         }
@@ -132,7 +132,7 @@ namespace F8Framework.Core
             set
             {
                 _switchMusic = value;
-                PlayerPrefsManager.Instance.SetBool("_switchMusic", value);
+                StorageManager.Instance.SetBool("_switchMusic", value);
                 if (!value)
                 {
                     _audioMusic.MusicSource.Stop();
@@ -180,7 +180,7 @@ namespace F8Framework.Core
             set
             {
                 _volumeVoice = value;
-                PlayerPrefsManager.Instance.SetFloat("_volumeVoice", value);
+                StorageManager.Instance.SetFloat("_volumeVoice", value);
                 _audioMusicVoice.MusicSource.volume = value;
             }
         }
@@ -198,7 +198,7 @@ namespace F8Framework.Core
             set
             {
                 _switchVoice = value;
-                PlayerPrefsManager.Instance.SetBool("_switchVoice", value);
+                StorageManager.Instance.SetBool("_switchVoice", value);
                 if (!value)
                 {
                     _audioMusicVoice.MusicSource.Stop();
@@ -215,7 +215,7 @@ namespace F8Framework.Core
             set
             {
                 _volumeAudioEffect = value;
-                PlayerPrefsManager.Instance.SetFloat("_volumeAudioEffect", value);
+                StorageManager.Instance.SetFloat("_volumeAudioEffect", value);
                 _audioMusicBtnClick.MusicSource.volume = value;
                 _audioMusicUISound.MusicSource.volume = value;
             }
@@ -234,7 +234,7 @@ namespace F8Framework.Core
             set
             {
                 _switchAudioEffect = value;
-                PlayerPrefsManager.Instance.SetBool("_switchAudioEffect", value);
+                StorageManager.Instance.SetBool("_switchAudioEffect", value);
                 if (!value)
                 {
                     _audioMusicBtnClick.MusicSource.Stop();

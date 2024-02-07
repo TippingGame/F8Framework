@@ -33,7 +33,7 @@ UI界面分为三大类：
         };
         private object[] data = new object[] { 123123, "asdasd" };
         
-        /*----------UI管理功能----------*/
+        /*----------------------------UI管理功能----------------------------*/
         
         // 初始化
         UIManager.Instance.Initialize(configs);
@@ -50,7 +50,7 @@ UI界面分为三大类：
         UIManager.Instance.Clear(true);
         
         
-        /*----------如何使用模板----------*/
+        /*----------------------------如何使用模板----------------------------*/
         
         // 自动获取组件
         public partial class UIMain

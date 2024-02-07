@@ -12,7 +12,7 @@ namespace F8Framework.Core
         
         protected virtual void SetComponents()
         {
-            LogF8.LogEntity("首次添加需要点击组件绑定按钮");
+            LogF8.Log("首次添加需要点击组件绑定按钮");
         }
         public void Reset()
         {
@@ -108,7 +108,7 @@ namespace F8Framework.Core
             }
             else
             {
-                LogF8.LogEntity("在脚本中找不到插入标记。请在要生成代码的位置添加“// Auto Bind Components”。");
+                LogF8.Log("在脚本中找不到插入标记。请在要生成代码的位置添加“// Auto Bind Components”。");
             }
         }
         
