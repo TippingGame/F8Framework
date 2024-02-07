@@ -15,18 +15,18 @@ public class DemoUIManager : MonoBehaviour
         /*----------UI管理功能----------*/
         
         // 初始化
-        UIManager.Instance.Initialize(configs);
+        FF8.UI.Initialize(configs);
         // 打开UI，可选参数：data，new UICallbacks()
-        UIManager.Instance.Open(1, data, new UICallbacks());
-        UIManager.Instance.OpenAsync(1);
+        FF8.UI.Open(1, data, new UICallbacks());
+        FF8.UI.OpenAsync(1);
         // 打开提示类Notify
-        UIManager.Instance.ShowNotify(1, "tip");
+        FF8.UI.ShowNotify(1, "tip");
         // UI是否存在
-        UIManager.Instance.Has(1);
+        FF8.UI.Has(1);
         // 关闭UI，可选参数：isDestroy
-        UIManager.Instance.Close(1, true);
+        FF8.UI.Close(1, true);
         // 关闭所有UI（除了Notify类），可选参数：isDestroy
-        UIManager.Instance.Clear(true);
+        FF8.UI.Clear(true);
     }
 }
 // 提供UI界面基类，BaseView

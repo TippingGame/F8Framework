@@ -8,7 +8,7 @@ public class DemoF8Timer : MonoBehaviour
     void Start()
     {
         //普通Timer,传入自身this，每1秒执行一次，延迟0秒后开始，执行3次(-1表示循环)
-        timeid = TimerManager.Instance.Register(this,1f,0,3, () =>
+        timeid = FF8.Timer.Register(this,1f,0,3, () =>
         {
             LogF8.Log("tick");
         }, () =>
@@ -17,7 +17,7 @@ public class DemoF8Timer : MonoBehaviour
         });
         
         //FrameTimer,传入自身this，每1帧执行一次，延迟0帧后开始，循环执行(-1表示循环)
-        timeid = TimerManager.Instance.RegisterFrame(this,1f,0,-1, () =>
+        timeid = FF8.Timer.RegisterFrame(this,1f,0,-1, () =>
         {
             LogF8.Log("tick");
         }, () =>
@@ -25,15 +25,15 @@ public class DemoF8Timer : MonoBehaviour
             LogF8.Log("完成");
         });
         
-        TimerManager.Instance.UnRegister(timeid);//停止名为timeid的Timer
+        FF8.Timer.UnRegister(timeid);//停止名为timeid的Timer
         
         //自动OnApplicationFocus监听焦点，暂停所有Timer
-        TimerManager.Instance.Pause();
-        TimerManager.Instance.Restart();
+        FF8.Timer.Pause();
+        FF8.Timer.Restart();
         
-        TimerManager.Instance.SetServerTime(1702573904000);//网络游戏，与服务器对表
-        TimerManager.Instance.GetServerTime();
+        FF8.Timer.SetServerTime(1702573904000);//网络游戏，与服务器对表
+        FF8.Timer.GetServerTime();
         
-        TimerManager.Instance.GetTime(); //获取游戏中的总时长
+        FF8.Timer.GetTime(); //获取游戏中的总时长
     }
 }
