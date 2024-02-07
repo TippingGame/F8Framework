@@ -6,8 +6,8 @@
 
 ## 简介（希望自己点击F8，就能开始制作游戏，不想多余的事）
 Unity F8AssetManager资产加载组件。  
-1.编辑器下：点击F8自动生成资产索引，AB名称，清理AB和文件夹。  
-2.运行时：自动区分不同平台，同步/异步加载资产，自动判断是Resources资产还是AssetBundle资产，可加载Remote远程资产，获取加载进度，同步打断异步加载，多个相同资源同时加载。
+1.编辑器下：点击F8自动生成资产索引，AB名称，自动区分不同平台，清理多余AB和文件夹，Editor模式下减少开发周期。  
+2.运行时：同步/异步加载单个资产，指定文件夹加载多个资产，自动判断是Resources/AssetBundle资产，加载Remote远程资产，获取加载进度，同步打断异步加载，相同资源同时加载。
 
 ## 导入插件（需要首先导入核心）
 注意！内置在->F8Framework核心：https://github.com/TippingGame/F8Framework.git  

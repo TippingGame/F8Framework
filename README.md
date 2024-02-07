@@ -15,8 +15,8 @@ Unity 2021.3.15f1+
 
 ## 文档快速预览 - 3分钟
 ### ----------可选功能----------  
-* [1. 配置表](https://github.com/TippingGame/F8ExcelTool.git) - 使用Excel作为配置表，兼顾**高性能、高适应性**，点击F8加载手动生成的 Excel 二进制缓存，运行时自动读取最新 Excel，无需频繁导表。https://github.com/TippingGame/F8ExcelTool.git   
-* [2. 热更新版本管理](https://github.com/TippingGame/F8ExcelTool.git) - 待添加  
+* [1. 配置表](https://github.com/TippingGame/F8ExcelTool.git) - 使用Excel作为配置表，兼顾**高性能、高适应性**，点击F8加载手动生成的 Excel 二进制缓存，运行时自动读取最新 Excel，无需频繁导表。https://github.com/TippingGame/F8ExcelTool.git
+* [2. 热更新版本管理](https://github.com/TippingGame/F8ExcelTool.git) - 待添加
 ### ----------核心功能----------
 * [1. 资源加载（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/AssetManager/README.md) - **编辑器下**：点击F8自动生成资产索引，AB名称，自动区分不同平台，清理多余AB和文件夹，Editor模式下减少开发周期。**运行时**：同步/异步加载单个资产，指定文件夹加载多个资产，自动判断是Resources/AssetBundle资产，加载Remote远程资产，获取加载进度，同步打断异步加载，相同资源同时加载。
 * [2. 模块中心（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Module/README.md) - 模块中心可以获取所有模块的实例，自由控制生命周期。
@@ -31,7 +31,8 @@ Unity 2021.3.15f1+
 * [11. SDK接入管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/AssetManager/README.md) - 待添加
 * [12. 网络连接与通信（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/AssetManager/README.md) - 待添加
 * [13. 引用池（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/ReferencePool/README.md)/ [对象池（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/GameObjectPool/README.md) - 引用池管理，C# 对象，入池/取出/回收/清空。对象池管理，Unity GameObject 预加载，生成/销毁/延迟销毁，生命周期事件监听。
-
+### ----------拓展功能----------
+* [1. 热更新版本管理](https://github.com/TippingGame/F8ExcelTool.git) - 待添加
 ## 使用步骤
 
 ### 导入
