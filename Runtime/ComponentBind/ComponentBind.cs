@@ -4,16 +4,16 @@ namespace F8Framework.Core
 {
     public class ComponentBind : MonoBehaviour
     {
+        protected virtual void SetComponents()
+        {
+            LogF8.Log("首次添加需要点击组件绑定按钮");
+        }
 #if UNITY_EDITOR
         public void Bind()
         {
             GenerateAutoBindComponentsCode();
         }
         
-        protected virtual void SetComponents()
-        {
-            LogF8.Log("首次添加需要点击组件绑定按钮");
-        }
         public void Reset()
         {
             Bind();
