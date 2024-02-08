@@ -1,4 +1,4 @@
-# F8Framework
+# F8 Framework
 
 [![license](http://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT) [![Unity Version](https://img.shields.io/badge/unity-2021.3.15f1-blue)](https://unity.com) [![Platform](https://img.shields.io/badge/platform-Win%20%7C%20Android%20%7C%20iOS%20%7C%20Mac%20%7C%20Linux-orange)]() 
 
@@ -7,7 +7,7 @@
 > F8 Framework original intention: Just click F8 and start making the game, don't want to be redundant.
 
 ## 简介
-F8Framework是一个**优雅，轻量，符合直觉的**基于Unity引擎的游戏框架，组件围绕F8一键启动，框架整体遵循以**极少的使用成本**开发游戏。  
+F8 Framework是一个**优雅，轻量，符合直觉的**基于Unity引擎的Game Framework，组件围绕F8一键启动，框架整体遵循以**极少的使用成本**开发游戏。  
 
 ## 支持版本
 Unity 2021.3.15f1+  
