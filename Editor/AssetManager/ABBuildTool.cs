@@ -21,7 +21,7 @@ namespace F8Framework.Core.Editor
             // 获取“StreamingAssets”文件夹路径（不一定这个文件夹，可自定义）            
             string strABOutPAthDir = URLSetting.GetAssetBundlesOutPath();
             
-            //清理多余文件夹和ab
+            // 清理多余文件夹和ab
             DeleteRemovedAssetBundles();
 
             FileTools.CheckDirAndCreateWhenNeeded(strABOutPAthDir);
@@ -54,8 +54,15 @@ namespace F8Framework.Core.Editor
                     if (File.Exists(abpath))
                     {
                         // It's a file, delete the file
-                        FileTools.SafeDeleteFile(abpath);
-                        FileTools.SafeDeleteFile(abpath + ".manifest");
+                        if (FileTools.SafeDeleteFile(abpath))
+                        {
+                            FileTools.SafeDeleteFile(abpath + ".meta");
+                        }
+
+                        if (FileTools.SafeDeleteFile(abpath + ".manifest"))
+                        {
+                            FileTools.SafeDeleteFile(abpath+ ".manifest" + ".meta");
+                        }
                         LogF8.LogAsset("删除多余AB文件：" + abpath);
                     }
                     else if (Directory.Exists(abpath))

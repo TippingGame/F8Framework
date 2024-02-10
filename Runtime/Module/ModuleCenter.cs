@@ -20,6 +20,12 @@ namespace F8Framework.Core
             return ModuleCenter._moduleCenters;
         }
         
+        // 通过子类的类型获取 ModuleCenters 中的某一个 center
+        public static ModuleCenter GetCenterByType<T>() where T : ModuleCenter
+        {
+            return GetCenterByType(typeof(T));
+        }
+        
         // 通过子类的类型获取ModuleCenters中的某一个center
         public static ModuleCenter GetCenterByType(Type type)
         {

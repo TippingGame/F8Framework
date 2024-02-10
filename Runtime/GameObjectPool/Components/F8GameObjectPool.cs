@@ -162,7 +162,7 @@ namespace F8Framework.Core
         /// <summary>
         /// Has this pool registered as persistent?
         /// </summary>
-        public bool HasRegisteredAsPersistent => GameObjectPool.HasPoolRegisteredAsPersistent(this);
+        public bool HasRegisteredAsPersistent => FF8.GameObjectPool.HasPoolRegisteredAsPersistent(this);
 
         /// <summary>
         /// The actions will be performed on a game object spawned by this pool.
@@ -218,7 +218,7 @@ namespace F8Framework.Core
         private void OnDestroy()
         {
             Clear();
-            GameObjectPool.UnregisterPool(this);
+            FF8.GameObjectPool.UnregisterPool(this);
         }
 
         /// <summary>
@@ -506,7 +506,7 @@ namespace F8Framework.Core
 
             for (int i = 0; i < _poolablesTemp._count; i++)
             {
-                GameObjectPool.DespawnImmediate(_poolablesTemp._components[i]);
+                FF8.GameObjectPool.DespawnImmediate(_poolablesTemp._components[i]);
             }
 
             if (_poolablesTemp._count > 0)
@@ -528,7 +528,7 @@ namespace F8Framework.Core
                 return false;
             }
             
-            if (GameObjectPool.s_checkForPrefab)
+            if (FF8.GameObjectPool.s_checkForPrefab)
             {
                 if (CheckForPrefab(prefab) == false)
                 {
@@ -556,7 +556,7 @@ namespace F8Framework.Core
                 SetupPreloadedClones();
             }
             
-            GameObjectPool.RegisterPool(this);
+            FF8.GameObjectPool.RegisterPool(this);
             
             _isSetup = true;
             return true;
@@ -825,7 +825,7 @@ namespace F8Framework.Core
         
         private bool TryRegisterPoolAsPersistent()
         {
-            if (GameObjectPool.HasPoolRegisteredAsPersistent(this) == false)
+            if (FF8.GameObjectPool.HasPoolRegisteredAsPersistent(this) == false)
             {
 #if DEBUG
                 if (_cachedTransform.parent != null)
@@ -838,7 +838,7 @@ namespace F8Framework.Core
 #endif
                 _dontDestroyOnLoad = true;
                 DontDestroyOnLoad(gameObject);
-                GameObjectPool.RegisterPersistentPool(this);
+                FF8.GameObjectPool.RegisterPersistentPool(this);
                 return true;
             }
             
@@ -1001,7 +1001,7 @@ namespace F8Framework.Core
                 poolable._transform.SetParent(_isSetup ? _cachedTransform : transform, false);
             }
 
-            GameObjectPool.GameObjectInstantiated.RaiseEvent(newGameObject);
+            FF8.GameObjectPool.GameObjectInstantiated.RaiseEvent(newGameObject);
             RaiseGameObjectInstantiatedCallback(newGameObject);
             return poolable;
         }

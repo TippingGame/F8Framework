@@ -26,7 +26,7 @@ namespace F8Framework.Core
             if (_isSetup)
                 throw new Exception("池对象已经设置！");
 #endif
-            GameObjectPool.ClonesMap.Add(_gameObject, this);
+            FF8.GameObjectPool.ClonesMap.Add(_gameObject, this);
             _status = PoolableStatus.Despawned;
             _isSetup = true;
         }
@@ -37,14 +37,14 @@ namespace F8Framework.Core
             if (_isSetup)
                 throw new Exception("池对象已经设置！");
 #endif
-            GameObjectPool.ClonesMap.Add(_gameObject, this);
+            FF8.GameObjectPool.ClonesMap.Add(_gameObject, this);
             _status = PoolableStatus.SpawnedOverCapacity;
             _isSetup = true;
         }
 
         internal void Dispose(bool immediately)
         {
-            GameObjectPool.ClonesMap.Remove(_gameObject);
+            FF8.GameObjectPool.ClonesMap.Remove(_gameObject);
             
             if (immediately)
                 Object.DestroyImmediate(_gameObject);

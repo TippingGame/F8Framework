@@ -16,12 +16,12 @@ namespace F8Framework.Core
 #if DEBUG
         private void Start()
         {
-            if (GameObjectPool.IsClone(gameObject) == false)
+            if (FF8.GameObjectPool.IsClone(gameObject) == false)
             {
                 LogF8.LogError("您已将一个取消生成计时器添加到不是克隆的游戏对象！", this);
             }
             
-            if (GameObjectPool.TryGetPoolByClone(gameObject, out F8GameObjectPool pool))
+            if (FF8.GameObjectPool.TryGetPoolByClone(gameObject, out F8GameObjectPool pool))
             {
                 if (pool.BehaviourOnCapacityReached == BehaviourOnCapacityReached.Recycle)
                 {
@@ -76,7 +76,7 @@ namespace F8Framework.Core
         {
             if (IsDespawnMoment(deltaTime))
             {
-                GameObjectPool.Despawn(gameObject);
+                FF8.GameObjectPool.Despawn(gameObject);
             }
         }
 

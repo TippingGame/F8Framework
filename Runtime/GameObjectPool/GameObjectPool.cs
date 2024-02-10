@@ -8,1135 +8,1141 @@ using UnityEditor;
 
 namespace F8Framework.Core
 {
-    public class GameObjectPool
+    public static partial class FF8
     {
-        internal static readonly Dictionary<GameObject, Poolable> ClonesMap = 
-            new Dictionary<GameObject, Poolable>(Constants.DefaultClonesCapacity);
-        
-        internal static readonly F8PoolList<DespawnRequest> DespawnRequests = 
-            new F8PoolList<DespawnRequest>(Constants.DefaultDespawnRequestsCapacity);
-
-        internal static F8PoolMode s_f8PoolMode = Constants.DefaultF8PoolMode;
-        internal static bool s_hasTheF8PoolInitialized = false;
-        internal static bool s_isApplicationQuitting = false;
-        internal static bool s_despawnPersistentClonesOnDestroy = true;
-        internal static bool s_checkClonesForNull = true;
-        internal static bool s_checkForPrefab = true;
-        internal static F8PoolGlobal s_instance = null;
-
-        private static readonly Dictionary<GameObject, F8GameObjectPool> AllPoolsMap = 
-            new Dictionary<GameObject, F8GameObjectPool>(Constants.DefaultPoolsMapCapacity);
-        
-        private static readonly Dictionary<GameObject, F8GameObjectPool> PersistentPoolsMap = 
-            new Dictionary<GameObject, F8GameObjectPool>(Constants.DefaultPersistentPoolsCapacity);
-
-        private static readonly List<ISpawnable> SpawnableItemComponents = 
-            new List<ISpawnable>(Constants.DefaultPoolableInterfacesCapacity);
-        
-        private static readonly List<IDespawnable> DespawnableItemComponents = 
-            new List<IDespawnable>(Constants.DefaultPoolableInterfacesCapacity);
-
-        private static readonly object SecurityLock = new object();
-
-        private static BehaviourOnCapacityReached BehaviourOnCapacityReached => s_hasTheF8PoolInitialized 
-            ? s_instance._behaviourOnCapacityReached 
-            : Constants.DefaultBehaviourOnCapacityReached;
-        
-        private static DespawnType DespawnType => s_hasTheF8PoolInitialized
-            ? s_instance._despawnType
-            : Constants.DefaultDespawnType;
-        
-        private static CallbacksType CallbacksType => s_hasTheF8PoolInitialized 
-            ? s_instance._callbacksType 
-            : Constants.DefaultCallbacksType;
-
-        private static ReactionOnRepeatedDelayedDespawn ReactionOnRepeatedDelayedDespawn => s_hasTheF8PoolInitialized
-            ? s_instance._reactionOnRepeatedDelayedDespawn
-            : Constants.DefaultDelayedDespawnHandleType;
-        
-        private static int Capacity => s_hasTheF8PoolInitialized 
-            ? s_instance._capacity 
-            : Constants.DefaultPoolCapacity;
-        
-        private static bool Persistent => s_hasTheF8PoolInitialized 
-            ? s_instance._dontDestroyOnLoad 
-            : Constants.DefaultPoolPersistenceStatus;
-        
-        private static bool Warnings => s_hasTheF8PoolInitialized 
-            ? s_instance._sendWarnings 
-            : Constants.DefaultSendWarningsStatus;
-        
-        /// <summary>
-        /// The actions will be performed on a game object created in any pool.
-        /// </summary>
-        public static readonly F8PoolEvent<GameObject> GameObjectInstantiated = new F8PoolEvent<GameObject>();
-        
-        /// <summary>
-        /// Installs a pools by PoolPreset.
-        /// </summary>
-        public static void InstallPools(PoolsPreset poolsPreset)
+        public class GameObjectPool
         {
-#if DEBUG
-            if (poolsPreset == null)
-                throw new ArgumentNullException(nameof(poolsPreset));
-#endif
-            int count = poolsPreset.Presets.Count;
-            
-            for (int i = 0; i < count; i++)
+            internal static readonly Dictionary<GameObject, Poolable> ClonesMap =
+                new Dictionary<GameObject, Poolable>(Constants.DefaultClonesCapacity);
+
+            internal static readonly F8PoolList<DespawnRequest> DespawnRequests =
+                new F8PoolList<DespawnRequest>(Constants.DefaultDespawnRequestsCapacity);
+
+            internal static F8PoolMode s_f8PoolMode = Constants.DefaultF8PoolMode;
+            internal static bool s_hasTheF8PoolInitialized = false;
+            internal static bool s_isApplicationQuitting = false;
+            internal static bool s_despawnPersistentClonesOnDestroy = true;
+            internal static bool s_checkClonesForNull = true;
+            internal static bool s_checkForPrefab = true;
+            internal static F8PoolGlobal s_instance = null;
+
+            private static readonly Dictionary<GameObject, F8GameObjectPool> AllPoolsMap =
+                new Dictionary<GameObject, F8GameObjectPool>(Constants.DefaultPoolsMapCapacity);
+
+            private static readonly Dictionary<GameObject, F8GameObjectPool> PersistentPoolsMap =
+                new Dictionary<GameObject, F8GameObjectPool>(Constants.DefaultPersistentPoolsCapacity);
+
+            private static readonly List<ISpawnable> SpawnableItemComponents =
+                new List<ISpawnable>(Constants.DefaultPoolableInterfacesCapacity);
+
+            private static readonly List<IDespawnable> DespawnableItemComponents =
+                new List<IDespawnable>(Constants.DefaultPoolableInterfacesCapacity);
+
+            private static readonly object SecurityLock = new object();
+
+            private static BehaviourOnCapacityReached BehaviourOnCapacityReached => s_hasTheF8PoolInitialized
+                ? s_instance._behaviourOnCapacityReached
+                : Constants.DefaultBehaviourOnCapacityReached;
+
+            private static DespawnType DespawnType => s_hasTheF8PoolInitialized
+                ? s_instance._despawnType
+                : Constants.DefaultDespawnType;
+
+            private static CallbacksType CallbacksType => s_hasTheF8PoolInitialized
+                ? s_instance._callbacksType
+                : Constants.DefaultCallbacksType;
+
+            private static ReactionOnRepeatedDelayedDespawn ReactionOnRepeatedDelayedDespawn =>
+                s_hasTheF8PoolInitialized
+                    ? s_instance._reactionOnRepeatedDelayedDespawn
+                    : Constants.DefaultDelayedDespawnHandleType;
+
+            private static int Capacity => s_hasTheF8PoolInitialized
+                ? s_instance._capacity
+                : Constants.DefaultPoolCapacity;
+
+            private static bool Persistent => s_hasTheF8PoolInitialized
+                ? s_instance._dontDestroyOnLoad
+                : Constants.DefaultPoolPersistenceStatus;
+
+            private static bool Warnings => s_hasTheF8PoolInitialized
+                ? s_instance._sendWarnings
+                : Constants.DefaultSendWarningsStatus;
+
+            /// <summary>
+            /// The actions will be performed on a game object created in any pool.
+            /// </summary>
+            public static readonly F8PoolEvent<GameObject> GameObjectInstantiated = new F8PoolEvent<GameObject>();
+
+            /// <summary>
+            /// Installs a pools by PoolPreset.
+            /// </summary>
+            public static void InstallPools(PoolsPreset poolsPreset)
             {
-                PoolPreset preset = poolsPreset.Presets[i];
-
-                if (preset.Enabled == false)
-                    continue;
-                
-                GameObject prefab = preset.Prefab;
 #if DEBUG
-                if (prefab == null)
-                {
-                    LogF8.LogError($"名称为{nameof(PoolsPreset)}的'{poolsPreset}'预设中有一个或多个空的预制体!",
-                        poolsPreset);
-
-                    continue;
-                }
+                if (poolsPreset == null)
+                    throw new ArgumentNullException(nameof(poolsPreset));
 #endif
-                int preloadSize = Mathf.Clamp(preset.PreloadSize, 0, preset.Capacity);
+                int count = poolsPreset.Presets.Count;
 
-                if (TryGetPoolByPrefab(prefab, out F8GameObjectPool pool) == false)
+                for (int i = 0; i < count; i++)
                 {
-                    pool = CreateNewGameObjectPool(prefab);
-                    
-                    SetupNewPool(
-                        pool, 
-                        prefab, 
-                        preset.BehaviourOnCapacityReached, 
-                        preset.DespawnType,
-                        preset.CallbacksType, 
-                        preset.Capacity, 
-                        preloadSize, 
-                        preset.Persistent, 
-                        preset.Warnings);
-                }
-                else
-                {
-                    if (preset.Persistent && pool.HasRegisteredAsPersistent)
+                    PoolPreset preset = poolsPreset.Presets[i];
+
+                    if (preset.Enabled == false)
+                        continue;
+
+                    GameObject prefab = preset.Prefab;
+#if DEBUG
+                    if (prefab == null)
                     {
+                        LogF8.LogError($"名称为{nameof(PoolsPreset)}的'{poolsPreset}'预设中有一个或多个空的预制体!",
+                            poolsPreset);
+
                         continue;
                     }
-#if DEBUG
-                    LogF8.LogError($"您正在尝试通过{nameof(PoolsPreset)} '{poolsPreset}'安装的池 '{pool}' 已经存在!",
-                        pool);
 #endif
-                }
-            }
-        }
+                    int preloadSize = Mathf.Clamp(preset.PreloadSize, 0, preset.Capacity);
 
-        /// <summary>
-        /// Spawns a GameObject.
-        /// </summary>
-        /// <param name="prefab">GameObject prefab to spawn.</param>
-        /// <returns>Spawned GameObject.</returns>
-        public static GameObject Spawn(GameObject prefab)
-        {
-            Transform prefabTransform = prefab.transform;
-            
-            return DefaultSpawn(
-                prefab, prefabTransform.localPosition, prefabTransform.localRotation, null, false, out _);
-        }
-
-        /// <summary>
-        /// Spawns a GameObject.
-        /// </summary>
-        /// <param name="prefab">GameObject prefab to spawn.</param>
-        /// <param name="position">Spawned GameObject position.</param>
-        /// <param name="rotation">Spawned GameObject rotation.</param>
-        /// <returns>Spawned GameObject.</returns>
-        public static GameObject Spawn(GameObject prefab, Vector3 position, Quaternion rotation)
-        {
-            return DefaultSpawn(prefab, position, rotation, null, false, out _);
-        }
-        
-        /// <summary>
-        /// Spawns a GameObject.
-        /// </summary>
-        /// <param name="prefab">GameObject prefab to spawn.</param>
-        /// <param name="position">Spawned GameObject position.</param>
-        /// <param name="rotation">Spawned GameObject rotation.</param>
-        /// <param name="parent">The parent of the spawned GameObject.</param>
-        /// <returns>Spawned GameObject.</returns>
-        public static GameObject Spawn(GameObject prefab, Vector3 position, Quaternion rotation, Transform parent)
-        {
-            if (parent != null)
-            {
-                position = parent.InverseTransformPoint(position);
-                rotation = Quaternion.Inverse(parent.rotation) * rotation;
-            }
-            
-            return DefaultSpawn(prefab, position, rotation, parent, false, out _);
-        }
-
-        /// <summary>
-        /// Spawns a GameObject.
-        /// </summary>
-        /// <param name="prefab">GameObject prefab to spawn.</param>
-        /// <param name="parent">The parent of the spawned GameObject.</param>
-        /// <param name="worldPositionStays">World position stays.</param>
-        /// <returns>Spawned GameObject.</returns>
-        public static GameObject Spawn(GameObject prefab, Transform parent, bool worldPositionStays = false)
-        {
-            GetPositionAndRotationByParent(prefab, parent, out Vector3 position, out Quaternion rotation);
-
-            return DefaultSpawn(prefab, position, rotation, parent, worldPositionStays, out _);
-        }
-        
-        /// <summary>
-        /// Spawns a GameObject as T component.
-        /// </summary>
-        /// <param name="prefab">Component prefab to spawn.</param>
-        /// <typeparam name="T">Component.</typeparam>
-        /// <returns>Spawned GameObject as T component.</returns>
-        public static T Spawn<T>(T prefab) where T : Component
-        {
-            Transform prefabTransform = prefab.transform;
-            
-            GameObject spawnedGameObject = DefaultSpawn(prefab.gameObject, prefabTransform.localPosition,
-                prefabTransform.localRotation, null, false, out bool haveToGetComponent);
-            
-            return haveToGetComponent 
-                ? spawnedGameObject.GetComponent<T>() 
-                : null;
-        }
-
-        /// <summary>
-        /// Spawns a GameObject as T component.
-        /// </summary>
-        /// <param name="prefab">Component prefab to spawn.</param>
-        /// <param name="position">Spawned GameObject position.</param>
-        /// <param name="rotation">Spawned GameObject rotation.</param>
-        /// <typeparam name="T">Component type.</typeparam>
-        /// <returns>Spawned GameObject as T component.</returns>
-        public static T Spawn<T>(T prefab, Vector3 position, Quaternion rotation) 
-            where T : Component
-        {
-            GameObject spawnedGameObject = DefaultSpawn(prefab.gameObject, position, rotation, null, false, 
-                out bool haveToGetComponent);
-
-            return haveToGetComponent 
-                ? spawnedGameObject.GetComponent<T>() 
-                : null;
-        }
-        
-        /// <summary>
-        /// Spawns a GameObject as T component.
-        /// </summary>
-        /// <param name="prefab">Component prefab to spawn.</param>
-        /// <param name="parent">The parent of the spawned GameObject.</param>
-        /// <param name="position">Spawned GameObject position.</param>
-        /// <param name="rotation">Spawned GameObject rotation.</param>
-        /// <typeparam name="T">Component type.</typeparam>
-        /// <returns>Spawned GameObject as T component.</returns>
-        public static T Spawn<T>(T prefab, Vector3 position, Quaternion rotation, Transform parent) 
-            where T : Component
-        {
-            if (parent != null)
-            {
-                position = parent.InverseTransformPoint(position);
-                rotation = Quaternion.Inverse(parent.rotation) * rotation;
-            }
-            
-            GameObject spawnedGameObject = DefaultSpawn(prefab.gameObject, position, rotation, parent, false, 
-                out bool haveToGetComponent);
-
-            return haveToGetComponent 
-                ? spawnedGameObject.GetComponent<T>() 
-                : null;
-        }
-        
-        /// <summary>
-        /// Spawns a GameObject as T component.
-        /// </summary>
-        /// <param name="prefab">Component prefab to spawn.</param>
-        /// <param name="parent">The parent of the spawned GameObject.</param>
-        /// <param name="worldPositionStays">World position stays.</param>
-        /// <typeparam name="T">Component type.</typeparam>
-        /// <returns>Spawned GameObject as T component.</returns>
-        public static T Spawn<T>(T prefab, Transform parent, bool worldPositionStays = false) where T : Component
-        {
-            GameObject prefabGameObject = prefab.gameObject;
-            
-            GetPositionAndRotationByParent(prefabGameObject, parent, out Vector3 position, out Quaternion rotation);
-            
-            GameObject spawnedGameObject = DefaultSpawn(prefabGameObject, position, rotation, parent, 
-                worldPositionStays, out bool haveToGetComponent);
-
-            return haveToGetComponent 
-                ? spawnedGameObject.GetComponent<T>() 
-                : null;
-        }
-
-        /// <summary>
-        /// Despawns the clone.
-        /// </summary>
-        /// <param name="clone">Clone to despawn.</param>
-        /// <param name="delay">Despawn delay.</param>
-        public static void Despawn(Component clone, float delay = 0f)
-        {
-            DefaultDespawn(clone.gameObject, delay);
-        }
-        
-        /// <summary>
-        /// Despawns the clone.
-        /// </summary>
-        /// <param name="clone">Clone to despawn.</param>
-        /// <param name="delay">Despawn delay.</param>
-        public static void Despawn(GameObject clone, float delay = 0f)
-        {
-            DefaultDespawn(clone, delay);
-        }
-
-        /// <summary>
-        /// Performs an action for each pool.
-        /// </summary>
-        /// <param name="action">Action to perform.</param>
-        /// <exception cref="ArgumentNullException">Throws if action is null.</exception>
-        public static void ForEachPool(Action<F8GameObjectPool> action)
-        {
-#if DEBUG
-            if (action == null)
-                throw new ArgumentNullException(nameof(action));
-#endif
-            foreach (F8GameObjectPool pool in AllPoolsMap.Values)
-            {
-                action.Invoke(pool);
-            }
-        }
-
-        /// <summary>
-        /// Performs an action for each clone.
-        /// </summary>
-        /// <param name="action">Action to perform.</param>
-        /// <exception cref="ArgumentNullException">Throws if action is null.</exception>
-        public static void ForEachClone(Action<GameObject> action)
-        {
-#if DEBUG
-            if (action == null)
-                throw new ArgumentNullException(nameof(action));
-#endif
-            foreach (Poolable poolable in ClonesMap.Values)
-            {
-                action.Invoke(poolable._gameObject);
-            }
-        }
-        
-        /// <summary>
-        /// Tries to get pool by spawned gameObject.
-        /// </summary>
-        /// <param name="clone">Component which spawned via F8Pool</param>
-        /// <param name="pool">Found pool.</param>
-        /// <returns>Returns true if pool found, otherwise false.</returns>
-        public static bool TryGetPoolByClone(Component clone, out F8GameObjectPool pool)
-        {
-            return TryGetPoolByClone(clone.gameObject, out pool);
-        }
-        
-        /// <summary>
-        /// Tries to get pool by spawned gameObject.
-        /// </summary>
-        /// <param name="clone">GameObject which spawned via F8Pool</param>
-        /// <param name="pool">Found pool.</param>
-        /// <returns>Returns true if pool found, otherwise false.</returns>
-        public static bool TryGetPoolByClone(GameObject clone, out F8GameObjectPool pool)
-        {
-            if (ClonesMap.TryGetValue(clone, out Poolable poolable) && poolable._isSetup)
-            {
-                pool = poolable._pool;
-                return true;
-            }
-            
-            pool = null;
-            return false;
-        }
-        
-        /// <summary>
-        /// Tries to get pool by gameObject prefab.
-        /// </summary>
-        /// <param name="prefab">Component prefab.</param>
-        /// <param name="pool">Found pool.</param>
-        /// <returns>Returns true if pool found, otherwise false.</returns>
-        public static bool TryGetPoolByPrefab(Component prefab, out F8GameObjectPool pool)
-        {
-            return TryGetPoolByPrefab(prefab.gameObject, out pool);
-        }
-
-        /// <summary>
-        /// Tries to get pool by gameObject prefab.
-        /// </summary>
-        /// <param name="prefab">GameObject prefab.</param>
-        /// <param name="pool">Found pool.</param>
-        /// <returns>Returns true if pool found, otherwise false.</returns>
-        public static bool TryGetPoolByPrefab(GameObject prefab, out F8GameObjectPool pool)
-        {
-            return AllPoolsMap.TryGetValue(prefab, out pool);
-        }
-
-        /// <summary>
-        /// Returns the pool by clone.
-        /// </summary>
-        /// <param name="clone">Component which spawned via F8Pool</param>
-        /// <returns>Found pool.</returns>
-        public static F8GameObjectPool GetPoolByClone(Component clone)
-        {
-            return GetPoolByClone(clone.gameObject);
-        }
-        
-        /// <summary>
-        /// Returns the pool by clone.
-        /// </summary>
-        /// <param name="clone">GameObject which spawned via F8Pool</param>
-        /// <returns>Found pool.</returns>
-        public static F8GameObjectPool GetPoolByClone(GameObject clone)
-        {
-            var hasPool = TryGetPoolByClone(clone, out F8GameObjectPool pool);
-#if DEBUG
-            if (hasPool == false)
-                LogF8.LogError($"克隆 '{clone}' 未找到对应的池!",
-                    clone);
-#endif
-            return pool;
-        }
-        
-        /// <summary>
-        /// Returns the pool by prefab.
-        /// </summary>
-        /// <param name="prefab">Component's prefab.</param>
-        /// <returns>Found pool.</returns>
-        public static F8GameObjectPool GetPoolByPrefab(Component prefab)
-        {
-            return GetPoolByPrefab(prefab.gameObject);
-        }
-        
-        /// <summary>
-        /// Returns the pool by prefab.
-        /// </summary>
-        /// <param name="prefab">GameObject's prefab.</param>
-        /// <returns>Found pool.</returns>
-        public static F8GameObjectPool GetPoolByPrefab(GameObject prefab)
-        {
-            var hasPool = TryGetPoolByPrefab(prefab, out F8GameObjectPool pool);
-#if DEBUG
-            if (hasPool == false)
-                LogF8.LogError($"未通过预制体 '{prefab}' 找到池!",
-                    prefab);
-#endif
-            return pool;
-        }
-
-        /// <summary>
-        /// Is the component a clone (spawned using F8Pool)?
-        /// </summary>
-        /// <param name="clone">Component to check.</param>
-        /// <returns>True if component is a clone of the prefab, otherwise false.</returns>
-        public static bool IsClone(Component clone)
-        {
-            return IsClone(clone.gameObject);
-        }
-        
-        /// <summary>
-        /// Is the game object a clone (spawned using F8Pool)?
-        /// </summary>
-        /// <param name="clone">GameObject to check.</param>
-        /// <returns>True if game object is a clone of the prefab, otherwise false.</returns>
-        public static bool IsClone(GameObject clone)
-        {
-            return ClonesMap.ContainsKey(clone);
-        }
-
-        /// <summary>
-        /// Returns the status of the clone.
-        /// </summary>
-        /// <param name="clone">Component which spawned via F8Pool</param>
-        /// <returns>Status of the clone.</returns>
-        public static PoolableStatus GetCloneStatus(Component clone)
-        {
-            return GetCloneStatus(clone.gameObject);
-        }
-        
-        /// <summary>
-        /// Returns the status of the clone.
-        /// </summary>
-        /// <param name="clone">GameObject which spawned via F8Pool</param>
-        /// <returns>Status of the clone.</returns>
-        public static PoolableStatus GetCloneStatus(GameObject clone)
-        {
-            if (ClonesMap.TryGetValue(clone.gameObject, out Poolable poolable))
-            {
-                return poolable._status;
-            }
-#if DEBUG
-            LogF8.LogError($"克隆 '{clone}' 不是可池化的!",
-                clone);
-#endif
-            return default;
-        }
-
-        /// <summary>
-        /// Destroys a clone.
-        /// </summary>
-        /// <param name="clone">Component which spawned via F8Pool</param>
-        public static void DestroyClone(Component clone)
-        {
-            DestroyPoolableWithGameObject(clone.gameObject, false);
-        }
-
-        /// <summary>
-        /// Destroys a clone.
-        /// </summary>
-        /// <param name="clone">GameObject which spawned via F8Pool</param>
-        public static void DestroyClone(GameObject clone)
-        {
-            DestroyPoolableWithGameObject(clone, false);
-        }
-
-        /// <summary>
-        /// Destroys a clone immediately.
-        /// </summary>
-        /// <param name="clone">GameObject which spawned via F8Pool</param>
-        public static void DestroyCloneImmediate(Component clone)
-        {
-            DestroyPoolableWithGameObject(clone.gameObject, true);
-        }
-        
-        /// <summary>
-        /// Destroys a clone immediately.
-        /// </summary>
-        /// <param name="clone">GameObject which spawned via F8Pool</param>
-        public static void DestroyCloneImmediate(GameObject clone)
-        {
-            DestroyPoolableWithGameObject(clone, true);
-        }
-
-        /// <summary>
-        /// Destroys all pools.
-        /// </summary>
-        /// <param name="immediately">Should all pools be destroyed immediately?</param>
-        public static void DestroyAllPools(bool immediately = false)
-        {
-            if (CanPerformPoolAction() == false)
-            {
-#if DEBUG
-                LogF8.LogError("在应用程序退出时，您正在尝试销毁所有池！");
-#endif
-                return;
-            }
-
-            if (immediately)
-                ForEachPool(pool => pool.DestroyPoolImmediate());
-            else
-                ForEachPool(pool => pool.DestroyPool());
-        }
-        
-        internal static void RegisterPool(F8GameObjectPool pool)
-        {
-            if (AllPoolsMap.ContainsKey(pool._prefab) == false)
-            {
-                AllPoolsMap.Add(pool._prefab, pool);
-            }
-#if DEBUG
-            else
-            {
-                LogF8.LogError($"您正在尝试注册另一个使用相同预制体 '{pool._prefab}' 的池 '{pool.name}'!",
-                    pool);
-            }
-#endif
-        }
-        
-        internal static void UnregisterPool(F8GameObjectPool pool)
-        {
-            if (pool._isSetup == false)
-                return;
-
-            if (pool._dontDestroyOnLoad)
-                PersistentPoolsMap.Remove(pool._prefab);
-            
-            AllPoolsMap.Remove(pool._prefab);
-        }
-
-        internal static void RegisterPersistentPool(F8GameObjectPool pool)
-        {
-            if (pool._dontDestroyOnLoad)
-            {
-                if (PersistentPoolsMap.ContainsKey(pool._prefab) == false)
-                {
-                    PersistentPoolsMap.Add(pool._prefab, pool);
-                }
-#if DEBUG
-                else
-                {
-                    if (pool._sendWarnings)
+                    if (TryGetPoolByPrefab(prefab, out F8GameObjectPool pool) == false)
                     {
-                        LogF8.LogEntity($"您正在尝试注册持久池 '{pool.name}' 两次！",
+                        pool = CreateNewGameObjectPool(prefab);
+
+                        SetupNewPool(
+                            pool,
+                            prefab,
+                            preset.BehaviourOnCapacityReached,
+                            preset.DespawnType,
+                            preset.CallbacksType,
+                            preset.Capacity,
+                            preloadSize,
+                            preset.Persistent,
+                            preset.Warnings);
+                    }
+                    else
+                    {
+                        if (preset.Persistent && pool.HasRegisteredAsPersistent)
+                        {
+                            continue;
+                        }
+#if DEBUG
+                        LogF8.LogError($"您正在尝试通过{nameof(PoolsPreset)} '{poolsPreset}'安装的池 '{pool}' 已经存在!",
                             pool);
-                    }
-                }
-#endif
-            }
-        }
-
-        internal static bool HasPoolRegisteredAsPersistent(F8GameObjectPool pool)
-        {
-            return PersistentPoolsMap.ContainsKey(pool._prefab);
-        }
-
-        internal static void DespawnImmediate(Poolable poolable)
-        {
-            if (poolable._isSetup)
-            {
-                if (poolable._status == PoolableStatus.SpawnedOverCapacity)
-                {
-                    if (poolable._pool._behaviourOnCapacityReached == BehaviourOnCapacityReached.InstantiateWithCallbacks)
-                    {
-                        RaiseCallbacksOnDespawn(poolable);
-                    }
-                    
-                    poolable.Dispose(true);
-                    return;
-                }
-                
-                RaiseCallbacksOnDespawn(poolable);
-                
-                poolable._pool.Release(poolable);
-                poolable._pool.RaiseGameObjectDespawnedCallback(poolable._gameObject);
-                poolable._status = PoolableStatus.Despawned;
-            }
-            else
-            {
-#if DEBUG
-                if (Warnings)
-                {
-                    LogF8.LogEntity($"可池化对象 '{poolable._gameObject}' 尚未设置并将被销毁！", 
-                        poolable._gameObject);
-                }
-#endif
-                poolable.Dispose(true);
-            }
-        }
-        
-        internal static void ResetPool()
-        {
-            ResetLists();
-            ResetClonesDictionary();
-            HandlePersistentPoolsOnDestroy();
-            s_hasTheF8PoolInitialized = false;
-        }
-
-        private static void RaiseCallbacksOnSpawn(Poolable poolable)
-        {
-            if (poolable._pool._callbacksType == CallbacksType.None)
-                return;
-            
-            InvokeCallbacks(
-                poolable._gameObject, 
-                poolable._pool._callbacksType, 
-                spawnable => spawnable.OnSpawn(), 
-                SpawnableItemComponents, 
-                Constants.OnSpawnMessageName);
-        }
-        
-        private static void RaiseCallbacksOnDespawn(Poolable poolable)
-        {
-            if (poolable._pool._callbacksType == CallbacksType.None)
-                return;
-            
-            InvokeCallbacks(
-                poolable._gameObject, 
-                poolable._pool._callbacksType, 
-                despawnable => despawnable.OnDespawn(), 
-                DespawnableItemComponents, 
-                Constants.OnDespawnMessageName);
-        }
-
-        private static void InitializeTheF8Pool()
-        {
-            lock (SecurityLock)
-            {
-                if (s_instance == null)
-                {
-                    if (TryFindF8PoolInstanceAsSingle(out s_instance) == false)
-                    {
-                        CreateF8PoolInstance();
-#if DEBUG
-                        LogF8.LogEntity($"<{nameof(F8PoolGlobal)}> 实例已自动创建。也可以手动添加以修改默认参数。");
 #endif
                     }
                 }
-
-                s_hasTheF8PoolInitialized = true;
-            }
-        }
-
-        private static bool TryFindF8PoolInstanceAsSingle(out F8PoolGlobal f8Pool)
-        {
-            var instances = Object.FindObjectsOfType<F8PoolGlobal>();
-            var length = instances.Length;
-
-            if (length > 0)
-            {
-#if DEBUG
-                if (length > 1)
-                {
-                    for (var i = 1; i < length; i++)
-                    {
-                        Object.Destroy(instances[i]);
-                    }
-                    
-                    LogF8.LogError($"场景中 {nameof(F8PoolGlobal)} 实例的数量大于一个！");
-                }
-#endif
-                f8Pool = instances[0];
-                return true;
             }
 
-            f8Pool = null;
-            return false;
-        }
-        
-        private static F8GameObjectPool GetPoolByPrefabOrCreate(GameObject prefab)
-        {
-            if (TryGetPoolByPrefab(prefab, out F8GameObjectPool pool) == false)
-            {
-                pool = CreateNewGameObjectPool(prefab);
-
-                SetupNewPool(
-                    pool, 
-                    prefab, 
-                    BehaviourOnCapacityReached, 
-                    DespawnType,
-                    CallbacksType, 
-                    Capacity, 
-                    Constants.NewPoolPreloadSize, 
-                    Persistent, 
-                    Warnings);
-            }
-
-            return pool;
-        }
-        
-        private static void CreateF8PoolInstance()
-        {
-            s_instance = F8PoolGlobal.Instance;
-        }
-
-        private static F8GameObjectPool CreateNewGameObjectPool(GameObject prefab)
-        {
-            return new GameObject($"[{nameof(GameObjectPool)}] {prefab.name}").AddComponent<F8GameObjectPool>();
-        }
-
-        private static void SetupNewPool(
-            F8GameObjectPool pool, 
-            GameObject prefab, 
-            BehaviourOnCapacityReached behaviourOnCapacityReached, 
-            DespawnType despawnType,
-            CallbacksType callbacksType, 
-            int capacity, 
-            int preloadSize, 
-            bool persistent, 
-            bool warnings)
-        {
-            pool._dontDestroyOnLoad = persistent;
-            pool.SetWarningsActive(warnings);
-            pool.SetCapacity(capacity);
-            pool.SetCallbacksType(callbacksType);
-            pool.SetDespawnType(despawnType);
-            pool.SetBehaviourOnCapacityReached(behaviourOnCapacityReached);
-            pool.TrySetup(prefab);
-            pool.PopulatePool(preloadSize);
-        }
-
-        private static GameObject DefaultSpawn(GameObject prefab, Vector3 position, Quaternion rotation,
-            Transform parent, bool worldPositionStays, out bool haveToGetComponent)
-        {
-            if (CanPerformPoolAction() == false)
-            {
-#if DEBUG
-                LogF8.LogError($"在应用程序退出时，您正在尝试生成预制体 '{prefab}'！", prefab);
-#endif
-                haveToGetComponent = false;
-                return null;
-            }
-
-            F8GameObjectPool pool = GetPoolByPrefabOrCreate(prefab);
-            pool.Get(out GettingPoolableArguments arguments);
-
-            if (arguments.IsResultNullable)
-            {
-                haveToGetComponent = false;
-                return null;
-            }
-#if DEBUG
-            if (s_checkClonesForNull)
-            {
-                if (arguments.Poolable._gameObject == null)
-                {
-                    LogF8.LogError("您正在尝试生成一个已经在没有 {nameof(GameObjectPool)} 的情况下被销毁的克隆！预制体: '{prefab}'", pool);
-                }
-            }
-#endif
-            if (arguments.Poolable._status == PoolableStatus.Despawned)
-            {
-                arguments.Poolable._gameObject.SetActive(true);
-            }
-
-            SetupTransform(arguments.Poolable, pool, position, rotation, parent, worldPositionStays);
-            pool.RaiseGameObjectSpawnedCallback(arguments.Poolable._gameObject);
-            
-            if (arguments.Poolable._status == PoolableStatus.SpawnedOverCapacity)
-            {
-                if (pool._behaviourOnCapacityReached == BehaviourOnCapacityReached.InstantiateWithCallbacks)
-                {
-                    RaiseCallbacksOnSpawn(arguments.Poolable);
-                }
-            }
-            else
-            {
-                arguments.Poolable._status = PoolableStatus.Spawned;
-                RaiseCallbacksOnSpawn(arguments.Poolable);
-            }
-
-            haveToGetComponent = true;
-            return arguments.Poolable._gameObject;
-        }
-
-        private static void DefaultDespawn(GameObject gameObject, float delay = 0f)
-        {
-            if (CanPerformPoolAction() == false)
-            {
-#if DEBUG
-                LogF8.LogError($"在应用程序退出时，您正在尝试取消生成 '{gameObject}'！", gameObject);
-#endif
-                return;
-            }
-
-            if (ClonesMap.TryGetValue(gameObject, out Poolable poolable))
-            {
-                if (poolable._status == PoolableStatus.Despawned)
-                {
-#if DEBUG
-                    if (poolable._pool._sendWarnings)
-                    {
-                        LogF8.LogEntity("您要取消生成的游戏对象已经被取消生成！", gameObject);
-                    }
-#endif
-                    return;
-                }
-                
-                if (delay > 0f)
-                {
-                    DespawnWithDelay(poolable, delay);
-                }
-                else
-                {
-                    DespawnImmediate(poolable);
-                }
-            }
-            else
-            {
-#if DEBUG
-                if (Warnings)
-                {
-                    LogF8.LogEntity($"'{gameObject}' 未使用 {nameof(GameObjectPool)}（或池已销毁）生成，并将被销毁！", gameObject);
-                }
-#endif
-                Object.Destroy(gameObject, delay);
-            }
-        }
-
-        private static void DespawnWithDelay(Poolable poolable, float delay)
-        {
-            ReactionOnRepeatedDelayedDespawn reaction = ReactionOnRepeatedDelayedDespawn;
-                    
-            if (reaction == ReactionOnRepeatedDelayedDespawn.Ignore)
-            {
-                CreateDespawnRequest(poolable, delay);
-            }
-            else
-            {
-                if (HasDespawnRequest(poolable, out int index))
-                {
-                    ref DespawnRequest request = ref DespawnRequests._components[index];
-                            
-                    switch (reaction)
-                    {
-                        case ReactionOnRepeatedDelayedDespawn.ResetDelay:
-                            ResetDespawnDelay(ref request, delay);
-                            break;
-                        case ReactionOnRepeatedDelayedDespawn.ResetDelayIfNewTimeIsLess:
-                            ResetDespawnDelayIfNewTimeIsLess(ref request, delay);
-                            break;
-                        case ReactionOnRepeatedDelayedDespawn.ResetDelayIfNewTimeIsGreater:
-                            ResetDespawnDelayIfNewTimeIsGreater(ref request, delay);
-                            break;
-                        case ReactionOnRepeatedDelayedDespawn.ThrowException:
-#if DEBUG
-                            if (HasDespawnRequest(poolable, out _))
-                            {
-                                LogF8.LogError("延迟取消生成请求已经存在于该克隆！", poolable._gameObject);
-                            }       
-#endif
-                            break;
-                    }
-                }
-                else
-                {
-                    CreateDespawnRequest(poolable, delay);
-                }
-            }
-        }
-        
-        private static bool HasDespawnRequest(Poolable poolable, out int id)
-        {
-            for (int i = 0; i < DespawnRequests._count; i++)
-            {
-                if (DespawnRequests._components[i].Poolable == poolable)
-                {
-                    id = i;
-                    return true;
-                }
-            }
-
-            id = default;
-            return false;
-        }
-
-        private static void CreateDespawnRequest(Poolable poolable, float delay)
-        {
-            DespawnRequests.Add(new DespawnRequest
-            {
-                Poolable = poolable,
-                TimeToDespawn = delay
-            });
-        }
-
-        private static void ResetDespawnDelay(ref DespawnRequest request, float delay)
-        {
-            request.TimeToDespawn = delay;
-        }
-        
-        private static void ResetDespawnDelayIfNewTimeIsLess(ref DespawnRequest request, float delay)
-        {
-            if (delay < request.TimeToDespawn)
-            {
-                request.TimeToDespawn = delay;
-            }
-        }
-        
-        private static void ResetDespawnDelayIfNewTimeIsGreater(ref DespawnRequest request, float delay)
-        {
-            if (delay > request.TimeToDespawn)
-            {
-                request.TimeToDespawn = delay;
-            }
-        }
-        
-        private static bool CanPerformPoolAction()
-        {
-            if (s_isApplicationQuitting)
-            {
-#if UNITY_EDITOR
-                if (EditorSettings.enterPlayModeOptionsEnabled && s_instance == null)
-                {
-                    throw new Exception($"<{nameof(F8PoolGlobal)}> 实例为空！" +
-                                        "在 '进入播放模式选项' 中启用 '重新加载域' 选项或 " +
-                                        $"手动在场景中的任何 {nameof(GameObject)} 上添加此组件 " +
-                                        "以解决此问题。");
-                }
-#endif
-                return false;
-            }
-            
-            if (s_hasTheF8PoolInitialized == false)
-            {
-#if DEBUG
-                if (Application.isPlaying == false)
-                {
-                    throw new Exception("在应用程序未运行时，您正在尝试执行生成或取消生成操作！");
-                } 
-#endif
-                InitializeTheF8Pool();
-            }
-
-            return true;
-        }
-
-        private static void GetPositionAndRotationByParent(GameObject prefab, Transform parent, 
-            out Vector3 position, out Quaternion rotation)
-        {
-            if (parent != null)
+            /// <summary>
+            /// Spawns a GameObject.
+            /// </summary>
+            /// <param name="prefab">GameObject prefab to spawn.</param>
+            /// <returns>Spawned GameObject.</returns>
+            public static GameObject Spawn(GameObject prefab)
             {
                 Transform prefabTransform = prefab.transform;
-                
-                position = prefabTransform.position;
-                rotation = prefabTransform.rotation;
-            }
-            else
-            {
-                position = Constants.DefaultPosition;
-                rotation = Constants.DefaultRotation;
-            }
-        }
-        
-        private static void SetupTransform(Poolable poolable, F8GameObjectPool pool, Vector3 position, 
-            Quaternion rotation, Transform parent = null, bool worldPositionStays = false)
-        {
-            if (s_f8PoolMode == F8PoolMode.Safety)
-            {
-                SetPoolableNullParent(poolable);
-            }
-            else
-            {
-                CheckPoolableForLightweightTransformSetup(pool, poolable);
-            }
-            
-            poolable._transform.localScale = pool._regularPrefabScale;
-            poolable._transform.SetPositionAndRotation(position, rotation);
-            poolable._transform.SetParent(parent, worldPositionStays);
-        }
 
-        private static void CheckPoolableForLightweightTransformSetup(F8GameObjectPool pool, Poolable poolable)
-        {
-            if (pool._behaviourOnCapacityReached == BehaviourOnCapacityReached.Recycle)
-            {
-                SetPoolableNullParent(poolable);
-                return;
+                return DefaultSpawn(
+                    prefab, prefabTransform.localPosition, prefabTransform.localRotation, null, false, out _);
             }
-            
-            if (pool._despawnType == DespawnType.OnlyDeactivate)
+
+            /// <summary>
+            /// Spawns a GameObject.
+            /// </summary>
+            /// <param name="prefab">GameObject prefab to spawn.</param>
+            /// <param name="position">Spawned GameObject position.</param>
+            /// <param name="rotation">Spawned GameObject rotation.</param>
+            /// <returns>Spawned GameObject.</returns>
+            public static GameObject Spawn(GameObject prefab, Vector3 position, Quaternion rotation)
             {
-                SetPoolableNullParent(poolable);
-                return;
+                return DefaultSpawn(prefab, position, rotation, null, false, out _);
             }
+
+            /// <summary>
+            /// Spawns a GameObject.
+            /// </summary>
+            /// <param name="prefab">GameObject prefab to spawn.</param>
+            /// <param name="position">Spawned GameObject position.</param>
+            /// <param name="rotation">Spawned GameObject rotation.</param>
+            /// <param name="parent">The parent of the spawned GameObject.</param>
+            /// <returns>Spawned GameObject.</returns>
+            public static GameObject Spawn(GameObject prefab, Vector3 position, Quaternion rotation, Transform parent)
+            {
+                if (parent != null)
+                {
+                    position = parent.InverseTransformPoint(position);
+                    rotation = Quaternion.Inverse(parent.rotation) * rotation;
+                }
+
+                return DefaultSpawn(prefab, position, rotation, parent, false, out _);
+            }
+
+            /// <summary>
+            /// Spawns a GameObject.
+            /// </summary>
+            /// <param name="prefab">GameObject prefab to spawn.</param>
+            /// <param name="parent">The parent of the spawned GameObject.</param>
+            /// <param name="worldPositionStays">World position stays.</param>
+            /// <returns>Spawned GameObject.</returns>
+            public static GameObject Spawn(GameObject prefab, Transform parent, bool worldPositionStays = false)
+            {
+                GetPositionAndRotationByParent(prefab, parent, out Vector3 position, out Quaternion rotation);
+
+                return DefaultSpawn(prefab, position, rotation, parent, worldPositionStays, out _);
+            }
+
+            /// <summary>
+            /// Spawns a GameObject as T component.
+            /// </summary>
+            /// <param name="prefab">Component prefab to spawn.</param>
+            /// <typeparam name="T">Component.</typeparam>
+            /// <returns>Spawned GameObject as T component.</returns>
+            public static T Spawn<T>(T prefab) where T : Component
+            {
+                Transform prefabTransform = prefab.transform;
+
+                GameObject spawnedGameObject = DefaultSpawn(prefab.gameObject, prefabTransform.localPosition,
+                    prefabTransform.localRotation, null, false, out bool haveToGetComponent);
+
+                return haveToGetComponent
+                    ? spawnedGameObject.GetComponent<T>()
+                    : null;
+            }
+
+            /// <summary>
+            /// Spawns a GameObject as T component.
+            /// </summary>
+            /// <param name="prefab">Component prefab to spawn.</param>
+            /// <param name="position">Spawned GameObject position.</param>
+            /// <param name="rotation">Spawned GameObject rotation.</param>
+            /// <typeparam name="T">Component type.</typeparam>
+            /// <returns>Spawned GameObject as T component.</returns>
+            public static T Spawn<T>(T prefab, Vector3 position, Quaternion rotation)
+                where T : Component
+            {
+                GameObject spawnedGameObject = DefaultSpawn(prefab.gameObject, position, rotation, null, false,
+                    out bool haveToGetComponent);
+
+                return haveToGetComponent
+                    ? spawnedGameObject.GetComponent<T>()
+                    : null;
+            }
+
+            /// <summary>
+            /// Spawns a GameObject as T component.
+            /// </summary>
+            /// <param name="prefab">Component prefab to spawn.</param>
+            /// <param name="parent">The parent of the spawned GameObject.</param>
+            /// <param name="position">Spawned GameObject position.</param>
+            /// <param name="rotation">Spawned GameObject rotation.</param>
+            /// <typeparam name="T">Component type.</typeparam>
+            /// <returns>Spawned GameObject as T component.</returns>
+            public static T Spawn<T>(T prefab, Vector3 position, Quaternion rotation, Transform parent)
+                where T : Component
+            {
+                if (parent != null)
+                {
+                    position = parent.InverseTransformPoint(position);
+                    rotation = Quaternion.Inverse(parent.rotation) * rotation;
+                }
+
+                GameObject spawnedGameObject = DefaultSpawn(prefab.gameObject, position, rotation, parent, false,
+                    out bool haveToGetComponent);
+
+                return haveToGetComponent
+                    ? spawnedGameObject.GetComponent<T>()
+                    : null;
+            }
+
+            /// <summary>
+            /// Spawns a GameObject as T component.
+            /// </summary>
+            /// <param name="prefab">Component prefab to spawn.</param>
+            /// <param name="parent">The parent of the spawned GameObject.</param>
+            /// <param name="worldPositionStays">World position stays.</param>
+            /// <typeparam name="T">Component type.</typeparam>
+            /// <returns>Spawned GameObject as T component.</returns>
+            public static T Spawn<T>(T prefab, Transform parent, bool worldPositionStays = false) where T : Component
+            {
+                GameObject prefabGameObject = prefab.gameObject;
+
+                GetPositionAndRotationByParent(prefabGameObject, parent, out Vector3 position, out Quaternion rotation);
+
+                GameObject spawnedGameObject = DefaultSpawn(prefabGameObject, position, rotation, parent,
+                    worldPositionStays, out bool haveToGetComponent);
+
+                return haveToGetComponent
+                    ? spawnedGameObject.GetComponent<T>()
+                    : null;
+            }
+
+            /// <summary>
+            /// Despawns the clone.
+            /// </summary>
+            /// <param name="clone">Clone to despawn.</param>
+            /// <param name="delay">Despawn delay.</param>
+            public static void Despawn(Component clone, float delay = 0f)
+            {
+                DefaultDespawn(clone.gameObject, delay);
+            }
+
+            /// <summary>
+            /// Despawns the clone.
+            /// </summary>
+            /// <param name="clone">Clone to despawn.</param>
+            /// <param name="delay">Despawn delay.</param>
+            public static void Despawn(GameObject clone, float delay = 0f)
+            {
+                DefaultDespawn(clone, delay);
+            }
+
+            /// <summary>
+            /// Performs an action for each pool.
+            /// </summary>
+            /// <param name="action">Action to perform.</param>
+            /// <exception cref="ArgumentNullException">Throws if action is null.</exception>
+            public static void ForEachPool(Action<F8GameObjectPool> action)
+            {
 #if DEBUG
-            if (poolable._pool._cachedTransform.lossyScale != Constants.Vector3One)
-            {
-                LogF8.LogError($"池及其父物体在 F8 池 '{nameof(F8PoolMode.Performance)}' 模式下必须具有相同的缩放，即 'Vector3.one'！", poolable._pool);
-
-                SetPoolableNullParent(poolable);
-            }
+                if (action == null)
+                    throw new ArgumentNullException(nameof(action));
 #endif
-        }
-
-        private static void SetPoolableNullParent(Poolable poolable)
-        {
-            poolable._transform.SetParent(null, false);
-        }
-        
-        private static void InvokeCallbacks<T>(GameObject gameObject, CallbacksType callbacksType, 
-            Action<T> poolableCallback, List<T> listForComponentsCaching, string messageKey)
-        {
-            switch (callbacksType)
-            {
-                case CallbacksType.Interfaces: 
-                    InvokeGameObjectPoolEvents(gameObject, listForComponentsCaching, 
-                        poolableCallback, inChildren: false);
-                    break;
-                case CallbacksType.InterfacesInChildren:
-                    InvokeGameObjectPoolEvents(gameObject, listForComponentsCaching, 
-                        poolableCallback, inChildren: true);
-                    break;
-                case CallbacksType.SendMessage:
-                    gameObject.SendMessage(messageKey, SendMessageOptions.DontRequireReceiver);
-                    break;
-                case CallbacksType.BroadcastMessage:
-                    gameObject.BroadcastMessage(messageKey, SendMessageOptions.DontRequireReceiver);
-                    break;
-                case CallbacksType.None:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(callbacksType));
+                foreach (F8GameObjectPool pool in AllPoolsMap.Values)
+                {
+                    action.Invoke(pool);
+                }
             }
-        }
 
-        private static void InvokeGameObjectPoolEvents<T>(GameObject gameObject, List<T> listForComponentCaching, 
-            Action<T> callback, bool inChildren)
-        {
-            if (inChildren)
-                gameObject.GetComponentsInChildren(listForComponentCaching);
-            else
-                gameObject.GetComponents(listForComponentCaching);
-
-            int count = listForComponentCaching.Count;
-            
-            for (int i = 0; i < count; i++)
+            /// <summary>
+            /// Performs an action for each clone.
+            /// </summary>
+            /// <param name="action">Action to perform.</param>
+            /// <exception cref="ArgumentNullException">Throws if action is null.</exception>
+            public static void ForEachClone(Action<GameObject> action)
             {
-                callback.Invoke(listForComponentCaching[i]);
+#if DEBUG
+                if (action == null)
+                    throw new ArgumentNullException(nameof(action));
+#endif
+                foreach (Poolable poolable in ClonesMap.Values)
+                {
+                    action.Invoke(poolable._gameObject);
+                }
             }
-        }
-        
-        private static void DestroyPoolableWithGameObject(GameObject clone, bool immediately)
-        {
-            if (ClonesMap.TryGetValue(clone, out Poolable poolable))
+
+            /// <summary>
+            /// Tries to get pool by spawned gameObject.
+            /// </summary>
+            /// <param name="clone">Component which spawned via F8Pool</param>
+            /// <param name="pool">Found pool.</param>
+            /// <returns>Returns true if pool found, otherwise false.</returns>
+            public static bool TryGetPoolByClone(Component clone, out F8GameObjectPool pool)
+            {
+                return TryGetPoolByClone(clone.gameObject, out pool);
+            }
+
+            /// <summary>
+            /// Tries to get pool by spawned gameObject.
+            /// </summary>
+            /// <param name="clone">GameObject which spawned via F8Pool</param>
+            /// <param name="pool">Found pool.</param>
+            /// <returns>Returns true if pool found, otherwise false.</returns>
+            public static bool TryGetPoolByClone(GameObject clone, out F8GameObjectPool pool)
+            {
+                if (ClonesMap.TryGetValue(clone, out Poolable poolable) && poolable._isSetup)
+                {
+                    pool = poolable._pool;
+                    return true;
+                }
+
+                pool = null;
+                return false;
+            }
+
+            /// <summary>
+            /// Tries to get pool by gameObject prefab.
+            /// </summary>
+            /// <param name="prefab">Component prefab.</param>
+            /// <param name="pool">Found pool.</param>
+            /// <returns>Returns true if pool found, otherwise false.</returns>
+            public static bool TryGetPoolByPrefab(Component prefab, out F8GameObjectPool pool)
+            {
+                return TryGetPoolByPrefab(prefab.gameObject, out pool);
+            }
+
+            /// <summary>
+            /// Tries to get pool by gameObject prefab.
+            /// </summary>
+            /// <param name="prefab">GameObject prefab.</param>
+            /// <param name="pool">Found pool.</param>
+            /// <returns>Returns true if pool found, otherwise false.</returns>
+            public static bool TryGetPoolByPrefab(GameObject prefab, out F8GameObjectPool pool)
+            {
+                return AllPoolsMap.TryGetValue(prefab, out pool);
+            }
+
+            /// <summary>
+            /// Returns the pool by clone.
+            /// </summary>
+            /// <param name="clone">Component which spawned via F8Pool</param>
+            /// <returns>Found pool.</returns>
+            public static F8GameObjectPool GetPoolByClone(Component clone)
+            {
+                return GetPoolByClone(clone.gameObject);
+            }
+
+            /// <summary>
+            /// Returns the pool by clone.
+            /// </summary>
+            /// <param name="clone">GameObject which spawned via F8Pool</param>
+            /// <returns>Found pool.</returns>
+            public static F8GameObjectPool GetPoolByClone(GameObject clone)
+            {
+                var hasPool = TryGetPoolByClone(clone, out F8GameObjectPool pool);
+#if DEBUG
+                if (hasPool == false)
+                    LogF8.LogError($"克隆 '{clone}' 未找到对应的池!",
+                        clone);
+#endif
+                return pool;
+            }
+
+            /// <summary>
+            /// Returns the pool by prefab.
+            /// </summary>
+            /// <param name="prefab">Component's prefab.</param>
+            /// <returns>Found pool.</returns>
+            public static F8GameObjectPool GetPoolByPrefab(Component prefab)
+            {
+                return GetPoolByPrefab(prefab.gameObject);
+            }
+
+            /// <summary>
+            /// Returns the pool by prefab.
+            /// </summary>
+            /// <param name="prefab">GameObject's prefab.</param>
+            /// <returns>Found pool.</returns>
+            public static F8GameObjectPool GetPoolByPrefab(GameObject prefab)
+            {
+                var hasPool = TryGetPoolByPrefab(prefab, out F8GameObjectPool pool);
+#if DEBUG
+                if (hasPool == false)
+                    LogF8.LogError($"未通过预制体 '{prefab}' 找到池!",
+                        prefab);
+#endif
+                return pool;
+            }
+
+            /// <summary>
+            /// Is the component a clone (spawned using F8Pool)?
+            /// </summary>
+            /// <param name="clone">Component to check.</param>
+            /// <returns>True if component is a clone of the prefab, otherwise false.</returns>
+            public static bool IsClone(Component clone)
+            {
+                return IsClone(clone.gameObject);
+            }
+
+            /// <summary>
+            /// Is the game object a clone (spawned using F8Pool)?
+            /// </summary>
+            /// <param name="clone">GameObject to check.</param>
+            /// <returns>True if game object is a clone of the prefab, otherwise false.</returns>
+            public static bool IsClone(GameObject clone)
+            {
+                return ClonesMap.ContainsKey(clone);
+            }
+
+            /// <summary>
+            /// Returns the status of the clone.
+            /// </summary>
+            /// <param name="clone">Component which spawned via F8Pool</param>
+            /// <returns>Status of the clone.</returns>
+            public static PoolableStatus GetCloneStatus(Component clone)
+            {
+                return GetCloneStatus(clone.gameObject);
+            }
+
+            /// <summary>
+            /// Returns the status of the clone.
+            /// </summary>
+            /// <param name="clone">GameObject which spawned via F8Pool</param>
+            /// <returns>Status of the clone.</returns>
+            public static PoolableStatus GetCloneStatus(GameObject clone)
+            {
+                if (ClonesMap.TryGetValue(clone.gameObject, out Poolable poolable))
+                {
+                    return poolable._status;
+                }
+#if DEBUG
+                LogF8.LogError($"克隆 '{clone}' 不是可池化的!",
+                    clone);
+#endif
+                return default;
+            }
+
+            /// <summary>
+            /// Destroys a clone.
+            /// </summary>
+            /// <param name="clone">Component which spawned via F8Pool</param>
+            public static void DestroyClone(Component clone)
+            {
+                DestroyPoolableWithGameObject(clone.gameObject, false);
+            }
+
+            /// <summary>
+            /// Destroys a clone.
+            /// </summary>
+            /// <param name="clone">GameObject which spawned via F8Pool</param>
+            public static void DestroyClone(GameObject clone)
+            {
+                DestroyPoolableWithGameObject(clone, false);
+            }
+
+            /// <summary>
+            /// Destroys a clone immediately.
+            /// </summary>
+            /// <param name="clone">GameObject which spawned via F8Pool</param>
+            public static void DestroyCloneImmediate(Component clone)
+            {
+                DestroyPoolableWithGameObject(clone.gameObject, true);
+            }
+
+            /// <summary>
+            /// Destroys a clone immediately.
+            /// </summary>
+            /// <param name="clone">GameObject which spawned via F8Pool</param>
+            public static void DestroyCloneImmediate(GameObject clone)
+            {
+                DestroyPoolableWithGameObject(clone, true);
+            }
+
+            /// <summary>
+            /// Destroys all pools.
+            /// </summary>
+            /// <param name="immediately">Should all pools be destroyed immediately?</param>
+            public static void DestroyAllPools(bool immediately = false)
+            {
+                if (CanPerformPoolAction() == false)
+                {
+#if DEBUG
+                    LogF8.LogError("在应用程序退出时，您正在尝试销毁所有池！");
+#endif
+                    return;
+                }
+
+                if (immediately)
+                    ForEachPool(pool => pool.DestroyPoolImmediate());
+                else
+                    ForEachPool(pool => pool.DestroyPool());
+            }
+
+            internal static void RegisterPool(F8GameObjectPool pool)
+            {
+                if (AllPoolsMap.ContainsKey(pool._prefab) == false)
+                {
+                    AllPoolsMap.Add(pool._prefab, pool);
+                }
+#if DEBUG
+                else
+                {
+                    LogF8.LogError($"您正在尝试注册另一个使用相同预制体 '{pool._prefab}' 的池 '{pool.name}'!",
+                        pool);
+                }
+#endif
+            }
+
+            internal static void UnregisterPool(F8GameObjectPool pool)
+            {
+                if (pool._isSetup == false)
+                    return;
+
+                if (pool._dontDestroyOnLoad)
+                    PersistentPoolsMap.Remove(pool._prefab);
+
+                AllPoolsMap.Remove(pool._prefab);
+            }
+
+            internal static void RegisterPersistentPool(F8GameObjectPool pool)
+            {
+                if (pool._dontDestroyOnLoad)
+                {
+                    if (PersistentPoolsMap.ContainsKey(pool._prefab) == false)
+                    {
+                        PersistentPoolsMap.Add(pool._prefab, pool);
+                    }
+#if DEBUG
+                    else
+                    {
+                        if (pool._sendWarnings)
+                        {
+                            LogF8.LogEntity($"您正在尝试注册持久池 '{pool.name}' 两次！",
+                                pool);
+                        }
+                    }
+#endif
+                }
+            }
+
+            internal static bool HasPoolRegisteredAsPersistent(F8GameObjectPool pool)
+            {
+                return PersistentPoolsMap.ContainsKey(pool._prefab);
+            }
+
+            internal static void DespawnImmediate(Poolable poolable)
             {
                 if (poolable._isSetup)
                 {
-                    poolable._pool.UnregisterPoolable(poolable);
-                    poolable.Dispose(immediately);
+                    if (poolable._status == PoolableStatus.SpawnedOverCapacity)
+                    {
+                        if (poolable._pool._behaviourOnCapacityReached ==
+                            BehaviourOnCapacityReached.InstantiateWithCallbacks)
+                        {
+                            RaiseCallbacksOnDespawn(poolable);
+                        }
+
+                        poolable.Dispose(true);
+                        return;
+                    }
+
+                    RaiseCallbacksOnDespawn(poolable);
+
+                    poolable._pool.Release(poolable);
+                    poolable._pool.RaiseGameObjectDespawnedCallback(poolable._gameObject);
+                    poolable._status = PoolableStatus.Despawned;
                 }
-#if DEBUG
                 else
                 {
-                    LogF8.LogError($"克隆 '{clone}' 尚未设置！", clone);
+#if DEBUG
+                    if (Warnings)
+                    {
+                        LogF8.LogEntity($"可池化对象 '{poolable._gameObject}' 尚未设置并将被销毁！",
+                            poolable._gameObject);
+                    }
+#endif
+                    poolable.Dispose(true);
+                }
+            }
+
+            internal static void ResetPool()
+            {
+                ResetLists();
+                ResetClonesDictionary();
+                HandlePersistentPoolsOnDestroy();
+                s_hasTheF8PoolInitialized = false;
+            }
+
+            private static void RaiseCallbacksOnSpawn(Poolable poolable)
+            {
+                if (poolable._pool._callbacksType == CallbacksType.None)
+                    return;
+
+                InvokeCallbacks(
+                    poolable._gameObject,
+                    poolable._pool._callbacksType,
+                    spawnable => spawnable.OnSpawn(),
+                    SpawnableItemComponents,
+                    Constants.OnSpawnMessageName);
+            }
+
+            private static void RaiseCallbacksOnDespawn(Poolable poolable)
+            {
+                if (poolable._pool._callbacksType == CallbacksType.None)
+                    return;
+
+                InvokeCallbacks(
+                    poolable._gameObject,
+                    poolable._pool._callbacksType,
+                    despawnable => despawnable.OnDespawn(),
+                    DespawnableItemComponents,
+                    Constants.OnDespawnMessageName);
+            }
+
+            private static void InitializeTheF8Pool()
+            {
+                lock (SecurityLock)
+                {
+                    if (s_instance == null)
+                    {
+                        if (TryFindF8PoolInstanceAsSingle(out s_instance) == false)
+                        {
+                            CreateF8PoolInstance();
+#if DEBUG
+                            LogF8.LogEntity($"<{nameof(F8PoolGlobal)}> 实例已自动创建。也可以手动添加以修改默认参数。");
+#endif
+                        }
+                    }
+
+                    s_hasTheF8PoolInitialized = true;
+                }
+            }
+
+            private static bool TryFindF8PoolInstanceAsSingle(out F8PoolGlobal f8Pool)
+            {
+                var instances = Object.FindObjectsOfType<F8PoolGlobal>();
+                var length = instances.Length;
+
+                if (length > 0)
+                {
+#if DEBUG
+                    if (length > 1)
+                    {
+                        for (var i = 1; i < length; i++)
+                        {
+                            Object.Destroy(instances[i]);
+                        }
+
+                        LogF8.LogError($"场景中 {nameof(F8PoolGlobal)} 实例的数量大于一个！");
+                    }
+#endif
+                    f8Pool = instances[0];
+                    return true;
+                }
+
+                f8Pool = null;
+                return false;
+            }
+
+            private static F8GameObjectPool GetPoolByPrefabOrCreate(GameObject prefab)
+            {
+                if (TryGetPoolByPrefab(prefab, out F8GameObjectPool pool) == false)
+                {
+                    pool = CreateNewGameObjectPool(prefab);
+
+                    SetupNewPool(
+                        pool,
+                        prefab,
+                        BehaviourOnCapacityReached,
+                        DespawnType,
+                        CallbacksType,
+                        Capacity,
+                        Constants.NewPoolPreloadSize,
+                        Persistent,
+                        Warnings);
+                }
+
+                return pool;
+            }
+
+            private static void CreateF8PoolInstance()
+            {
+                s_instance = F8PoolGlobal.Instance;
+            }
+
+            private static F8GameObjectPool CreateNewGameObjectPool(GameObject prefab)
+            {
+                return new GameObject($"[{nameof(GameObjectPool)}] {prefab.name}").AddComponent<F8GameObjectPool>();
+            }
+
+            private static void SetupNewPool(
+                F8GameObjectPool pool,
+                GameObject prefab,
+                BehaviourOnCapacityReached behaviourOnCapacityReached,
+                DespawnType despawnType,
+                CallbacksType callbacksType,
+                int capacity,
+                int preloadSize,
+                bool persistent,
+                bool warnings)
+            {
+                pool._dontDestroyOnLoad = persistent;
+                pool.SetWarningsActive(warnings);
+                pool.SetCapacity(capacity);
+                pool.SetCallbacksType(callbacksType);
+                pool.SetDespawnType(despawnType);
+                pool.SetBehaviourOnCapacityReached(behaviourOnCapacityReached);
+                pool.TrySetup(prefab);
+                pool.PopulatePool(preloadSize);
+            }
+
+            private static GameObject DefaultSpawn(GameObject prefab, Vector3 position, Quaternion rotation,
+                Transform parent, bool worldPositionStays, out bool haveToGetComponent)
+            {
+                if (CanPerformPoolAction() == false)
+                {
+#if DEBUG
+                    LogF8.LogError($"在应用程序退出时，您正在尝试生成预制体 '{prefab}'！", prefab);
+#endif
+                    haveToGetComponent = false;
+                    return null;
+                }
+
+                F8GameObjectPool pool = GetPoolByPrefabOrCreate(prefab);
+                pool.Get(out GettingPoolableArguments arguments);
+
+                if (arguments.IsResultNullable)
+                {
+                    haveToGetComponent = false;
+                    return null;
+                }
+#if DEBUG
+                if (s_checkClonesForNull)
+                {
+                    if (arguments.Poolable._gameObject == null)
+                    {
+                        LogF8.LogError("您正在尝试生成一个已经在没有 {nameof(GameObjectPool)} 的情况下被销毁的克隆！预制体: '{prefab}'", pool);
+                    }
+                }
+#endif
+                if (arguments.Poolable._status == PoolableStatus.Despawned)
+                {
+                    arguments.Poolable._gameObject.SetActive(true);
+                }
+
+                SetupTransform(arguments.Poolable, pool, position, rotation, parent, worldPositionStays);
+                pool.RaiseGameObjectSpawnedCallback(arguments.Poolable._gameObject);
+
+                if (arguments.Poolable._status == PoolableStatus.SpawnedOverCapacity)
+                {
+                    if (pool._behaviourOnCapacityReached == BehaviourOnCapacityReached.InstantiateWithCallbacks)
+                    {
+                        RaiseCallbacksOnSpawn(arguments.Poolable);
+                    }
+                }
+                else
+                {
+                    arguments.Poolable._status = PoolableStatus.Spawned;
+                    RaiseCallbacksOnSpawn(arguments.Poolable);
+                }
+
+                haveToGetComponent = true;
+                return arguments.Poolable._gameObject;
+            }
+
+            private static void DefaultDespawn(GameObject gameObject, float delay = 0f)
+            {
+                if (CanPerformPoolAction() == false)
+                {
+#if DEBUG
+                    LogF8.LogError($"在应用程序退出时，您正在尝试取消生成 '{gameObject}'！", gameObject);
+#endif
+                    return;
+                }
+
+                if (ClonesMap.TryGetValue(gameObject, out Poolable poolable))
+                {
+                    if (poolable._status == PoolableStatus.Despawned)
+                    {
+#if DEBUG
+                        if (poolable._pool._sendWarnings)
+                        {
+                            LogF8.LogEntity("您要取消生成的游戏对象已经被取消生成！", gameObject);
+                        }
+#endif
+                        return;
+                    }
+
+                    if (delay > 0f)
+                    {
+                        DespawnWithDelay(poolable, delay);
+                    }
+                    else
+                    {
+                        DespawnImmediate(poolable);
+                    }
+                }
+                else
+                {
+#if DEBUG
+                    if (Warnings)
+                    {
+                        LogF8.LogEntity($"'{gameObject}' 未使用 {nameof(GameObjectPool)}（或池已销毁）生成，并将被销毁！", gameObject);
+                    }
+#endif
+                    Object.Destroy(gameObject, delay);
+                }
+            }
+
+            private static void DespawnWithDelay(Poolable poolable, float delay)
+            {
+                ReactionOnRepeatedDelayedDespawn reaction = ReactionOnRepeatedDelayedDespawn;
+
+                if (reaction == ReactionOnRepeatedDelayedDespawn.Ignore)
+                {
+                    CreateDespawnRequest(poolable, delay);
+                }
+                else
+                {
+                    if (HasDespawnRequest(poolable, out int index))
+                    {
+                        ref DespawnRequest request = ref DespawnRequests._components[index];
+
+                        switch (reaction)
+                        {
+                            case ReactionOnRepeatedDelayedDespawn.ResetDelay:
+                                ResetDespawnDelay(ref request, delay);
+                                break;
+                            case ReactionOnRepeatedDelayedDespawn.ResetDelayIfNewTimeIsLess:
+                                ResetDespawnDelayIfNewTimeIsLess(ref request, delay);
+                                break;
+                            case ReactionOnRepeatedDelayedDespawn.ResetDelayIfNewTimeIsGreater:
+                                ResetDespawnDelayIfNewTimeIsGreater(ref request, delay);
+                                break;
+                            case ReactionOnRepeatedDelayedDespawn.ThrowException:
+#if DEBUG
+                                if (HasDespawnRequest(poolable, out _))
+                                {
+                                    LogF8.LogError("延迟取消生成请求已经存在于该克隆！", poolable._gameObject);
+                                }
+#endif
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        CreateDespawnRequest(poolable, delay);
+                    }
+                }
+            }
+
+            private static bool HasDespawnRequest(Poolable poolable, out int id)
+            {
+                for (int i = 0; i < DespawnRequests._count; i++)
+                {
+                    if (DespawnRequests._components[i].Poolable == poolable)
+                    {
+                        id = i;
+                        return true;
+                    }
+                }
+
+                id = default;
+                return false;
+            }
+
+            private static void CreateDespawnRequest(Poolable poolable, float delay)
+            {
+                DespawnRequests.Add(new DespawnRequest
+                {
+                    Poolable = poolable,
+                    TimeToDespawn = delay
+                });
+            }
+
+            private static void ResetDespawnDelay(ref DespawnRequest request, float delay)
+            {
+                request.TimeToDespawn = delay;
+            }
+
+            private static void ResetDespawnDelayIfNewTimeIsLess(ref DespawnRequest request, float delay)
+            {
+                if (delay < request.TimeToDespawn)
+                {
+                    request.TimeToDespawn = delay;
+                }
+            }
+
+            private static void ResetDespawnDelayIfNewTimeIsGreater(ref DespawnRequest request, float delay)
+            {
+                if (delay > request.TimeToDespawn)
+                {
+                    request.TimeToDespawn = delay;
+                }
+            }
+
+            private static bool CanPerformPoolAction()
+            {
+                if (s_isApplicationQuitting)
+                {
+#if UNITY_EDITOR
+                    if (EditorSettings.enterPlayModeOptionsEnabled && s_instance == null)
+                    {
+                        throw new Exception($"<{nameof(F8PoolGlobal)}> 实例为空！" +
+                                            "在 '进入播放模式选项' 中启用 '重新加载域' 选项或 " +
+                                            $"手动在场景中的任何 {nameof(GameObject)} 上添加此组件 " +
+                                            "以解决此问题。");
+                    }
+#endif
+                    return false;
+                }
+
+                if (s_hasTheF8PoolInitialized == false)
+                {
+#if DEBUG
+                    if (Application.isPlaying == false)
+                    {
+                        throw new Exception("在应用程序未运行时，您正在尝试执行生成或取消生成操作！");
+                    }
+#endif
+                    InitializeTheF8Pool();
+                }
+
+                return true;
+            }
+
+            private static void GetPositionAndRotationByParent(GameObject prefab, Transform parent,
+                out Vector3 position, out Quaternion rotation)
+            {
+                if (parent != null)
+                {
+                    Transform prefabTransform = prefab.transform;
+
+                    position = prefabTransform.position;
+                    rotation = prefabTransform.rotation;
+                }
+                else
+                {
+                    position = Constants.DefaultPosition;
+                    rotation = Constants.DefaultRotation;
+                }
+            }
+
+            private static void SetupTransform(Poolable poolable, F8GameObjectPool pool, Vector3 position,
+                Quaternion rotation, Transform parent = null, bool worldPositionStays = false)
+            {
+                if (s_f8PoolMode == F8PoolMode.Safety)
+                {
+                    SetPoolableNullParent(poolable);
+                }
+                else
+                {
+                    CheckPoolableForLightweightTransformSetup(pool, poolable);
+                }
+
+                poolable._transform.localScale = pool._regularPrefabScale;
+                poolable._transform.SetPositionAndRotation(position, rotation);
+                poolable._transform.SetParent(parent, worldPositionStays);
+            }
+
+            private static void CheckPoolableForLightweightTransformSetup(F8GameObjectPool pool, Poolable poolable)
+            {
+                if (pool._behaviourOnCapacityReached == BehaviourOnCapacityReached.Recycle)
+                {
+                    SetPoolableNullParent(poolable);
+                    return;
+                }
+
+                if (pool._despawnType == DespawnType.OnlyDeactivate)
+                {
+                    SetPoolableNullParent(poolable);
+                    return;
+                }
+#if DEBUG
+                if (poolable._pool._cachedTransform.lossyScale != Constants.Vector3One)
+                {
+                    LogF8.LogError($"池及其父物体在 F8 池 '{nameof(F8PoolMode.Performance)}' 模式下必须具有相同的缩放，即 'Vector3.one'！",
+                        poolable._pool);
+
+                    SetPoolableNullParent(poolable);
                 }
 #endif
             }
-            else
+
+            private static void SetPoolableNullParent(Poolable poolable)
             {
+                poolable._transform.SetParent(null, false);
+            }
+
+            private static void InvokeCallbacks<T>(GameObject gameObject, CallbacksType callbacksType,
+                Action<T> poolableCallback, List<T> listForComponentsCaching, string messageKey)
+            {
+                switch (callbacksType)
+                {
+                    case CallbacksType.Interfaces:
+                        InvokeGameObjectPoolEvents(gameObject, listForComponentsCaching,
+                            poolableCallback, inChildren: false);
+                        break;
+                    case CallbacksType.InterfacesInChildren:
+                        InvokeGameObjectPoolEvents(gameObject, listForComponentsCaching,
+                            poolableCallback, inChildren: true);
+                        break;
+                    case CallbacksType.SendMessage:
+                        gameObject.SendMessage(messageKey, SendMessageOptions.DontRequireReceiver);
+                        break;
+                    case CallbacksType.BroadcastMessage:
+                        gameObject.BroadcastMessage(messageKey, SendMessageOptions.DontRequireReceiver);
+                        break;
+                    case CallbacksType.None:
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(callbacksType));
+                }
+            }
+
+            private static void InvokeGameObjectPoolEvents<T>(GameObject gameObject, List<T> listForComponentCaching,
+                Action<T> callback, bool inChildren)
+            {
+                if (inChildren)
+                    gameObject.GetComponentsInChildren(listForComponentCaching);
+                else
+                    gameObject.GetComponents(listForComponentCaching);
+
+                int count = listForComponentCaching.Count;
+
+                for (int i = 0; i < count; i++)
+                {
+                    callback.Invoke(listForComponentCaching[i]);
+                }
+            }
+
+            private static void DestroyPoolableWithGameObject(GameObject clone, bool immediately)
+            {
+                if (ClonesMap.TryGetValue(clone, out Poolable poolable))
+                {
+                    if (poolable._isSetup)
+                    {
+                        poolable._pool.UnregisterPoolable(poolable);
+                        poolable.Dispose(immediately);
+                    }
 #if DEBUG
-                LogF8.LogEntity($"克隆 '{clone}' 并非由 {nameof(GameObjectPool)} 生成！", clone);
+                    else
+                    {
+                        LogF8.LogError($"克隆 '{clone}' 尚未设置！", clone);
+                    }
 #endif
-                Object.Destroy(clone);
+                }
+                else
+                {
+#if DEBUG
+                    LogF8.LogEntity($"克隆 '{clone}' 并非由 {nameof(GameObjectPool)} 生成！", clone);
+#endif
+                    Object.Destroy(clone);
+                }
             }
-        }
 
-        private static void ResetLists()
-        {
-            ClearListAndSetCapacity(SpawnableItemComponents, Constants.DefaultPoolableInterfacesCapacity);
-            ClearListAndSetCapacity(DespawnableItemComponents, Constants.DefaultPoolableInterfacesCapacity);
-            ClearListAndSetCapacity(DespawnRequests, Constants.DefaultDespawnRequestsCapacity);
-        }
-
-        private static void HandlePersistentPoolsOnDestroy()
-        {
-            if (s_isApplicationQuitting)
-                return;
-            
-            if (s_despawnPersistentClonesOnDestroy == false)
-                return;
-            
-            if (PersistentPoolsMap.Count == 0)
-                return;
-            
-            foreach (F8GameObjectPool persistentPool in PersistentPoolsMap.Values)
+            private static void ResetLists()
             {
-                persistentPool.DespawnAllClones();
+                ClearListAndSetCapacity(SpawnableItemComponents, Constants.DefaultPoolableInterfacesCapacity);
+                ClearListAndSetCapacity(DespawnableItemComponents, Constants.DefaultPoolableInterfacesCapacity);
+                ClearListAndSetCapacity(DespawnRequests, Constants.DefaultDespawnRequestsCapacity);
             }
-        }
-        
-        private static void ResetClonesDictionary()
-        {
-            if (s_isApplicationQuitting)
+
+            private static void HandlePersistentPoolsOnDestroy()
             {
-                ClonesMap.Clear();
+                if (s_isApplicationQuitting)
+                    return;
+
+                if (s_despawnPersistentClonesOnDestroy == false)
+                    return;
+
+                if (PersistentPoolsMap.Count == 0)
+                    return;
+
+                foreach (F8GameObjectPool persistentPool in PersistentPoolsMap.Values)
+                {
+                    persistentPool.DespawnAllClones();
+                }
             }
-        }
 
-        private static void ClearListAndSetCapacity<T>(List<T> list, int capacity)
-        {
-            list.Clear();
-            list.Capacity = capacity;
-        }
+            private static void ResetClonesDictionary()
+            {
+                if (s_isApplicationQuitting)
+                {
+                    ClonesMap.Clear();
+                }
+            }
 
-        private static void ClearListAndSetCapacity(F8PoolList<DespawnRequest> list, int capacity)
-        {
-            list.Clear();
-            list.SetCapacity(capacity);
+            private static void ClearListAndSetCapacity<T>(List<T> list, int capacity)
+            {
+                list.Clear();
+                list.Capacity = capacity;
+            }
+
+            private static void ClearListAndSetCapacity(F8PoolList<DespawnRequest> list, int capacity)
+            {
+                list.Clear();
+                list.SetCapacity(capacity);
+            }
         }
     }
 }

@@ -1,6 +1,6 @@
 namespace F8Framework.Core
 {
-    public static class FF8
+    public static partial class FF8
     {
         //相当于重命名
         /* ------------------------核心模块------------------------ */

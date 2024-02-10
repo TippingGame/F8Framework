@@ -26,37 +26,37 @@ Unity F8GameObjectPool组件，对象池管理，预加载，生成/销毁/延�
         /*------------------------------使用GameObjectPool对象池------------------------------*/
         
         // 使用GameObject或者Component创建对象
-        GameObject spawnedClone = GameObjectPool.Spawn(_gameObjectPrefab);
-        DemoGameObjectPool component = GameObjectPool.Spawn(_componentPrefab, Vector3.zero, Quaternion.identity, this.transform);
+        GameObject spawnedClone = FF8.GameObjectPool.Spawn(_gameObjectPrefab);
+        DemoGameObjectPool component = FF8.GameObjectPool.Spawn(_componentPrefab, Vector3.zero, Quaternion.identity, this.transform);
         
         // 销毁
-        GameObjectPool.Despawn(gameObject, delay: 0.5f);
+        FF8.GameObjectPool.Despawn(gameObject, delay: 0.5f);
         
         // 粒子特效播放完成后立即销毁
-        GameObjectPool
+        FF8.GameObjectPool
             .Spawn(_particleSystemPrefab)
             .DespawnOnComplete();
         
         // 如何获取对象池
-        F8GameObjectPool _pool = GameObjectPool.GetPoolByPrefab(_gameObjectPrefab);
+        F8GameObjectPool _pool = FF8.GameObjectPool.GetPoolByPrefab(_gameObjectPrefab);
         
         // 对每个池执行操作。
-        GameObjectPool.ForEachPool(LogF8.Log);
+        FF8.GameObjectPool.ForEachPool(LogF8.Log);
 
         // 对每个克隆执行操作。
-        GameObjectPool.ForEachClone(LogF8.Log);
+        FF8.GameObjectPool.ForEachClone(LogF8.Log);
 
         // 尝试获取克隆的状态（已生成 / 已取消生成 / 已生成超过容量）。
-        PoolableStatus cloneStatus = GameObjectPool.GetCloneStatus(spawnedClone);
+        PoolableStatus cloneStatus = FF8.GameObjectPool.GetCloneStatus(spawnedClone);
 
         // 游戏对象是否是克隆（使用 GameObjectPool 生成）？
-        bool isClone = GameObjectPool.IsClone(spawnedClone);
+        bool isClone = FF8.GameObjectPool.IsClone(spawnedClone);
         
         // 如果要销毁克隆但不取消生成克隆，请使用此方法以避免错误！
-        GameObjectPool.DestroyClone(spawnedClone);
+        FF8.GameObjectPool.DestroyClone(spawnedClone);
         
         // 销毁所有池。
-        GameObjectPool.DestroyAllPools(immediately: false);
+        FF8.GameObjectPool.DestroyAllPools(immediately: false);
         
         
         
