@@ -13,7 +13,7 @@ F8 Framework是一个**优雅，轻量，符合直觉的**基于Unity引擎的Ga
 Unity 2021.3.15f1+  
 系统支持：Win/Android/iOS/Mac/Linux
 
-## 文档快速预览 - 3分钟
+## 文档快速预览 - 1分钟
 ### ----------可选功能----------  
 * [1. 配置表](https://github.com/TippingGame/F8ExcelTool.git) - 使用Excel作为配置表，兼顾**高性能、高适应性**，点击F8加载手动生成的 Excel 二进制缓存，运行时自动读取最新 Excel，无需频繁导表。https://github.com/TippingGame/F8ExcelTool.git
 * [2. 热更新版本管理](https://github.com/TippingGame/F8ExcelTool.git) - 待添加
@@ -26,7 +26,7 @@ Unity 2021.3.15f1+
 * [6. 时间管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Timer/README.md) - 提供Timer、FrameTimer两种计时器，暂停/恢复，自动释放Timer。
 * [7. 补间动画（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Tween/README.md) - 播放/终止动画，有旋转/位移/缩放/渐变/填充动画，为UI设计的相对布局位移动画。
 * [8. 引用池管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/ReferencePool/README.md) - 引用池管理，C# 对象，入池/取出/回收/清空。
-* [9. 实体对象池（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/GameObjectPool/README.md) - 实体对象池管理，Unity GameObject 预加载，生成/销毁/延迟销毁，生命周期事件监听。
+* [9. 游戏对象池（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/GameObjectPool/README.md) - 游戏对象池管理，Unity GameObject 预加载，生成/销毁/延迟销毁，生命周期事件监听。
 * [10. 多语言管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/AssetManager/README.md) - 待添加
 * [11. 有限状态机（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/AssetManager/README.md) - 待添加
 * [12. UI界面管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/UI/README.md) - 处理界面加载，打开，关闭，查询，层级控制，自定义动画，自动获取组件索引。UI界面分为三大类：**普通UI、模态弹窗、非模态弹窗**。
