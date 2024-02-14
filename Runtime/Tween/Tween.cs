@@ -9,25 +9,29 @@ namespace F8Framework.Core
     /// <summary>
     /// Tween engine
     /// </summary>
-    public class Tween : SingletonMono<Tween>
+    [UpdateRefresh]
+    [LateUpdateRefresh]
+    [FixedUpdateRefresh]
+    public class Tween : ModuleSingleton<Tween>, IModule
     {
         #region PRIVATE
         private List<BaseTween> tweens = TweenPool.activeTweens;
         private Dictionary<GameObject, List<int>> tweenConnections = new Dictionary<GameObject, List<int>>();
         #endregion
 
-        public Action<float> OnUpdate;
+        public Action<float> OnUpdateAction;
         
         #region UNITY_EVENTS
-        protected override void Init()
+        
+        public void OnInit(object createParam)
         {
             
         }
 
-        private void Update()
+        public void OnUpdate()
         {
-            if(OnUpdate != null)
-                OnUpdate.Invoke(Time.deltaTime);
+            if(OnUpdateAction != null)
+                OnUpdateAction.Invoke(Time.deltaTime);
             
             for(int n = 0; n < tweens.Count; n++)
             {
@@ -41,12 +45,10 @@ namespace F8Framework.Core
                 {
                     n--;
                 }
-            }                      
-
+            }
         }
 
-
-        private void LateUpdate()
+        public void OnLateUpdate()
         {
             for (int n = 0; n < tweens.Count; n++)
             {
@@ -63,7 +65,7 @@ namespace F8Framework.Core
             }
         }
 
-        private void FixedUpdate()
+        public void OnFixedUpdate()
         {
             for (int n = 0; n < tweens.Count; n++)
             {
@@ -78,7 +80,11 @@ namespace F8Framework.Core
                     n--;
                 }
             }
-           
+        }
+
+        public void OnTermination()
+        {
+            base.Destroy();
         }
 
         #endregion

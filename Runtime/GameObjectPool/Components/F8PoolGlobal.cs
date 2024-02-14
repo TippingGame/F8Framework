@@ -7,7 +7,7 @@ namespace F8Framework.Core
     [DisallowMultipleComponent]
     [AddComponentMenu(Constants.F8PoolComponentPath + "F8 Pool Global")]
 #endif
-    public sealed class F8PoolGlobal : SingletonMono<F8PoolGlobal>
+    public sealed class F8PoolGlobal : ModuleSingletonMono<F8PoolGlobal>, IModule
     {
         [Header("Main")] 
         [Tooltip(Constants.Tooltips.GlobalUpdateType)]
@@ -70,34 +70,22 @@ namespace F8Framework.Core
             }
         }
 #endif
-        protected override void Init()
+        
+        public void OnInit(object createParam)
         {
             Initialize();
             PreloadPools(PreloadType.OnAwake);
         }
 
-        private void Start()
-        {
-            PreloadPools(PreloadType.OnStart);
-        }
-
-        private void Update()
+        public void OnUpdate()
         {
             if (_updateType == UpdateType.Update)
             {
                 HandleDespawnRequests(Time.deltaTime);
             }
         }
-        
-        private void FixedUpdate()
-        {
-            if (_updateType == UpdateType.FixedUpdate)
-            {
-                HandleDespawnRequests(Time.fixedDeltaTime);
-            }
-        }
-        
-        private void LateUpdate()
+
+        public void OnLateUpdate()
         {
             if (_updateType == UpdateType.LateUpdate)
             {
@@ -105,12 +93,15 @@ namespace F8Framework.Core
             }
         }
 
-        private void OnApplicationQuit()
+        public void OnFixedUpdate()
         {
-            FF8.GameObjectPool.s_isApplicationQuitting = true;
+            if (_updateType == UpdateType.FixedUpdate)
+            {
+                HandleDespawnRequests(Time.fixedDeltaTime);
+            }
         }
-        
-        public override void OnQuitGame()
+
+        public void OnTermination()
         {
             FF8.GameObjectPool.ResetPool();
 
@@ -118,6 +109,18 @@ namespace F8Framework.Core
             {
                 FF8.GameObjectPool.GameObjectInstantiated.Clear();
             }
+            
+            Destroy(gameObject);
+        }
+
+        private void Start()
+        {
+            PreloadPools(PreloadType.OnStart);
+        }
+
+        private void OnApplicationQuit()
+        {
+            FF8.GameObjectPool.s_isApplicationQuitting = true;
         }
 
         private void Initialize()

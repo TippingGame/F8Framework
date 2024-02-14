@@ -3,7 +3,8 @@ using UnityEngine;
 
 namespace F8Framework.Core
 {
-    public class AudioManager : SingletonMono<AudioManager>
+    [UpdateRefresh]
+    public class AudioManager : ModuleSingletonMono<AudioManager>, IModule
     {
         /*----------背景音乐----------*/
         private AudioMusic _audioMusic;
@@ -25,31 +26,33 @@ namespace F8Framework.Core
         private float _volumeAudioEffect = 1f;
         private bool _switchAudioEffect = true;
 
-        protected override void Init()
+        private Transform _transform;
+        public void OnInit(object createParam)
         {
+            _transform = this.transform;
             GameObject gameObjectMusic = new GameObject("Music", typeof(AudioSource));
-            gameObjectMusic.transform.SetParent(this.transform);
+            gameObjectMusic.transform.SetParent(_transform);
             _audioMusic = new AudioMusic();
             _audioMusic.MusicSource = gameObjectMusic.GetComponent<AudioSource>();
             _audioMusic.MusicSource.playOnAwake = false;
             _audioMusic.MusicSource.loop = false;
 
             GameObject gameObjectVoice = new GameObject("Voice", typeof(AudioSource));
-            gameObjectVoice.transform.SetParent(this.transform);
+            gameObjectVoice.transform.SetParent(_transform);
             _audioMusicVoice = new AudioMusic();
             _audioMusicVoice.MusicSource = gameObjectVoice.GetComponent<AudioSource>();
             _audioMusicVoice.MusicSource.playOnAwake = false;
             _audioMusicVoice.MusicSource.loop = false;
 
             GameObject gameObjectBtnClick = new GameObject("BtnClick", typeof(AudioSource));
-            gameObjectBtnClick.transform.SetParent(this.transform);
+            gameObjectBtnClick.transform.SetParent(_transform);
             _audioMusicBtnClick = new AudioMusic();
             _audioMusicBtnClick.MusicSource = gameObjectBtnClick.GetComponent<AudioSource>();
             _audioMusicBtnClick.MusicSource.playOnAwake = false;
             _audioMusicBtnClick.MusicSource.loop = false;
             
             GameObject gameObjectUISound = new GameObject("UISound", typeof(AudioSource));
-            gameObjectUISound.transform.SetParent(this.transform);
+            gameObjectUISound.transform.SetParent(_transform);
             _audioMusicUISound = new AudioMusic();
             _audioMusicUISound.MusicSource = gameObjectUISound.GetComponent<AudioSource>();
             _audioMusicUISound.MusicSource.playOnAwake = false;
@@ -67,13 +70,29 @@ namespace F8Framework.Core
             _switchAudioEffect = StorageManager.Instance.GetBool("_switchAudioEffect", true);
         }
 
-        private void Update()
+        public void OnUpdate()
         {
             _audioMusic.Tick();
             _audioMusicVoice.Tick();
             _audioMusicBtnClick.Tick();
             _audioMusicUISound.Tick();
         }
+        
+        public void OnLateUpdate()
+        {
+            
+        }
+
+        public void OnFixedUpdate()
+        {
+            
+        }
+
+        public void OnTermination()
+        {
+            Destroy(gameObject);
+        }
+        
         /*----------背景音乐----------*/
         
         // 设置背景音乐播放完成回调
@@ -298,7 +317,7 @@ namespace F8Framework.Core
             {
                 return ;
             }
-            Vector3 actualPosition = position.GetValueOrDefault(this.transform.position);
+            Vector3 actualPosition = position.GetValueOrDefault(_transform.position);
             float actualVolume = volume * _volumeAudioEffect;
             _audioMusicAudioEffect.Load(assetName, actualPosition, actualVolume, callback);
         }

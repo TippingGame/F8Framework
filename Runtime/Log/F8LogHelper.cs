@@ -6,7 +6,8 @@ using System.Text;
 
 namespace F8Framework.Core
 {
-    public class F8LogHelper : SingletonMono<F8LogHelper>
+    [UpdateRefresh]
+    public class F8LogHelper : ModuleSingleton<F8LogHelper>, IModule
     {
         private int MAX_LOG_FILE_CNT = 7;
         private float LOG_TIME = 0.5f;
@@ -34,7 +35,7 @@ namespace F8Framework.Core
         private StreamWriter writer;
         private float logTime;
 
-        protected override void Init()
+        public void OnInit(object createParam)
         {
             var nowTime = DateTime.Now;
             
@@ -60,12 +61,73 @@ namespace F8Framework.Core
             logTime = 0;
         }
 
-        public override void OnEnterGame()
+        public void OnUpdate()
+        {
+            if (!Application.isEditor && isEnableLog)
+            {
+                if (Time.realtimeSinceStartup - logTime > LOG_TIME)
+                {
+                    lock (backList)
+                    {
+                        if (logInfos.Count > 0)
+                        {
+                            for (int i = 0; i < logInfos.Count; i++)
+                            {
+                                var logInfo = logInfos[i];
+                                LogOneMessage(logInfo.type, logInfo.msg, logInfo.stackTrace);
+                            }
+
+                            logInfos.Clear();
+                            writer.Flush();
+                        }
+                    }
+
+                    lock (backList)
+                    {
+                        if (backList.Count > 0)
+                        {
+                            (frontList, backList) = (backList, frontList);
+                        }
+                    }
+
+                    if (frontList.Count > 0)
+                    {
+                        for (int i = 0; i < frontList.Count; i++)
+                        {
+                            var logInfo = frontList[i];
+                            LogOneMessage(logInfo.type, logInfo.msg);
+                        }
+
+                        frontList.Clear();
+                        writer.Flush();
+                    }
+
+                    logTime = Time.realtimeSinceStartup;
+                }
+            }
+        }
+
+        public void OnLateUpdate()
+        {
+            
+        }
+
+        public void OnFixedUpdate()
+        {
+            
+        }
+
+        public void OnTermination()
+        {
+            base.Destroy();
+        }
+        
+        public void OnEnterGame()
         {
             isEnableLog = true;
         }
 
-        public override void OnQuitGame()
+        public void OnQuitGame()
         {
             isEnableLog = false;
             lock (backList)
@@ -120,52 +182,7 @@ namespace F8Framework.Core
                 logInfos.Add(new log_info(type, condition, stackTrace));
             }
         }
-
-        private void Update()
-        {
-            if (!Application.isEditor && isEnableLog)
-            {
-                if (Time.realtimeSinceStartup - logTime > LOG_TIME)
-                {
-                    lock (backList)
-                    {
-                        if (logInfos.Count > 0)
-                        {
-                            for (int i = 0; i < logInfos.Count; i++)
-                            {
-                                var logInfo = logInfos[i];
-                                LogOneMessage(logInfo.type, logInfo.msg, logInfo.stackTrace);
-                            }
-
-                            logInfos.Clear();
-                            writer.Flush();
-                        }
-                    }
-
-                    lock (backList)
-                    {
-                        if (backList.Count > 0)
-                        {
-                            (frontList, backList) = (backList, frontList);
-                        }
-                    }
-
-                    if (frontList.Count > 0)
-                    {
-                        for (int i = 0; i < frontList.Count; i++)
-                        {
-                            var logInfo = frontList[i];
-                            LogOneMessage(logInfo.type, logInfo.msg);
-                        }
-
-                        frontList.Clear();
-                        writer.Flush();
-                    }
-
-                    logTime = Time.realtimeSinceStartup;
-                }
-            }
-        }
+        
         public void LogToMainThread(LogType type, string msg)
         {
             lock (backList)
@@ -173,6 +190,7 @@ namespace F8Framework.Core
                 backList.Add(new log_info(type, msg));
             }
         }
+
     }
 }
 

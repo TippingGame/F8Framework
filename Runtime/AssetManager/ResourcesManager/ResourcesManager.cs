@@ -7,7 +7,7 @@ namespace F8Framework.Core
     /// <summary>
     /// 提供资源管理工具 - 包括加载和卸载。
     /// </summary> 
-    public class ResourcesManager : Singleton<ResourcesManager>
+    public class ResourcesManager : ModuleSingleton<ResourcesManager>, IModule
     {
         
         private Dictionary<string, ResourcesLoader> resourceLoaders = new Dictionary<string, ResourcesLoader>();
@@ -462,9 +462,30 @@ namespace F8Framework.Core
             resourceLoaders.Clear();
         }
 
-        private void OnDestroy()
+        public void OnInit(object createParam)
+        {
+            
+        }
+
+        public void OnUpdate()
+        {
+            
+        }
+
+        public void OnLateUpdate()
+        {
+            
+        }
+
+        public void OnFixedUpdate()
+        {
+            
+        }
+
+        public void OnTermination()
         {
             Clear();
+            base.Destroy();
         }
     }
 }

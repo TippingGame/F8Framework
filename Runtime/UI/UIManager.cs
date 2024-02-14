@@ -26,7 +26,7 @@ namespace F8Framework.Core
         }
     }
 
-    public class UIManager : SingletonMono<UIManager>
+    public class UIManager : ModuleSingletonMono<UIManager>, IModule
     {
         private LayerGame _layerGame;
         private LayerUI _layerUI;
@@ -42,12 +42,19 @@ namespace F8Framework.Core
         {
             _configs = configs;
             
-            GameObject gameGo = transform.Find("LayerGame").gameObject;
-            GameObject uiGo = transform.Find("LayerUI").gameObject;
-            GameObject popupGo = transform.Find("LayerPopUp").gameObject;
-            GameObject dialogGo = transform.Find("LayerDialog").gameObject;
-            GameObject notifyGo = transform.Find("LayerNotify").gameObject;
-            GameObject guideGo = transform.Find("LayerGuide").gameObject;
+            GameObject gameGo = new GameObject("LayerGame");
+            GameObject uiGo = new GameObject("LayerUI");
+            GameObject popupGo = new GameObject("LayerPopUp");
+            GameObject dialogGo = new GameObject("LayerDialog");
+            GameObject notifyGo = new GameObject("LayerNotify");
+            GameObject guideGo = new GameObject("LayerGuide");
+
+            gameGo.SetParent(transform);
+            uiGo.SetParent(transform);
+            popupGo.SetParent(transform);
+            dialogGo.SetParent(transform);
+            notifyGo.SetParent(transform);
+            guideGo.SetParent(transform);
             
             _layerGame = gameGo.AddComponent<LayerGame>();
             _layerUI = uiGo.AddComponent<LayerUI>();
@@ -55,8 +62,40 @@ namespace F8Framework.Core
             _layerDialog = dialogGo.AddComponent<LayerDialog>();
             _layerNotify = notifyGo.AddComponent<LayerNotify>();
             _layerGuide = guideGo.AddComponent<LayerGuide>();
+            
+            _layerGame.Init(100);
+            _layerUI.Init(200);
+            _layerPopUp.Init(300);
+            _layerDialog.Init(400);
+            _layerNotify.Init(500);
+            _layerGuide.Init(600);
         }
 
+        public void OnInit(object createParam)
+        {
+            
+        }
+
+        public void OnUpdate()
+        {
+            
+        }
+
+        public void OnLateUpdate()
+        {
+            
+        }
+
+        public void OnFixedUpdate()
+        {
+            
+        }
+
+        public void OnTermination()
+        {
+            Destroy(gameObject);
+        }
+        
         public void ShowNotify(int uiId, string content)
         {
             if (!_configs.TryGetValue(uiId, out UIConfig config))

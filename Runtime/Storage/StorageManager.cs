@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace F8Framework.Core
 {
-    public class StorageManager : Singleton<StorageManager>
+    public class StorageManager : ModuleSingleton<StorageManager>, IModule
     {
         private string _id = "";
 
@@ -101,6 +101,31 @@ namespace F8Framework.Core
         public void Clear()
         {
             PlayerPrefs.DeleteAll();
+        }
+
+        public void OnInit(object createParam)
+        {
+            
+        }
+
+        public void OnUpdate()
+        {
+            
+        }
+
+        public void OnLateUpdate()
+        {
+            
+        }
+
+        public void OnFixedUpdate()
+        {
+            
+        }
+
+        public void OnTermination()
+        {
+            
         }
     }
 }

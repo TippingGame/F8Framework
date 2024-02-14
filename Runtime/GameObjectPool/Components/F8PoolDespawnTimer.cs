@@ -56,14 +56,6 @@ namespace F8Framework.Core
             }
         }
 
-        private void FixedUpdate()
-        {
-            if (_updateType == UpdateType.FixedUpdate)
-            {
-                HandleDespawn(Time.fixedDeltaTime);
-            }
-        }
-
         private void LateUpdate()
         {
             if (_updateType == UpdateType.LateUpdate)

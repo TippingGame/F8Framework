@@ -1,7 +1,7 @@
 using F8Framework.Core;
 using UnityEngine;
 
-public class DemoModuleCenter : MonoBehaviour
+public class DemoModuleCenterMono : MonoBehaviour
 {
     void Start()
     {
@@ -23,7 +23,7 @@ public class DemoModuleCenter : MonoBehaviour
 [UpdateRefresh]
 [LateUpdateRefresh]
 [FixedUpdateRefresh]
-public class DemoModuleCenterClass : ModuleSingleton<DemoModuleCenterClass>, IModule
+public class DemoModuleCenterMonoClass : ModuleSingletonMono<DemoModuleCenterMonoClass>, IModule
 {
     public void OnInit(object createParam)
     {
@@ -48,6 +48,6 @@ public class DemoModuleCenterClass : ModuleSingleton<DemoModuleCenterClass>, IMo
     public void OnTermination()
     {
         // 模块销毁
-        base.Destroy();
+        Destroy(gameObject);
     }
 }

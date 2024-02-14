@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace F8Framework.Core
 {
-    public class MessageManager : Singleton<MessageManager>,MessageInterface 
+    public class MessageManager : ModuleSingleton<MessageManager>, MessageInterface ,IModule
     {
         private Dictionary<int, HashSet<IEventDataBase>> events = new Dictionary<int, HashSet<IEventDataBase>>();
         private HashSet<IEventDataBase> delects = new HashSet<IEventDataBase>();
@@ -205,6 +205,32 @@ namespace F8Framework.Core
             events.Clear();
             delects.Clear();
             callStack.Clear();
+        }
+
+        public void OnInit(object createParam)
+        {
+            
+        }
+
+        public void OnUpdate()
+        {
+            
+        }
+
+        public void OnLateUpdate()
+        {
+            
+        }
+
+        public void OnFixedUpdate()
+        {
+            
+        }
+
+        public void OnTermination()
+        {
+            Clear();
+            base.Destroy();
         }
     }
 }

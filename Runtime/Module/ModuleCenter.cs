@@ -1,84 +1,339 @@
-using System;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
+using UnityEngine;
 
 namespace F8Framework.Core
 {
-    public abstract class ModuleCenter
-    {
-        // 用于存储子类的元数据，使用子类的类型作为索引
-        private static Dictionary<Type, ModuleCenter> _moduleCenters;
-  
-        static ModuleCenter()
-        {
-            // 在静态构造函数中初始化字典
-            InitializeModuleCenters();
-        }
+	public static class ModuleCenter
+	{
+		private class ModuleWrapper
+		{
+			public int Priority { private set; get; }
+			public IModule Module { private set; get; }
 
-        public static Dictionary<Type, ModuleCenter> GetSubCenter()
-        {
-            return ModuleCenter._moduleCenters;
-        }
-        
-        // 通过子类的类型获取 ModuleCenters 中的某一个 center
-        public static ModuleCenter GetCenterByType<T>() where T : ModuleCenter
-        {
-            return GetCenterByType(typeof(T));
-        }
-        
-        // 通过子类的类型获取ModuleCenters中的某一个center
-        public static ModuleCenter GetCenterByType(Type type)
-        {
-            if (_moduleCenters.TryGetValue(type, out var center))
-            {
-                return center;
-            }
+			public ModuleWrapper(IModule module, int priority)
+			{
+				Module = module;
+				Priority = priority;
+			}
+		}
 
-            // 处理未找到的情况，你可以根据需求进行适当的处理
-            return null;
-        }
-        
-        // 获取特定基类的所有子类，并调用它们的构造函数和Init函数
-        private static void InitializeModuleCenters()
-        {
-            // 获取特定基类的所有子类
-            _moduleCenters = new Dictionary<Type, ModuleCenter>();
+		private static readonly List<ModuleWrapper> _coms = new List<ModuleWrapper>(100);
+		private static readonly List<ModuleWrapper> _comsUpdate = new List<ModuleWrapper>(100);
+		private static readonly List<ModuleWrapper> _comsFixedUpdate = new List<ModuleWrapper>(100);
+		private static MonoBehaviour _behaviour;
+		private static bool _isDirty = false;
+		private static bool _isDirtyFixed = false;
+		private static long _frame = 0;
 
-            Type baseType = typeof(ModuleCenter);
-            foreach (Type type in Assembly.GetAssembly(baseType).GetTypes())
-            {
-                if (type.IsSubclassOf(baseType) && !type.IsAbstract)
-                {
-                    // 使用 Activator.CreateInstance 创建实例
-                    ModuleCenter moduleCenter = (ModuleCenter)Activator.CreateInstance(type);
-                    
-                    // 将子类的类型作为索引，实例作为值存储到字典中
-                    _moduleCenters[type] = moduleCenter;
-                }
-            }
-        }
-        
-        // 将 Instance 方法移到父类中
-        protected static T GetInstance<T>() where T : ModuleCenter, new()
-        {
-            Type type = typeof(T);
-            if (_moduleCenters.TryGetValue(type, out var center))
-            {
-                return (T)center;
-            }
+		/// <summary>
+		/// 初始化框架
+		/// </summary>
+		public static void Initialize(MonoBehaviour behaviour)
+		{
+			if (behaviour == null)
+				throw new Exception("MonoBehaviour 为空。");
+			if (_behaviour != null)
+				throw new Exception($"{nameof(ModuleCenter)} 已初始化。");
 
-            T instance = new T();
-            _moduleCenters[type] = instance;
-            instance.Init();
-            return instance;
-        }
-        
-        protected abstract void Init();
+			UnityEngine.Object.DontDestroyOnLoad(behaviour.gameObject);
+			_behaviour = behaviour;
 
-        public abstract void OnEnterGame();
+			behaviour.StartCoroutine(CheckFrame());
+		}
 
-        public abstract void OnQuitGame();
+		/// <summary>
+		/// 检测ModuleCenter更新方法
+		/// </summary>
+		private static IEnumerator CheckFrame()
+		{
+			var wait = new WaitForSeconds(1f);
+			yield return wait;
 
-       
-    }
+			// 说明：初始化之后，如果忘记更新ModuleCenter，这里会抛出异常
+			if (_frame == 0)
+				throw new Exception($"请调用更新方法：ModuleCenter.Update");
+		}
+
+		/// <summary>
+		/// 更新框架
+		/// </summary>
+		public static void Update()
+		{
+			_frame++;
+
+			// 如果有新模块需要重新排序
+			if (_isDirty)
+			{
+				_isDirty = false;
+
+				_comsUpdate.Sort((left, right) =>
+				{
+					if (left.Priority < right.Priority)
+						return -1;
+					else if (left.Priority == right.Priority)
+						return 0;
+					else
+						return 1;
+				});
+			}
+
+			// 轮询所有模块
+			for (int i = 0; i < _comsUpdate.Count; i++)
+			{
+				_comsUpdate[i]?.Module.OnUpdate();
+			}
+			
+			// 轮询所有模块
+			for (int i = 0; i < _comsUpdate.Count; i++)
+			{
+				_comsUpdate[i]?.Module.OnLateUpdate();
+			}
+		}
+		
+		/// <summary>
+		/// 更新框架
+		/// </summary>
+		public static void FixedUpdate()
+		{
+			// 如果有新模块需要重新排序
+			if (_isDirtyFixed)
+			{
+				_isDirtyFixed = false;
+				
+				_comsFixedUpdate.Sort((left, right) =>
+				{
+					if (left.Priority < right.Priority)
+						return -1;
+					else if (left.Priority == right.Priority)
+						return 0;
+					else
+						return 1;
+				});
+			}
+
+			// 轮询所有模块
+			for (int i = 0; i < _comsFixedUpdate.Count; i++)
+			{
+				_comsFixedUpdate[i]?.Module.OnFixedUpdate();
+			}
+		}
+		
+		/// <summary>
+		/// 查询游戏模块是否存在
+		/// </summary>
+		public static bool Contains<T>() where T : class, IModule
+		{
+			System.Type type = typeof(T);
+			return Contains(type);
+		}
+
+		/// <summary>
+		/// 查询游戏模块是否存在
+		/// </summary>
+		public static bool Contains(System.Type moduleType)
+		{
+			for (int i = 0; i < _coms.Count; i++)
+			{
+				if (_coms[i].Module.GetType() == moduleType)
+					return true;
+			}
+			return false;
+		}
+
+		/// <summary>
+		/// 创建游戏模块
+		/// </summary>
+		/// <typeparam name="T">模块类</typeparam>
+		/// <param name="priority">运行时的优先级，优先级越大越早执行。如果没有设置优先级，那么会按照添加顺序执行</param>
+		public static T CreateModule<T>(int priority = 0) where T : class, IModule
+		{
+			return CreateModule<T>(null, priority);
+		}
+
+		/// <summary>
+		/// 创建游戏模块
+		/// </summary>
+		/// <typeparam name="T">模块类</typeparam>
+		/// <param name="createParam">创建参数</param>
+		/// <param name="priority">运行时的优先级，优先级越大越早执行。如果没有设置优先级，那么会按照添加顺序执行</param>
+		public static T CreateModule<T>(System.Object createParam, int priority = 0) where T : class, IModule
+		{
+			if (priority < 0)
+				throw new Exception("优先级不能为负");
+
+			if (Contains(typeof(T)))
+				throw new Exception($"游戏模块 {typeof(T)} 已存在");
+
+			// 如果没有设置优先级
+			if (priority == 0)
+			{
+				int minPriority = GetMaxPriority();
+				priority = ++minPriority;
+			}
+
+			LogF8.Log($"创建游戏模块: {typeof(T)}");
+
+			T module = null;
+
+			// 检查类型是否是 MonoBehaviour 的子类
+			if (typeof(MonoBehaviour).IsAssignableFrom(typeof(T)))
+			{
+				GameObject obj = new GameObject(typeof(T).Name, typeof(T));
+				module = obj.GetComponent<T>();
+			}
+			else
+			{
+				module = Activator.CreateInstance<T>();
+			}
+
+			ModuleWrapper wrapper = new ModuleWrapper(module, priority);
+			wrapper.Module.OnInit(createParam);
+			_coms.Add(wrapper);
+			_coms.Sort((left, right) =>
+			{
+				if (left.Priority < right.Priority)
+					return -1;
+				else if (left.Priority == right.Priority)
+					return 0;
+				else
+					return 1;
+			});
+			if (typeof(T).GetCustomAttributes(typeof(UpdateRefreshAttribute), false).Length > 0)
+			{
+				_comsUpdate.Add(wrapper);
+				_isDirty = true;
+			}
+			if (typeof(T).GetCustomAttributes(typeof(FixedUpdateRefreshAttribute), false).Length > 0)
+			{
+				_comsFixedUpdate.Add(wrapper);
+				_isDirtyFixed = true;
+			}
+			return module;
+		}
+
+		/// <summary>
+		/// 销毁模块
+		/// </summary>
+		/// <typeparam name="T">模块类</typeparam>
+		public static bool DestroyModule<T>()
+		{
+			var moduleType = typeof(T);
+			for (int i = 0; i < _comsUpdate.Count; i++)
+			{
+				if (_comsUpdate[i].Module.GetType() == moduleType)
+				{
+					_comsUpdate[i].Module.OnTermination();
+					_comsUpdate.RemoveAt(i);
+				}
+			}
+			
+			for (int i = 0; i < _comsFixedUpdate.Count; i++)
+			{
+				if (_comsFixedUpdate[i].Module.GetType() == moduleType)
+				{
+					_comsFixedUpdate[i].Module.OnTermination();
+					_comsFixedUpdate.RemoveAt(i);
+				}
+			}
+			
+			for (int i = 0; i < _coms.Count; i++)
+			{
+				if (_coms[i].Module.GetType() == moduleType)
+				{
+					_coms[i].Module.OnTermination();
+					_coms.RemoveAt(i);
+					return true;
+				}
+			}
+			
+			return false;
+		}
+
+		/// <summary>
+		/// 获取游戏模块
+		/// </summary>
+		/// <typeparam name="T">模块类</typeparam>
+		public static T GetModule<T>() where T : class, IModule
+		{
+			System.Type type = typeof(T);
+			for (int i = 0; i < _coms.Count; i++)
+			{
+				if (_coms[i].Module.GetType() == type)
+					return _coms[i].Module as T;
+			}
+
+			LogF8.LogError($"未找到游戏模块 {type}");
+			return null;
+		}
+
+		/// <summary>
+		/// 获取当前模块里最大的优先级数值
+		/// </summary>
+		private static int GetMaxPriority()
+		{
+			int maxPriority = int.MinValue; // 初始化为 int 类型的最小值
+			for (int i = 0; i < _coms.Count; i++)
+			{
+				if (_coms[i].Priority > maxPriority)
+					maxPriority = _coms[i].Priority;
+			}
+			return maxPriority; // 大于等于零
+		}
+
+		#region 协程相关
+		/// <summary>
+		/// 开启一个协程
+		/// </summary>
+		public static Coroutine StartCoroutine(IEnumerator coroutine)
+		{
+			if (_behaviour == null)
+				throw new Exception($"{nameof(ModuleCenter)} 未初始化。使用 ModuleCenter.Initialize");
+			return _behaviour.StartCoroutine(coroutine);
+		}
+
+		/// <summary>
+		/// 停止一个协程
+		/// </summary>
+		public static void StopCoroutine(Coroutine coroutine)
+		{
+			if (_behaviour == null)
+				throw new Exception($"{nameof(ModuleCenter)} 未初始化。使用 ModuleCenter.Initialize");
+			_behaviour.StopCoroutine(coroutine);
+		}
+
+
+		/// <summary>
+		/// 开启一个协程
+		/// </summary>
+		public static void StartCoroutine(string methodName)
+		{
+			if (_behaviour == null)
+				throw new Exception($"{nameof(ModuleCenter)} 未初始化。使用 ModuleCenter.Initialize");
+			_behaviour.StartCoroutine(methodName);
+		}
+
+		/// <summary>
+		/// 停止一个协程
+		/// </summary>
+		public static void StopCoroutine(string methodName)
+		{
+			if (_behaviour == null)
+				throw new Exception($"{nameof(ModuleCenter)} 未初始化。使用 ModuleCenter.Initialize");
+			_behaviour.StopCoroutine(methodName);
+		}
+
+
+		/// <summary>
+		/// 停止所有协程
+		/// </summary>
+		public static void StopAllCoroutines()
+		{
+			if (_behaviour == null)
+				throw new Exception($"{nameof(ModuleCenter)} 未初始化。使用 ModuleCenter.Initialize");
+			_behaviour.StopAllCoroutines();
+		}
+		#endregion
+	}
 }

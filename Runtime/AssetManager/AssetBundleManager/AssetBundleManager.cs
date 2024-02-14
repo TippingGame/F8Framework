@@ -9,7 +9,8 @@ namespace F8Framework.Core
     /// <summary>
     /// 提供资产捆绑包管理工具，包括加载、扩展和卸载。
     /// </summary>
-    public class AssetBundleManager : SingletonMono<AssetBundleManager>
+    [UpdateRefresh]
+    public class AssetBundleManager : ModuleSingleton<AssetBundleManager>, IModule
     {
         
         private AssetBundleManifest manifest;
@@ -889,7 +890,7 @@ namespace F8Framework.Core
             assetBundleLoaders.Clear();
         }
 
-        protected override void Init()
+        public void OnInit(object createParam)
         {
             string manifestPath = AssetBundleHelper.GetAssetBundleManifestPath();
             if (manifestPath == null)
@@ -901,7 +902,7 @@ namespace F8Framework.Core
             manifest.GetAllAssetBundles();
         }
 
-        private void Update()
+        public void OnUpdate()
         {
             foreach (AssetBundleLoader loader in assetBundleLoaders.Values)
             {
@@ -909,9 +910,20 @@ namespace F8Framework.Core
             }
         }
 
-        public override void OnQuitGame()
+        public void OnLateUpdate()
+        {
+            
+        }
+
+        public void OnFixedUpdate()
+        {
+            
+        }
+
+        public void OnTermination()
         {
             Clear();
+            base.Destroy();
         }
     }
 }

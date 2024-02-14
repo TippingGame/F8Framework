@@ -5,7 +5,9 @@
 [![Platform](https://img.shields.io/badge/platform-Win%20%7C%20Android%20%7C%20iOS%20%7C%20Mac%20%7C%20Linux-orange)]() 
 
 ## 简介（希望自己点击F8，就能开始制作游戏，不想多余的事）
-Unity F8Module模块中心组件，通过继承模块，模块中心可以获取所有模块的实例，自由控制生命周期
+Unity F8Module模块中心组件。
+1. 通过继承模块 ModuleSingleton / ModuleSingletonMono，控制所有模块的，获取/初始化/轮询顺序/销毁。
+2. 使用自定义模块 CustomModule
 
 ## 导入插件（需要首先导入核心）
 注意！内置在->F8Framework核心：https://github.com/TippingGame/F8Framework.git  
@@ -14,46 +16,92 @@ Unity F8Module模块中心组件，通过继承模块，模块中心可以获取
 
 ### 创建模板
 
-1. 右键资源文件夹，看到（F8模块中心功能），创建模板  
+1. 右键资源文件夹，看到（F8模块中心功能），创建模板 ModuleSingleton / ModuleSingletonMono / CustomModule  
 
 ### 代码使用方法
 ```C#
         /*----------------------------模块中心功能----------------------------*/
         
+        //初始化模块中心
+        ModuleCenter.Initialize(this);
+        
+        // 创建模块，（参数可选，优先级越小越早轮询）
+        int priority = 100;
+        ModuleCenter.CreateModule<TimerManager>(priority);
+        
+        // 通过ModuleCenter调用模块方法
+        ModuleCenter.GetModule<TimerManager>().GetServerTime();
+        
+        // 通过获取实例调用模块方法
+        TimerManager.Instance.GetServerTime();
+        
+        // 继承ModuleSingletonMono创建模块，按需添加Update特性
+        [UpdateRefresh]
+        [LateUpdateRefresh]
+        [FixedUpdateRefresh]
+        public class DemoModuleCenterMonoClass : ModuleSingletonMono<DemoModuleCenterMonoClass>, IModule
+        {
+            public void OnInit(object createParam)
+            {
+                // 模块创建初始化
+            }
+        
+            public void OnUpdate()
+            {
+                // 模块Update
+            }
+        
+            public void OnLateUpdate()
+            {
+                // 模块LateUpdate
+            }
+        
+            public void OnFixedUpdate()
+            {
+                // 模块FixedUpdate
+            }
+        
+            public void OnTermination()
+            {
+                // 模块销毁
+                Destroy(gameObject);
+            }
+        }
+        
+        /*----------------------------自定义模块功能----------------------------*/
+        
         // 获取所有模块，并调用进入游戏
-        foreach (var center in ModuleCenter.GetSubCenter())
+        foreach (var center in CustomModule.GetSubCenter())
         {
             center.Value.OnEnterGame();
         }
         
         // 获取指定模块
-        ModuleCenter demoCenter = ModuleCenter.GetCenterByType(typeof(DemoCenter));
+        CustomModule demo = CustomModule.GetCenterByType(typeof(CustomModuleClass));
         
         // 使用模块
-        DemoCenter.Instance.OnEnterGame();
+        CustomModuleClass.Instance.OnEnterGame();
         
+        // 继承CustomModule的自定义模块
+        public class CustomModuleClass : CustomModule
+        {
+            public static CustomModuleClass Instance => GetInstance<CustomModuleClass>();
+            
+            protected override void Init()
+            {
+                // 初始化CustomModule
+            }
+                
+            public override void OnEnterGame()
+            {
+                // 进入游戏
+            }
         
-        /*----------------------------如何继承模块中心----------------------------*/
-        
-public class DemoCenter : ModuleCenter
-{
-	public static DemoCenter Instance => GetInstance<DemoCenter>();
-	
-	protected override void Init()
-	{
-		// 初始化Center
-	}
-		
-	public override void OnEnterGame()
-	{
-		// 进入游戏
-	}
-
-	public override void OnQuitGame()
-	{
-		// 退出游戏
-	}
-}
+            public override void OnQuitGame()
+            {
+                // 退出游戏
+            }
+        }
 ```
 
 

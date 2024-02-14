@@ -4,7 +4,8 @@ using UnityEngine;
 
 namespace F8Framework.Core
 {
-    public class TimerManager : SingletonMono<TimerManager>
+    [UpdateRefresh]
+    public class TimerManager : ModuleSingleton<TimerManager>, IModule
     {
         private Dictionary<string, Timer> times = new Dictionary<string, Timer>(); // 存储计时器的字典
         private HashSet<string> deleteTimes = new HashSet<string>(); // 存储要删除的计时器ID的哈希集合
@@ -14,15 +15,30 @@ namespace F8Framework.Core
         private long tempTime; // 临时时间
         private bool isFocus = true; // 是否处于焦点状态
         private int frameTime = 1; // 帧时间，默认为1
-
-        protected override void Init()
+        
+        public void OnInit(object createParam)
         {
             initTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             serverTime = 0;
             tempTime = 0;
         }
 
-        private void Update()
+        public void OnLateUpdate()
+        {
+            
+        }
+
+        public void OnFixedUpdate()
+        {
+            
+        }
+
+        public void OnTermination()
+        {
+            base.Destroy();
+        }
+        
+        public void OnUpdate()
         {
             foreach (var add in addTimes) //待添加字典
             {

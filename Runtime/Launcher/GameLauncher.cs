@@ -1,18 +1,42 @@
-using System.Collections;
-using System.Collections.Generic;
+using F8Framework.Core;
 using UnityEngine;
 
 public class GameLauncher : MonoBehaviour
 {
-    // Start is called before the first frame update
     void Start()
+    {
+        // 初始化模块中心
+        ModuleCenter.Initialize(this);
+
+        // 按顺序创建模块
+        FF8.Message.ToString();
+        FF8.Storage.ToString();
+        FF8.Timer.ToString();
+        FF8.Pool.ToString();
+        FF8.Asset.ToString();
+        FF8.Audio.ToString();
+        FF8.Tween.ToString();
+        FF8.UI.ToString();
+        FF8.LogHelper.ToString();
+
+        StartGame();
+    }
+    
+    // 开始游戏
+    public void StartGame()
     {
         
     }
-
-    // Update is called once per frame
+    
     void Update()
     {
-        
+        // 更新模块
+        ModuleCenter.Update();
+    }
+    
+    void FixedUpdate()
+    {
+        // 更新模块
+        ModuleCenter.FixedUpdate();
     }
 }

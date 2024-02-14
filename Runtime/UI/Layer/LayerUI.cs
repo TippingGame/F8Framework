@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace F8Framework.Core
 {
@@ -7,7 +8,25 @@ namespace F8Framework.Core
     {
         protected Dictionary<string, ViewParams> uiViews = new Dictionary<string, ViewParams>();
         protected Dictionary<string, ViewParams> uiCache = new Dictionary<string, ViewParams>();
+        
+        private Canvas _canvas;
+        private CanvasScaler _canvasScaler;
+        private GraphicRaycaster _graphicRaycaster;
+        
+        private void Awake()
+        {
+            // 获取组件
+            _canvas = gameObject.AddComponent<Canvas>();
+            _canvasScaler = gameObject.AddComponent<CanvasScaler>();
+            _graphicRaycaster = gameObject.AddComponent<GraphicRaycaster>();
+        }
 
+        public void Init(int sortOrder, RenderMode renderMode = RenderMode.ScreenSpaceOverlay)
+        {
+            _canvas.sortingOrder = sortOrder;
+            _canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        }
+        
         public string Add(int uiId, UIConfig config, object[] parameters = null, UICallbacks callbacks = null)
         {
             var prefabPath = config.AssetName;

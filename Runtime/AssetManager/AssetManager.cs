@@ -12,8 +12,12 @@ namespace F8Framework.Core
     public delegate void OnAssetObject<T>(T obj)
         where T : Object;
     
-    public class AssetManager : Singleton<AssetManager>
+    public class AssetManager : ModuleSingleton<AssetManager>, IModule
     {
+        private AssetBundleManager _assetBundleManager;
+
+        private ResourcesManager _resourcesManager;
+        
         //资产信息
         public class AssetInfo
         {
@@ -980,6 +984,32 @@ namespace F8Framework.Core
                     progress = 0f;
                 }
                 return progress;
+            }
+
+            public void OnInit(object createParam)
+            {
+                _assetBundleManager = ModuleCenter.CreateModule<AssetBundleManager>();
+                _resourcesManager = ModuleCenter.CreateModule<ResourcesManager>();
+            }
+
+            public void OnUpdate()
+            {
+                
+            }
+
+            public void OnLateUpdate()
+            {
+                
+            }
+
+            public void OnFixedUpdate()
+            {
+                
+            }
+
+            public void OnTermination()
+            {
+                
             }
     }
 }

@@ -3,20 +3,20 @@ using UnityEngine;
 
 namespace F8Framework.Core.Editor
 {
-    public class CreateModuleScript : ScriptableObject
+    public class CreateCustomModuleScript : ScriptableObject
     {
-        [MenuItem("Assets/（F8模块中心功能）/（ModuleCenter.cs）", false, -1)]
+        [MenuItem("Assets/（F8模块中心功能）/（CustomModule.cs）", false, -1)]
         static void CreateBaseViewScript()
         {
             string path = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 1)) +
-                          "/ModuleCenterTemplate.cs.txt";
+                          "/CustomModuleTemplate.cs.txt";
             
-            ProjectWindowUtil.CreateScriptAssetFromTemplateFile(path, "ModuleCenter.cs");
+            ProjectWindowUtil.CreateScriptAssetFromTemplateFile(path, "CustomModule.cs");
         }
         
         private static string GetScriptPath()
         {
-            MonoScript monoScript = MonoScript.FromScriptableObject(CreateInstance<CreateModuleScript>());
+            MonoScript monoScript = MonoScript.FromScriptableObject(CreateInstance<CreateCustomModuleScript>());
 
             // 获取脚本在 Assets 中的相对路径
             string scriptRelativePath = AssetDatabase.GetAssetPath(monoScript);
