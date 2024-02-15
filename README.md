@@ -7,7 +7,7 @@
 > F8 Framework original intention: Just click F8 and start making the game, don't want to be redundant.
 
 ## 简介
-F8 Framework是一个**优雅，轻量，符合直觉的**基于Unity引擎的Game Framework，组件围绕F8一键启动，框架整体遵循以**极少的使用成本**开发游戏。  
+F8 Framework是一个**优雅，轻量，符合直觉的**基于Unity引擎的Game Framework，组件围绕F8一键启动，延迟加载策略减少不必要的资源消耗，框架整体遵循以**极少的使用成本**开发游戏。  
 
 ## 支持版本
 Unity 2021.3.15f1+  
@@ -19,7 +19,7 @@ Unity 2021.3.15f1+
 * [2. 热更新版本管理](https://github.com/TippingGame/F8ExcelTool.git) - 待添加
 ### ----------核心功能----------
 * [1. 资源加载（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/AssetManager/README.md) - **编辑器下**：点击F8自动生成资产索引，AB名称，自动区分不同平台，清理多余AB和文件夹，Editor模式下减少开发周期。**运行时**：同步/异步加载单个资产，指定文件夹加载多个资产，自动判断是Resources/AssetBundle资产，加载Remote远程资产，获取加载进度，同步打断异步加载，相同资源同时加载。
-* [2. 模块中心（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Module/README.md) - 模块中心可以获取所有模块的实例，自由控制生命周期。
+* [2. 模块中心（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Module/README.md) - 模块中心可以获取所有模块的实例，延迟加载策略，自由控制生命周期。
 * [3. 日志管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Log/README.md) - 打印日志，写入文件，上报错误。
 * [4. 声音管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Audio/README.md) - 声音的播放，暂停，停止，进度控制，音量控制/保存，全局暂停/恢复。Audio分为三大类：**背景音乐、人声、特效声**。
 * [5. 事件管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Event/README.md) - 发送消息事件，事件监听，防止消息死循环，自动释放事件。
