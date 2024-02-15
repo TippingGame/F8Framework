@@ -14,6 +14,9 @@ namespace F8Framework.Core
         // 游戏时间管理
         public static TimerManager Timer = ModuleCenter.CreateModule<TimerManager>();
         
+        // 流程管理
+        public static ProcedureManager Procedure = ModuleCenter.CreateModule<ProcedureManager>();
+        
         // 游戏对象池
         public static F8PoolGlobal Pool = ModuleCenter.CreateModule<F8PoolGlobal>();
         

@@ -12,6 +12,7 @@ public class GameLauncher : MonoBehaviour
         FF8.Message.ToString();
         FF8.Storage.ToString();
         FF8.Timer.ToString();
+        FF8.Procedure.ToString();
         FF8.Pool.ToString();
         FF8.Asset.ToString();
         FF8.Audio.ToString();
