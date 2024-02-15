@@ -146,7 +146,7 @@ namespace F8Framework.Core
 		/// 创建游戏模块
 		/// </summary>
 		/// <typeparam name="T">模块类</typeparam>
-		/// <param name="priority">运行时的优先级，优先级越大越早执行。如果没有设置优先级，那么会按照添加顺序执行</param>
+		/// <param name="priority">运行时的优先级，优先级越小越早执行。如果没有设置优先级，那么会按照添加顺序执行</param>
 		public static T CreateModule<T>(int priority = 0) where T : class, IModule
 		{
 			return CreateModule<T>(null, priority);
@@ -157,7 +157,7 @@ namespace F8Framework.Core
 		/// </summary>
 		/// <typeparam name="T">模块类</typeparam>
 		/// <param name="createParam">创建参数</param>
-		/// <param name="priority">运行时的优先级，优先级越大越早执行。如果没有设置优先级，那么会按照添加顺序执行</param>
+		/// <param name="priority">运行时的优先级，优先级越小越早执行。如果没有设置优先级，那么会按照添加顺序执行</param>
 		public static T CreateModule<T>(System.Object createParam, int priority = 0) where T : class, IModule
 		{
 			if (priority < 0)

@@ -17,6 +17,9 @@ namespace F8Framework.Core
         // 流程管理
         public static ProcedureManager Procedure = ModuleCenter.CreateModule<ProcedureManager>();
         
+        // 有限状态机
+        public static FSMManager FSM = ModuleCenter.CreateModule<FSMManager>();
+        
         // 游戏对象池
         public static F8PoolGlobal Pool = ModuleCenter.CreateModule<F8PoolGlobal>();
         
