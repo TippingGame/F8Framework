@@ -138,7 +138,7 @@ namespace F8Framework.Core
                     if (assetBundleDownloadRequest == null)
                     {
                         assetBundleLoadState = LoaderState.FINISHED;
-                        string errMsg = string.Format("Remote asset bundle {0} can't be found, please check it", assetBundlePath);
+                        string errMsg = string.Format("找不到远程资产捆绑包 {0} ，请检查", assetBundlePath);
                         LogF8.LogError(errMsg);
                     }
                 }
@@ -149,7 +149,7 @@ namespace F8Framework.Core
                     if (assetBundleLoadRequest == null)
                     {
                         assetBundleLoadState = LoaderState.FINISHED;
-                        string errMsg = string.Format("Local asset bundle {0} can't be found, please check it", assetBundlePath);
+                        string errMsg = string.Format("找不到本地资产捆绑包 {0} ，请检查", assetBundlePath);
                         LogF8.LogError(errMsg);
                     }
                 }
@@ -172,7 +172,7 @@ namespace F8Framework.Core
                     if (assetBundleDownloadRequest == null)
                     {
                         assetBundleLoadState = LoaderState.FINISHED;
-                        string errMsg = string.Format("Remote asset bundle {0} can't be found, please check it", assetBundlePath);
+                        string errMsg = string.Format("找不到远程资产捆绑包 {0} ，请检查", assetBundlePath);
                         LogF8.LogError(errMsg);
                     }
                     else
@@ -187,7 +187,7 @@ namespace F8Framework.Core
                     if (assetBundleLoadRequest == null)
                     {
                         assetBundleLoadState = LoaderState.FINISHED;
-                        string errMsg = string.Format("Local asset bundle {0} can't be found, please check it", assetBundlePath);
+                        string errMsg = string.Format("找不到本地资产捆绑包 {0} ，请检查", assetBundlePath);
                         LogF8.LogError(errMsg);
                     }
                     else
@@ -557,7 +557,7 @@ namespace F8Framework.Core
                                 if (!assetBundleLoadRequest.assetBundle)
                                 {
                                     assetBundleLoadState = LoaderState.FINISHED;
-                                    string errMsg = string.Format("Load asset bundle {0} can't be loaded.", assetBundlePath);
+                                    string errMsg = string.Format("无法加载本地资产捆绑包 {0} ", assetBundlePath);
                                     LogF8.LogError(errMsg);
                                 }
                                 else
@@ -576,7 +576,7 @@ namespace F8Framework.Core
                                 if (!assetBundleDownloadRequest.DownloadedAssetBundle)
                                 {
                                     assetBundleLoadState = LoaderState.FINISHED;
-                                    string errMsg = string.Format("Remote asset bundle {0} can't be loaded, try reload", assetBundlePath);
+                                    string errMsg = string.Format("无法加载远程资产捆绑包 {0} ，请重试", assetBundlePath);
                                     LogF8.LogError(errMsg);
                                 }
                                 else

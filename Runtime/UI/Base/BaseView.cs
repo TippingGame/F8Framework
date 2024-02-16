@@ -1,4 +1,4 @@
-using UnityEngine;
+using System;
 
 namespace F8Framework.Core
 {
@@ -15,6 +15,21 @@ namespace F8Framework.Core
         public object[] Args;
         public int UIid;
         public WindowState windowState = WindowState.Closed;
+        
+        // 消息事件
+        private EventDispatcher _eventDispatcher = null;
+                
+        public EventDispatcher EventDispatcher {
+            get
+            {
+                if (_eventDispatcher == null)
+                {
+                    _eventDispatcher = new EventDispatcher();
+                }
+        
+                return _eventDispatcher;
+            }
+        }
 
         private void Awake()
         {
@@ -81,6 +96,10 @@ namespace F8Framework.Core
 
         public void BeforeRemove()
         {
+            if (_eventDispatcher != null) {
+                _eventDispatcher.Clear();
+                _eventDispatcher = null;
+            }
             OnBeforeRemove();
         }
 
@@ -95,6 +114,36 @@ namespace F8Framework.Core
 
         protected virtual void OnRemoved()
         {
+        }
+        
+        public void AddEventListener<T>(T eventName, Action listener) where T : struct, Enum, IConvertible
+        {
+            EventDispatcher.AddEventListener(eventName, listener, this);
+        }
+            
+        public void AddEventListener<T>(T eventName, Action<object[]> listener) where T : struct, Enum, IConvertible
+        {
+            EventDispatcher.AddEventListener(eventName, listener, this);
+        }
+            
+        public void RemoveEventListener<T>(T eventName,Action listener) where T : struct, Enum, IConvertible
+        {
+            EventDispatcher.RemoveEventListener(eventName, listener, this);
+        }
+            
+        public void RemoveEventListener<T>(T eventName,Action<object[]> listener) where T : struct, Enum, IConvertible
+        {
+            EventDispatcher.RemoveEventListener(eventName, listener, this);
+        }
+            
+        public void DispatchEvent<T>(T eventName) where T : struct, Enum, IConvertible
+        {
+            EventDispatcher.DispatchEvent(eventName);
+        }
+            
+        public void DispatchEvent<T>(T eventName, object[] arg1) where T : struct, Enum, IConvertible
+        {
+            EventDispatcher.DispatchEvent(eventName, arg1);
         }
     }
 }

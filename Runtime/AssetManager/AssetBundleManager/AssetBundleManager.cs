@@ -124,10 +124,10 @@ namespace F8Framework.Core
                         if (loadedCount == assetBundlePaths.Count)
                         {
                             // 所有依赖项加载完成后，加载主资源
-                            lastLoader.ExpandAsync(() => {
+                            lastLoader.ExpandAsync(() =>
+                            {
                                 // 主资源加载完成后，如果需要展开，则在展开完成后回调
-                                if (loadCallback != null)
-                                    loadCallback(GetAssetBundle(info.AssetBundlePath));
+                                loadCallback?.Invoke(GetAssetBundle(info.AssetBundlePath));
                             });
                         }
                     }
@@ -314,8 +314,7 @@ namespace F8Framework.Core
                                 l.RemoveDependentNames(assetBundlePath);
                             }
 
-                            if (callback != null)
-                                callback();
+                            callback?.Invoke();
                         }
                     }
                 );

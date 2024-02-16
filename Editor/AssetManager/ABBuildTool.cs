@@ -29,6 +29,8 @@ namespace F8Framework.Core.Editor
             LogF8.LogAsset("打包AssetBundle" + URLSetting.GetAssetBundlesOutPath());
             // 打包生成AB包 (目标平台自动根据当前平台设置)
             BuildPipeline.BuildAssetBundles(strABOutPAthDir, BuildAssetBundleOptions.ChunkBasedCompression, EditorUserBuildSettings.activeBuildTarget);
+            
+            LogF8.LogAsset("打包成功!");
         }
 
         public static void DeleteRemovedAssetBundles()

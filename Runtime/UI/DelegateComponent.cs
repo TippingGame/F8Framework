@@ -72,7 +72,7 @@ namespace F8Framework.Core
 
         private void ApplyComponentsFunction(string functionName, object parameters = null, int uiId = 0)
         {
-            foreach (var component in gameObject.GetComponents<MonoBehaviour>())
+            foreach (var component in gameObject.GetComponents<BaseView>())
             {
                 var methodInfo = component.GetType().GetMethod(functionName);
                 if (methodInfo != null)

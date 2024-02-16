@@ -77,7 +77,7 @@ namespace F8Framework.Core
             }
             catch (Exception e)
             {
-                string message = string.Format("Failed to send file download request for uri: {0}. Exception: {1}", uri, e.Message);
+                string message = string.Format("无法发送uri：{0} 的文件下载请求。异常：{1}", uri, e.Message);
                 LogF8.LogError(message);
                 LoadFail();
             }
@@ -100,7 +100,7 @@ namespace F8Framework.Core
             }
             catch (Exception e)
             {
-                string message = string.Format("Failed to asset bundle download request for uri: {0}. Exception: {1}", uri, e.Message);
+                string message = string.Format("无法为uri：{0} 资产捆绑包下载请求。异常：{1}", uri, e.Message);
                 LogF8.LogError(message);
                 LoadFail();
             }
@@ -110,7 +110,7 @@ namespace F8Framework.Core
         {
             if (!FileTools.IsLegalURI(uri))
             {
-                LogF8.LogError($"Failed to asset bundle download request for uri: {uri}. Invalid URI.");
+                LogF8.LogError($"无法为uri：{uri}资产捆绑包下载请求。无效的URI。");
                 LoadFail();
                 yield break;
             }
@@ -124,7 +124,7 @@ namespace F8Framework.Core
             }
             catch (Exception e)
             {
-                LogF8.LogError($"Failed to create UnityWebRequest for uri: {uri}. Exception: {e.Message}");
+                LogF8.LogError($"无法创建 UnityWebRequest，URI：{uri}。异常：{e.Message}");
                 LoadFail();
                 yield break;
             }
@@ -135,7 +135,7 @@ namespace F8Framework.Core
             // 请求完成后检查是否有错误
             if (uwr.result != UnityWebRequest.Result.Success)
             {
-                LogF8.LogError($"Failed to asset bundle download request for uri: {uri}. Error: {uwr.error}");
+                LogF8.LogError($"无法对 URI：{uri} 发起资源包下载请求。错误：{uwr.error}");
                 LoadFail();
             }
         }

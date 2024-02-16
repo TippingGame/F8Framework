@@ -105,6 +105,8 @@ namespace F8Framework.Core
                 UnityEditor.AssetDatabase.Refresh();
                 
                 SetComponents();
+                
+                UnityEditor.EditorUtility.SetDirty(this);
             }
             else
             {
