@@ -19,6 +19,19 @@ namespace F8Framework.Core
         private static int counter = 0;
         private static StringBuilder sb = new StringBuilder();
         
+        // 调色板
+        // private static Color color1 = new Color(.14f, .65f, 1.00f);
+        // private static Color color2 = new Color(.89f, .12f, .12f);
+        // private static Color color3 = new Color(.09f, .85f, .43f);
+        // private static Color color4 = new Color(.80f, .24f, 1.00f);
+        // private static Color color5 = new Color(1.00f, .79f, .0f);
+        // private static Color color6 = new Color(.09f, .80f, .85f);
+        // private static Color color7 = new Color(.66f, .85f, .09f);
+        // private static Color color8 = new Color(1.0f, 0.63f, 0.66f);
+        // private static Color color9 = new Color(1.0f, 0.62f, 0.35f);
+        // private static Color color10 = new Color(0.86f, 0.55f, 0.92f);
+        // private static Color color11 = new Color(1.0f, 0.90f, 0.40f);
+        
         public static void EnabledLog()
         {
             UnityEngine.Debug.unityLogger.logEnabled = true;
@@ -66,239 +79,128 @@ namespace F8Framework.Core
             Debug.Log(o);
         }
 
+        public static void LogModule(string s, Object context)
+        {
+            LogColor("[模块日志]", new Color(.14f, .65f, 1.00f), s, context);
+        }
+        
+        public static void LogModule(string s, params object[] p)
+        {
+            LogColor("[模块日志]", new Color(.14f, .65f, 1.00f), s, p);
+        }
+        
+        public static void LogModule(object o)
+        {
+            LogColor("[模块日志]", new Color(.14f, .65f, 1.00f), o);
+        }
+        
         public static void LogNet(string s, Object context)
         {
-            sb.Clear();
-            sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.yellow));
-            sb.Append(DateTime.Now);
-            sb.Append("[网络日志]");
-            sb.Append("</color>");
-            sb.Append(s);
-            Debug.Log(sb.ToString(), context);
+            LogColor("[网络日志]", new Color(1.00f, .79f, .0f), s, context);
         }
         
         public static void LogNet(string s, params object[] p)
         {
-            sb.Clear();
-            sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.yellow));
-            sb.Append(DateTime.Now);
-            sb.Append("[网络日志]");
-            sb.Append("</color>");
-            if (p != null && p.Length > 0)
-                sb.AppendFormat(s, p);
-            else
-                sb.Append(s);
-            Debug.Log(sb.ToString());
+            LogColor("[网络日志]", new Color(1.00f, .79f, .0f), s, p);
         }
         
         public static void LogNet(object o)
         {
-            sb.Clear();
-            sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.yellow));
-            sb.Append(DateTime.Now);
-            sb.Append("[网络日志]");
-            sb.Append("</color>");
-            sb.Append(o);
-            Debug.Log(sb.ToString());
+            LogColor("[网络日志]", new Color(1.00f, .79f, .0f), o);
         }
         
         public static void LogConfig(string s, Object context)
         {
-            sb.Clear();
-            sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.grey));
-            sb.Append(DateTime.Now);
-            sb.Append("[配置日志]");
-            sb.Append("</color>");
-            sb.Append(s);
-            Debug.Log(sb.ToString(), context);
+            LogColor("[配置日志]", new Color(.66f, .85f, .09f), s, context);
         }
         
         public static void LogConfig(string s, params object[] p)
         {
-            sb.Clear();
-            sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.grey));
-            sb.Append(DateTime.Now);
-            sb.Append("[配置日志]");
-            sb.Append("</color>");
-            if (p != null && p.Length > 0)
-                sb.AppendFormat(s, p);
-            else
-                sb.Append(s);
-            Debug.Log(sb.ToString());
+            LogColor("[配置日志]", new Color(.66f, .85f, .09f), s, p);
         }
         
         public static void LogConfig(object o)
         {
-            sb.Clear();
-            sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.grey));
-            sb.Append(DateTime.Now);
-            sb.Append("[配置日志]");
-            sb.Append("</color>");
-            sb.Append(o);
-            Debug.Log(sb.ToString());
+            LogColor("[配置日志]", new Color(.66f, .85f, .09f), o);
         }
         
         public static void LogView(string s, Object context)
         {
-            sb.Clear();
-            sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.magenta));
-            sb.Append(DateTime.Now);
-            sb.Append("[视图日志]");
-            sb.Append("</color>");
-            sb.Append(s);
-            Debug.Log(sb.ToString(), context);
+            LogColor("[视图日志]", Color.yellow, s, context);
         }
         
         public static void LogView(string s, params object[] p)
         {
-            sb.Clear();
-            sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.magenta));
-            sb.Append(DateTime.Now);
-            sb.Append("[视图日志]");
-            sb.Append("</color>");
-            if (p != null && p.Length > 0)
-                sb.AppendFormat(s, p);
-            else
-                sb.Append(s);
-            Debug.Log(sb.ToString());
+            LogColor("[视图日志]", Color.yellow, s, p);
         }
         
         public static void LogView(object o)
         {
-            sb.Clear();
-            sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.magenta));
-            sb.Append(DateTime.Now);
-            sb.Append("[视图日志]");
-            sb.Append("</color>");
-            sb.Append(o);
-            Debug.Log(sb.ToString());
+            LogColor("[视图日志]", Color.yellow, o);
         }
         
         public static void LogEvent(string s, Object context)
         {
-            sb.Clear();
-            sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.cyan));
-            sb.Append(DateTime.Now);
-            sb.Append("[事件日志]");
-            sb.Append("</color>");
-            sb.Append(s);
-            Debug.Log(sb.ToString(), context);
+            LogColor("[事件日志]", Color.cyan, s, context);
         }
         
         public static void LogEvent(string s, params object[] p)
         {
-            sb.Clear();
-            sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.cyan));
-            sb.Append(DateTime.Now);
-            sb.Append("[事件日志]");
-            sb.Append("</color>");
-            if (p != null && p.Length > 0)
-                sb.AppendFormat(s, p);
-            else
-                sb.Append(s);
-            Debug.Log(sb.ToString());
+            LogColor("[事件日志]", Color.cyan, s, p);
         }
         
         public static void LogEvent(object o)
         {
-            sb.Clear();
-            sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.cyan));
-            sb.Append(DateTime.Now);
-            sb.Append("[事件日志]");
-            sb.Append("</color>");
-            sb.Append(o);
-            Debug.Log(sb.ToString());
+            LogColor("[事件日志]", Color.cyan, o);
         }
 
         public static void LogEntity(string s, Object context)
         {
-            sb.Clear();
-            sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.blue));
-            sb.Append(DateTime.Now);
-            sb.Append("[实体日志]");
-            sb.Append("</color>");
-            sb.Append(s);
-            Debug.Log(sb.ToString(), context);
+            LogColor("[实体日志]", new Color(.09f, .85f, .43f), s, context);
         }
         
         public static void LogEntity(string s, params object[] p)
         {
-            sb.Clear();
-            sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.blue));
-            sb.Append(DateTime.Now);
-            sb.Append("[实体日志]");
-            sb.Append("</color>");
-            if (p != null && p.Length > 0)
-                sb.AppendFormat(s, p);
-            else
-                sb.Append(s);
-            Debug.Log(sb.ToString());
+            LogColor("[实体日志]", new Color(.09f, .85f, .43f), s, p);
         }
         
         public static void LogEntity(object o)
         {
-            sb.Clear();
-            sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.blue));
-            sb.Append(DateTime.Now);
-            sb.Append("[实体日志]");
-            sb.Append("</color>");
-            sb.Append(o);
-            Debug.Log(sb.ToString());
+            LogColor("[实体日志]", new Color(.09f, .85f, .43f), o);
         }
         
         public static void LogAsset(string s, Object context)
         {
-            sb.Clear();
-            sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.green));
-            sb.Append(DateTime.Now);
-            sb.Append("[资产日志]");
-            sb.Append("</color>");
-            sb.Append(s);
-            Debug.Log(sb.ToString(), context);
+            LogColor("[资产日志]", Color.green, s, context);
         }
         
         public static void LogAsset(string s, params object[] p)
         {
-            sb.Clear();
-            sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.green));
-            sb.Append(DateTime.Now);
-            sb.Append("[资产日志]");
-            sb.Append("</color>");
-            if (p != null && p.Length > 0)
-                sb.AppendFormat(s, p);
-            else
-                sb.Append(s);
-            Debug.Log(sb.ToString());
+            LogColor("[资产日志]", Color.green, s, p);
         }
         
         public static void LogAsset(object o)
         {
-            sb.Clear();
-            sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(Color.green));
-            sb.Append(DateTime.Now);
-            sb.Append("[资产日志]");
-            sb.Append("</color>");
-            sb.Append(o);
-            Debug.Log(sb.ToString());
+            LogColor("[资产日志]", Color.green, o);
         }
         
-        public static void LogColor(Color color, string s, Object context)
+        private static void LogColor(string logName, Color color, string s, Object context)
         {
             sb.Clear();
             sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(color));
             sb.Append(DateTime.Now);
-            sb.Append("[颜色日志]");
+            sb.Append(logName);
             sb.Append("</color>");
             sb.Append(s);
             Debug.Log(sb.ToString(), context);
         }
         
-        public static void LogColor(Color color, string s, params object[] p)
+        private static void LogColor(string logName, Color color, string s, params object[] p)
         {
             sb.Clear();
             sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(color));
             sb.Append(DateTime.Now);
-            sb.Append("[颜色日志]");
+            sb.Append(logName);
             sb.Append("</color>");
             if (p != null && p.Length > 0)
                 sb.AppendFormat(s, p);
@@ -307,12 +209,12 @@ namespace F8Framework.Core
             Debug.Log(sb.ToString());
         }
         
-        public static void LogColor(Color color, object o)
+        private static void LogColor(string logName, Color color, object o)
         {
             sb.Clear();
             sb = sb.AppendFormat(@"<color=#{0}>", ColorUtility.ToHtmlStringRGB(color));
             sb.Append(DateTime.Now);
-            sb.Append("[颜色日志]");
+            sb.Append(logName);
             sb.Append("</color>");
             sb.Append(o);
             Debug.Log(sb.ToString());
@@ -334,6 +236,21 @@ namespace F8Framework.Core
             LogError("Assert failed! Message:\n" + s, p);
         }
 
+        public static void LogWarning(string s, Object context)
+        {
+            Debug.LogWarning(s, context);
+        }
+        
+        public static void LogWarning(string s, params object[] p)
+        {
+            Debug.LogWarning((p != null && p.Length > 0 ? string.Format(s, p) : s));
+        }
+        
+        public static void LogWarning(object o)
+        {
+            Debug.LogWarning(o);
+        }
+        
         public static void LogError(string s, Object context)
         {
             Debug.LogError(s, context);

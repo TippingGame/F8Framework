@@ -133,11 +133,11 @@ namespace F8Framework.Core.Editor
             AssetImporter ai = AssetImporter.GetAtPath(path);
             // 使用 Path.ChangeExtension 去掉扩展名
             string bundleName = Path.ChangeExtension(path, null).Replace(URLSetting.AssetBundlesPath, "");
-            if (!ai.assetBundleName.Equals(bundleName))
+            if (!ai.assetBundleName.Equals(bundleName) && ai.assetBundleName == null)
             {
                 ai.assetBundleName = bundleName;
             }
-            return bundleName;
+            return ai.assetBundleName;
         }
         
         public static void GenerateAssetNames()
@@ -153,6 +153,7 @@ namespace F8Framework.Core.Editor
                 string[] allPaths = filePaths.Concat(folderPaths).ToArray();
                 
                 List<string> tempNames = new List<string>();
+                Dictionary<string, string> tempNamesDirectory = new Dictionary<string, string>();
                 
                 // 创建文本文件
                 StringBuilder codeStr = new StringBuilder(
@@ -209,14 +210,24 @@ namespace F8Framework.Core.Editor
                             fileNameWithoutExtension += id;
                         }
                         tempNames.Add(fileNameWithoutExtension);
-                        
+
                         codeStr.Append(string.Format("          {{\"{0}\", new AssetMapping(\"{1}\", new []{{\"{2}\"}})}},\n", fileNameWithoutExtension, abName.ToLower(), assetPath));
                         
+                        // 修改同一AB名的assetPath
+                        if (!tempNamesDirectory.ContainsKey(fileNameWithoutExtension))
+                        {
+                            tempNamesDirectory.TryAdd(fileNameWithoutExtension, assetPath);
+                        }
+                        else
+                        {
+                            codeStr.Replace(tempNamesDirectory[fileNameWithoutExtension], tempNamesDirectory[fileNameWithoutExtension] + ", " + assetPath);
+                            tempNamesDirectory[fileNameWithoutExtension] = tempNamesDirectory[fileNameWithoutExtension] + ", " + assetPath;
+                        }
                     }
                     else if (Directory.Exists(filePath)) // 文件夹
                     {
                         string abName = assetPath.Replace(URLSetting.AssetBundlesPath, "");
-                        
+                       
                         string[] assetPaths = Directory.GetFiles(filePath, "*", SearchOption.TopDirectoryOnly)
                             .Where(path => !path.EndsWith(".meta", StringComparison.OrdinalIgnoreCase) && !path.EndsWith(".DS_Store", StringComparison.OrdinalIgnoreCase))
                             .ToArray();

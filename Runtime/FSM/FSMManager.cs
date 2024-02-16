@@ -288,7 +288,7 @@ namespace F8Framework.Core
 
         public void OnTermination()
         {
-            
+            base.Destroy();
         }
     }
 }

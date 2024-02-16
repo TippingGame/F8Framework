@@ -36,6 +36,7 @@ namespace F8Framework.Core
 
             assetBundlePaths.Add(info.AssetBundlePath);
 
+            int loadedCount = 0;
             foreach (string assetBundlePath in assetBundlePaths)
             {
                 AssetBundleLoader loader;
@@ -59,7 +60,12 @@ namespace F8Framework.Core
                 }
                 
                 loader.Load();
-                loader.Expand();
+                
+                ++loadedCount;
+                if (loadedCount == assetBundlePaths.Count)
+                {
+                    loader.Expand();
+                }
             }
 
             result = GetAssetBundle(info.AssetBundlePath);

@@ -21,7 +21,6 @@ Unity F8Log组件，打印日志，写入文件，上报错误
         LogF8.LogNet("1123{0}", "测试");
         LogF8.LogEvent(this);
         LogF8.LogConfig(this);
-        LogF8.LogColor(Color.red, this);
         LogF8.LogView(this);
         LogF8.LogEntity(this);
         
