@@ -18,7 +18,7 @@ Unity F8Localization本地化组件。
 
 1. 在 StreamingAssets/config 目录创建一个Excel（Sheet改名为LocalizedStrings） 作为本地化配置
 ![image](ui_20240219212643.png)
-2. 编辑器和运行时，支持42种系统语言实时切换。（快捷键F6）
+2. 编辑器和运行时，支持42种系统语言实时切换。（快捷键F6）  
 ![image](ui_20240219212707.png)
 3. Text / TextTextMeshPro 特有功能（实时显示ID索引）
 ![image](ui_20240219213728.png)
