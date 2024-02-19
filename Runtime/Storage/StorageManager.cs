@@ -62,13 +62,13 @@ namespace F8Framework.Core
         /// 从指定游戏配置项中读取对象。
         /// </summary>
         /// <typeparam name="T">要读取对象的类型。</typeparam>
-        /// <param name="settingName">要获取游戏配置项的名称。</param>
+        /// <param name="key">要获取游戏配置项的名称。</param>
         /// <returns>读取的对象。</returns>
-         public T GetObject<T>(string settingName)
+         public T GetObject<T>(string key, bool user = false)
          {
-             if (PlayerPrefs.HasKey(settingName))
+             if (PlayerPrefs.HasKey(key))
              {
-                 string jsonString = PlayerPrefs.GetString(settingName);
+                 string jsonString = PlayerPrefs.GetString(GetKeywords(key, user));
                  return JsonUtility.FromJson<T>(jsonString);
              }
 
@@ -81,9 +81,9 @@ namespace F8Framework.Core
         /// <typeparam name="T">要写入对象的类型。</typeparam>
         /// <param name="settingName">要写入游戏配置项的名称。</param>
         /// <param name="obj">要写入的对象。</param>
-        public void SetObject<T>(string settingName, T obj)
+        public void SetObject<T>(string key, T obj, bool user = false)
         {
-            PlayerPrefs.SetString(settingName, JsonUtility.ToJson(obj));
+            PlayerPrefs.SetString(GetKeywords(key, user), JsonUtility.ToJson(obj));
         }
         
         public void Remove(string key, bool user = false)

@@ -35,9 +35,11 @@ public class DemoAssetManager : MonoBehaviour
         });
         
         //协程
-        var loadDir = FF8.Asset.LoadDirAsyncCoroutine("NewFolder");
-        yield return loadDir;
-        
+        var loadDir = FF8.Asset.LoadDirAsyncCoroutine("NewFolder").GetEnumerator();
+        while (loadDir.MoveNext())
+        {
+            yield return loadDir.Current;
+        }
         
         /*-------------------------------------其他功能-------------------------------------*/
         //获取加载进度

@@ -576,7 +576,7 @@ namespace F8Framework.Core
             /// </summary>
             /// <param name="assetName">资产路径字符串。</param>
             /// <param name="mode">访问模式。</param>
-            public IEnumerator LoadDirAsyncCoroutine(string assetName, AssetAccessMode mode = AssetAccessMode.UNKNOWN)
+            public IEnumerable LoadDirAsyncCoroutine(string assetName, AssetAccessMode mode = AssetAccessMode.UNKNOWN)
             {
                 AssetInfo info = GetAssetInfo(assetName, mode);
                 if (info == null || !info.IsLegal)

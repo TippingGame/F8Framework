@@ -135,7 +135,7 @@ namespace F8Framework.Core.Editor
             AssetImporter ai = AssetImporter.GetAtPath(path);
             // 使用 Path.ChangeExtension 去掉扩展名
             string bundleName = Path.ChangeExtension(path, null).Replace(URLSetting.AssetBundlesPath, "");
-            if (!ai.assetBundleName.Equals(bundleName) && ai.assetBundleName == null)
+            if (!ai.assetBundleName.Equals(bundleName) && ai.assetBundleName.IsNullOrEmpty())
             {
                 ai.assetBundleName = bundleName;
             }

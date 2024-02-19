@@ -19,6 +19,7 @@ public class GameLauncher : MonoBehaviour
         FF8.Audio.ToString();
         FF8.Tween.ToString();
         FF8.UI.ToString();
+        FF8.Localization.ToString();
         FF8.LogHelper.ToString();
 
         StartGame();

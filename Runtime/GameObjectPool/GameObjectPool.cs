@@ -945,12 +945,9 @@ namespace F8Framework.Core
                 if (s_isApplicationQuitting)
                 {
 #if UNITY_EDITOR
-                    if (EditorSettings.enterPlayModeOptionsEnabled && s_instance == null)
+                    if (UnityEditor.EditorSettings.enterPlayModeOptionsEnabled && s_instance == null)
                     {
-                        throw new Exception($"<{nameof(F8PoolGlobal)}> 实例为空！" +
-                                            "在 '进入播放模式选项' 中启用 '重新加载域' 选项或 " +
-                                            $"手动在场景中的任何 {nameof(GameObject)} 上添加此组件 " +
-                                            "以解决此问题。");
+                        LogF8.LogError($"<{nameof(F8PoolGlobal)}> 实例为空！");
                     }
 #endif
                     return false;
@@ -961,7 +958,7 @@ namespace F8Framework.Core
 #if DEBUG
                     if (Application.isPlaying == false)
                     {
-                        throw new Exception("在应用程序未运行时，您正在尝试执行生成或取消生成操作！");
+                        LogF8.LogError("在应用程序未运行时，您正在尝试执行生成或取消生成操作！");
                     }
 #endif
                     InitializeTheF8Pool();

@@ -14,6 +14,7 @@ namespace F8Framework.Core
             { "RectTransform", nameof (UnityEngine.RectTransform) },
             { "Canvas", nameof (UnityEngine.Canvas) },
             { "CanvasGroup", nameof (UnityEngine.CanvasGroup) },
+            { "SpriteRenderer", nameof (UnityEngine.SpriteRenderer) },{ "spr", nameof (UnityEngine.SpriteRenderer) },
             { "VerticalLayoutGroup", nameof (UnityEngine.UI.VerticalLayoutGroup) },
             { "HorizontalLayoutGroup", nameof (UnityEngine.UI.HorizontalLayoutGroup) },
             { "GridLayoutGroup", nameof (UnityEngine.UI.GridLayoutGroup) },
@@ -30,7 +31,7 @@ namespace F8Framework.Core
             { "Scrollbar", nameof (UnityEngine.UI.Scrollbar) },
             { "ScrollRect", nameof (UnityEngine.UI.ScrollRect) },
             { "Dropdown", nameof (UnityEngine.UI.Dropdown) },
-            { "Text (TMP)", "TMP_Text" },{ "tmp", "TMP_Text" },
+            { "Text (TMP)", "TMPro.TMP_Text" },{ "tmp", "TMPro.TMP_Text" },
         };
     }
 }

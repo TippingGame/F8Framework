@@ -33,9 +33,9 @@ namespace F8Framework.Core
 		public static void Initialize(MonoBehaviour behaviour)
 		{
 			if (behaviour == null)
-				throw new Exception("MonoBehaviour 为空。");
+				LogF8.LogError("MonoBehaviour 为空。");
 			if (_behaviour != null)
-				throw new Exception($"{nameof(ModuleCenter)} 已初始化。");
+				LogF8.LogError($"{nameof(ModuleCenter)} 已初始化。");
 
 			UnityEngine.Object.DontDestroyOnLoad(behaviour.gameObject);
 			_behaviour = behaviour;
@@ -53,7 +53,7 @@ namespace F8Framework.Core
 
 			// 说明：初始化之后，如果忘记更新ModuleCenter，这里会抛出异常
 			if (_frame == 0)
-				throw new Exception($"请调用更新方法：ModuleCenter.Update");
+				LogF8.LogError($"请调用更新方法：ModuleCenter.Update");
 		}
 
 		/// <summary>
@@ -161,11 +161,17 @@ namespace F8Framework.Core
 		public static T CreateModule<T>(System.Object createParam, int priority = 0) where T : class, IModule
 		{
 			if (priority < 0)
-				throw new Exception("优先级不能为负");
-
+			{
+				LogF8.LogError("优先级不能为负");
+				priority = 0;
+			}
+			
 			if (Contains(typeof(T)))
-				throw new Exception($"游戏模块 {typeof(T)} 已存在");
-
+			{
+				LogF8.LogError($"游戏模块 {typeof(T)} 已存在");
+				return null;
+			}
+			
 			// 如果没有设置优先级
 			if (priority == 0)
 			{
@@ -289,7 +295,7 @@ namespace F8Framework.Core
 		public static Coroutine StartCoroutine(IEnumerator coroutine)
 		{
 			if (_behaviour == null)
-				throw new Exception($"{nameof(ModuleCenter)} 未初始化。使用 ModuleCenter.Initialize");
+				LogF8.LogError($"{nameof(ModuleCenter)} 未初始化。使用 ModuleCenter.Initialize");
 			return _behaviour.StartCoroutine(coroutine);
 		}
 
@@ -299,7 +305,7 @@ namespace F8Framework.Core
 		public static void StopCoroutine(Coroutine coroutine)
 		{
 			if (_behaviour == null)
-				throw new Exception($"{nameof(ModuleCenter)} 未初始化。使用 ModuleCenter.Initialize");
+				LogF8.LogError($"{nameof(ModuleCenter)} 未初始化。使用 ModuleCenter.Initialize");
 			_behaviour.StopCoroutine(coroutine);
 		}
 
@@ -310,7 +316,7 @@ namespace F8Framework.Core
 		public static void StartCoroutine(string methodName)
 		{
 			if (_behaviour == null)
-				throw new Exception($"{nameof(ModuleCenter)} 未初始化。使用 ModuleCenter.Initialize");
+				LogF8.LogError($"{nameof(ModuleCenter)} 未初始化。使用 ModuleCenter.Initialize");
 			_behaviour.StartCoroutine(methodName);
 		}
 
@@ -320,7 +326,7 @@ namespace F8Framework.Core
 		public static void StopCoroutine(string methodName)
 		{
 			if (_behaviour == null)
-				throw new Exception($"{nameof(ModuleCenter)} 未初始化。使用 ModuleCenter.Initialize");
+				LogF8.LogError($"{nameof(ModuleCenter)} 未初始化。使用 ModuleCenter.Initialize");
 			_behaviour.StopCoroutine(methodName);
 		}
 
@@ -331,7 +337,7 @@ namespace F8Framework.Core
 		public static void StopAllCoroutines()
 		{
 			if (_behaviour == null)
-				throw new Exception($"{nameof(ModuleCenter)} 未初始化。使用 ModuleCenter.Initialize");
+				LogF8.LogError($"{nameof(ModuleCenter)} 未初始化。使用 ModuleCenter.Initialize");
 			_behaviour.StopAllCoroutines();
 		}
 		#endregion

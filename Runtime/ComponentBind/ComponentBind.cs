@@ -8,7 +8,11 @@ namespace F8Framework.Core
         {
             LogF8.Log("首次添加需要点击组件绑定按钮");
         }
+        
 #if UNITY_EDITOR
+        // 分隔符
+        private string _division = "_";
+        
         public void Bind()
         {
             GenerateAutoBindComponentsCode();
@@ -50,26 +54,46 @@ namespace F8Framework.Core
             // 遍历Prefab中的所有物体
             foreach (Transform child in childs)
             {
-                // 检查物体名字的一部分是否包含在字典的key中
-                foreach (var key in DefaultCodeBindNameTypeConfig.BindNameTypeDict.Keys)
+                if (child.Equals(transform))// 忽略自身
+                    continue;
+                
+                System.Collections.Generic.List<string> componentNames = null;
+                
+                string[] nameDivision = child.gameObject.name.Split(_division);
+                
+                foreach (var name in nameDivision)
                 {
-                    if (child.gameObject.name.Contains(key))
+                    // 检查物体名字的一部分是否包含在字典的key中
+                    foreach (var key in DefaultCodeBindNameTypeConfig.BindNameTypeDict.Keys)
                     {
+                        if (!name.Contains(key))
+                            
+                            continue;
                         string componentType = DefaultCodeBindNameTypeConfig.BindNameTypeDict[key];
+                        if (componentNames == null)
+                            componentNames = new System.Collections.Generic.List<string>();
 
-                        string normalizeName  = RemoveSpecialCharacters(child.gameObject.name);
+                        if (componentNames.Contains(componentType))
+                            continue;
+                        componentNames.Add(componentType);
 
+                        if (!child.GetComponent(componentType))
+                            continue;
+                            
+                        string normalizeName = RemoveSpecialCharacters(child.gameObject.name);
+
+                        string normalizeKey = RemoveSpecialCharacters(key);
                         // 生成自动获取组件的代码
-                        generatedCode.AppendLine($"    [SerializeField] private {componentType} {normalizeName}{componentType};");
+                        generatedCode.AppendLine($"    [SerializeField] private {componentType} {normalizeName}_{normalizeKey};");
                         // 生成引用代码
                         string childPath = GetChildPath(child, prefab.transform);
                         if (componentType == "GameObject")
                         {
-                            referenceCode.AppendLine($"        {normalizeName}{componentType} = transform.Find(\"{SelectiveEscape(childPath)}\").gameObject;");
+                            referenceCode.AppendLine($"        {normalizeName}_{normalizeKey} = transform.Find(\"{SelectiveEscape(childPath)}\").gameObject;");
                         }
                         else
                         {
-                            referenceCode.AppendLine($"        {normalizeName}{componentType} = transform.Find(\"{SelectiveEscape(childPath)}\").GetComponent<{componentType}>();");
+                            referenceCode.AppendLine($"        {normalizeName}_{normalizeKey} = transform.Find(\"{SelectiveEscape(childPath)}\").GetComponent<{componentType}>();");
                         }
                     }
                 }
@@ -87,7 +111,7 @@ namespace F8Framework.Core
             {
                 // 替换注释之间的内容，包含头尾的注释
                 scriptContent = scriptContent.Remove(match.Groups[0].Index, match.Groups[0].Length);
-                scriptContent = scriptContent.Insert(match.Groups[0].Index, $"// Auto Bind Components\n{generatedCode}\n" +
+                scriptContent = scriptContent.Insert(match.Groups[0].Index, $"// Auto Bind Components\n{generatedCode}" +
                                                                             $"\n#if UNITY_EDITOR" +
                                                                             $"\n    protected override void SetComponents()" +
                                                                             $"\n    {{" +
@@ -138,13 +162,27 @@ namespace F8Framework.Core
         // 获取子物体的路径
         private string GetChildPath(Transform child, Transform root)
         {
+            if (child == null || root == null)
+            {
+                LogF8.LogError("child或者root为空");
+                return "";
+            }
+            
             System.Text.StringBuilder path = new System.Text.StringBuilder(child.name);
 
-            while (child.parent != root)
+            while (child.parent != null && child.parent != root)
             {
                 child = child.parent;
-                path.Insert(0, $"{child.name}/");
+                if (!string.IsNullOrEmpty(child.name)) // 确保子对象的父级名称不为空
+                {
+                    path.Insert(0, $"{child.name}/");
+                }
+                else
+                {
+                    LogF8.LogError("child.name为空");
+                }
             }
+
 
             return path.ToString();
         }

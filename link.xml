@@ -1,6 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <linker>
   <assembly fullname="Assembly-CSharp" preserve="all" />
-    <assembly fullname="F8Framework.Core" preserve="all" />
-      <assembly fullname="F8Framework.AssetMap" preserve="all" />
+  <assembly fullname="I18N" preserve="all" />
+  <assembly fullname="I18N.CJK" preserve="all" />
+  <assembly fullname="I18N.MidEast" preserve="all" />
+  <assembly fullname="I18N.Other" preserve="all" />
+  <assembly fullname="I18N.Rare" preserve="all" />
+  <assembly fullname="I18N.West" preserve="all" />
+  <assembly fullname="ICSharpCode.SharpZipLib" preserve="all" />
+  <assembly fullname="Excel" preserve="all" />
+  <assembly fullname="F8Framework.AssetMap" preserve="all" />
+  <assembly fullname="F8ExcelDataClass" preserve="all" />
+  <assembly fullname="F8Framework.Core" preserve="all" />
 </linker>

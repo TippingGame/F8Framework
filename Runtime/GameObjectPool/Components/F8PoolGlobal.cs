@@ -127,7 +127,7 @@ namespace F8Framework.Core
         {
 #if DEBUG
             if (FF8.GameObjectPool.s_instance != null && FF8.GameObjectPool.s_instance != this)
-                throw new Exception($"场景中的 {nameof(FF8.GameObjectPool)} 实例数量大于一个！");
+                LogF8.LogError($"场景中的 {nameof(FF8.GameObjectPool)} 实例数量大于一个！");
 
             if (enabled == false)
                 LogF8.LogEntity($"<{nameof(F8PoolGlobal)}> 实例已禁用！" +

@@ -24,7 +24,7 @@ namespace F8Framework.Core
         {
 #if DEBUG
             if (_isSetup)
-                throw new Exception("池对象已经设置！");
+                LogF8.LogError("池对象已经设置！");
 #endif
             FF8.GameObjectPool.ClonesMap.Add(_gameObject, this);
             _status = PoolableStatus.Despawned;
@@ -35,7 +35,7 @@ namespace F8Framework.Core
         {
 #if DEBUG
             if (_isSetup)
-                throw new Exception("池对象已经设置！");
+                LogF8.LogError("池对象已经设置！");
 #endif
             FF8.GameObjectPool.ClonesMap.Add(_gameObject, this);
             _status = PoolableStatus.SpawnedOverCapacity;

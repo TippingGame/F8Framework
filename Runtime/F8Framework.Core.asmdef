@@ -1,7 +1,9 @@
 {
     "name": "F8Framework.Core",
     "rootNamespace": "",
-    "references": ["F8Framework.AssetMap"
+    "references": ["F8Framework.AssetMap",
+        "Unity.TextMeshPro",
+        "Unity.Timeline"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
