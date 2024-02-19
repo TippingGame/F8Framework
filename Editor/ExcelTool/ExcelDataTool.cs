@@ -72,7 +72,6 @@ namespace F8Framework.Core.Editor
         
         public static void LoadAllExcelData()
         {
-            LogF8.LogConfig(123123);
             FileTools.SafeDeleteDir(FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/ConfigData/F8DataManager");
             CreateAsmdefFile();
             EditorUtility.ClearProgressBar();

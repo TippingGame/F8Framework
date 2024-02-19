@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using Excel;
+using UnityEngine;
 using Assembly = System.Reflection.Assembly;
 
 namespace F8Framework.Core

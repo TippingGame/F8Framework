@@ -17,36 +17,34 @@ namespace F8Framework.F8DataManager
 {
 	public class F8DataManager : Singleton<F8DataManager>
 	{
-		private table1 p_table1;
-		private table2 p_table2;
+		private Sheet1 p_Sheet1;
+		private Sheet2 p_Sheet2;
 		private LocalizedStrings p_LocalizedStrings;
-		private Entities1 p_Entities1;
-		private Entities2 p_Entities2;
 
-		public table1Item Gettable1ByID(Int32 id)
+		public Sheet1Item GetSheet1ByID(Int32 id)
 		{
-			table1Item t = null;
-			p_table1.Dict.TryGetValue(id, out t);
-			if (t == null) LogF8.LogError("can't find the id " + id + " in table1");
+			Sheet1Item t = null;
+			p_Sheet1.Dict.TryGetValue(id, out t);
+			if (t == null) LogF8.LogError("can't find the id " + id + " in Sheet1");
 			return t;
 		}
 
-		public Dictionary<int, table1Item> Gettable1()
+		public Dictionary<int, Sheet1Item> GetSheet1()
 		{
-			return p_table1.Dict;
+			return p_Sheet1.Dict;
 		}
 
-		public table2Item Gettable2ByID(Int32 id)
+		public Sheet2Item GetSheet2ByID(Int32 id)
 		{
-			table2Item t = null;
-			p_table2.Dict.TryGetValue(id, out t);
-			if (t == null) LogF8.LogError("can't find the id " + id + " in table2");
+			Sheet2Item t = null;
+			p_Sheet2.Dict.TryGetValue(id, out t);
+			if (t == null) LogF8.LogError("can't find the id " + id + " in Sheet2");
 			return t;
 		}
 
-		public Dictionary<int, table2Item> Gettable2()
+		public Dictionary<int, Sheet2Item> GetSheet2()
 		{
-			return p_table2.Dict;
+			return p_Sheet2.Dict;
 		}
 
 		public LocalizedStringsItem GetLocalizedStringsByID(Int32 id)
@@ -62,57 +60,25 @@ namespace F8Framework.F8DataManager
 			return p_LocalizedStrings.Dict;
 		}
 
-		public Entities1Item GetEntities1ByID(Int32 id)
-		{
-			Entities1Item t = null;
-			p_Entities1.Dict.TryGetValue(id, out t);
-			if (t == null) LogF8.LogError("can't find the id " + id + " in Entities1");
-			return t;
-		}
-
-		public Dictionary<int, Entities1Item> GetEntities1()
-		{
-			return p_Entities1.Dict;
-		}
-
-		public Entities2Item GetEntities2ByID(Int32 id)
-		{
-			Entities2Item t = null;
-			p_Entities2.Dict.TryGetValue(id, out t);
-			if (t == null) LogF8.LogError("can't find the id " + id + " in Entities2");
-			return t;
-		}
-
-		public Dictionary<int, Entities2Item> GetEntities2()
-		{
-			return p_Entities2.Dict;
-		}
-
 		public void LoadAll()
 		{
-			p_table1 = Load("table1") as table1;
-			p_table2 = Load("table2") as table2;
+			p_Sheet1 = Load("Sheet1") as Sheet1;
+			p_Sheet2 = Load("Sheet2") as Sheet2;
 			p_LocalizedStrings = Load("LocalizedStrings") as LocalizedStrings;
-			p_Entities1 = Load("Entities1") as Entities1;
-			p_Entities2 = Load("Entities2") as Entities2;
 		}
 
 		public void RuntimeLoadAll(Dictionary<String, System.Object> objs)
 		{
-			p_table1 = objs["table1"] as table1;
-			p_table2 = objs["table2"] as table2;
+			p_Sheet1 = objs["Sheet1"] as Sheet1;
+			p_Sheet2 = objs["Sheet2"] as Sheet2;
 			p_LocalizedStrings = objs["LocalizedStrings"] as LocalizedStrings;
-			p_Entities1 = objs["Entities1"] as Entities1;
-			p_Entities2 = objs["Entities2"] as Entities2;
 		}
 
 		public IEnumerable LoadAllAsync()
 		{
-			yield return LoadAsync("table1", result => p_table1 = result as table1);
-			yield return LoadAsync("table2", result => p_table2 = result as table2);
+			yield return LoadAsync("Sheet1", result => p_Sheet1 = result as Sheet1);
+			yield return LoadAsync("Sheet2", result => p_Sheet2 = result as Sheet2);
 			yield return LoadAsync("LocalizedStrings", result => p_LocalizedStrings = result as LocalizedStrings);
-			yield return LoadAsync("Entities1", result => p_Entities1 = result as Entities1);
-			yield return LoadAsync("Entities2", result => p_Entities2 = result as Entities2);
 		}
 
 		private System.Object Load(string name)

@@ -1,10 +1,6 @@
-#if UNITY_EDITOR
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System.IO;
-using System;
 
 namespace F8Framework.Core.Editor
 {
@@ -26,6 +22,7 @@ namespace F8Framework.Core.Editor
             if (isInitialized) return;
             EditorApplication.update += OnUpdate;
             curChangeEventArgs = null;
+            FileTools.CheckDirAndCreateWhenNeeded(Application.dataPath + ExcelDataTool.ExcelPath);
             watcher = new FileSystemWatcher(Application.dataPath + ExcelDataTool.ExcelPath, "*.xlsx");
             watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite | NotifyFilters.FileName;
             watcher.EnableRaisingEvents = true;
@@ -55,4 +52,3 @@ namespace F8Framework.Core.Editor
         }
     }
 }
-#endif

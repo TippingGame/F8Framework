@@ -27,7 +27,7 @@ Unity 2021.3.15f1+
 * [8. 补间动画（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Tween/README.md) - 播放/终止动画，有旋转/位移/缩放/渐变/填充动画，为UI设计的相对布局位移动画。
 * [9. 引用池管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/ReferencePool/README.md) - 引用池管理，C# 对象，入池/取出/回收/清空。
 * [10. 游戏对象池（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/GameObjectPool/README.md) - 游戏对象池管理，Unity GameObject 预加载，生成/销毁/延迟销毁，生命周期事件监听。
-* [11. 多语言管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/AssetManager/README.md) - 待添加
+* [11. 多语言管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Localization/README.md) - 本地化 Text / TextMeshPro / Image / RawImage / SpriteRenderer / Renderer / Audio / Timeline 等组件，使用Excel作为多语言翻译表
 * [12. 有限状态机（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/FSM/README.md) - 通过继承有限状态机状态 FSMState 和状态切换 FSMSwitch，控制状态机，添加/切换/轮询/销毁。
 * [13. UI界面管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/UI/README.md) - 处理界面加载，打开，关闭，查询，层级控制，自定义动画，自动获取组件索引。UI界面分为三大类：**普通UI、模态弹窗、非模态弹窗**。
 * [14. 输入系统管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/AssetManager/README.md) - 待添加

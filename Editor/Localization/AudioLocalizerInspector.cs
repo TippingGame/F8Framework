@@ -12,7 +12,7 @@ namespace F8Framework.Core
 		void OnEnable()
 		{
 			localizer = (AudioLocalizer)target;
-			playFromSamePositionWhenInject = serializedObject.FindProperty("注入时从同一位置播放");
+			playFromSamePositionWhenInject = serializedObject.FindProperty("playFromSamePositionWhenInject");
 		}
 
 		public override void OnInspectorGUI()
