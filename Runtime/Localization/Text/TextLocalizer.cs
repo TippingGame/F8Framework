@@ -48,19 +48,19 @@ namespace F8Framework.Core
 			// for Timeline Preview
 			if (!Application.isPlaying)
 			{
-				Localizer.Load();
+				Localization.Load();
 				Prepare();
 			}
 #endif
 
-			if (!Localizer.Has(textId))
+			if (!Localization.Has(textId))
 			{
 				if (Application.isPlaying) LogF8.LogError($"Text ID: {textId} 不可用。");
 				return false;
 			}
 
 			this.textId = textId;
-			var text = Localizer.GetTextFromId(textId);
+			var text = Localization.GetTextFromId(textId);
 			injector.Inject(text, this);
 			return true;
 		}

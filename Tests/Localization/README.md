@@ -33,22 +33,22 @@ Unity F8Localization本地化组件。
         /*----------------------------本地化功能----------------------------*/
         
         // 切换语言
-        Localizer.ChangeLanguage("English");
+        Localization.ChangeLanguage("English");
         
         // 获取翻译文本
-        string text = Localizer.GetTextFromId("test", "Support", "Format");
-        string text1 = Localizer.GetTextFromIdLanguage("test", "English");
+        string text = Localization.GetTextFromId("test", "Support", "Format");
+        string text1 = Localization.GetTextFromIdLanguage("test", "English");
         
         // 语言列表
-        Localizer.LanguageList;
+        Localization.LanguageList;
         
         // 当前语言
-        Localizer.CurrentLanguageName;
+        Localization.CurrentLanguageName;
         
         // 重新加载翻译表
-        Localizer.Load();
+        Localization.Load();
         
         // 刷新所有本地化组件
-        Localizer.InjectAll();
+        Localization.InjectAll();
 ```
 

@@ -8,7 +8,7 @@ namespace F8Framework.Core
 
 		protected virtual void Awake()
 		{
-			Localizer.AddLocalizer(this);
+			Localization.AddLocalizer(this);
 			Prepare();
 		}
 
@@ -29,7 +29,7 @@ namespace F8Framework.Core
 
 		protected virtual void OnDestroy()
 		{
-			Localizer.RemoveLocalizer(this);
+			Localization.RemoveLocalizer(this);
 		}
 	}
 }

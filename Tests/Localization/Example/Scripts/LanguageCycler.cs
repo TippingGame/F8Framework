@@ -41,7 +41,7 @@ public class LanguageCycler : MonoBehaviour
 
 	public void Cycle()
 	{
-		Localizer.ActivateNextLanguage();
+		Localization.ActivateNextLanguage();
 	}
 }
 

@@ -17,13 +17,13 @@ namespace F8Framework.Core
 			if (json == "")
 			{
 				// 根据系统语言设置
-				Localizer.CurrentLanguageName = Application.systemLanguage.ToString();
+				Localization.CurrentLanguageName = Application.systemLanguage.ToString();
 				return Application.systemLanguage.ToString();
 			}
 			else
 			{
 				var definition = JsonUtility.FromJson<Definition>(json);
-				Localizer.CurrentLanguageName = definition.currentLanguageName;
+				Localization.CurrentLanguageName = definition.currentLanguageName;
 				return definition.currentLanguageName;
 			}
 #else
@@ -43,7 +43,7 @@ namespace F8Framework.Core
 		public static void SaveLanguageSettings()
 		{
 #if UNITY_EDITOR
-			var definition = new Definition { currentLanguageName = Localizer.CurrentLanguageName };
+			var definition = new Definition { currentLanguageName = Localization.CurrentLanguageName };
 			var json = JsonUtility.ToJson(definition);
 			EditorPrefs.SetString(LocalizationConst.CurrentLanguageKey, json);
 #else

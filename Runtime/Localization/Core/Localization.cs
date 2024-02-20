@@ -8,7 +8,7 @@ using UnityEngine;
 namespace F8Framework.Core
 {
     // 本地化工具类
-    public class Localizer : ModuleSingleton<Localizer>, IModule
+    public class Localization : ModuleSingleton<Localization>, IModule
     {
         // 本地化器列表
         static readonly List<LocalizerBase> Localizers = new List<LocalizerBase>();

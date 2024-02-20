@@ -32,7 +32,7 @@ namespace F8Framework.Core
         // UI界面管理
         private static UIManager _ui;
         // 本地化
-        private static Localizer _localization;
+        private static Localization _localization;
         // 日志助手
         private static F8LogHelper _logHelper;
 
@@ -156,12 +156,12 @@ namespace F8Framework.Core
             }
         }
 
-        public static Localizer Localization
+        public static Localization Localization
         {
             get
             {
                 if (_localization == null)
-                    _localization = ModuleCenter.CreateModule<Localizer>();
+                    _localization = ModuleCenter.CreateModule<Localization>();
                 return _localization;
             }
         }

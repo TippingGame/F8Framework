@@ -19,12 +19,12 @@ namespace F8Framework.Core
 		{
 			// base.OnInspectorGUI();
 
-			Localizer.Load();
+			Localization.Load();
 			serializedObject.Update();
 
 			EditorGUILayout.PropertyField(playFromSamePositionWhenInject, new GUIContent("从同一位置播放"));
 
-			var langCount = Localizer.LanguageList.Count;
+			var langCount = Localization.LanguageList.Count;
 
 			if (localizer.clips == null)
 			{
@@ -42,7 +42,7 @@ namespace F8Framework.Core
 
 			for (var i = 0; i < langCount; i++)
 			{
-				var clip = EditorGUILayout.ObjectField(Localizer.LanguageList[i], localizer.clips[i], typeof(AudioClip), false) as AudioClip;
+				var clip = EditorGUILayout.ObjectField(Localization.LanguageList[i], localizer.clips[i], typeof(AudioClip), false) as AudioClip;
 				if (localizer.clips[i] != clip)
 				{
 					localizer.clips[i] = clip;
