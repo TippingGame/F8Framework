@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using F8Framework.Core;
-using F8Framework.F8DataManager;
+using F8Framework.ConfigData;
 
 public class DemoExcelTool : MonoBehaviour
 {

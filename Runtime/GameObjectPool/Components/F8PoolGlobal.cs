@@ -63,10 +63,10 @@ namespace F8Framework.Core
         {
             if (Application.isPlaying)
             {
-                FF8.GameObjectPool.s_f8PoolMode = _f8PoolMode;
-                FF8.GameObjectPool.s_checkForPrefab = _checkForPrefab;
-                FF8.GameObjectPool.s_checkClonesForNull = _checkClonesForNull;
-                FF8.GameObjectPool.s_despawnPersistentClonesOnDestroy = _despawnPersistentClonesOnDestroy;
+                GameObjectPool.s_f8PoolMode = _f8PoolMode;
+                GameObjectPool.s_checkForPrefab = _checkForPrefab;
+                GameObjectPool.s_checkClonesForNull = _checkClonesForNull;
+                GameObjectPool.s_despawnPersistentClonesOnDestroy = _despawnPersistentClonesOnDestroy;
             }
         }
 #endif
@@ -103,11 +103,11 @@ namespace F8Framework.Core
 
         public void OnTermination()
         {
-            FF8.GameObjectPool.ResetPool();
+            GameObjectPool.Instance.ResetPool();
 
-            if (_clearEventsOnDestroy || FF8.GameObjectPool.s_isApplicationQuitting)
+            if (_clearEventsOnDestroy || GameObjectPool.s_isApplicationQuitting)
             {
-                FF8.GameObjectPool.GameObjectInstantiated.Clear();
+                GameObjectPool.GameObjectInstantiated.Clear();
             }
             
             Destroy(gameObject);
@@ -120,26 +120,26 @@ namespace F8Framework.Core
 
         private void OnApplicationQuit()
         {
-            FF8.GameObjectPool.s_isApplicationQuitting = true;
+            GameObjectPool.s_isApplicationQuitting = true;
         }
 
         private void Initialize()
         {
 #if DEBUG
-            if (FF8.GameObjectPool.s_instance != null && FF8.GameObjectPool.s_instance != this)
-                LogF8.LogError($"场景中的 {nameof(FF8.GameObjectPool)} 实例数量大于一个！");
+            if (GameObjectPool.s_instance != null && GameObjectPool.s_instance != this)
+                LogF8.LogError($"场景中的 {nameof(GameObjectPool)} 实例数量大于一个！");
 
             if (enabled == false)
                 LogF8.LogEntity($"<{nameof(F8PoolGlobal)}> 实例已禁用！" +
                                 "因此，某些功能可能无法正常工作！", this);
 #endif
-            FF8.GameObjectPool.s_isApplicationQuitting = false;
-            FF8.GameObjectPool.s_instance = this;
-            FF8.GameObjectPool.s_hasTheF8PoolInitialized = true;
-            FF8.GameObjectPool.s_f8PoolMode = _f8PoolMode;
-            FF8.GameObjectPool.s_checkForPrefab = _checkForPrefab;
-            FF8.GameObjectPool.s_checkClonesForNull = _checkClonesForNull;
-            FF8.GameObjectPool.s_despawnPersistentClonesOnDestroy = _despawnPersistentClonesOnDestroy;
+            GameObjectPool.s_isApplicationQuitting = false;
+            GameObjectPool.s_instance = this;
+            GameObjectPool.s_hasTheF8PoolInitialized = true;
+            GameObjectPool.s_f8PoolMode = _f8PoolMode;
+            GameObjectPool.s_checkForPrefab = _checkForPrefab;
+            GameObjectPool.s_checkClonesForNull = _checkClonesForNull;
+            GameObjectPool.s_despawnPersistentClonesOnDestroy = _despawnPersistentClonesOnDestroy;
         }
 
         private void PreloadPools(PreloadType requiredType)
@@ -147,18 +147,18 @@ namespace F8Framework.Core
             if (requiredType != preloadPoolsType)
                 return;
             
-            FF8.GameObjectPool.InstallPools(poolsPreset);
+            GameObjectPool.Instance.InstallPools(poolsPreset);
         }
 
         private void HandleDespawnRequests(float deltaTime)
         {
-            for (int i = 0; i < FF8.GameObjectPool.DespawnRequests._count; i++)
+            for (int i = 0; i < GameObjectPool.DespawnRequests._count; i++)
             {
-                ref DespawnRequest request = ref FF8.GameObjectPool.DespawnRequests._components[i];
+                ref DespawnRequest request = ref GameObjectPool.DespawnRequests._components[i];
 
                 if (request.Poolable._status == PoolableStatus.Despawned)
                 {
-                    FF8.GameObjectPool.DespawnRequests.RemoveUnorderedAt(i);
+                    GameObjectPool.DespawnRequests.RemoveUnorderedAt(i);
                     continue;
                 }
                 
@@ -166,8 +166,8 @@ namespace F8Framework.Core
                 
                 if (request.TimeToDespawn <= 0f)
                 {
-                    FF8.GameObjectPool.DespawnImmediate(request.Poolable);
-                    FF8.GameObjectPool.DespawnRequests.RemoveUnorderedAt(i);
+                    GameObjectPool.Instance.DespawnImmediate(request.Poolable);
+                    GameObjectPool.DespawnRequests.RemoveUnorderedAt(i);
                 }
             }
         }

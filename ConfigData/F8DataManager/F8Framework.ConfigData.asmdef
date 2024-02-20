@@ -1,5 +1,5 @@
 {
-    "name": "F8Framework.F8DataManager",
+    "name": "F8Framework.ConfigData",
     "references": ["F8Framework.Core"],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -60,11 +60,11 @@ namespace F8Framework.Core
                 LogF8.LogConfig("<color=green>获取本地化表格成功！</color>");
             }
             
-            foreach (var item in tb)
+            foreach (var item in tb.Values)
             {
                 List<string> list = new List<string>();
             
-                Type type2 = item.Value.GetType();
+                Type type2 = item.GetType();
                 FieldInfo[] fields = type2.GetFields();
         
                 foreach (var field in fields)
@@ -76,7 +76,7 @@ namespace F8Framework.Core
                         {
                             LanguageList.Add(field.Name);
                         }
-                        object value = field.GetValue(item.Value); // 这里传递的是 item 对象
+                        object value = field.GetValue(item); // 这里传递的是 item 对象
                         if (value != null)
                         {
                             list.Add(value.ToString());
@@ -85,16 +85,16 @@ namespace F8Framework.Core
                         {
                             // 如果字段的值为 null，你可以选择添加一个默认值，或者进行其他处理
                             list.Add("");
-                            LogF8.LogConfig($"字段：\"<b>{item.Value.TextID}</b>\" 的值为空");
+                            LogF8.LogConfig($"字段：\"<b>{item.TextID}</b>\" 的值为空");
                         }
                     }
                 }
-                if (LocalizedStrings.ContainsKey(item.Value.TextID))
+                if (LocalizedStrings.ContainsKey(item.TextID))
                 {
-                    LogF8.LogError($"本地化表 ID \"<b>{item.Value.TextID}</b>\" 出现重复，请修改。");
+                    LogF8.LogError($"本地化表 ID \"<b>{item.TextID}</b>\" 出现重复，请修改。");
                     continue;
                 }
-                LocalizedStrings.TryAdd(item.Value.TextID, list);
+                LocalizedStrings.TryAdd(item.TextID, list);
             }
 
             LocalizationSettings.LoadLanguageSettings();

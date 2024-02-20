@@ -1,6 +1,8 @@
+// using F8Framework.ConfigData;
+
 namespace F8Framework.Core
 {
-    public static partial class FF8
+    public static class FF8
     {
         //相当于重命名
         /* ------------------------核心模块------------------------ */
@@ -15,10 +17,14 @@ namespace F8Framework.Core
         private static ProcedureManager _procedure;
         // 有限状态机
         private static FSMManager _fsm;
-        // 游戏对象池全局控制
-        private static F8PoolGlobal _pool;
+        // 游戏对象池
+        private static GameObjectPool _gameObjectPool;
+        // 游戏对象池全局设置
+        private static F8PoolGlobal _poolGlobal;
         // 资产管理
         private static AssetManager _asset;
+        // 读取配置表
+        // private static F8DataManager _config;
         // 音频管理
         private static AudioManager _audio;
         // 补间动画
@@ -80,13 +86,23 @@ namespace F8Framework.Core
             }
         }
 
-        public static F8PoolGlobal Pool
+        public static GameObjectPool GameObjectPool
         {
             get
             {
-                if (_pool == null)
-                    _pool = ModuleCenter.CreateModule<F8PoolGlobal>();
-                return _pool;
+                if (_gameObjectPool == null)
+                    _gameObjectPool = ModuleCenter.CreateModule<GameObjectPool>();
+                return _gameObjectPool;
+            }
+        }
+        
+        public static F8PoolGlobal PoolGlobal
+        {
+            get
+            {
+                if (_poolGlobal == null)
+                    _poolGlobal = ModuleCenter.CreateModule<F8PoolGlobal>();
+                return _poolGlobal;
             }
         }
 
@@ -99,7 +115,17 @@ namespace F8Framework.Core
                 return _asset;
             }
         }
-
+        
+        // public static F8DataManager Config
+        // {
+        //     get
+        //     {
+        //         if (_config == null)
+        //             _config = F8DataManager.Instance;
+        //         return _config;
+        //     }
+        // }
+        
         public static AudioManager Audio
         {
             get
@@ -152,19 +178,8 @@ namespace F8Framework.Core
         
         /* ------------------------可选模块------------------------ */
         
-        // // 读取配置表
-        // private static F8Framework.F8DataManager.F8DataManager _config;
-        //
-        // public static F8LogHelper Config
-        // {
-        //     get
-        //     {
-        //         if (_config == null)
-        //             _config = ModuleCenter.CreateModule<F8Framework.F8DataManager.F8DataManager>();
-        //         return _config;
-        //     }
-        // }
         
+
     }
 }
 

@@ -11,7 +11,7 @@ namespace F8Framework.Core
         /// <returns>A particle system to despawn on complete.</returns>
         public static ParticleSystem DespawnOnComplete(this ParticleSystem particleSystem)
         {
-            FF8.GameObjectPool.Despawn(particleSystem.gameObject, particleSystem.main.duration);
+            GameObjectPool.Instance.Despawn(particleSystem.gameObject, particleSystem.main.duration);
             return particleSystem;
         }
     }

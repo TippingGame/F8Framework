@@ -13,7 +13,7 @@ using System.IO;
 using F8Framework.F8ExcelDataClass;
 using F8Framework.Core;
 
-namespace F8Framework.F8DataManager
+namespace F8Framework.ConfigData
 {
 	public class F8DataManager : Singleton<F8DataManager>
 	{
@@ -25,7 +25,7 @@ namespace F8Framework.F8DataManager
 		{
 			Sheet1Item t = null;
 			p_Sheet1.Dict.TryGetValue(id, out t);
-			if (t == null) LogF8.LogError("can't find the id " + id + " in Sheet1");
+			if (t == null) LogF8.LogError("找不到id： " + id + " ，配置表： Sheet1");
 			return t;
 		}
 
@@ -38,7 +38,7 @@ namespace F8Framework.F8DataManager
 		{
 			Sheet2Item t = null;
 			p_Sheet2.Dict.TryGetValue(id, out t);
-			if (t == null) LogF8.LogError("can't find the id " + id + " in Sheet2");
+			if (t == null) LogF8.LogError("找不到id： " + id + " ，配置表： Sheet2");
 			return t;
 		}
 
@@ -51,7 +51,7 @@ namespace F8Framework.F8DataManager
 		{
 			LocalizedStringsItem t = null;
 			p_LocalizedStrings.Dict.TryGetValue(id, out t);
-			if (t == null) LogF8.LogError("can't find the id " + id + " in LocalizedStrings");
+			if (t == null) LogF8.LogError("找不到id： " + id + " ，配置表： LocalizedStrings");
 			return t;
 		}
 
@@ -79,6 +79,14 @@ namespace F8Framework.F8DataManager
 			yield return LoadAsync("Sheet1", result => p_Sheet1 = result as Sheet1);
 			yield return LoadAsync("Sheet2", result => p_Sheet2 = result as Sheet2);
 			yield return LoadAsync("LocalizedStrings", result => p_LocalizedStrings = result as LocalizedStrings);
+		}
+
+		public IEnumerator LoadAllAsync(Action onLoadComplete)
+		{
+			yield return LoadAsync("Sheet1", result => p_Sheet1 = result as Sheet1);
+			yield return LoadAsync("Sheet2", result => p_Sheet2 = result as Sheet2);
+			yield return LoadAsync("LocalizedStrings", result => p_LocalizedStrings = result as LocalizedStrings);
+			onLoadComplete?.Invoke();
 		}
 
 		private System.Object Load(string name)

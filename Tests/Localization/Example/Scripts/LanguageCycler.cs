@@ -14,8 +14,10 @@ public class LanguageCycler : MonoBehaviour
 		FF8.Timer.ToString();
 		FF8.Procedure.ToString();
 		FF8.FSM.ToString();
-		FF8.Pool.ToString();
+		FF8.GameObjectPool.ToString();
+		FF8.PoolGlobal.ToString();
 		FF8.Asset.ToString();
+		// FF8.Config.ToString();
 		FF8.Audio.ToString();
 		FF8.Tween.ToString();
 		FF8.UI.ToString();

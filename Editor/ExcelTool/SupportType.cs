@@ -203,7 +203,7 @@ namespace F8Framework.Core.Editor
             source.Append("using System.IO;\n");
             source.Append("using " + ExcelDataTool.CODE_NAMESPACE + ";\n");
             source.Append("using F8Framework.Core;\n\n");
-            source.Append("namespace F8Framework.F8DataManager\n");
+            source.Append("namespace F8Framework.ConfigData\n");
             source.Append("{\n");
             source.Append("\tpublic class F8DataManager : Singleton<F8DataManager>\n");
             source.Append("\t{\n");
@@ -230,9 +230,9 @@ namespace F8Framework.Core.Editor
                 source.Append("\t\t{\n");
                 source.Append("\t\t\t" + typeName + " t = null;\n");
                 source.Append("\t\t\tp_" + t.Name + ".Dict.TryGetValue(id, out t);\n");
-                source.Append("\t\t\tif (t == null) LogF8.LogError(" + '"' + "can't find the id " + '"' + " + id " +
+                source.Append("\t\t\tif (t == null) LogF8.LogError(" + '"' + "找不到id： " + '"' + " + id " +
                               "+ " +
-                              '"' + " in " + t.Name + '"' + ");\n");
+                              '"' + " ，配置表： " + t.Name + '"' + ");\n");
                 source.Append("\t\t\treturn t;\n");
                 source.Append("\t\t}\n\n");
 
@@ -270,6 +270,16 @@ namespace F8Framework.Core.Editor
                 source.Append("\t\t\tyield return LoadAsync("+ '"' + t.Name + '"' + ", result => " +  "p_" + t.Name + " = result" + " as " + t.Name + ");\n");
             }
 
+            source.Append("\t\t}\n\n");
+            
+            //异步加载所有配置表
+            source.Append("\t\tpublic IEnumerator LoadAllAsync(Action onLoadComplete)\n");
+            source.Append("\t\t{\n");
+            foreach (Type t in types)
+            {
+                source.Append("\t\t\tyield return LoadAsync("+ '"' + t.Name + '"' + ", result => " +  "p_" + t.Name + " = result" + " as " + t.Name + ");\n");
+            }
+            source.Append("\t\t\tonLoadComplete?.Invoke();\n");
             source.Append("\t\t}\n\n");
             
             //反序列化

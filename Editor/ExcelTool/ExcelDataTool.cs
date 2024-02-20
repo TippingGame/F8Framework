@@ -48,12 +48,12 @@ namespace F8Framework.Core.Editor
         private static void CreateAsmdefFile()
         {
             // 创建.asmdef文件的路径
-            string asmdefPath = Application.dataPath + DataManagerFolder + "/F8Framework.F8DataManager.asmdef";
+            string asmdefPath = Application.dataPath + DataManagerFolder + "/F8Framework.ConfigData.asmdef";
             
             FileTools.CheckFileAndCreateDirWhenNeeded(asmdefPath);
             // 创建一个新的.asmdef文件
             string asmdefContent = @"{
-    ""name"": ""F8Framework.F8DataManager"",
+    ""name"": ""F8Framework.ConfigData"",
     ""references"": [""F8Framework.Core""],
     ""includePlatforms"": [],
     ""excludePlatforms"": [],

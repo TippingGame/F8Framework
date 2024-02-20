@@ -155,7 +155,7 @@ namespace F8Framework.Core.Editor
                 string[] allPaths = filePaths.Concat(folderPaths).ToArray();
                 
                 List<string> tempNames = new List<string>();
-                Dictionary<string, string> tempNamesDirectory = new Dictionary<string, string>();
+                Dictionary<string, List<string>> tempNamesDirectory = new Dictionary<string, List<string>>();
                 
                 // 创建文本文件
                 StringBuilder codeStr = new StringBuilder(
@@ -213,18 +213,36 @@ namespace F8Framework.Core.Editor
                         }
                         tempNames.Add(fileNameWithoutExtension);
 
-                        codeStr.Append(string.Format("          {{\"{0}\", new AssetMapping(\"{1}\", new []{{\"{2}\"}})}},\n", fileNameWithoutExtension, abName.ToLower(), assetPath));
-                        
                         // 修改同一AB名的assetPath
-                        if (!tempNamesDirectory.ContainsKey(fileNameWithoutExtension))
+                        List<string> assetPathsForAbName;
+                        string _temp = null;
+                        if (!tempNamesDirectory.TryGetValue(abName.ToLower(), out assetPathsForAbName))
                         {
-                            tempNamesDirectory.TryAdd(fileNameWithoutExtension, assetPath);
+                            // 如果该 AssetBundle 名称还没有对应的资源路径列表，就创建一个新的列表
+                            assetPathsForAbName = new List<string>();
+                            tempNamesDirectory.Add(abName.ToLower(), assetPathsForAbName);
                         }
                         else
                         {
-                            codeStr.Replace(tempNamesDirectory[fileNameWithoutExtension], tempNamesDirectory[fileNameWithoutExtension] + ", " + assetPath);
-                            tempNamesDirectory[fileNameWithoutExtension] = tempNamesDirectory[fileNameWithoutExtension] + ", " + assetPath;
+                            _temp = string.Join(", ", assetPathsForAbName.Select(p => "\"" + p + "\""));
                         }
+                        
+                        // 将当前资源路径添加到列表中，但是只添加一次，确保每个资源路径只出现一次
+                        if (!assetPathsForAbName.Contains(assetPath))
+                        {
+                            assetPathsForAbName.Add(assetPath);
+                        }
+                        
+                        if (_temp != null)
+                        {
+                            codeStr.Replace(_temp, string.Join(", ", assetPathsForAbName.Select(p => "\"" + p + "\"")));
+                        }
+
+                        string mappingLine = string.Format("          {{\"{0}\", new AssetMapping(\"{1}\", new []{{", fileNameWithoutExtension, abName.ToLower());
+                        mappingLine += string.Join(", ", assetPathsForAbName.Select(p => "\"" + p + "\"")); // 添加所有资源路径
+                        mappingLine += "})},\n";
+
+                        codeStr.Append(mappingLine);
                     }
                     else if (Directory.Exists(filePath)) // 文件夹
                     {
