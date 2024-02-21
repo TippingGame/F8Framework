@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using F8Framework.Core;
 
     #ROOTNAMESPACEBEGIN#
-public partial class #SCRIPTNAME# : BaseView
+public class #SCRIPTNAME# : BaseView
 {
     // Awake
     protected override void OnAwake()
@@ -13,7 +14,7 @@ public partial class #SCRIPTNAME# : BaseView
     }
     
     // 参数传入
-    protected override void OnAdded(object[] args, int uiId)
+    protected override void OnAdded(int uiId, object[] args = null)
     {
         #NOTRIM#
     }
@@ -52,14 +53,8 @@ public partial class #SCRIPTNAME# : BaseView
     {
         #NOTRIM#
     }
-}
-#ROOTNAMESPACEEND#
-
-// 自动获取组件
-public partial class #SCRIPTNAME#
-{
-    // Auto Bind Components
     
-    // Auto Bind Components
+    // 自动获取组件（自动生成，不能删除）
+    
+    // 自动获取组件（自动生成，不能删除）
 }
-// 自动获取组件

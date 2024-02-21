@@ -75,16 +75,25 @@ namespace F8Framework.Core
             foreach (var component in gameObject.GetComponents<BaseView>())
             {
                 var methodInfo = component.GetType().GetMethod(functionName);
-                if (methodInfo != null)
+                if (methodInfo == null)
+                {
+                    continue;
+                }
+
+                if (functionName == "Added")
                 {
                     if (parameters == null)
                     {
-                        methodInfo.Invoke(component, null);
+                        methodInfo.Invoke(component, new object[] { uiId, null });
                     }
                     else
                     {
                         methodInfo.Invoke(component, new object[] { parameters, uiId });
                     }
+                }
+                else
+                {
+                    methodInfo.Invoke(component, null);
                 }
             }
         }

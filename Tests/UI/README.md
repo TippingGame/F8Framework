@@ -50,16 +50,7 @@ UI界面分为三大类：
         
         /*----------------------------如何使用模板----------------------------*/
         
-        // 自动获取组件
-        public partial class UIMain
-        {
-            // Auto Bind Components
-            
-            // Auto Bind Components
-        }
-        // 自动获取组件
-        
-        public partial class UIMain : BaseView
+        public class UIMain : BaseView
         {
             protected override void OnAwake()
             {
@@ -102,6 +93,10 @@ UI界面分为三大类：
             {
                 // 删除
             }
+            
+            // 自动获取组件（自动生成，不能删除）
+    
+            // 自动获取组件（自动生成，不能删除）
         }
 ```
 

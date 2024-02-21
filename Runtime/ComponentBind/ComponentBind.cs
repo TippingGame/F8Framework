@@ -51,6 +51,8 @@ namespace F8Framework.Core
                     transforms.Enqueue(child);
                 }
             }
+            
+            System.Collections.Generic.Dictionary<string, int> tempDic = new System.Collections.Generic.Dictionary<string, int>();
             // 遍历Prefab中的所有物体
             foreach (Transform child in childs)
             {
@@ -83,6 +85,14 @@ namespace F8Framework.Core
                         string normalizeName = RemoveSpecialCharacters(child.gameObject.name);
 
                         string normalizeKey = RemoveSpecialCharacters(key);
+
+                        if (!tempDic.TryAdd($"{normalizeName}_{normalizeKey}", 1))
+                        {
+                            tempDic[$"{normalizeName}_{normalizeKey}"] += 1;
+                            normalizeKey += _division + tempDic[$"{normalizeName}_{normalizeKey}"];
+                            LogF8.LogView("重名物体已修改为：" + normalizeKey);
+                        }
+                        
                         // 生成自动获取组件的代码
                         generatedCode.AppendLine($"    [SerializeField] private {componentType} {normalizeName}_{normalizeKey};");
                         // 生成引用代码
@@ -103,7 +113,7 @@ namespace F8Framework.Core
             string scriptContent = System.IO.File.ReadAllText(scriptPath);
 
             // 使用正则表达式匹配并替换注释之间的内容
-            string pattern = @"// Auto Bind Components(.*?)// Auto Bind Components";
+            string pattern = @"// 自动获取组件（自动生成，不能删除）(.*?)// 自动获取组件（自动生成，不能删除）";
             System.Text.RegularExpressions.Regex regex = new System.Text.RegularExpressions.Regex(pattern, System.Text.RegularExpressions.RegexOptions.Singleline);
             System.Text.RegularExpressions.Match match = regex.Match(scriptContent);
 
@@ -111,14 +121,14 @@ namespace F8Framework.Core
             {
                 // 替换注释之间的内容，包含头尾的注释
                 scriptContent = scriptContent.Remove(match.Groups[0].Index, match.Groups[0].Length);
-                scriptContent = scriptContent.Insert(match.Groups[0].Index, $"// Auto Bind Components\n{generatedCode}" +
+                scriptContent = scriptContent.Insert(match.Groups[0].Index, $"// 自动获取组件（自动生成，不能删除）\n{generatedCode}" +
                                                                             $"\n#if UNITY_EDITOR" +
                                                                             $"\n    protected override void SetComponents()" +
                                                                             $"\n    {{" +
                                                                             $"\n{referenceCode}" +
-                                                                            $"\n    }}" +
+                                                                            $"    }}" +
                                                                             $"\n#endif" +
-                                                                            $"\n    // Auto Bind Components");
+                                                                            $"\n    // 自动获取组件（自动生成，不能删除）");
                 
                 // 将所有换行符替换为 UNIX 风格的 "\n"
                 scriptContent = scriptContent.Replace("\r\n", "\n").Replace("\r", "\n");
@@ -134,7 +144,7 @@ namespace F8Framework.Core
             }
             else
             {
-                LogF8.Log("在脚本中找不到插入标记。请在要生成代码的位置添加“// Auto Bind Components”。");
+                LogF8.Log("在脚本中找不到插入标记。请在要生成代码的位置添加“// 自动获取组件（自动生成，不能删除）”。");
             }
         }
         

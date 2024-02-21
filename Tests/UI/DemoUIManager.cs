@@ -29,25 +29,16 @@ public class DemoUIManager : MonoBehaviour
         FF8.UI.Clear(true);
     }
 }
+
 // 提供UI界面基类，BaseView
-
-// 自动获取组件
-public partial class UIMain
-{
-    // Auto Bind Components
-    
-    // Auto Bind Components
-}
-// 自动获取组件
-
-public partial class UIMain : BaseView
+public class UIMain : BaseView
 {
     protected override void OnAwake()
     {
         // Awake
     }
         
-    protected override void OnAdded(object[] args, int uiId)
+    protected override void OnAdded(int uiId, object[] args = null)
     {
         // 参数传入
     }
@@ -83,4 +74,8 @@ public partial class UIMain : BaseView
     {
         // 删除
     }
+    
+    // 自动获取组件（自动生成，不能删除）
+    
+    // 自动获取组件（自动生成，不能删除）
 }

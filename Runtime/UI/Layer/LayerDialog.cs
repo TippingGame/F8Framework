@@ -57,7 +57,7 @@ namespace F8Framework.Core
             }
 
             viewParams.Callbacks = callbacks ?? new UICallbacks();
-            UICallbacks.NodeEventDelegate onRemoveSource = viewParams.Callbacks.OnRemoved;
+            UICallbacks.OnAddedEventDelegate onRemoveSource = viewParams.Callbacks.OnRemoved;
             
             viewParams.Callbacks.OnRemoved = (param, id) =>
             {

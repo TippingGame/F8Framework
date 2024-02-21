@@ -37,7 +37,7 @@ namespace F8Framework.Core
 #if UNITY_EDITOR || UNITY_STANDALONE
         string INPUT_PATH = URLSetting.CS_STREAMINGASSETS_URL + ExcelPath;
 #elif UNITY_ANDROID
-        string INPUT_PATH = Application.persistentDataPath + "/" + ExcelPath;
+        string INPUT_PATH = UnityEngine.Application.persistentDataPath + "/" + ExcelPath;
 #elif UNITY_IPHONE || UNITY_IOS
         string INPUT_PATH = URLSetting.CS_STREAMINGASSETS_URL + ExcelPath;
 #else

@@ -5,15 +5,15 @@ namespace F8Framework.Core
 {
     public class UICallbacks
     {
-        public delegate void NodeEventDelegate(object[] parameters, int uiId);
-
-        public NodeEventDelegate OnAdded;
-        public NodeEventDelegate OnRemoved;
+        public delegate void OnAddedEventDelegate(object[] parameters, int uiId);
+        
+        public OnAddedEventDelegate OnAdded;
+        public OnAddedEventDelegate OnRemoved;
         public Action<Action> OnBeforeRemove;
 
         public UICallbacks(
-            NodeEventDelegate onAdded = null,
-            NodeEventDelegate onRemoved = null,
+            OnAddedEventDelegate onAdded = null,
+            OnAddedEventDelegate onRemoved = null,
             Action<Action> onBeforeRemove = null)
         {
             OnAdded = onAdded;

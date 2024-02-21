@@ -41,17 +41,17 @@ namespace F8Framework.Core
         {
         }
 
-        public void Added(object[] args, int uiId)
+        public void Added(int uiId, object[] args = null)
         {
             this.Args = args;
             this.UIid = uiId;
-            OnAdded(args, uiId);
+            OnAdded(uiId, args);
             windowState = WindowState.Animating;
             OnViewTweenInit();
             OnPlayViewTween();
         }
 
-        protected virtual void OnAdded(object[] args, int uiId)
+        protected virtual void OnAdded(int uiId, object[] args = null)
         {
         }
 
