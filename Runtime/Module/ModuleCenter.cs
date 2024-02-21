@@ -21,9 +21,11 @@ namespace F8Framework.Core
 
 		private static readonly List<ModuleWrapper> _coms = new List<ModuleWrapper>(100);
 		private static readonly List<ModuleWrapper> _comsUpdate = new List<ModuleWrapper>(100);
+		private static readonly List<ModuleWrapper> _comsLateUpdate = new List<ModuleWrapper>(100);
 		private static readonly List<ModuleWrapper> _comsFixedUpdate = new List<ModuleWrapper>(100);
 		private static MonoBehaviour _behaviour;
 		private static bool _isDirty = false;
+		private static bool _isDirtyLate = false;
 		private static bool _isDirtyFixed = false;
 		private static long _frame = 0;
 
@@ -84,11 +86,33 @@ namespace F8Framework.Core
 			{
 				_comsUpdate[i]?.Module.OnUpdate();
 			}
-			
-			// 轮询所有模块
-			for (int i = 0; i < _comsUpdate.Count; i++)
+		}
+		
+		/// <summary>
+		/// 更新框架
+		/// </summary>
+		public static void LateUpdate()
+		{
+			// 如果有新模块需要重新排序
+			if (_isDirtyLate)
 			{
-				_comsUpdate[i]?.Module.OnLateUpdate();
+				_isDirtyLate = false;
+				
+				_comsLateUpdate.Sort((left, right) =>
+				{
+					if (left.Priority < right.Priority)
+						return -1;
+					else if (left.Priority == right.Priority)
+						return 0;
+					else
+						return 1;
+				});
+			}
+
+			// 轮询所有模块
+			for (int i = 0; i < _comsLateUpdate.Count; i++)
+			{
+				_comsLateUpdate[i]?.Module.OnLateUpdate();
 			}
 		}
 		
@@ -211,6 +235,11 @@ namespace F8Framework.Core
 				_comsUpdate.Add(wrapper);
 				_isDirty = true;
 			}
+			if (typeof(T).GetCustomAttributes(typeof(LateUpdateRefreshAttribute), false).Length > 0)
+			{
+				_comsLateUpdate.Add(wrapper);
+				_isDirtyLate = true;
+			}
 			if (typeof(T).GetCustomAttributes(typeof(FixedUpdateRefreshAttribute), false).Length > 0)
 			{
 				_comsFixedUpdate.Add(wrapper);
@@ -232,6 +261,15 @@ namespace F8Framework.Core
 				{
 					_comsUpdate[i].Module.OnTermination();
 					_comsUpdate.RemoveAt(i);
+				}
+			}
+			
+			for (int i = 0; i < _comsLateUpdate.Count; i++)
+			{
+				if (_comsLateUpdate[i].Module.GetType() == moduleType)
+				{
+					_comsLateUpdate[i].Module.OnTermination();
+					_comsLateUpdate.RemoveAt(i);
 				}
 			}
 			

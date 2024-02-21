@@ -30,13 +30,13 @@ namespace F8Framework.Core
 			Definition definition = StorageManager.Instance.GetObject<Definition>(LocalizationConst.CurrentLanguageKey, true);
 			if (definition == null)
 			{
-				Localizer.CurrentLanguageName = Application.systemLanguage.ToString();
+				Localization.CurrentLanguageName = Application.systemLanguage.ToString();
 			}
 			else
 			{
-				Localizer.CurrentLanguageName = definition.currentLanguageName;
+				Localization.CurrentLanguageName = definition.currentLanguageName;
 			}
-			return Localizer.CurrentLanguageName;
+			return Localization.CurrentLanguageName;
 #endif
 		}
 
@@ -47,7 +47,7 @@ namespace F8Framework.Core
 			var json = JsonUtility.ToJson(definition);
 			EditorPrefs.SetString(LocalizationConst.CurrentLanguageKey, json);
 #else
-			var definition = new Definition { currentLanguageName = Localizer.CurrentLanguageName };
+			var definition = new Definition { currentLanguageName = Localization.CurrentLanguageName };
 			StorageManager.Instance.SetObject<Definition>(LocalizationConst.CurrentLanguageKey, definition, true);
 #endif
 		}

@@ -85,7 +85,7 @@ namespace F8Framework.Core
                         {
                             // 如果字段的值为 null，你可以选择添加一个默认值，或者进行其他处理
                             list.Add("");
-                            LogF8.LogConfig($"字段：\"<b>{item.TextID}</b>\" 的值为空");
+                            LogF8.LogConfig($"本地化表字段：\"<b>{item.TextID}</b>\" 的值为空");
                         }
                     }
                 }
