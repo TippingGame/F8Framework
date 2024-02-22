@@ -89,8 +89,8 @@ namespace F8Framework.Core
                         if (!tempDic.TryAdd($"{normalizeName}_{normalizeKey}", 1))
                         {
                             tempDic[$"{normalizeName}_{normalizeKey}"] += 1;
+                            LogF8.LogView("有重名物体：" + normalizeKey);
                             normalizeKey += _division + tempDic[$"{normalizeName}_{normalizeKey}"];
-                            LogF8.LogView("重名物体已修改为：" + normalizeKey);
                         }
                         
                         // 生成自动获取组件的代码

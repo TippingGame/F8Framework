@@ -10,67 +10,67 @@ namespace F8Framework.Core
 {
     public class GameObjectPool : ModuleSingleton<GameObjectPool>, IModule
     {
-        internal static readonly Dictionary<GameObject, Poolable> ClonesMap =
+        internal readonly Dictionary<GameObject, Poolable> ClonesMap =
             new Dictionary<GameObject, Poolable>(Constants.DefaultClonesCapacity);
 
-        internal static readonly F8PoolList<DespawnRequest> DespawnRequests =
+        internal readonly F8PoolList<DespawnRequest> DespawnRequests =
             new F8PoolList<DespawnRequest>(Constants.DefaultDespawnRequestsCapacity);
 
-        internal static F8PoolMode s_f8PoolMode = Constants.DefaultF8PoolMode;
-        internal static bool s_hasTheF8PoolInitialized = false;
-        internal static bool s_isApplicationQuitting = false;
-        internal static bool s_despawnPersistentClonesOnDestroy = true;
-        internal static bool s_checkClonesForNull = true;
-        internal static bool s_checkForPrefab = true;
-        internal static F8PoolGlobal s_instance = null;
+        internal F8PoolMode s_f8PoolMode = Constants.DefaultF8PoolMode;
+        internal bool s_hasTheF8PoolInitialized = false;
+        internal bool s_isApplicationQuitting = false;
+        internal bool s_despawnPersistentClonesOnDestroy = true;
+        internal bool s_checkClonesForNull = true;
+        internal bool s_checkForPrefab = true;
+        internal F8PoolGlobal s_instance = null;
 
-        private static readonly Dictionary<GameObject, F8GameObjectPool> AllPoolsMap =
+        private readonly Dictionary<GameObject, F8GameObjectPool> AllPoolsMap =
             new Dictionary<GameObject, F8GameObjectPool>(Constants.DefaultPoolsMapCapacity);
 
-        private static readonly Dictionary<GameObject, F8GameObjectPool> PersistentPoolsMap =
+        private readonly Dictionary<GameObject, F8GameObjectPool> PersistentPoolsMap =
             new Dictionary<GameObject, F8GameObjectPool>(Constants.DefaultPersistentPoolsCapacity);
 
-        private static readonly List<ISpawnable> SpawnableItemComponents =
+        private readonly List<ISpawnable> SpawnableItemComponents =
             new List<ISpawnable>(Constants.DefaultPoolableInterfacesCapacity);
 
-        private static readonly List<IDespawnable> DespawnableItemComponents =
+        private readonly List<IDespawnable> DespawnableItemComponents =
             new List<IDespawnable>(Constants.DefaultPoolableInterfacesCapacity);
 
-        private static readonly object SecurityLock = new object();
+        private readonly object SecurityLock = new object();
 
-        private static BehaviourOnCapacityReached BehaviourOnCapacityReached => s_hasTheF8PoolInitialized
+        private BehaviourOnCapacityReached BehaviourOnCapacityReached => s_hasTheF8PoolInitialized
             ? s_instance._behaviourOnCapacityReached
             : Constants.DefaultBehaviourOnCapacityReached;
 
-        private static DespawnType DespawnType => s_hasTheF8PoolInitialized
+        private DespawnType DespawnType => s_hasTheF8PoolInitialized
             ? s_instance._despawnType
             : Constants.DefaultDespawnType;
 
-        private static CallbacksType CallbacksType => s_hasTheF8PoolInitialized
+        private CallbacksType CallbacksType => s_hasTheF8PoolInitialized
             ? s_instance._callbacksType
             : Constants.DefaultCallbacksType;
 
-        private static ReactionOnRepeatedDelayedDespawn ReactionOnRepeatedDelayedDespawn =>
+        private ReactionOnRepeatedDelayedDespawn ReactionOnRepeatedDelayedDespawn =>
             s_hasTheF8PoolInitialized
                 ? s_instance._reactionOnRepeatedDelayedDespawn
                 : Constants.DefaultDelayedDespawnHandleType;
 
-        private static int Capacity => s_hasTheF8PoolInitialized
+        private int Capacity => s_hasTheF8PoolInitialized
             ? s_instance._capacity
             : Constants.DefaultPoolCapacity;
 
-        private static bool Persistent => s_hasTheF8PoolInitialized
+        private bool Persistent => s_hasTheF8PoolInitialized
             ? s_instance._dontDestroyOnLoad
             : Constants.DefaultPoolPersistenceStatus;
 
-        private static bool Warnings => s_hasTheF8PoolInitialized
+        private bool Warnings => s_hasTheF8PoolInitialized
             ? s_instance._sendWarnings
             : Constants.DefaultSendWarningsStatus;
 
         /// <summary>
         /// The actions will be performed on a game object created in any pool.
         /// </summary>
-        public static readonly F8PoolEvent<GameObject> GameObjectInstantiated = new F8PoolEvent<GameObject>();
+        public readonly F8PoolEvent<GameObject> GameObjectInstantiated = new F8PoolEvent<GameObject>();
 
         /// <summary>
         /// Installs a pools by PoolPreset.

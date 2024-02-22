@@ -17,37 +17,37 @@ namespace F8Framework.Core
 			if (json == "")
 			{
 				// 根据系统语言设置
-				Localization.CurrentLanguageName = Application.systemLanguage.ToString();
+				Localization.Instance.CurrentLanguageName = Application.systemLanguage.ToString();
 				return Application.systemLanguage.ToString();
 			}
 			else
 			{
 				var definition = JsonUtility.FromJson<Definition>(json);
-				Localization.CurrentLanguageName = definition.currentLanguageName;
+				Localization.Instance.CurrentLanguageName = definition.currentLanguageName;
 				return definition.currentLanguageName;
 			}
 #else
 			Definition definition = StorageManager.Instance.GetObject<Definition>(LocalizationConst.CurrentLanguageKey, true);
 			if (definition == null)
 			{
-				Localization.CurrentLanguageName = Application.systemLanguage.ToString();
+				Localization.Instance.CurrentLanguageName = Application.systemLanguage.ToString();
 			}
 			else
 			{
-				Localization.CurrentLanguageName = definition.currentLanguageName;
+				Localization.Instance.CurrentLanguageName = definition.currentLanguageName;
 			}
-			return Localization.CurrentLanguageName;
+			return Localization.Instance.CurrentLanguageName;
 #endif
 		}
 
 		public static void SaveLanguageSettings()
 		{
 #if UNITY_EDITOR
-			var definition = new Definition { currentLanguageName = Localization.CurrentLanguageName };
+			var definition = new Definition { currentLanguageName = Localization.Instance.CurrentLanguageName };
 			var json = JsonUtility.ToJson(definition);
 			EditorPrefs.SetString(LocalizationConst.CurrentLanguageKey, json);
 #else
-			var definition = new Definition { currentLanguageName = Localization.CurrentLanguageName };
+			var definition = new Definition { currentLanguageName = Localization.Instance.CurrentLanguageName };
 			StorageManager.Instance.SetObject<Definition>(LocalizationConst.CurrentLanguageKey, definition, true);
 #endif
 		}

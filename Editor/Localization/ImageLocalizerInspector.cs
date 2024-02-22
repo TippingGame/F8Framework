@@ -20,10 +20,10 @@ namespace F8Framework.Core
 		{
 			// base.OnInspectorGUI();
 
-			Localization.Load();
+			Localization.Instance.Load();
 			serializedObject.Update();
 
-			var langCount = Localization.LanguageList.Count;
+			var langCount = Localization.Instance.LanguageList.Count;
 
 			var component = ComponentFinder.Find<Image, RawImage, SpriteRenderer, Renderer>(localizer);
 			
@@ -67,7 +67,7 @@ namespace F8Framework.Core
 
 			for (var i = 0; i < langCount; i++)
 			{
-				var tex = EditorGUILayout.ObjectField(Localization.LanguageList[i], localizer.texture2Ds[i], typeof(Texture2D), false) as Texture2D;
+				var tex = EditorGUILayout.ObjectField(Localization.Instance.LanguageList[i], localizer.texture2Ds[i], typeof(Texture2D), false) as Texture2D;
 				if (localizer.texture2Ds[i] != tex)
 				{
 					localizer.texture2Ds[i] = tex;
@@ -94,7 +94,7 @@ namespace F8Framework.Core
 
 			for (var i = 0; i < langCount; i++)
 			{
-				var tex = EditorGUILayout.ObjectField(Localization.LanguageList[i], localizer.textures[i], typeof(Texture), false) as Texture;
+				var tex = EditorGUILayout.ObjectField(Localization.Instance.LanguageList[i], localizer.textures[i], typeof(Texture), false) as Texture;
 				if (localizer.textures[i] != tex)
 				{
 					localizer.textures[i] = tex;
@@ -121,7 +121,7 @@ namespace F8Framework.Core
 
 			for (var i = 0; i < langCount; i++)
 			{
-				var sprite = EditorGUILayout.ObjectField(Localization.LanguageList[i], localizer.sprites[i], typeof(Sprite), false) as Sprite;
+				var sprite = EditorGUILayout.ObjectField(Localization.Instance.LanguageList[i], localizer.sprites[i], typeof(Sprite), false) as Sprite;
 				if (localizer.sprites[i] != sprite)
 				{
 					localizer.sprites[i] = sprite;

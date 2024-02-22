@@ -63,10 +63,10 @@ namespace F8Framework.Core
         {
             if (Application.isPlaying)
             {
-                GameObjectPool.s_f8PoolMode = _f8PoolMode;
-                GameObjectPool.s_checkForPrefab = _checkForPrefab;
-                GameObjectPool.s_checkClonesForNull = _checkClonesForNull;
-                GameObjectPool.s_despawnPersistentClonesOnDestroy = _despawnPersistentClonesOnDestroy;
+                GameObjectPool.Instance.s_f8PoolMode = _f8PoolMode;
+                GameObjectPool.Instance.s_checkForPrefab = _checkForPrefab;
+                GameObjectPool.Instance.s_checkClonesForNull = _checkClonesForNull;
+                GameObjectPool.Instance.s_despawnPersistentClonesOnDestroy = _despawnPersistentClonesOnDestroy;
             }
         }
 #endif
@@ -105,9 +105,9 @@ namespace F8Framework.Core
         {
             GameObjectPool.Instance.ResetPool();
 
-            if (_clearEventsOnDestroy || GameObjectPool.s_isApplicationQuitting)
+            if (_clearEventsOnDestroy || GameObjectPool.Instance.s_isApplicationQuitting)
             {
-                GameObjectPool.GameObjectInstantiated.Clear();
+                FF8.GameObjectPool.GameObjectInstantiated.Clear();
             }
             
             Destroy(gameObject);
@@ -120,26 +120,26 @@ namespace F8Framework.Core
 
         private void OnApplicationQuit()
         {
-            GameObjectPool.s_isApplicationQuitting = true;
+            GameObjectPool.Instance.s_isApplicationQuitting = true;
         }
 
         private void Initialize()
         {
 #if DEBUG
-            if (GameObjectPool.s_instance != null && GameObjectPool.s_instance != this)
+            if (GameObjectPool.Instance.s_instance != null && GameObjectPool.Instance.s_instance != this)
                 LogF8.LogError($"场景中的 {nameof(GameObjectPool)} 实例数量大于一个！");
 
             if (enabled == false)
                 LogF8.LogEntity($"<{nameof(F8PoolGlobal)}> 实例已禁用！" +
                                 "因此，某些功能可能无法正常工作！", this);
 #endif
-            GameObjectPool.s_isApplicationQuitting = false;
-            GameObjectPool.s_instance = this;
-            GameObjectPool.s_hasTheF8PoolInitialized = true;
-            GameObjectPool.s_f8PoolMode = _f8PoolMode;
-            GameObjectPool.s_checkForPrefab = _checkForPrefab;
-            GameObjectPool.s_checkClonesForNull = _checkClonesForNull;
-            GameObjectPool.s_despawnPersistentClonesOnDestroy = _despawnPersistentClonesOnDestroy;
+            GameObjectPool.Instance.s_isApplicationQuitting = false;
+            GameObjectPool.Instance.s_instance = this;
+            GameObjectPool.Instance.s_hasTheF8PoolInitialized = true;
+            GameObjectPool.Instance.s_f8PoolMode = _f8PoolMode;
+            GameObjectPool.Instance.s_checkForPrefab = _checkForPrefab;
+            GameObjectPool.Instance.s_checkClonesForNull = _checkClonesForNull;
+            GameObjectPool.Instance.s_despawnPersistentClonesOnDestroy = _despawnPersistentClonesOnDestroy;
         }
 
         private void PreloadPools(PreloadType requiredType)
@@ -152,13 +152,13 @@ namespace F8Framework.Core
 
         private void HandleDespawnRequests(float deltaTime)
         {
-            for (int i = 0; i < GameObjectPool.DespawnRequests._count; i++)
+            for (int i = 0; i < GameObjectPool.Instance.DespawnRequests._count; i++)
             {
-                ref DespawnRequest request = ref GameObjectPool.DespawnRequests._components[i];
+                ref DespawnRequest request = ref GameObjectPool.Instance.DespawnRequests._components[i];
 
                 if (request.Poolable._status == PoolableStatus.Despawned)
                 {
-                    GameObjectPool.DespawnRequests.RemoveUnorderedAt(i);
+                    GameObjectPool.Instance.DespawnRequests.RemoveUnorderedAt(i);
                     continue;
                 }
                 
@@ -167,7 +167,7 @@ namespace F8Framework.Core
                 if (request.TimeToDespawn <= 0f)
                 {
                     GameObjectPool.Instance.DespawnImmediate(request.Poolable);
-                    GameObjectPool.DespawnRequests.RemoveUnorderedAt(i);
+                    GameObjectPool.Instance.DespawnRequests.RemoveUnorderedAt(i);
                 }
             }
         }

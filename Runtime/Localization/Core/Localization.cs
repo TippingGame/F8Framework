@@ -11,15 +11,15 @@ namespace F8Framework.Core
     public class Localization : ModuleSingleton<Localization>, IModule
     {
         // 本地化器列表
-        static readonly List<LocalizerBase> Localizers = new List<LocalizerBase>();
+        readonly List<LocalizerBase> Localizers = new List<LocalizerBase>();
         // 语言列表
-        public static List<string> LanguageList { get; private set; } = new List<string>();
+        public List<string> LanguageList { get; private set; } = new List<string>();
         // 本地化字符串字典
-        static readonly Dictionary<string, List<string>> LocalizedStrings = new Dictionary<string, List<string>>();
+        readonly Dictionary<string, List<string>> LocalizedStrings = new Dictionary<string, List<string>>();
         // 当前语言名称
-        public static string CurrentLanguageName { get; set; }
+        public string CurrentLanguageName { get; set; }
         // 当前语言索引
-        public static int CurrentLanguageIndex => GetLanguageIndex(CurrentLanguageName);
+        public int CurrentLanguageIndex => GetLanguageIndex(CurrentLanguageName);
 
         private LocalizedStrings p_LocalizedStrings;
         public void OnInit(object createParam)
@@ -30,7 +30,7 @@ namespace F8Framework.Core
         /// <summary>
         /// 加载本地化字符串到内存。
         /// </summary>
-        public static void Load(bool force = false)
+        public void Load(bool force = false)
         {
             if (LocalizedStrings.Count > 0 && force == false)
             {
@@ -105,7 +105,7 @@ namespace F8Framework.Core
         /// 更改当前语言。
         /// </summary>
         /// <param name="languageName">例如："日语"，"英语"</param>
-        public static void ChangeLanguage(string languageName)
+        public void ChangeLanguage(string languageName)
         {
             var languageIndex = 0;
             if (languageName != "")
@@ -121,7 +121,7 @@ namespace F8Framework.Core
         /// 激活上一个语言。
         /// </summary>
         /// <returns>激活的语言名称</returns>
-        public static string ActivatePreviousLanguage()
+        public string ActivatePreviousLanguage()
         {
             var prevIndex = (int)Mathf.Repeat(CurrentLanguageIndex - 1, LanguageList.Count);
             ChangeLanguage(LanguageList[prevIndex]);
@@ -133,7 +133,7 @@ namespace F8Framework.Core
         /// 激活下一个语言。
         /// </summary>
         /// <returns>激活的语言名称</returns>
-        public static string ActivateNextLanguage()
+        public string ActivateNextLanguage()
         {
             var nextIndex = (int)Mathf.Repeat(CurrentLanguageIndex + 1, LanguageList.Count);
             ChangeLanguage(LanguageList[nextIndex]);
@@ -142,7 +142,7 @@ namespace F8Framework.Core
         }
 
         // 获取语言索引
-        static int GetLanguageIndex(string languageName)
+        int GetLanguageIndex(string languageName)
         {
             var i = LanguageList.FindIndex(s => s.Contains(languageName));
             if (i == -1) LogF8.LogError($"不可用的语言名称: {languageName}");
@@ -150,13 +150,13 @@ namespace F8Framework.Core
         }
 
         // 添加本地化器
-        public static void AddLocalizer(LocalizerBase localizer)
+        public void AddLocalizer(LocalizerBase localizer)
         {
             Localizers.Add(localizer);
         }
 
         // 移除本地化器
-        public static void RemoveLocalizer(LocalizerBase localizer)
+        public void RemoveLocalizer(LocalizerBase localizer)
         {
             Localizers.Remove(localizer);
         }
@@ -164,7 +164,7 @@ namespace F8Framework.Core
         /// <summary>
         /// 重新注入所有注入器的字符串。
         /// </summary>
-        public static void InjectAll()
+        public void InjectAll()
         {
             foreach (var localizer in Localizers) localizer.Localize();
         }
@@ -174,7 +174,7 @@ namespace F8Framework.Core
         /// </summary>
         /// <param name="id">文本 ID</param>
         /// <returns></returns>
-        public static bool Has(string id)
+        public bool Has(string id)
         {
             return LocalizedStrings.ContainsKey(id);
         }
@@ -185,7 +185,7 @@ namespace F8Framework.Core
         /// <param name="id">文本 ID</param>
         /// <param name="p">Format</param>
         /// <returns>本地化文本</returns>
-        public static string GetTextFromId(string id, params object[] p)
+        public string GetTextFromId(string id, params object[] p)
         {
             return GetTextFromIdLanguage(id, CurrentLanguageName, p);
         }
@@ -197,7 +197,7 @@ namespace F8Framework.Core
         /// <param name="languageName">语言名称</param>
         /// <param name="p">Format</param>
         /// <returns>本地化文本</returns>
-        public static string GetTextFromIdLanguage(string id, string languageName, params object[] p)
+        public string GetTextFromIdLanguage(string id, string languageName, params object[] p)
         {
             if (!LocalizedStrings.ContainsKey(id)) return null;
             var languageIndex = GetLanguageIndex(languageName);
@@ -213,7 +213,7 @@ namespace F8Framework.Core
         /// </summary>
         /// <param name="id">文本 ID</param>
         /// <returns>包含本地化字符串的字典</returns>
-        public static Dictionary<string, string> GetDictionaryFromId(string id)
+        public Dictionary<string, string> GetDictionaryFromId(string id)
         {
             if (!LocalizedStrings.ContainsKey(id)) return null;
 
@@ -229,7 +229,7 @@ namespace F8Framework.Core
         }
 
         // 获取所有 ID 列表
-        public static List<string> GetAllIds()
+        public List<string> GetAllIds()
         {
             return LocalizedStrings.Keys.ToList();
         }

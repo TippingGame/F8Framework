@@ -156,7 +156,7 @@ namespace F8Framework.Core
             }
         }
 
-        public static Localization Localization
+        public static Localization Local
         {
             get
             {

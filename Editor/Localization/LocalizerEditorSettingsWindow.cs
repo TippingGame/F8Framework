@@ -46,11 +46,11 @@ namespace F8Framework.Core
 			index = EditorGUILayout.Popup(index, options);
 			if (options[index] != LocalizationSettings.LoadLanguageSettings())
 			{
-				Localization.CurrentLanguageName = options[index];
+				Localization.Instance.CurrentLanguageName = options[index];
 				LocalizationSettings.SaveLanguageSettings();
 				if (Application.isPlaying)
 				{
-					Localization.InjectAll();
+					Localization.Instance.InjectAll();
 				}
 			}
 

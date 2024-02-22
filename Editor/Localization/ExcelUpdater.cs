@@ -38,7 +38,7 @@ namespace F8Framework.Core.Editor
         {
             if (curChangeEventArgs != null)
             {
-                Localization.Load(true);
+                Localization.Instance.Load(true);
                 curChangeEventArgs = null;
             }
         }

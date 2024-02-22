@@ -9,33 +9,33 @@ namespace F8Framework.Core
     
     public interface IEventData : IEventDataBase
     {
-        Enum GetEvent();
+        int GetEvent();
         Action Listener { get; }
         object Handle { get; }
     }
     
     public interface IEventData<in T1> : IEventDataBase
     {
-        Enum GetEvent();
+        int GetEvent();
         Action<T1> Listener { get; }
         object Handle { get; }
     }
     
-    public class EventData<TEnum> : IEventData where TEnum : Enum, IConvertible
+    public class EventData : IEventData
     {
-        public TEnum Event;
+        public int Event;
         public Action Listener;
         public object Handle;
 
-        public EventData(TEnum eventName, Action listener, object handle = null)
+        public EventData(int eventName, Action listener, object handle = null)
         {
             Event = eventName;
             Listener = listener;
             Handle = handle;
         }
-        public Enum GetEvent()
+        public int GetEvent()
         {
-            return Event as Enum;
+            return Event;
         }
         Action IEventData.Listener => Listener;
         object IEventData.Handle => Handle;
@@ -52,8 +52,8 @@ namespace F8Framework.Core
                 return false;
             }
 
-            EventData<TEnum> other = (EventData<TEnum>)obj;
-            return Event.Equals(other.Event) && Listener.Equals(other.Listener);
+            EventData other = (EventData)obj;
+            return Event == other.Event && Listener.Equals(other.Listener);
         }
 
         public override int GetHashCode()
@@ -66,30 +66,39 @@ namespace F8Framework.Core
                 return hash;
             }
         }
+        
+        public bool EventDataShouldBeInvoked()
+        {
+            if (Handle == null || Handle.Equals(null))
+            {
+                return false;
+            }
+            return true;
+        }
     }
     
-    public class EventData<TEnum, T2> : IEventData<T2> where TEnum : Enum, IConvertible
+    public class EventData<T1> : IEventData<T1>
     {
-        public TEnum Event;
-        public Action<T2> Listener;
+        public int Event;
+        public Action<T1> Listener;
         public object Handle;
 
-        public EventData(TEnum eventName, Action<T2> listener, object handle = null)
+        public EventData(int eventName, Action<T1> listener, object handle = null)
         {
             Event = eventName;
             Listener = listener;
             Handle = handle;
         }
-        public Enum GetEvent()
+        public int GetEvent()
         {
-            return Event as Enum;
+            return Event;
         }
-        Action<T2> IEventData<T2>.Listener => Listener;
-        object IEventData<T2>.Handle => Handle;
+        Action<T1> IEventData<T1>.Listener => Listener;
+        object IEventData<T1>.Handle => Handle;
         
         public string LogDebugInfo()
         {
-              return "【" + Event + "】【" + Listener.Method.Name + "】";
+            return "【" + Event + "】【" + Listener.Method.Name + "】";
         }
         
         public override bool Equals(object obj)
@@ -99,8 +108,8 @@ namespace F8Framework.Core
                 return false;
             }
 
-            EventData<TEnum, T2> other = (EventData<TEnum, T2>)obj;
-            return Event.Equals(other.Event) && Listener.Equals(other.Listener);
+            EventData<T1> other = (EventData<T1>)obj;
+            return Event == other.Event && Listener.Equals(other.Listener);
         }
 
         public override int GetHashCode()
@@ -112,6 +121,15 @@ namespace F8Framework.Core
                 hash = hash * 23 + Listener.GetHashCode();
                 return hash;
             }
+        }
+        
+        public bool EventDataShouldBeInvoked()
+        {
+            if (Handle == null || Handle.Equals(null))
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

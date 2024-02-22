@@ -10,7 +10,7 @@ namespace F8Framework.Core
             get
             {
                 if (_instance == null)
-                    LogF8.LogError($"{typeof(T)} 未创建。");
+                    LogF8.LogError($"模块 {typeof(T)} 未创建。");
                 return _instance;
             }
         }

@@ -21,7 +21,7 @@ public class LanguageCycler : MonoBehaviour
 		FF8.Audio.ToString();
 		FF8.Tween.ToString();
 		FF8.UI.ToString();
-		FF8.Localization.ToString();
+		FF8.Local.ToString();
 		FF8.LogHelper.ToString();
 	}
 	void Update()
@@ -34,6 +34,12 @@ public class LanguageCycler : MonoBehaviour
 		}
 	}
 
+	void LateUpdate()
+	{
+		// 更新模块
+		ModuleCenter.LateUpdate();
+	}
+	
 	private void FixedUpdate()
 	{
 		ModuleCenter.FixedUpdate();
@@ -41,7 +47,7 @@ public class LanguageCycler : MonoBehaviour
 
 	public void Cycle()
 	{
-		Localization.ActivateNextLanguage();
+		Localization.Instance.ActivateNextLanguage();
 	}
 }
 

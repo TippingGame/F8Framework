@@ -26,19 +26,22 @@ Unity F8Event组件，优雅的发送消息、事件监听系统，防止消息�
         
         private object[] data = new object[] { 123123, "asdasd" };
         // 全局监听
-        FF8.Message.AddEventListener(MessageEvent.ApplicationFocus,OnPlayerSpawned,this);
+        FF8.Message.AddEventListener(MessageEvent.ApplicationFocus, OnPlayerSpawned, this);
+        FF8.Message.AddEventListener(10001, OnPlayerSpawned, this);
         // 发送全局消息（不带参数/带参数）
-        FF8.Message.DispatchEvent(MessageEvent.ApplicationFocus,data);
+        FF8.Message.DispatchEvent(MessageEvent.ApplicationFocus, data);
+        FF8.Message.DispatchEvent(10001, data);
         // 移除监听
-        FF8.Message.RemoveEventListener(MessageEvent.ApplicationFocus, OnPlayerSpawned,this);
+        FF8.Message.RemoveEventListener(MessageEvent.ApplicationFocus, OnPlayerSpawned, this);
+        FF8.Message.RemoveEventListener(10001, OnPlayerSpawned, this);
         
         
         // EventDispatcher用法，用作在实体或UI上，简化代码，监听自动释放
-        AddEventListener(MessageEvent.ApplicationFocus,OnPlayerSpawned);
+        AddEventListener(MessageEvent.ApplicationFocus, OnPlayerSpawned);
         DispatchEvent(MessageEvent.ApplicationFocus);
         // 可不执行，Clear()时会清理此脚本所有监听
         RemoveEventListener(MessageEvent.ApplicationFocus, OnPlayerSpawned);
 ```
 
-## EventDispatcher使用方法
-直接拖拽DemoEventDispatcher.cs，挂载到GameObject  
+## EventDispatcher使用方法[（参考）](https://github.com/TippingGame/F8Framework/blob/main/Runtime/UI/Base/BaseView.cs)
+Demo直接拖拽DemoEventDispatcher.cs，挂载到GameObject  

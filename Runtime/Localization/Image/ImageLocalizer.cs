@@ -35,7 +35,7 @@ namespace F8Framework.Core
 
 		internal override void Localize()
 		{
-			var index = Localization.CurrentLanguageIndex;
+			var index = Localization.Instance.CurrentLanguageIndex;
 			injector.Inject(index, this);
 		}
 	}

@@ -215,12 +215,6 @@ namespace F8Framework.Core
             }
         }
 
-        private void OnDestroy()
-        {
-            Clear();
-            GameObjectPool.Instance.UnregisterPool(this);
-        }
-
         /// <summary>
         /// You can initialize the pool manually using this method.
         /// </summary>
@@ -416,6 +410,7 @@ namespace F8Framework.Core
         public void DestroyPool()
         {
             Clear();
+            GameObjectPool.Instance.UnregisterPool(this);
             Destroy(gameObject);
         }
 
@@ -425,6 +420,7 @@ namespace F8Framework.Core
         public void DestroyPoolImmediate()
         {
             Clear();
+            GameObjectPool.Instance.UnregisterPool(this);
             DestroyImmediate(gameObject);
         }
         
@@ -528,7 +524,7 @@ namespace F8Framework.Core
                 return false;
             }
             
-            if (GameObjectPool.s_checkForPrefab)
+            if (GameObjectPool.Instance.s_checkForPrefab)
             {
                 if (CheckForPrefab(prefab) == false)
                 {
@@ -1001,7 +997,7 @@ namespace F8Framework.Core
                 poolable._transform.SetParent(_isSetup ? _cachedTransform : transform, false);
             }
 
-            GameObjectPool.GameObjectInstantiated.RaiseEvent(newGameObject);
+            FF8.GameObjectPool.GameObjectInstantiated.RaiseEvent(newGameObject);
             RaiseGameObjectInstantiatedCallback(newGameObject);
             return poolable;
         }

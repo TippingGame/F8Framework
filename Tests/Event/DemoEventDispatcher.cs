@@ -53,25 +53,56 @@ public class DemoEventDispatcher : MonoBehaviour
     {
         EventDispatcher.AddEventListener(eventName, listener, this);
     }
-    
+            
     public void RemoveEventListener<T>(T eventName,Action listener) where T : struct, Enum, IConvertible
     {
         EventDispatcher.RemoveEventListener(eventName, listener, this);
     }
-    
+            
     public void RemoveEventListener<T>(T eventName,Action<object[]> listener) where T : struct, Enum, IConvertible
     {
         EventDispatcher.RemoveEventListener(eventName, listener, this);
     }
-    
+            
     public void DispatchEvent<T>(T eventName) where T : struct, Enum, IConvertible
     {
         EventDispatcher.DispatchEvent(eventName);
     }
-    
-    public void DispatchEvent<T>(T eventName, object[] arg1) where T : struct, Enum, IConvertible
+            
+    public void DispatchEvent<T>(T eventName, params object[] arg1) where T : struct, Enum, IConvertible
     {
         EventDispatcher.DispatchEvent(eventName, arg1);
+    }
+        
+        
+    public void AddEventListener(int eventId, Action listener)
+    {
+        EventDispatcher.AddEventListener(eventId, listener, this);
+    }
+            
+    public void AddEventListener(int eventId, Action<object[]> listener)
+    {
+        EventDispatcher.AddEventListener(eventId, listener, this);
+    }
+            
+    public void RemoveEventListener(int eventId,Action listener)
+    {
+        EventDispatcher.RemoveEventListener(eventId, listener, this);
+    }
+            
+    public void RemoveEventListener(int eventId,Action<object[]> listener)
+    {
+        EventDispatcher.RemoveEventListener(eventId, listener, this);
+    }
+            
+    public void DispatchEvent(int eventId)
+    {
+        EventDispatcher.DispatchEvent(eventId);
+    }
+            
+    public void DispatchEvent(int eventId, params object[] arg1)
+    {
+        EventDispatcher.DispatchEvent(eventId, arg1);
     }
     
      void OnDestroy() {

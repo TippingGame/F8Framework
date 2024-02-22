@@ -21,7 +21,7 @@ public class GameLauncher : MonoBehaviour
         FF8.Audio.ToString();
         FF8.Tween.ToString();
         FF8.UI.ToString();
-        FF8.Localization.ToString();
+        FF8.Local.ToString();
         FF8.LogHelper.ToString();
 
         StartGame();
@@ -37,6 +37,12 @@ public class GameLauncher : MonoBehaviour
     {
         // 更新模块
         ModuleCenter.Update();
+    }
+    
+    void LateUpdate()
+    {
+        // 更新模块
+        ModuleCenter.LateUpdate();
     }
     
     void FixedUpdate()

@@ -20,8 +20,8 @@ namespace F8Framework.Core
 			base.OnInspectorGUI();
 
 			GUI.skin.GetStyle("HelpBox").richText = true;
-			Localization.Load();
-			var keys = Localization.GetAllIds();
+			Localization.Instance.Load();
+			var keys = Localization.Instance.GetAllIds();
 
 			if (keys.Count == 0)
 			{
@@ -38,7 +38,7 @@ namespace F8Framework.Core
 				return;
 			}
 
-			var dict = Localization.GetDictionaryFromId(localizer.textId);
+			var dict = Localization.Instance.GetDictionaryFromId(localizer.textId);
 			if (dict != null)
 			{
 				var helpText = dict.Aggregate("", (current, item) => current + $"{item.Key}: {item.Value}\n");
