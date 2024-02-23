@@ -80,10 +80,8 @@ namespace F8Framework.Core
 			{
 				_comsUpdate.Add(moduleToAdd);
 			}
-			if (_comsUpdateToAdd.Count > 0)
-			{
-				_comsUpdateToAdd.Clear();
-			}
+			
+			_comsUpdateToAdd.Clear();
 			
 			// 如果有新模块需要重新排序
 			if (_isDirty)
@@ -120,10 +118,8 @@ namespace F8Framework.Core
 			{
 				_comsUpdate.Remove(moduleToRemove);
 			}
-			if (_comsUpdateToRemove.Count > 0)
-			{
-				_comsUpdateToRemove.Clear();
-			}
+			
+			_comsUpdateToRemove.Clear();
 		}
 		
 		/// <summary>
@@ -136,10 +132,8 @@ namespace F8Framework.Core
 			{
 				_comsLateUpdate.Add(moduleToAdd);
 			}
-			if (_comsLateUpdateToAdd.Count > 0)
-			{
-				_comsLateUpdateToAdd.Clear();
-			}
+			
+			_comsLateUpdateToAdd.Clear();
 			
 			// 如果有新模块需要重新排序
 			if (_isDirtyLate)
@@ -176,10 +170,8 @@ namespace F8Framework.Core
 			{
 				_comsLateUpdate.Remove(moduleToRemove);
 			}
-			if (_comsLateUpdateToRemove.Count > 0)
-			{
-				_comsLateUpdateToRemove.Clear();
-			}
+			
+			_comsLateUpdateToRemove.Clear();
 		}
 		
 		/// <summary>
@@ -192,10 +184,8 @@ namespace F8Framework.Core
 			{
 				_comsFixedUpdate.Add(moduleToAdd);
 			}
-			if (_comsFixedUpdateToAdd.Count > 0)
-			{
-				_comsFixedUpdateToAdd.Clear();
-			}
+			
+			_comsFixedUpdateToAdd.Clear();
 			
 			// 如果有新模块需要重新排序
 			if (_isDirtyFixed)
@@ -232,10 +222,8 @@ namespace F8Framework.Core
 			{
 				_comsFixedUpdate.Remove(moduleToRemove);
 			}
-			if (_comsFixedUpdateToRemove.Count > 0)
-			{
-				_comsFixedUpdateToRemove.Clear();
-			}
+			
+			_comsFixedUpdateToRemove.Clear();
 		}
 		
 		/// <summary>

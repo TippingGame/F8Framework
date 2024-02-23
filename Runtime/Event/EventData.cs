@@ -5,6 +5,8 @@ namespace F8Framework.Core
     public interface IEventDataBase
     {
         public string LogDebugInfo();
+
+        public bool EventDataShouldBeInvoked();
     }
     
     public interface IEventData : IEventDataBase

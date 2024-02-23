@@ -44,10 +44,8 @@ namespace F8Framework.Core
             {
                 times.Add(add.Key, add.Value);
             }
-            if (addTimes.Count > 0)
-            {
-                addTimes.Clear();
-            }
+            
+            addTimes.Clear();
             
             if (isFocus == false || times.Count <= 0) // 如果失去焦点或者计时器数量为0，则返回
             {
@@ -93,10 +91,7 @@ namespace F8Framework.Core
                 times.Remove(delete);
             }
             
-            if (deleteTimes.Count > 0)
-            {
-                deleteTimes.Clear();
-            }
+            deleteTimes.Clear();
         }
 
        private void OnTimerComplete(string id)
@@ -116,7 +111,7 @@ namespace F8Framework.Core
         }
 
         // 注册一个计时器并返回其ID
-        public string Register(object handle, float step = 1f, float delay = 0f, int field = 0, Action onSecond = null, Action onComplete = null)
+        public string AddTimer(object handle, float step = 1f, float delay = 0f, int field = 0, Action onSecond = null, Action onComplete = null)
         {
             string id = Guid.NewGuid().ToString(); // 生成一个唯一的ID
             Timer timer = new Timer(handle, id, step, delay, field, onSecond, onComplete, false); // 创建一个计时器对象
@@ -125,7 +120,7 @@ namespace F8Framework.Core
         }
 
         // 注册一个以帧为单位的计时器并返回其ID
-        public string RegisterFrame(object handle, float step = 1f, float delay = 0f, int field = 0, Action onSecond = null, Action onComplete = null)
+        public string AddTimerFrame(object handle, float step = 1f, float delay = 0f, int field = 0, Action onSecond = null, Action onComplete = null)
         {
             string id = Guid.NewGuid().ToString(); // 生成一个唯一的ID
             Timer timer = new Timer(handle, id, step, delay, field, onSecond, onComplete, true); // 创建一个以帧为单位的计时器对象
@@ -134,7 +129,7 @@ namespace F8Framework.Core
         }
 
         // 根据ID注销计时器
-        public void UnRegister(string id)
+        public void RemoveTimer(string id)
         {
             if (id == null)
             {
