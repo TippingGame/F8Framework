@@ -4,7 +4,7 @@ using UnityEngine;
 using F8Framework.Core;
 
     #ROOTNAMESPACEBEGIN#
-public class #SCRIPTNAME# : CustomModule
+public class #SCRIPTNAME# : StaticModule
 {
     public static #SCRIPTNAME# Instance => GetInstance<#SCRIPTNAME#>();
     

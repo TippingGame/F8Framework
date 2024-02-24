@@ -15,10 +15,13 @@ namespace F8Framework.Core
     public sealed class PoolPreset
     {
 #if UNITY_EDITOR
+        [Tooltip(Constants.Tooltips.PoolName)]
         [SerializeField] private string _name;
         [Space]
 #endif
+        [Tooltip(Constants.Tooltips.PoolEnabled)]
         [SerializeField] private bool _enabled = true;
+        [Tooltip(Constants.Tooltips.Persistent)]
         [SerializeField] private GameObject _prefab;
         [Tooltip(Constants.Tooltips.OverflowBehaviour)]
         [SerializeField] private BehaviourOnCapacityReached _behaviourOnCapacityReached = Constants.DefaultBehaviourOnCapacityReached;
@@ -26,9 +29,13 @@ namespace F8Framework.Core
         [SerializeField] private DespawnType _despawnType = Constants.DefaultDespawnType;
         [Tooltip(Constants.Tooltips.CallbacksType)]
         [SerializeField] private CallbacksType _callbacksType = Constants.DefaultCallbacksType;
+        [Tooltip(Constants.Tooltips.Capacity)]
         [SerializeField, Min(0)] private int _capacity;
+        [Tooltip(Constants.Tooltips.PreloadSize)]
         [SerializeField, Min(0)] private int _preloadSize;
+        [Tooltip(Constants.Tooltips.Persistent)]
         [SerializeField] private bool _dontDestroyOnLoad;
+        [Tooltip(Constants.Tooltips.Warnings)]
         [SerializeField] private bool _warnings = true;
 
         public bool Enabled => _enabled;

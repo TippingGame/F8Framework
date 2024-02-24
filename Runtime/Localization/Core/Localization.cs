@@ -38,7 +38,29 @@ namespace F8Framework.Core
             }
             LocalizedStrings.Clear();
             
+            // 后续会转到配置模块中加载
+#if UNITY_EDITOR
             ReadExcel.Instance.LoadAllExcelData();
+#else
+            string _classLoadAll = "F8DataManager";
+            string methodLoadAll = "LoadAll";
+            var allAssembliesLoadAll = AppDomain.CurrentDomain.GetAssemblies();
+            var typeLoadAll = allAssembliesLoadAll.SelectMany(assembly => assembly.GetTypes()).FirstOrDefault(type1 => type1.Name == _classLoadAll);
+            if (typeLoadAll == null)
+            {
+                LogF8.LogError("需要检查是否有正确生成F8DataManager.cs!");
+                return;
+            }
+            else
+            {
+                //通过反射，获取单例的实例
+                var property = typeLoadAll.BaseType.GetProperty("Instance");
+                var instance = property.GetValue(null,null);
+                var myMethodExists = typeLoadAll.GetMethod(methodLoadAll);
+                myMethodExists.Invoke(instance, null);
+                LogF8.LogConfig("<color=green>加载所有配置表！</color>");
+            }
+#endif
             
             Dictionary<int, LocalizedStringsItem> tb;
             string _class = "F8DataManager";

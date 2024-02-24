@@ -22,7 +22,7 @@ namespace F8Framework.Core
             serverTime = 0;
             tempTime = 0;
         }
-
+        
         public void OnLateUpdate()
         {
             
@@ -35,6 +35,8 @@ namespace F8Framework.Core
 
         public void OnTermination()
         {
+            FF8.Message.RemoveEventListener(MessageEvent.ApplicationFocus, OnApplicationFocus, this);
+            FF8.Message.RemoveEventListener(MessageEvent.NotApplicationFocus, NotApplicationFocus, this);
             base.Destroy();
         }
         
@@ -186,20 +188,25 @@ namespace F8Framework.Core
             }
         }
 
-        // 当应用程序获得或失去焦点时调用
-        // void OnApplicationFocus(bool hasFocus)
-        // {
-        //     if (hasFocus) // 如果应用程序获得焦点，重新开始所有计时器
-        //     {
-        //         Restart();
-        //         isFocus = true;
-        //     }
-        //     else // 如果应用程序失去焦点，暂停所有计时器
-        //     {
-        //         isFocus = false;
-        //         Pause();
-        //     }
-        // }
+        public void AddListenerApplicationFocus()
+        {
+            FF8.Message.AddEventListener(MessageEvent.ApplicationFocus, OnApplicationFocus, this);
+            FF8.Message.AddEventListener(MessageEvent.NotApplicationFocus, NotApplicationFocus, this);
+        }
+
+        // 当应用程序获得焦点时调用
+        void OnApplicationFocus()
+        {
+            Restart();
+            isFocus = true;
+        }
+        
+        // 当应用程序失去焦点时调用
+        void NotApplicationFocus()
+        {
+            isFocus = false;
+            Pause();
+        }
 
         // 重新启动所有计时器
         public void Restart()

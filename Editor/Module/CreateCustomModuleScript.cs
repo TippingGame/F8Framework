@@ -5,13 +5,31 @@ namespace F8Framework.Core.Editor
 {
     public class CreateCustomModuleScript : ScriptableObject
     {
-        [MenuItem("Assets/（F8模块中心功能）/（CustomModule.cs）", false, -1)]
-        static void CreateBaseViewScript()
+        [MenuItem("Assets/（F8模块中心功能）/（Module.cs）", false, -3)]
+        static void CreateModuleScript()
         {
             string path = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 1)) +
-                          "/CustomModuleTemplate.cs.txt";
+                          "/ModuleTemplate.cs.txt";
             
-            ProjectWindowUtil.CreateScriptAssetFromTemplateFile(path, "CustomModule.cs");
+            ProjectWindowUtil.CreateScriptAssetFromTemplateFile(path, "Module.cs");
+        }
+        
+        [MenuItem("Assets/（F8模块中心功能）/（ModuleMono.cs）", false, -2)]
+        static void CreateModuleMonoScript()
+        {
+            string path = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 1)) +
+                          "/ModuleMonoTemplate.cs.txt";
+            
+            ProjectWindowUtil.CreateScriptAssetFromTemplateFile(path, "ModuleMono.cs");
+        }
+        
+        [MenuItem("Assets/（F8模块中心功能）/（StaticModule.cs）", false, -1)]
+        static void CreateStaticModuleScript()
+        {
+            string path = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 1)) +
+                          "/StaticModuleTemplate.cs.txt";
+            
+            ProjectWindowUtil.CreateScriptAssetFromTemplateFile(path, "StaticModule.cs");
         }
         
         private static string GetScriptPath()

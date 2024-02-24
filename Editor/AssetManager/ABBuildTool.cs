@@ -9,10 +9,14 @@ using UnityEngine;
 
 namespace F8Framework.Core.Editor
 {
-    public class ABBuildTool
+    public class ABBuildTool : ScriptableObject
     {
         public static void BuildAllAB()
         {
+            AssetDatabase.RemoveUnusedAssetBundleNames();
+            
+            FileTools.SafeDeleteDir(FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/AssetMap");
+            
             LogF8.LogAsset("生成AssetBundleMap.cs，生成ResourceMap.cs，生成F8Framework.AssetMap.asmdef");
             GenerateAssetNames();
             GenerateResourceNames();
@@ -400,6 +404,20 @@ namespace F8Framework.Core.Editor
 
             assetPath = FileTools.FormatToUnityPath(assetPath);
             return assetPath;
+        }
+        
+        
+        private static string GetScriptPath()
+        {
+            MonoScript monoScript = MonoScript.FromScriptableObject(CreateInstance<ABBuildTool>());
+
+            // 获取脚本在 Assets 中的相对路径
+            string scriptRelativePath = AssetDatabase.GetAssetPath(monoScript);
+
+            // 获取绝对路径并规范化
+            string scriptPath = Path.GetFullPath(Path.Combine(Application.dataPath, "..", scriptRelativePath));
+
+            return scriptPath;
         }
     }
 }

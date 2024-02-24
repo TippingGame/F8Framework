@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace F8Framework.Core
 {
     // 消息管理器类，实现了单例模式和消息管理接口
-    public class MessageManager : ModuleSingleton<MessageManager>, IMessageManager, IModule
+    public class MessageManager : ModuleSingletonMono<MessageManager>, IMessageManager, IModule
     {
         // 存储事件ID与事件处理器列表的字典
         private Dictionary<int, List<IEventDataBase>> events = new Dictionary<int, List<IEventDataBase>>();
@@ -18,27 +18,50 @@ namespace F8Framework.Core
         // 输出消息死循环的函数
         private void MessageLoop(string debugInfo)
         {
-            LogF8.LogError("消息死循环:{0}", debugInfo);
+            LogF8.LogError("消息死循环：{0}", debugInfo);
         }
 
         // 输出不存在事件处理函数的警告
-        private void NotActionLog(string eventName, string actionName)
+        private void NotActionLog(string eventId, string actionName)
         {
-            LogF8.LogEvent("函数不存在:【{0}】【{1}】", eventName, actionName);
+            LogF8.LogEvent("函数不存在：【{0}】【{1}】", eventId, actionName);
         }
 
         // 输出不存在监听者的警告
         private void NotListenerLog(string debugInfo)
         {
-            LogF8.LogEvent("监听者不存在:【{0}】【{1}】", debugInfo);
+            LogF8.LogEvent("监听者不存在：{0}", debugInfo);
         }
 
         // 输出不存在事件的警告
-        private void NotEventLog(string eventName)
+        private void NotEventLogDispatch(string eventId)
         {
-            LogF8.LogEvent("事件不存在:【{0}】", eventName);
+            LogF8.LogEvent("没有创建监听，发送事件：【{0}】", eventId);
         }
-
+        
+        // 输出不存在事件的警告
+        private void NotEventLogRemove(string eventId)
+        {
+            LogF8.LogEvent("没有创建监听，移除监听：【{0}】", eventId);
+        }
+        
+        private void OnApplicationFocus(bool hasFocus)
+        {
+            if (hasFocus) // 应用程序获得焦点
+            {
+                DispatchEvent(MessageEvent.ApplicationFocus);
+            }
+            else // 应用程序失去焦点
+            {
+                DispatchEvent(MessageEvent.NotApplicationFocus);
+            }
+        }
+    
+        private void OnApplicationQuit()
+        {
+            DispatchEvent(MessageEvent.ApplicationQuit);
+        }
+        
         // 清空调用栈
         private void ClearCallStack()
         {
@@ -59,7 +82,7 @@ namespace F8Framework.Core
         }
 
         // 添加事件监听器（不带参数）
-        public void AddEventListener(int eventId, Action listener, object handle = null)
+        public void AddEventListener(int eventId, Action listener, object handle)
         {
             // 创建事件数据对象
             IEventDataBase eventData = new EventData(eventId, listener, handle);
@@ -89,7 +112,7 @@ namespace F8Framework.Core
         }
 
         // 添加事件监听器（带参数）
-        public void AddEventListener(int eventId, Action<object[]> listener, object handle = null)
+        public void AddEventListener(int eventId, Action<object[]> listener, object handle)
         {
             IEventDataBase eventData = new EventData<object[]>(eventId, listener, handle);
             if (!events.ContainsKey(eventId))
@@ -120,7 +143,7 @@ namespace F8Framework.Core
         {
             if (!events.ContainsKey(eventId))
             {
-                NotEventLog(eventId.ToString());
+                NotEventLogRemove(eventId.ToString());
                 return;
             }
 
@@ -162,7 +185,7 @@ namespace F8Framework.Core
         {
             if (!events.ContainsKey(eventId))
             {
-                NotEventLog(eventId.ToString());
+                NotEventLogRemove(eventId.ToString());
                 return;
             }
 
@@ -204,7 +227,7 @@ namespace F8Framework.Core
         {
             if (!events.TryGetValue(eventId, out List<IEventDataBase> eventDatas))
             {
-                NotEventLog(eventId.ToString());
+                NotEventLogDispatch(eventId.ToString());
                 return;
             }
 
@@ -262,7 +285,7 @@ namespace F8Framework.Core
         {
             if (!events.TryGetValue(eventId, out List<IEventDataBase> eventDatas))
             {
-                NotEventLog(eventId.ToString());
+                NotEventLogDispatch(eventId.ToString());
                 return;
             }
 
@@ -345,7 +368,7 @@ namespace F8Framework.Core
         public void OnTermination()
         {
             Clear();
-            base.Destroy();
+            Destroy(gameObject);
         }
     }
 }

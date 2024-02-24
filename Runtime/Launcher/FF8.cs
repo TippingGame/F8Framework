@@ -9,6 +9,8 @@ namespace F8Framework.Core
         
         // 全局消息
         private static MessageManager _message;
+        // 输入管理
+        private static InputManager _inputManager;
         // 本地存储
         private static StorageManager _storage;
         // 游戏时间管理
@@ -35,7 +37,7 @@ namespace F8Framework.Core
         private static Localization _localization;
         // 日志助手
         private static F8LogHelper _logHelper;
-
+        
         public static MessageManager Message
         {
             get
@@ -46,6 +48,16 @@ namespace F8Framework.Core
             }
         }
 
+        public static InputManager Input
+        {
+            get
+            {
+                if (_inputManager == null)
+                    _inputManager = ModuleCenter.CreateModule<InputManager>(new DefaultInputHelper());
+                return _inputManager;
+            }
+        }
+        
         public static StorageManager Storage
         {
             get

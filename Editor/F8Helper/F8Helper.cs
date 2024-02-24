@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace F8Framework.Core.Editor
 {
-    public class F8Helper : ScriptableObject
+    public class F8Helper
     {
         [MenuItem("开发工具/F8Run _F8")]
         public static void F8Run()
@@ -20,24 +20,9 @@ namespace F8Framework.Core.Editor
         [MenuItem("开发工具/打包AssetBundles目录资源-F8")]
         public static void BuildAssetBundles()
         {
-            FileTools.SafeDeleteDir(FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/AssetMap");
-            
             ABBuildTool.BuildAllAB();
             
             AssetDatabase.Refresh();
-        }
-        
-        private static string GetScriptPath()
-        {
-            MonoScript monoScript = MonoScript.FromScriptableObject(CreateInstance<F8Helper>());
-
-            // 获取脚本在 Assets 中的相对路径
-            string scriptRelativePath = AssetDatabase.GetAssetPath(monoScript);
-
-            // 获取绝对路径并规范化
-            string scriptPath = Path.GetFullPath(Path.Combine(Application.dataPath, "..", scriptRelativePath));
-
-            return scriptPath;
         }
 
         [InitializeOnLoadMethod]

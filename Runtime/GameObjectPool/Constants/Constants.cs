@@ -14,7 +14,6 @@ namespace F8Framework.Core
         internal const ReactionOnRepeatedDelayedDespawn DefaultDelayedDespawnHandleType = ReactionOnRepeatedDelayedDespawn.ResetDelay;
         internal const F8PoolMode DefaultF8PoolMode = F8PoolMode.Performance;
         internal const string F8PoolComponentPath = Author + "/F8 Pool/";
-        internal const string PoolsPresetComponentPath = "（F8预加载对象池）/Pools Preset";
         internal const string OnSpawnMessageName = "OnSpawn";
         internal const string OnDespawnMessageName = "OnDespawn";
         internal const int DefaultPoolsMapCapacity = 64;
@@ -74,6 +73,9 @@ namespace F8Framework.Core
             internal const string GlobalUpdateType = "此组件的 UpdateType。处理延迟销毁。";
             internal const string GlobalPreloadType = "下面的 PoolsPreset 中池的预加载类型。";
             internal const string PoolsToPreload = "要预加载的池。";
+            internal const string PoolName = "池名字。";
+            internal const string PoolEnabled = "池是否启用。";
+            internal const string PreloadSize = "要预加载的个数。";
         }
     }
 }

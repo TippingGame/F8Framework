@@ -37,7 +37,7 @@ namespace F8Framework.Core.Editor
         {
             int count = 0;
             // 获取 AssetBundles 文件夹下所有资源
-            string[] uiDirs = { System.IO.Path.Combine("Assets", "AssetBundles") };
+            string[] uiDirs = { System.IO.Path.Combine("Assets") };
             string[] guids = AssetDatabase.FindAssets("", uiDirs);
             foreach (string guid in guids)
             {

@@ -68,7 +68,7 @@ namespace F8Framework.Core.Editor
             LogF8.LogAsset("已清空所有选中的资产AB名");
         }
         
-        [MenuItem("Assets/（F8资产功能）/（设置所有资产为相同AB名）", false , 1002)]
+        [MenuItem("Assets/（F8资产功能）/（设置选中的所有资产为相同AB名（AB名取自第一个资产））", false , 1002)]
         private static void SetAssetBundleSameName()
         {
             // 获取所有选中 文件、文件夹的 GUID

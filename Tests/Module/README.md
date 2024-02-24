@@ -5,9 +5,9 @@
 [![Platform](https://img.shields.io/badge/platform-Win%20%7C%20Android%20%7C%20iOS%20%7C%20Mac%20%7C%20Linux-orange)]() 
 
 ## 简介（希望自己点击F8，就能开始制作游戏，不想多余的事）
-Unity F8Module模块中心组件。
-1. 通过继承模块 ModuleSingleton / ModuleSingletonMono，控制所有模块的，获取/初始化/轮询顺序/销毁。
-2. 使用自定义模块 CustomModule
+Unity F8Module模块中心组件。提供三种模块可使用。  
+1. 游戏模块 Module / ModuleMono，延时加载，可控顺序，控制所有模块的，获取/初始化/轮询/销毁。
+2. 静态模块 StaticModule ，随着游戏一同初始化，无顺序，提供 OnEnterGame / OnQuitGame 方法。
 
 ## 导入插件（需要首先导入核心）
 注意！内置在->F8Framework核心：https://github.com/TippingGame/F8Framework.git  
@@ -16,7 +16,7 @@ Unity F8Module模块中心组件。
 
 ### 创建模板
 
-1. 右键资源文件夹，看到（F8模块中心功能），创建模板 ModuleSingleton / ModuleSingletonMono / CustomModule  
+1. 右键资源文件夹，看到（F8模块中心功能），创建模板 Module / ModuleMono / StaticModule  
 
 ### 代码使用方法
 ```C#
@@ -68,28 +68,28 @@ Unity F8Module模块中心组件。
             }
         }
         
-        /*----------------------------自定义模块功能----------------------------*/
+        /*----------------------------自定义静态模块功能----------------------------*/
         
         // 获取所有模块，并调用进入游戏
-        foreach (var center in CustomModule.GetSubCenter())
+        foreach (var center in StaticModule.GetSubCenter())
         {
             center.Value.OnEnterGame();
         }
         
         // 获取指定模块
-        CustomModule demo = CustomModule.GetCenterByType(typeof(CustomModuleClass));
+        StaticModule demo = StaticModule.GetCenterByType(typeof(StaticModuleClass));
         
         // 使用模块
-        CustomModuleClass.Instance.OnEnterGame();
+        StaticModuleClass.Instance.OnEnterGame();
         
-        // 继承CustomModule的自定义模块
-        public class CustomModuleClass : CustomModule
+        // 继承StaticModule的自定义模块
+        public class StaticModuleClass : StaticModule
         {
-            public static CustomModuleClass Instance => GetInstance<CustomModuleClass>();
+            public static StaticModuleClass Instance => GetInstance<StaticModuleClass>();
             
             protected override void Init()
             {
-                // 初始化CustomModule
+                // 初始化StaticModule
             }
                 
             public override void OnEnterGame()

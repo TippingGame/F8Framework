@@ -1,0 +1,42 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using F8Framework.Core;
+
+    #ROOTNAMESPACEBEGIN#
+[UpdateRefresh]
+[LateUpdateRefresh]
+[FixedUpdateRefresh]
+public class #SCRIPTNAME# : ModuleSingleton<#SCRIPTNAME#>, IModule
+{
+    // 模块创建初始化
+    public void OnInit(object createParam)
+    {
+        #NOTRIM#
+    }
+    
+    // 模块Update
+    public void OnUpdate()
+    {
+        #NOTRIM#
+    }
+    
+    // 模块LateUpdate
+    public void OnLateUpdate()
+    {
+        #NOTRIM#
+    }
+    
+    // 模块FixedUpdate
+    public void OnFixedUpdate()
+    {
+        #NOTRIM#
+    }
+
+    // 模块销毁
+    public void OnTermination()
+    {
+        base.Destroy();
+    }
+}
+#ROOTNAMESPACEEND#

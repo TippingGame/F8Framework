@@ -25,11 +25,14 @@ public class DemoF8Timer : MonoBehaviour
         
         FF8.Timer.RemoveTimer(timeid); // 停止名为timeid的Timer
         
-        // 自动OnApplicationFocus监听焦点，暂停所有Timer
+        // 监听游戏程序获得或失去焦点，重新开始或暂停所有Timer
+        FF8.Timer.AddListenerApplicationFocus();
+        
+        // 手动重新开始或暂停所有Timer
         FF8.Timer.Pause();
         FF8.Timer.Restart();
         
-        FF8.Timer.SetServerTime(1702573904000); // 网络游戏，与服务器对表
+        FF8.Timer.SetServerTime(1702573904000); // 网络游戏，与服务器对表，单位ms
         FF8.Timer.GetServerTime();
         
         FF8.Timer.GetTime(); // 获取游戏中的总时长

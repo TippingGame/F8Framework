@@ -10,6 +10,7 @@ public class GameLauncher : MonoBehaviour
 
         // 按顺序创建模块，可按需添加
         FF8.Message.ToString();
+        FF8.Input.ToString();
         FF8.Storage.ToString();
         FF8.Timer.ToString();
         FF8.Procedure.ToString();
