@@ -153,4 +153,58 @@ namespace F8Framework.Core
         /// </summary>
         public abstract void OnShutdown();
     }
+    
+    /// <summary>
+    /// 输入按键类型
+    /// </summary>
+    public static class InputButtonType
+    {
+        /// <summary>
+        /// 鼠标左键
+        /// </summary>
+        public static string MouseLeft = "MouseLeft";
+        /// <summary>
+        /// 鼠标右键
+        /// </summary>
+        public static string MouseRight = "MouseRight";
+        /// <summary>
+        /// 鼠标中键
+        /// </summary>
+        public static string MouseMiddle = "MouseMiddle";
+        /// <summary>
+        /// 鼠标左键双击
+        /// </summary>
+        public static string MouseLeftDoubleClick = "MouseLeftDoubleClick";
+    }
+
+    /// <summary>
+    /// 输入轴线类型
+    /// </summary>
+    public static class InputAxisType
+    {
+        /// <summary>
+        /// 鼠标X轴移动
+        /// </summary>
+        public static string MouseX = "MouseX";
+        /// <summary>
+        /// 鼠标Y轴移动
+        /// </summary>
+        public static string MouseY = "MouseY";
+        /// <summary>
+        /// 鼠标滚轮滚动
+        /// </summary>
+        public static string MouseScrollWheel = "MouseScrollWheel";
+        /// <summary>
+        /// 键盘水平输入
+        /// </summary>
+        public static string Horizontal = "Horizontal";
+        /// <summary>
+        /// 键盘垂直输入
+        /// </summary>
+        public static string Vertical = "Vertical";
+        /// <summary>
+        /// 键盘上下输入
+        /// </summary>
+        public static string UpperLower = "UpperLower";
+    }
 }

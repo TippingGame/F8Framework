@@ -1,8 +1,5 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
@@ -58,21 +55,5 @@ namespace F8Framework.Core.Editor
         {
             ExcelDataTool.LoadAllExcelData();
         }
-        
-        private static bool AssemblyExists(string assemblyName)
-        {
-            try
-            {
-                // 尝试加载程序集，如果存在，则返回 true
-                Assembly.Load(assemblyName);
-                return true;
-            }
-            catch (FileNotFoundException)
-            {
-                // 如果文件未找到，则返回 false
-                return false;
-            }
-        }
-
     }
 }

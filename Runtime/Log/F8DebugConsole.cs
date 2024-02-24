@@ -90,7 +90,7 @@ namespace F8Framework.Core
             scrollPosition = GUILayout.BeginScrollView(scrollPosition);
 
             // Iterate through the recorded logs.
-            for (int i = 0; i < logs.Count; i++)
+            for (int i = logs.Count - 1; i >= 0; i--)
             {
                 var log = logs[i];
 
