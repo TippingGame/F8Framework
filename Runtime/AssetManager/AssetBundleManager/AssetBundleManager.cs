@@ -897,13 +897,20 @@ namespace F8Framework.Core
 
         public void OnInit(object createParam)
         {
+#if UNITY_WEBGL
+            string manifestPath = AssetBundleHelper.GetAssetBundleManifestPath(AssetBundleHelper.SourceType.REMOTE_ADDRESS);
+            if (manifestPath == null)
+                return;
+            DownloadRequest d = new DownloadRequest(manifestPath, 0);
+            while (!d.IsFinished) ;
+            manifest = d.DownloadedAssetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
+#else
             string manifestPath = AssetBundleHelper.GetAssetBundleManifestPath();
             if (manifestPath == null)
                 return;
-
             manifest = AssetBundle.LoadFromFile(manifestPath)?.
                 LoadAsset<AssetBundleManifest>("AssetBundleManifest");
-
+#endif
             manifest.GetAllAssetBundles();
         }
 

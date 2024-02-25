@@ -52,9 +52,9 @@ namespace F8Framework.Core
         /// 根据环境获取资产捆绑清单文件的路径。
         /// </summary>
         /// <returns>正确的路径。</returns>
-        public static string GetAssetBundleManifestPath()
+        public static string GetAssetBundleManifestPath(SourceType type = SourceType.STREAMING_ASSETS)
         {
-            string platformAssetBundlePath = GetAssetBundlePath();
+            string platformAssetBundlePath = GetAssetBundlePath(type);
             if (platformAssetBundlePath == null)
                 return null;
 

@@ -9,7 +9,7 @@ namespace F8Framework.Core
     /// 资源文件下载器。
     /// 使用 UnityWebRequest（UWR）提供网络内容下载功能。
     /// </summary>
-    public class DownloadRequest : IDisposable
+    public class DownloadRequest
     {
         private DownloadType type;
         private UnityWebRequest uwr;

@@ -8,7 +8,7 @@ namespace F8Framework.Core
     [UpdateRefresh]
     public sealed class InputManager : ModuleSingleton<InputManager>, IModule
     {
-        protected IInputHelper _helper;
+        private IInputHelper _helper;
         
         /// <summary>
         /// 是否启用输入设备

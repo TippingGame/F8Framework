@@ -34,6 +34,8 @@ namespace F8Framework.Core
                 string strReturenPlatformName = "iOS";
 #elif UNITY_ANDROID
                 string strReturenPlatformName = "Android";
+#elif UNITY_WEBGL
+                string strReturenPlatformName = "WebGL";
 #else
                 string strReturenPlatformName = "Unknown";
 #endif

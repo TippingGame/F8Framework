@@ -34,7 +34,7 @@ namespace F8Framework.Core.Editor
 
             FileTools.CheckDirAndCreateWhenNeeded(strABOutPAthDir);
             
-            LogF8.LogAsset("打包AssetBundle" + URLSetting.GetAssetBundlesOutPath());
+            LogF8.LogAsset("打包AssetBundle：" + URLSetting.GetAssetBundlesOutPath() + "  当前打包平台：" + EditorUserBuildSettings.activeBuildTarget);
             // 打包生成AB包 (目标平台自动根据当前平台设置)
             BuildPipeline.BuildAssetBundles(strABOutPAthDir, BuildAssetBundleOptions.ChunkBasedCompression, EditorUserBuildSettings.activeBuildTarget);
             

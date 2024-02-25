@@ -119,11 +119,19 @@ namespace F8Framework.Core
                 }
                 else if (accessMode.HasFlag(AssetAccessMode.ASSET_BUNDLE))
                 {
+#if UNITY_WEBGL
+                    return GetAssetInfoFromAssetBundle(assetName, remote: true, showTip: true);
+#else
                     return GetAssetInfoFromAssetBundle(assetName, showTip: true);
+#endif
                 }
                 else if (accessMode.HasFlag(AssetAccessMode.UNKNOWN))
                 {
+#if UNITY_WEBGL
+                    AssetInfo r = GetAssetInfoFromAssetBundle(assetName, true);
+#else
                     AssetInfo r = GetAssetInfoFromAssetBundle(assetName);
+#endif
                     if (r == null)
                     {
                         r = GetAssetInfoFromResource(assetName);
