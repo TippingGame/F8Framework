@@ -35,6 +35,8 @@ namespace F8Framework.Core
         private static UIManager _ui;
         // 本地化
         private static Localization _localization;
+        // SDK管理
+        private static SDKManager _sdkManager;
         // 日志助手
         private static F8LogHelper _logHelper;
         
@@ -175,6 +177,16 @@ namespace F8Framework.Core
                 if (_localization == null)
                     _localization = ModuleCenter.CreateModule<Localization>();
                 return _localization;
+            }
+        }
+        
+        public static SDKManager SDK
+        {
+            get
+            {
+                if (_sdkManager == null)
+                    _sdkManager = ModuleCenter.CreateModule<SDKManager>();
+                return _sdkManager;
             }
         }
         

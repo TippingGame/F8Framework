@@ -16,12 +16,16 @@ namespace F8Framework.Core.Editor
             AssetDatabase.RemoveUnusedAssetBundleNames();
             
             FileTools.SafeDeleteDir(FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/AssetMap");
+            AssetDatabase.Refresh();
+            AssetDatabase.SaveAssets();
             
             LogF8.LogAsset("生成AssetBundleMap.cs，生成ResourceMap.cs，生成F8Framework.AssetMap.asmdef");
             GenerateAssetNames();
             GenerateResourceNames();
             CreateAsmdefFile();
-
+            AssetDatabase.Refresh();
+            AssetDatabase.SaveAssets();
+            
             // 获取“StreamingAssets”文件夹路径（不一定这个文件夹，可自定义）            
             string strABOutPAthDir = URLSetting.GetAssetBundlesOutPath();
             
@@ -92,6 +96,7 @@ namespace F8Framework.Core.Editor
                 }
             }
             AssetDatabase.Refresh();
+            AssetDatabase.SaveAssets();
         }
         
         public static void RecordAssetsAndDirectories(string basePath, string rootPath, List<string> assetPaths, bool removeExtension = false)

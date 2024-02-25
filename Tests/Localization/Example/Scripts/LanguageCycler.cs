@@ -22,6 +22,7 @@ public class LanguageCycler : MonoBehaviour
 		FF8.Tween.ToString();
 		FF8.UI.ToString();
 		FF8.Local.ToString();
+		FF8.SDK.ToString();
 		FF8.LogHelper.ToString();
 	}
 	void Update()

@@ -36,6 +36,16 @@ namespace F8Framework.Core.Editor
 
         private static void OnUpdate()
         {
+            // 编译状态和资源刷新状态不能运行
+            if (EditorApplication.isUpdating)
+            {
+                return;
+            }
+            if (EditorApplication.isCompiling)
+            {
+                return;
+            }
+
             if (curChangeEventArgs != null)
             {
                 Localization.Instance.Load(true);
