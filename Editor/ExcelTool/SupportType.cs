@@ -273,7 +273,13 @@ namespace F8Framework.Core.Editor
             source.Append("\t\t}\n\n");
             
             //异步加载所有配置表
-            source.Append("\t\tpublic IEnumerator LoadAllAsync(Action onLoadComplete)\n");
+            source.Append("\t\tpublic void LoadAllAsyncCallback(Action onLoadComplete)\n");
+            source.Append("\t\t{\n");
+            source.Append("\t\t\tModuleCenter.StartCoroutine(LoadAllAsyncIEnumerator(onLoadComplete));\n");
+            source.Append("\t\t}\n\n");
+            
+            //异步加载所有配置表
+            source.Append("\t\tpublic IEnumerator LoadAllAsyncIEnumerator(Action onLoadComplete)\n");
             source.Append("\t\t{\n");
             foreach (Type t in types)
             {
@@ -299,7 +305,7 @@ namespace F8Framework.Core.Editor
             source.Append("\t\t\tvar load = AssetManager.Instance.LoadAsyncCoroutine<TextAsset>(name);\n");
             source.Append("\t\t\tyield return load;\n");
             source.Append("\t\t\t{\n");
-            source.Append("\t\t\t\tTextAsset textAsset = AssetManager.Instance.Load<TextAsset>(name);\n");
+            source.Append("\t\t\t\tTextAsset textAsset = AssetManager.Instance.GetAssetObject<TextAsset>(name);\n");
             source.Append("\t\t\t\tif (textAsset != null)\n");
             source.Append("\t\t\t\t{\n");
             source.Append("\t\t\t\t\tusing (Stream s = new MemoryStream(textAsset.bytes))\n");

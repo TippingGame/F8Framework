@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -15,7 +16,8 @@ namespace F8Framework.Core
         
         private AssetBundleManifest manifest;
         private Dictionary<string, AssetBundleLoader> assetBundleLoaders = new Dictionary<string, AssetBundleLoader>();
-        
+        private DownloadRequest downloadManifest;
+        private bool isDownloadManifest = false;
         /// <summary>
         /// 通过资产捆绑路径同步加载。
         /// 如果重复加载资产，则将直接从资源池中提供。
@@ -25,6 +27,9 @@ namespace F8Framework.Core
         /// <returns>要完成扩展的对象列表。</returns>
         public AssetBundle Load(string assetName, AssetManager.AssetInfo info)
         {
+#if UNITY_WEBGL
+            LogF8.LogError("WebGL平台下请勿同步加载！");
+#endif
             AssetBundle result;
 
             List<string> assetBundlePaths = new List<string>(GetDependenciedAssetBundles(info.AbName));
@@ -901,21 +906,28 @@ namespace F8Framework.Core
             string manifestPath = AssetBundleHelper.GetAssetBundleManifestPath(AssetBundleHelper.SourceType.REMOTE_ADDRESS);
             if (manifestPath == null)
                 return;
-            DownloadRequest d = new DownloadRequest(manifestPath, 0);
-            while (!d.IsFinished) ;
-            manifest = d.DownloadedAssetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
+            downloadManifest = new DownloadRequest(manifestPath, 0);
 #else
             string manifestPath = AssetBundleHelper.GetAssetBundleManifestPath();
             if (manifestPath == null)
                 return;
             manifest = AssetBundle.LoadFromFile(manifestPath)?.
                 LoadAsset<AssetBundleManifest>("AssetBundleManifest");
-#endif
             manifest.GetAllAssetBundles();
+#endif
         }
-
+        
         public void OnUpdate()
         {
+            if (isDownloadManifest == false)
+            {
+                if (downloadManifest.IsFinished)
+                {
+                    isDownloadManifest = true;
+                    manifest = downloadManifest.DownloadedAssetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
+                    manifest.GetAllAssetBundles();
+                }
+            }
             foreach (AssetBundleLoader loader in assetBundleLoaders.Values)
             {
                 loader.OnUpdate();

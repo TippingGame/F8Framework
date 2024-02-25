@@ -165,6 +165,109 @@ namespace F8Framework.Core
             }
 
             /// <summary>
+            /// 通过资产捆绑加载程序和对象名称获取资产对象。
+            /// </summary>
+            /// <typeparam name="T">资产对象的目标对象类型。</typeparam>
+            /// <param name="assetName">资产对象的路径。</param>
+            /// <param name="mode">访问模式。</param>
+            /// <returns>找到的资产对象。</returns>
+            public T GetAssetObject<T>(
+                string assetName,
+                AssetAccessMode mode = AssetAccessMode.UNKNOWN)
+                where T : Object
+            {
+                AssetInfo info = GetAssetInfo(assetName, mode);
+
+                if (info.AssetType == AssetTypeEnum.RESOURCE)
+                {
+                    T o = ResourcesManager.Instance.GetResouceObject<T>(info.AssetPath[0]);
+                    return o;
+                }
+                else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
+                {
+#if UNITY_EDITOR
+                    if (_isEditorMode)
+                    {
+                        var assetPaths = UnityEditor.AssetDatabase.GetAssetPathsFromAssetBundleAndAssetName(info.AbName, assetName);
+                        return UnityEditor.AssetDatabase.LoadAssetAtPath<T>(FindAssetPath(assetName, assetPaths));
+                    }
+#endif
+                    T o = AssetBundleManager.Instance.GetAssetObject<T>(FindAssetPath(assetName, info.AssetPath));
+                    return o;
+                }
+
+                return null;
+            }
+
+            /// <summary>
+            /// 同步加载资源对象。
+            /// </summary>
+            /// <param name="assetName">资产路径字符串。</param>
+            /// <param name="assetType">目标资产类型。</param>
+            /// <param name="mode">访问模式。</param>
+            /// <returns>加载的资产对象。</returns>
+            public Object GetAssetObject(
+                string assetName,
+                System.Type assetType,
+                AssetAccessMode mode = AssetAccessMode.UNKNOWN)
+            {
+                AssetInfo info = GetAssetInfo(assetName, mode);
+                
+                if (info.AssetType == AssetTypeEnum.RESOURCE)
+                {
+                    Object o = ResourcesManager.Instance.GetResouceObject(info.AssetPath[0], assetType);
+                    return o;
+                }
+                else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
+                {
+#if UNITY_EDITOR
+                    if (_isEditorMode)
+                    {
+                        var assetPaths = UnityEditor.AssetDatabase.GetAssetPathsFromAssetBundleAndAssetName(info.AbName, assetName);
+                        return UnityEditor.AssetDatabase.LoadAssetAtPath(FindAssetPath(assetName, assetPaths), assetType);
+                    }
+#endif
+                    Object o = AssetBundleManager.Instance.GetAssetObject(FindAssetPath(assetName, info.AssetPath), assetType);
+                    return o;
+                }
+
+                return null;
+            }
+
+            /// <summary>
+            /// 同步加载资源对象。
+            /// </summary>
+            /// <param name="assetName">资产路径字符串。</param>
+            /// <param name="mode">访问模式。</param>
+            /// <returns>加载的资产对象。</returns>
+            public Object GetAssetObject(
+                string assetName,
+                AssetAccessMode mode = AssetAccessMode.UNKNOWN)
+            {
+                AssetInfo info = GetAssetInfo(assetName, mode);
+                
+                if (info.AssetType == AssetTypeEnum.RESOURCE)
+                {
+                    Object o = ResourcesManager.Instance.GetResouceObject(info.AssetPath[0]);
+                    return o;
+                }
+                else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
+                {
+#if UNITY_EDITOR
+                    if (_isEditorMode)
+                    {
+                        var assetPaths = UnityEditor.AssetDatabase.GetAssetPathsFromAssetBundleAndAssetName(info.AbName, assetName);
+                        return UnityEditor.AssetDatabase.LoadAssetAtPath<Object>(FindAssetPath(assetName, assetPaths));
+                    }
+#endif
+                    Object o = AssetBundleManager.Instance.GetAssetObject(FindAssetPath(assetName, info.AssetPath));
+                    return o;
+                }
+
+                return null;
+            }
+            
+            /// <summary>
             /// 同步加载资源对象。
             /// </summary>
             /// <typeparam name="T">目标资产类型。</typeparam>

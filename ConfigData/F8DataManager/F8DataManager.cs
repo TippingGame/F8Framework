@@ -80,8 +80,13 @@ namespace F8Framework.ConfigData
 			yield return LoadAsync("Sheet2", result => p_Sheet2 = result as Sheet2);
 			yield return LoadAsync("LocalizedStrings", result => p_LocalizedStrings = result as LocalizedStrings);
 		}
-
-		public IEnumerator LoadAllAsync(Action onLoadComplete)
+		
+		public void LoadAllAsyncCallback(Action onLoadComplete)
+		{
+			ModuleCenter.StartCoroutine(LoadAllAsyncIEnumerator(onLoadComplete));
+		}
+		
+		public IEnumerator LoadAllAsyncIEnumerator(Action onLoadComplete)
 		{
 			yield return LoadAsync("Sheet1", result => p_Sheet1 = result as Sheet1);
 			yield return LoadAsync("Sheet2", result => p_Sheet2 = result as Sheet2);
@@ -104,7 +109,7 @@ namespace F8Framework.ConfigData
 			var load = AssetManager.Instance.LoadAsyncCoroutine<TextAsset>(name);
 			yield return load;
 			{
-				TextAsset textAsset = AssetManager.Instance.Load<TextAsset>(name);
+				TextAsset textAsset = AssetManager.Instance.GetAssetObject<TextAsset>(name);
 				if (textAsset != null)
 				{
 					using (Stream s = new MemoryStream(textAsset.bytes))

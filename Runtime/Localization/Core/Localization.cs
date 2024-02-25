@@ -41,9 +41,10 @@ namespace F8Framework.Core
             // 后续会转到配置模块中加载
 #if UNITY_EDITOR
             ReadExcel.Instance.LoadAllExcelData();
+            LoadSuccess();
 #else
             string _classLoadAll = "F8DataManager";
-            string methodLoadAll = "LoadAll";
+            string methodLoadAll = "LoadAllAsyncCallback";
             var allAssembliesLoadAll = AppDomain.CurrentDomain.GetAssemblies();
             var typeLoadAll = allAssembliesLoadAll.SelectMany(assembly => assembly.GetTypes()).FirstOrDefault(type1 => type1.Name == _classLoadAll);
             if (typeLoadAll == null)
@@ -56,12 +57,22 @@ namespace F8Framework.Core
                 //通过反射，获取单例的实例
                 var property = typeLoadAll.BaseType.GetProperty("Instance");
                 var instance = property.GetValue(null,null);
+                Action callback = () =>
+                {
+                    LogF8.Log("加载完了啊本地化");
+                    LoadSuccess();
+                };
+                object[] parameters = new object[] { callback };
                 var myMethodExists = typeLoadAll.GetMethod(methodLoadAll);
-                myMethodExists.Invoke(instance, null);
+                myMethodExists.Invoke(instance, parameters);
                 LogF8.LogConfig("<color=green>加载所有配置表！</color>");
             }
 #endif
             
+        }
+
+        private void LoadSuccess()
+        {
             Dictionary<int, LocalizedStringsItem> tb;
             string _class = "F8DataManager";
             string method= "GetLocalizedStrings";
@@ -122,7 +133,6 @@ namespace F8Framework.Core
             LocalizationSettings.LoadLanguageSettings();
             ChangeLanguage(CurrentLanguageName ?? "");
         }
-
         /// <summary>
         /// 更改当前语言。
         /// </summary>
