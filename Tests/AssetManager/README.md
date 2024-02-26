@@ -6,8 +6,9 @@
 
 ## 简介（希望自己点击F8，就能开始制作游戏，不想多余的事）
 Unity F8AssetManager资产加载组件。  
-1.编辑器下：点击F8自动生成资产索引，AB名称，自动区分不同平台，清理多余AB和文件夹，Editor模式下减少开发周期。  
-2.运行时：同步/异步加载单个资产，指定文件夹加载多个资产，自动判断是Resources/AssetBundle资产，加载Remote远程资产，获取加载进度，同步打断异步加载，相同资源同时加载。
+1. 编辑器下：点击F8自动生成资产索引，AB名称，自动区分不同平台，清理多余AB和文件夹，Editor模式下减少开发周期。  
+2. 运行时：同步/异步加载单个资产，指定文件夹加载多个资产，自动判断是Resources/AssetBundle资产，加载Remote远程资产，获取加载进度，同步打断异步加载，相同资源同时加载。
+3. AB加载类型：1. 加载单个AB 2. 加载文件夹底下AB（不遍历所有文件夹） 3. 设置多个资产为同一AB名（与前面加载方式一样）
 
 ## 导入插件（需要首先导入核心）
 注意！内置在->F8Framework核心：https://github.com/TippingGame/F8Framework.git  
@@ -21,7 +22,7 @@ Unity F8AssetManager资产加载组件。
           自动生成索引文件Assets/F8Framework/AssetMap目录下面  
 ![image](ui_20240205225637.png)
 ![image](ui_20240205230012.png)
-2. 生成AssetBundles目录，自动赋予资产AB名称，打包AssetBundle，目录StreamingAssets/AssetBundles/Windows（不同平台例如Windows/iOS）  
+2. 生成AssetBundles目录，自动赋予资产AB名称（已有AB名不会覆盖），打包AssetBundle，目录StreamingAssets/AssetBundles/Windows（不同平台例如Windows/iOS）  
 ![image](ui_20240205225815.png)
 3. 假如没有报错，就可以愉快地使用了  
 
@@ -50,6 +51,7 @@ Unity F8AssetManager资产加载组件。
         //协程
         var load = FF8.Asset.LoadAsyncCoroutine<GameObject>("Cube");
         yield return load;
+        GameObject go2 = FF8.Asset.GetAssetObject<GameObject>("Cube");
         
         //加载文件夹内资产
         FF8.Asset.LoadDirAsync("NewFolder", () =>

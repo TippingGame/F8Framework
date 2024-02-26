@@ -27,6 +27,7 @@ public class DemoAssetManager : MonoBehaviour
         //协程
         var load = FF8.Asset.LoadAsyncCoroutine<GameObject>("Cube");
         yield return load;
+        GameObject go2 = FF8.Asset.GetAssetObject<GameObject>("Cube");
         
         //加载文件夹内资产
         FF8.Asset.LoadDirAsync("NewFolder", () =>

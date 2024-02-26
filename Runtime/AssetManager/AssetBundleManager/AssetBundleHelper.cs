@@ -39,6 +39,10 @@ namespace F8Framework.Core
                     assetBundlePath = _persistentDataPath;
                     break;
                 case SourceType.REMOTE_ADDRESS:
+                    if (string.IsNullOrEmpty(URLSetting.REMOTE_ADDRESS))
+                    {
+                        LogF8.LogError("加载远程包需要配置远程地址：REMOTE_ADDRESS");
+                    }
                     assetBundlePath = _remoteAddress;
                     break;
                 default:

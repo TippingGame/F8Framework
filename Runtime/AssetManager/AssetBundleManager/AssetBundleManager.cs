@@ -862,11 +862,7 @@ namespace F8Framework.Core
                     = AssetBundleHelper.GetAssetBundleFullName(regPath, AssetBundleHelper.SourceType.REMOTE_ADDRESS);
                 return remoteABFullPath;
             }
-            else
-            {
-                LogF8.LogError("加载远程包需要配置远程地址：REMOTE_ADDRESS");
-                return null;
-            }
+            return null;
         }
         
         private string[] GetDependenciedAssetBundles(string abName)
