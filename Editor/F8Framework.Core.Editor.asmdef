@@ -3,7 +3,8 @@
     "rootNamespace": "",
     "references": [
         "F8Framework.Core",
-        "F8Framework.AssetMap"
+        "F8Framework.AssetMap",
+        "LitJson"
     ],
     "includePlatforms": [
         "Editor"

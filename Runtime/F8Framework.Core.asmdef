@@ -3,7 +3,8 @@
     "rootNamespace": "",
     "references": ["F8Framework.AssetMap",
         "Unity.TextMeshPro",
-        "Unity.Timeline"
+        "Unity.Timeline",
+        "LitJson"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

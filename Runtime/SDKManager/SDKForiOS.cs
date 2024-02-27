@@ -39,22 +39,22 @@ namespace F8Framework.Core
         [DllImport("__Internal")]
         private static extern void SDKToast(string msg);
 #else
-        private static extern void SDKInit();
-        private static extern void SDKLogin();
-        private static extern void SDKLogout();
-        private static extern void SDKSwitchAccount();
-        private static extern void SDKLoadVideoAd(string id, string userId);
-        private static extern void SDKShowVideoAd(string id, string userId);
+        private void SDKInit() { }
+        private void SDKLogin() { }
+        private void SDKLogout() { }
+        private void SDKSwitchAccount() { }
+        private void SDKLoadVideoAd(string id, string userId) { }
+        private void SDKShowVideoAd(string id, string userId) { }
 
-        private static extern void SDKPay(string serverNum, string serverName, string playerId, string playerName,
+        private void SDKPay(string serverNum, string serverName, string playerId, string playerName,
             string amount, string extra, string orderId,
-            string productName, string productContent, string playerLevel, string sign, string guid);
+            string productName, string productContent, string playerLevel, string sign, string guid) { }
 
-        private static extern void SDKUpdateRole(string scenes, string serverId, string serverName, string roleId,
-            string roleName, string roleLeve, string roleCTime);
+        private void SDKUpdateRole(string scenes, string serverId, string serverName, string roleId,
+            string roleName, string roleLeve, string roleCTime) { }
 
-        private static extern void SDKExitGame();
-        private static extern void SDKToast(string msg);
+        private void SDKExitGame() { }
+        private void SDKToast(string msg) { }
 #endif
 
         public override void Init()

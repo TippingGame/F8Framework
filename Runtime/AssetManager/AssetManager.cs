@@ -119,19 +119,11 @@ namespace F8Framework.Core
                 }
                 else if (accessMode.HasFlag(AssetAccessMode.ASSET_BUNDLE))
                 {
-#if UNITY_WEBGL
-                    return GetAssetInfoFromAssetBundle(assetName, remote: true, showTip: true);
-#else
                     return GetAssetInfoFromAssetBundle(assetName, showTip: true);
-#endif
                 }
                 else if (accessMode.HasFlag(AssetAccessMode.UNKNOWN))
                 {
-#if UNITY_WEBGL
-                    AssetInfo r = GetAssetInfoFromAssetBundle(assetName, true);
-#else
                     AssetInfo r = GetAssetInfoFromAssetBundle(assetName);
-#endif
                     if (r == null)
                     {
                         r = GetAssetInfoFromResource(assetName);
@@ -193,7 +185,18 @@ namespace F8Framework.Core
                     }
 #endif
                     T o = AssetBundleManager.Instance.GetAssetObject<T>(FindAssetPath(assetName, info.AssetPath));
-                    return o;
+                    if (o != null)
+                    {
+                        return o;
+                    }
+                    AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePath);
+                    ab.Expand();
+                    o = AssetBundleManager.Instance.GetAssetObject<T>(FindAssetPath(assetName, info.AssetPath));
+                    if (o != null)
+                    {
+                        return o;
+                    }
+                    LogF8.LogError("获取不到资产AssetObject");
                 }
 
                 return null;
@@ -228,7 +231,18 @@ namespace F8Framework.Core
                     }
 #endif
                     Object o = AssetBundleManager.Instance.GetAssetObject(FindAssetPath(assetName, info.AssetPath), assetType);
-                    return o;
+                    if (o != null)
+                    {
+                        return o;
+                    }
+                    AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePath);
+                    ab.Expand();
+                    o = AssetBundleManager.Instance.GetAssetObject(FindAssetPath(assetName, info.AssetPath), assetType);
+                    if (o != null)
+                    {
+                        return o;
+                    }
+                    LogF8.LogError("获取不到资产AssetObject");
                 }
 
                 return null;
@@ -261,7 +275,18 @@ namespace F8Framework.Core
                     }
 #endif
                     Object o = AssetBundleManager.Instance.GetAssetObject(FindAssetPath(assetName, info.AssetPath));
-                    return o;
+                    if (o != null)
+                    {
+                        return o;
+                    }
+                    AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePath);
+                    ab.Expand();
+                    o = AssetBundleManager.Instance.GetAssetObject(FindAssetPath(assetName, info.AssetPath));
+                    if (o != null)
+                    {
+                        return o;
+                    }
+                    LogF8.LogError("获取不到资产AssetObject");
                 }
 
                 return null;

@@ -133,7 +133,7 @@ namespace F8Framework.Core
             }
             else
             {
-                do //暂时只读第一个sheet
+                do // 读取所有的sheet
                 {
                     // sheet name
                     string className = excelReader.Name;

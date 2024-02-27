@@ -2,8 +2,10 @@ using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.CSharp;
 using System.CodeDom.Compiler;
+#if !UNITY_WEBGL
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+#endif
 using System.IO;
 using System;
 using System.Linq;
@@ -11,6 +13,7 @@ using System.Text;
 using UnityEngine;
 using UnityEditor;
 using Excel;
+using LitJson;
 
 namespace F8Framework.Core.Editor
 {
@@ -54,7 +57,8 @@ namespace F8Framework.Core.Editor
             // 创建一个新的.asmdef文件
             string asmdefContent = @"{
     ""name"": ""F8Framework.ConfigData"",
-    ""references"": [""F8Framework.Core""],
+    ""references"": [""F8Framework.Core"",
+        ""LitJson""],
     ""includePlatforms"": [],
     ""excludePlatforms"": [],
     ""allowUnsafeCode"": false,
@@ -75,13 +79,11 @@ namespace F8Framework.Core.Editor
             FileTools.SafeDeleteDir(FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/ConfigData/F8DataManager");
             FileTools.SafeDeleteDir(FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/ConfigData/F8ExcelDataClass");
             CreateAsmdefFile();
-            EditorUtility.ClearProgressBar();
             string INPUT_PATH = Application.dataPath + ExcelPath;
 
             if (!Directory.Exists(INPUT_PATH))
             {
                 EditorUtility.DisplayDialog("注意！！！", "\n请在游戏根目录下创建：" + ExcelPath + "目录，用于存放数据表。", "确定");
-                EditorUtility.ClearProgressBar();
                 throw new Exception("暂无目录存放数据表！");
             }
 
@@ -90,7 +92,6 @@ namespace F8Framework.Core.Editor
             if (files == null || files.Length == 0)
             {
                 EditorUtility.DisplayDialog("注意！！！", "\n暂无可以导入的数据表！" + ExcelPath + "目录", "确定");
-                EditorUtility.ClearProgressBar();
                 throw new Exception("暂无可以导入的数据表！");
             }
 
@@ -117,22 +118,21 @@ namespace F8Framework.Core.Editor
             FileTools.SafeDeleteFile(URLSetting.CS_STREAMINGASSETS_URL + FileIndexFile);
             foreach (string item in files)
             {
-                ProgressBar.UpdataBar("正在加载 " + item, step / files.Length * 0.4f);
                 step++;
                 GetExcelData(item);
                 OnLogCallBack(item.Substring(item.LastIndexOf('\\') + 1));
             }
 
-            EditorUtility.ClearProgressBar();
             if (codeList.Count == 0)
             {
                 EditorUtility.DisplayDialog("注意！！！", "\n暂无可以导入的数据表！", "确定");
-                EditorUtility.ClearProgressBar();
                 throw new Exception("暂无可以导入的数据表！");
             }
 
             //编译代码,生成包含所有数据表内数据类型的dll
             Assembly assembly = CompileCode(codeList.ToArray());
+            AssetDatabase.Refresh();
+            AssetDatabase.SaveAssets();
             //准备序列化数据
             string BinDataPath = Application.dataPath + BinDataFolder; //序列化后的数据存放路径
             if (Directory.Exists(BinDataPath)) Directory.Delete(BinDataPath, true); //删除旧的数据文件
@@ -140,8 +140,6 @@ namespace F8Framework.Core.Editor
             step = 1;
             foreach (KeyValuePair<string, List<ConfigData[]>> each in dataDict)
             {
-                ProgressBar.UpdataBar("序列化数据: " + each.Key,
-                    step / dataDict.Count * 0.6f + 0.399f); //0.399是为了进度条在生成所有代码以前不会走完显示完成弹窗
                 step++;
                 //Assembly.CreateInstance 方法 (String) 使用区分大小写的搜索，从此程序集中查找指定的类型，然后使用系统激活器创建它的实例化对象
                 object container = assembly.CreateInstance(CODE_NAMESPACE + "." + each.Key);
@@ -149,12 +147,9 @@ namespace F8Framework.Core.Editor
                 //序列化数据
                 Serialize(container, temp, each.Value, BinDataPath);
             }
-
-            EditorUtility.ClearProgressBar();
-            ProgressBar.UpdataBar("创建数据管理类: F8DataManager", 0.999f);
             ScriptGenerator.CreateDataManager(assembly);
-            ProgressBar.UpdataBar("\n导表成功!", 1);
             AssetDatabase.Refresh();
+            AssetDatabase.SaveAssets();
             LogF8.LogConfig("<color=yellow>导表成功!</color>");
         }
 
@@ -200,7 +195,6 @@ namespace F8Framework.Core.Editor
             catch
             {
                 EditorUtility.DisplayDialog("注意！！！", "\n请关闭 " + inputPath + " 后再导表！", "确定");
-                EditorUtility.ClearProgressBar();
                 throw new Exception("请关闭 " + inputPath + " 后再导表！");
             }
 
@@ -209,13 +203,11 @@ namespace F8Framework.Core.Editor
             else if (inputPath.EndsWith(".xlsx")) excelReader = ExcelReaderFactory.CreateOpenXmlReader(stream);
             if (!excelReader.IsValid)
             {
-                ProgressBar.HideBarWithFailInfo("\n无法读取的文件:  " + inputPath);
-                EditorUtility.ClearProgressBar();
                 throw new Exception("无法读取的文件:  " + inputPath);
             }
             else
             {
-                do //暂时只读第一个sheet
+                do // 读取所有的sheet
                 {
                     // sheet name
                     string className = excelReader.Name;
@@ -249,7 +241,6 @@ namespace F8Framework.Core.Editor
                         else if (index > 2)
                         {
                             if (types == null || names == null || datas == null){
-                                ProgressBar.HideBarWithFailInfo("\n数据错误！["+ className +"]配置表！第" + index + "行\n" + inputPath);
                                 throw new Exception("数据错误！["+ className +"]配置表！第" + index + "行" + inputPath);
                             }
                             //把读取的数据和数据类型,名称保存起来,后面用来动态生成类
@@ -273,7 +264,6 @@ namespace F8Framework.Core.Editor
 
                     if (string.IsNullOrEmpty(className))
                     {
-                        ProgressBar.HideBarWithFailInfo("\n空的类名（excel页签名）, 路径:  " + inputPath);
                         throw new Exception("空的类名（excel页签名）, 路径:  " + inputPath);
                     }
 
@@ -285,7 +275,6 @@ namespace F8Framework.Core.Editor
                         codeList.Add(generator.Generate());
                         if (dataDict.ContainsKey(className))
                         {
-                            ProgressBar.HideBarWithFailInfo("\n类名重复:" + className + " ,路径: " + inputPath);
                             throw new Exception("类名重复: " + className + " ,路径:  " + inputPath);
                         }
 
@@ -316,10 +305,9 @@ namespace F8Framework.Core.Editor
             CompilerResults cr = codeProvider.CompileAssemblyFromSource(objCompilerParameters, scripts);
             if (cr.Errors.HasErrors)
             {
-                ProgressBar.HideBarWithFailInfo("\n编译dll出错（详情见控制台）！");
                 foreach (CompilerError err in cr.Errors)
                 {
-                    LogF8.LogError(err.ErrorText);
+                    LogF8.LogError("编译dll出错：" + err.ErrorText);
                 }
 
                 throw new Exception("编译dll出错！请检查配置表格式！");
@@ -367,13 +355,22 @@ namespace F8Framework.Core.Editor
 
                 dict.GetType().GetMethod("Add").Invoke(dict, new System.Object[] { id, t });
             }
-
+#if UNITY_WEBGL
+            // 序列化对象
+            string json = JsonMapper.ToJson(container);
+            // 写入到文件
+            string filePath = BinDataPath + "/" + container.GetType().Name + ".json";
+            File.WriteAllText(filePath, json);
+            // 记录日志
+            LogF8.LogConfig("已序列化 " + BinDataPath + "/<color=#FFFF00>" + container.GetType().Name + ".json</color>");
+#else
             IFormatter f = new BinaryFormatter();
             Stream s = new FileStream(BinDataPath + "/" + container.GetType().Name + ".bytes", FileMode.OpenOrCreate,
                 FileAccess.Write, FileShare.Write);
             f.Serialize(s, container);
             LogF8.LogConfig("已序列化 " + BinDataPath + "/<color=#FFFF00>" + container.GetType().Name + ".bytes</color>");
             s.Close();
+#endif
         }
     }
 }

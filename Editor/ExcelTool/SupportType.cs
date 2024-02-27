@@ -172,8 +172,6 @@ namespace F8Framework.Core.Editor
                     type = "System.Object[][]";
                     break;
                 default:
-                    ProgressBar.HideBarWithFailInfo("\n输入了错误的数据类型: " + type + ", 类名: " + ClassName + ", 位于: " +
-                                                    InputPath);
                     throw new Exception("输入了错误的数据类型:  " + type + ", 类名:  " + ClassName + ", 位于:  " + InputPath);
             }
 
@@ -202,7 +200,8 @@ namespace F8Framework.Core.Editor
             source.Append("using System.Runtime.Serialization.Formatters.Binary;\n");
             source.Append("using System.IO;\n");
             source.Append("using " + ExcelDataTool.CODE_NAMESPACE + ";\n");
-            source.Append("using F8Framework.Core;\n\n");
+            source.Append("using F8Framework.Core;\n");
+            source.Append("using LitJson;\n\n");
             source.Append("namespace F8Framework.ConfigData\n");
             source.Append("{\n");
             source.Append("\tpublic class F8DataManager : Singleton<F8DataManager>\n");
@@ -247,7 +246,7 @@ namespace F8Framework.Core.Editor
             source.Append("\t\t{\n");
             foreach (Type t in types)
             {
-                source.Append("\t\t\tp_" + t.Name + " = Load(" + '"' + t.Name + '"' + ") as " + t.Name + ";\n");
+                source.Append("\t\t\tp_" + t.Name + " = Load<" + t.Name + ">(" + '"' + t.Name + '"' + ") as " + t.Name + ";\n");
             }
 
             source.Append("\t\t}\n\n");
@@ -267,7 +266,7 @@ namespace F8Framework.Core.Editor
             source.Append("\t\t{\n");
             foreach (Type t in types)
             {
-                source.Append("\t\t\tyield return LoadAsync("+ '"' + t.Name + '"' + ", result => " +  "p_" + t.Name + " = result" + " as " + t.Name + ");\n");
+                source.Append("\t\t\tyield return LoadAsync<" + t.Name + ">("+ '"' + t.Name + '"' + ", result => " +  "p_" + t.Name + " = result" + " as " + t.Name + ");\n");
             }
 
             source.Append("\t\t}\n\n");
@@ -283,37 +282,49 @@ namespace F8Framework.Core.Editor
             source.Append("\t\t{\n");
             foreach (Type t in types)
             {
-                source.Append("\t\t\tyield return LoadAsync("+ '"' + t.Name + '"' + ", result => " +  "p_" + t.Name + " = result" + " as " + t.Name + ");\n");
+                source.Append("\t\t\tyield return LoadAsync<" + t.Name + ">("+ '"' + t.Name + '"' + ", result => " +  "p_" + t.Name + " = result" + " as " + t.Name + ");\n");
             }
             source.Append("\t\t\tonLoadComplete?.Invoke();\n");
             source.Append("\t\t}\n\n");
             
             //反序列化
-            source.Append("\t\tprivate System.Object Load(string name)\n");
+            source.Append("\t\tprivate System.Object Load<T>(string name)\n");
             source.Append("\t\t{\n");
             source.Append("\t\t\tIFormatter f = new BinaryFormatter();\n");
-            source.Append("\t\t\tTextAsset text = AssetManager.Instance.Load<TextAsset>(name);\n");
-            source.Append("\t\t\tusing (MemoryStream memoryStream = new MemoryStream(text.bytes))\n");
+            source.Append("\t\t\tTextAsset textAsset = AssetManager.Instance.Load<TextAsset>(name);\n");
+            source.Append("\t\t\tif (textAsset != null)\n");
+            source.Append("\t\t\t{\n");
+            source.Append("\t\t\t\treturn null;\n");
+            source.Append("\t\t\t}\n");
+            source.Append("#if UNITY_WEBGL\n");
+            source.Append("\t\t\tT obj =  JsonMapper.ToObject<T>(textAsset.text);\n");
+            source.Append("\t\t\treturn obj;\n");
+            source.Append("#else\n");
+            source.Append("\t\t\tusing (MemoryStream memoryStream = new MemoryStream(textAsset.bytes))\n");
             source.Append("\t\t\t{\n");
             source.Append("\t\t\t\treturn f.Deserialize(memoryStream);\n");
             source.Append("\t\t\t}\n");
+            source.Append("#endif\n");
             source.Append("\t\t}\n");
             
-            source.Append("\t\tprivate IEnumerator LoadAsync(string name, Action<object> callback)\n");
+            source.Append("\t\tprivate IEnumerator LoadAsync<T>(string name, Action<object> callback)\n");
             source.Append("\t\t{\n");
             source.Append("\t\t\tIFormatter f = new BinaryFormatter();\n");
             source.Append("\t\t\tvar load = AssetManager.Instance.LoadAsyncCoroutine<TextAsset>(name);\n");
             source.Append("\t\t\tyield return load;\n");
+            source.Append("\t\t\tTextAsset textAsset = AssetManager.Instance.GetAssetObject<TextAsset>(name);\n");
+            source.Append("\t\t\tif (textAsset != null)\n");
             source.Append("\t\t\t{\n");
-            source.Append("\t\t\t\tTextAsset textAsset = AssetManager.Instance.GetAssetObject<TextAsset>(name);\n");
-            source.Append("\t\t\t\tif (textAsset != null)\n");
+            source.Append("#if UNITY_WEBGL\n");
+            source.Append("\t\t\t\tT obj =  JsonMapper.ToObject<T>(textAsset.text);\n");
+            source.Append("\t\t\t\tcallback(obj);\n");
+            source.Append("#else\n");
+            source.Append("\t\t\t\tusing (Stream s = new MemoryStream(textAsset.bytes))\n");
             source.Append("\t\t\t\t{\n");
-            source.Append("\t\t\t\t\tusing (Stream s = new MemoryStream(textAsset.bytes))\n");
-            source.Append("\t\t\t\t\t{\n");
-            source.Append("\t\t\t\t\t\tobject obj = f.Deserialize(s);\n");
-            source.Append("\t\t\t\t\t\tcallback(obj);\n");
-            source.Append("\t\t\t\t\t}\n");
+            source.Append("\t\t\t\t\tobject obj = f.Deserialize(s);\n");
+            source.Append("\t\t\t\t\tcallback(obj);\n");
             source.Append("\t\t\t\t}\n");
+            source.Append("#endif\n");
             source.Append("\t\t\t}\n");
             source.Append("\t\t}\n");
             source.Append("\t}\n");

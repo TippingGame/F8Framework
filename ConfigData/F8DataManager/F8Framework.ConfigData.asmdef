@@ -1,6 +1,7 @@
 {
     "name": "F8Framework.ConfigData",
-    "references": ["F8Framework.Core"],
+    "references": ["F8Framework.Core",
+        "LitJson"],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

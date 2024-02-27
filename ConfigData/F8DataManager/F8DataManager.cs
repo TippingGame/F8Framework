@@ -12,6 +12,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using F8Framework.F8ExcelDataClass;
 using F8Framework.Core;
+using LitJson;
 
 namespace F8Framework.ConfigData
 {
@@ -62,9 +63,9 @@ namespace F8Framework.ConfigData
 
 		public void LoadAll()
 		{
-			p_Sheet1 = Load("Sheet1") as Sheet1;
-			p_Sheet2 = Load("Sheet2") as Sheet2;
-			p_LocalizedStrings = Load("LocalizedStrings") as LocalizedStrings;
+			p_Sheet1 = Load<Sheet1>("Sheet1") as Sheet1;
+			p_Sheet2 = Load<Sheet2>("Sheet2") as Sheet2;
+			p_LocalizedStrings = Load<LocalizedStrings>("LocalizedStrings") as LocalizedStrings;
 		}
 
 		public void RuntimeLoadAll(Dictionary<String, System.Object> objs)
@@ -76,48 +77,60 @@ namespace F8Framework.ConfigData
 
 		public IEnumerable LoadAllAsync()
 		{
-			yield return LoadAsync("Sheet1", result => p_Sheet1 = result as Sheet1);
-			yield return LoadAsync("Sheet2", result => p_Sheet2 = result as Sheet2);
-			yield return LoadAsync("LocalizedStrings", result => p_LocalizedStrings = result as LocalizedStrings);
+			yield return LoadAsync<Sheet1>("Sheet1", result => p_Sheet1 = result as Sheet1);
+			yield return LoadAsync<Sheet2>("Sheet2", result => p_Sheet2 = result as Sheet2);
+			yield return LoadAsync<LocalizedStrings>("LocalizedStrings", result => p_LocalizedStrings = result as LocalizedStrings);
 		}
-		
+
 		public void LoadAllAsyncCallback(Action onLoadComplete)
 		{
 			ModuleCenter.StartCoroutine(LoadAllAsyncIEnumerator(onLoadComplete));
 		}
-		
+
 		public IEnumerator LoadAllAsyncIEnumerator(Action onLoadComplete)
 		{
-			yield return LoadAsync("Sheet1", result => p_Sheet1 = result as Sheet1);
-			yield return LoadAsync("Sheet2", result => p_Sheet2 = result as Sheet2);
-			yield return LoadAsync("LocalizedStrings", result => p_LocalizedStrings = result as LocalizedStrings);
+			yield return LoadAsync<Sheet1>("Sheet1", result => p_Sheet1 = result as Sheet1);
+			yield return LoadAsync<Sheet2>("Sheet2", result => p_Sheet2 = result as Sheet2);
+			yield return LoadAsync<LocalizedStrings>("LocalizedStrings", result => p_LocalizedStrings = result as LocalizedStrings);
 			onLoadComplete?.Invoke();
 		}
 
-		private System.Object Load(string name)
+		private System.Object Load<T>(string name)
 		{
 			IFormatter f = new BinaryFormatter();
-			TextAsset text = AssetManager.Instance.Load<TextAsset>(name);
-			using (MemoryStream memoryStream = new MemoryStream(text.bytes))
+			TextAsset textAsset = AssetManager.Instance.Load<TextAsset>(name);
+			if (textAsset != null)
+			{
+				return null;
+			}
+#if UNITY_WEBGL
+			T obj =  JsonMapper.ToObject<T>(textAsset.text);
+			return obj;
+#else
+			using (MemoryStream memoryStream = new MemoryStream(textAsset.bytes))
 			{
 				return f.Deserialize(memoryStream);
 			}
+#endif
 		}
-		private IEnumerator LoadAsync(string name, Action<object> callback)
+		private IEnumerator LoadAsync<T>(string name, Action<object> callback)
 		{
 			IFormatter f = new BinaryFormatter();
 			var load = AssetManager.Instance.LoadAsyncCoroutine<TextAsset>(name);
 			yield return load;
+			TextAsset textAsset = AssetManager.Instance.GetAssetObject<TextAsset>(name);
+			if (textAsset != null)
 			{
-				TextAsset textAsset = AssetManager.Instance.GetAssetObject<TextAsset>(name);
-				if (textAsset != null)
+#if UNITY_WEBGL
+				T obj =  JsonMapper.ToObject<T>(textAsset.text);
+				callback(obj);
+#else
+				using (Stream s = new MemoryStream(textAsset.bytes))
 				{
-					using (Stream s = new MemoryStream(textAsset.bytes))
-					{
-						object obj = f.Deserialize(s);
-						callback(obj);
-					}
+					object obj = f.Deserialize(s);
+					callback(obj);
 				}
+#endif
 			}
 		}
 	}

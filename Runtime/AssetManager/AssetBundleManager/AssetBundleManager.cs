@@ -16,7 +16,7 @@ namespace F8Framework.Core
         
         private AssetBundleManifest manifest;
         private Dictionary<string, AssetBundleLoader> assetBundleLoaders = new Dictionary<string, AssetBundleLoader>();
-        private DownloadRequest downloadManifest;
+        private DownloadRequest downloadManifest = null;
         private bool isDownloadManifest = false;
         /// <summary>
         /// 通过资产捆绑路径同步加载。
@@ -899,9 +899,12 @@ namespace F8Framework.Core
         public void OnInit(object createParam)
         {
 #if UNITY_WEBGL
-            string manifestPath = AssetBundleHelper.GetAssetBundleManifestPath(AssetBundleHelper.SourceType.REMOTE_ADDRESS);
+            string manifestPath = AssetBundleHelper.GetAssetBundleManifestPath();
             if (manifestPath == null)
                 return;
+    #if UNITY_EDITOR
+            manifestPath = "file://" + manifestPath;
+    #endif
             downloadManifest = new DownloadRequest(manifestPath, 0);
 #else
             string manifestPath = AssetBundleHelper.GetAssetBundleManifestPath();
@@ -915,15 +918,17 @@ namespace F8Framework.Core
         
         public void OnUpdate()
         {
+#if UNITY_WEBGL
             if (isDownloadManifest == false)
             {
-                if (downloadManifest.IsFinished)
+                if (downloadManifest != null && downloadManifest.IsFinished)
                 {
                     isDownloadManifest = true;
                     manifest = downloadManifest.DownloadedAssetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
                     manifest.GetAllAssetBundles();
                 }
             }
+#endif
             foreach (AssetBundleLoader loader in assetBundleLoaders.Values)
             {
                 loader.OnUpdate();
