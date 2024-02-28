@@ -107,7 +107,7 @@ namespace F8Framework.Core
 
             if (_clearEventsOnDestroy || GameObjectPool.Instance.s_isApplicationQuitting)
             {
-                FF8.GameObjectPool.GameObjectInstantiated.Clear();
+                GameObjectPool.Instance.GameObjectInstantiated.Clear();
             }
             
             Destroy(gameObject);

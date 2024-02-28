@@ -12,6 +12,7 @@ namespace F8Framework.AssetMap
        }
        
        private static Dictionary<string, string> mappings = new Dictionary<string, string> {
+          {"config", "config"},
        };
    }
 }

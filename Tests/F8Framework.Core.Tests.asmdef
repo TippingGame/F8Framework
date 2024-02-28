@@ -1,8 +1,13 @@
 {
-    "name": "F8Framework.ConfigData",
-    "references": ["F8Framework.Core",
-        "LitJson"],
-    "includePlatforms": [],
+    "name": "F8Framework.Core.Tests",
+    "rootNamespace": "",
+    "references": [
+        "F8Framework.Core",
+        "Unity.Timeline"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

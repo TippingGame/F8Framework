@@ -997,7 +997,7 @@ namespace F8Framework.Core
                 poolable._transform.SetParent(_isSetup ? _cachedTransform : transform, false);
             }
 
-            FF8.GameObjectPool.GameObjectInstantiated.RaiseEvent(newGameObject);
+            GameObjectPool.Instance.GameObjectInstantiated.RaiseEvent(newGameObject);
             RaiseGameObjectInstantiatedCallback(newGameObject);
             return poolable;
         }

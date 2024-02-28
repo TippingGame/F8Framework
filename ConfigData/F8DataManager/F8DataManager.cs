@@ -11,10 +11,9 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using F8Framework.F8ExcelDataClass;
-using F8Framework.Core;
 using LitJson;
 
-namespace F8Framework.ConfigData
+namespace F8Framework.Core
 {
 	public class F8DataManager : Singleton<F8DataManager>
 	{
@@ -61,6 +60,22 @@ namespace F8Framework.ConfigData
 			return p_LocalizedStrings.Dict;
 		}
 
+		public void LoadLocalizedStrings()
+		{
+			p_LocalizedStrings = Load<LocalizedStrings>("LocalizedStrings") as LocalizedStrings;
+		}
+
+		public void LoadLocalizedStringsCallback(Action onLoadComplete)
+		{
+			ModuleCenter.StartCoroutine(LoadLocalizedStringsIEnumerator(onLoadComplete));
+		}
+
+		public IEnumerator LoadLocalizedStringsIEnumerator(Action onLoadComplete)
+		{
+			yield return LoadAsync<LocalizedStrings>("LocalizedStrings", result => p_LocalizedStrings = result as LocalizedStrings);
+		onLoadComplete?.Invoke();
+		}
+
 		public void LoadAll()
 		{
 			p_Sheet1 = Load<Sheet1>("Sheet1") as Sheet1;
@@ -99,7 +114,7 @@ namespace F8Framework.ConfigData
 		{
 			IFormatter f = new BinaryFormatter();
 			TextAsset textAsset = AssetManager.Instance.Load<TextAsset>(name);
-			if (textAsset != null)
+			if (textAsset == null)
 			{
 				return null;
 			}

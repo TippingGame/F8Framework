@@ -50,28 +50,17 @@ namespace F8Framework.Core.Editor
         
         private static void CreateAsmdefFile()
         {
-            // 创建.asmdef文件的路径
-            string asmdefPath = Application.dataPath + DataManagerFolder + "/F8Framework.ConfigData.asmdef";
+            // 创建.asmref文件的路径
+            string asmrefPath = Application.dataPath + DataManagerFolder + "/F8DataManager.asmref";
             
-            FileTools.CheckFileAndCreateDirWhenNeeded(asmdefPath);
+            FileTools.CheckFileAndCreateDirWhenNeeded(asmrefPath);
             // 创建一个新的.asmdef文件
             string asmdefContent = @"{
-    ""name"": ""F8Framework.ConfigData"",
-    ""references"": [""F8Framework.Core"",
-        ""LitJson""],
-    ""includePlatforms"": [],
-    ""excludePlatforms"": [],
-    ""allowUnsafeCode"": false,
-    ""overrideReferences"": false,
-    ""precompiledReferences"": [],
-    ""autoReferenced"": true,
-    ""defineConstraints"": [],
-    ""versionDefines"": [],
-    ""noEngineReferences"": false
+    ""reference"": ""F8Framework.Core""
 }";
 
             // 将内容写入.asmdef文件
-            File.WriteAllText(asmdefPath, asmdefContent);
+            File.WriteAllText(asmrefPath, asmdefContent);
         }
         
         public static void LoadAllExcelData()

@@ -38,60 +38,28 @@ namespace F8Framework.Core
             }
             LocalizedStrings.Clear();
             
-            // 后续会转到配置模块中加载
+            // 必须先加载本地化配置表
 #if UNITY_EDITOR
             ReadExcel.Instance.LoadAllExcelData();
             LoadSuccess();
+#elif UNITY_WEBGL
+            F8DataManager.Instance.LoadLocalizedStringsCallback(() =>
+            {
+                LogF8.LogConfig("WebGL异步加载完本地化表");
+                LoadSuccess();
+            });
 #else
-            string _classLoadAll = "F8DataManager";
-            string methodLoadAll = "LoadAllAsyncCallback";
-            var allAssembliesLoadAll = AppDomain.CurrentDomain.GetAssemblies();
-            var typeLoadAll = allAssembliesLoadAll.SelectMany(assembly => assembly.GetTypes()).FirstOrDefault(type1 => type1.Name == _classLoadAll);
-            if (typeLoadAll == null)
-            {
-                LogF8.LogError("需要检查是否有正确生成F8DataManager.cs!");
-                return;
-            }
-            else
-            {
-                //通过反射，获取单例的实例
-                var property = typeLoadAll.BaseType.GetProperty("Instance");
-                var instance = property.GetValue(null,null);
-                Action callback = () =>
-                {
-                    LogF8.LogConfig("加载完本地化表");
-                    LoadSuccess();
-                };
-                object[] parameters = new object[] { callback };
-                var myMethodExists = typeLoadAll.GetMethod(methodLoadAll);
-                myMethodExists.Invoke(instance, parameters);
-                LogF8.LogConfig("<color=green>加载所有配置表！</color>");
-            }
+            F8DataManager.Instance.LoadLocalizedStrings();
+            LoadSuccess();
 #endif
             
         }
 
         private void LoadSuccess()
         {
-            Dictionary<int, LocalizedStringsItem> tb;
-            string _class = "F8DataManager";
-            string method= "GetLocalizedStrings";
-            var allAssemblies = AppDomain.CurrentDomain.GetAssemblies();
-            var type = allAssemblies.SelectMany(assembly => assembly.GetTypes()).FirstOrDefault(type1 => type1.Name == _class);
-            if (type == null)
-            {
-                LogF8.LogError("需要检查是否有正确生成F8DataManager.cs!");
-                return;
-            }
-            else
-            {
-                //通过反射，获取单例的实例
-                var property = type.BaseType.GetProperty("Instance");
-                var instance = property.GetValue(null,null);
-                var myMethodExists = type.GetMethod(method);
-                tb = myMethodExists.Invoke(instance, null) as Dictionary<int, LocalizedStringsItem>;
-                LogF8.LogConfig("<color=green>获取本地化表格成功！</color>");
-            }
+            Dictionary<int, LocalizedStringsItem> tb = F8DataManager.Instance.GetLocalizedStrings();
+           
+            LogF8.LogConfig("<color=green>获取本地化表格成功！</color>");
             
             foreach (var item in tb.Values)
             {

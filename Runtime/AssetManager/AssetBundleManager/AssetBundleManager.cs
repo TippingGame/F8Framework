@@ -16,8 +16,11 @@ namespace F8Framework.Core
         
         private AssetBundleManifest manifest;
         private Dictionary<string, AssetBundleLoader> assetBundleLoaders = new Dictionary<string, AssetBundleLoader>();
+#if UNITY_WEBGL
         private DownloadRequest downloadManifest = null;
         private bool isDownloadManifest = false;
+#endif
+        
         /// <summary>
         /// 通过资产捆绑路径同步加载。
         /// 如果重复加载资产，则将直接从资源池中提供。

@@ -83,25 +83,8 @@ namespace F8Framework.Core
                 Serialize(container, temp, each.Value);
                 objs.Add(each.Key, container);
             }
-            string _class = "F8DataManager";
-            string method= "RuntimeLoadAll";
-            var allAssemblies = AppDomain.CurrentDomain.GetAssemblies();
-            var type = allAssemblies.SelectMany(assembly => assembly.GetTypes()).FirstOrDefault(type1 => type1.Name == _class);
-            if (type == null)
-            {
-                LogF8.LogError("需要检查是否有正确生成F8DataManager.cs!");
-                return;
-            }
-            else
-            {
-                //通过反射，获取单例的实例
-                var property = type.BaseType.GetProperty("Instance");
-                var instance = property.GetValue(null,null);
-                object[] parameters = new object[] { objs };
-                var myMethodExists = type.GetMethod(method);
-                myMethodExists.Invoke(instance, parameters);
-                LogF8.LogConfig("<color=green>运行时导表成功！</color>");
-            }
+            F8DataManager.Instance.RuntimeLoadAll(objs);
+            LogF8.LogConfig("<color=green>运行时导表成功！</color>");
         }
 
         //数据表内每一格数据

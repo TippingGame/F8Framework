@@ -1,5 +1,3 @@
-// using F8Framework.ConfigData;
-
 namespace F8Framework.Core
 {
     public static class FF8
@@ -26,7 +24,7 @@ namespace F8Framework.Core
         // 资产管理
         private static AssetManager _asset;
         // 读取配置表
-        // private static F8DataManager _config;
+        private static F8DataManager _config;
         // 音频管理
         private static AudioManager _audio;
         // 补间动画
@@ -130,15 +128,15 @@ namespace F8Framework.Core
             }
         }
         
-        // public static F8DataManager Config
-        // {
-        //     get
-        //     {
-        //         if (_config == null)
-        //             _config = F8DataManager.Instance;
-        //         return _config;
-        //     }
-        // }
+        public static F8DataManager Config
+        {
+            get
+            {
+                if (_config == null)
+                    _config = F8DataManager.Instance;
+                return _config;
+            }
+        }
         
         public static AudioManager Audio
         {

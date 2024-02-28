@@ -18,7 +18,7 @@ public class GameLauncher : MonoBehaviour
         FF8.GameObjectPool.ToString();
         FF8.PoolGlobal.ToString();
         FF8.Asset.ToString();
-        // FF8.Config.ToString();
+        FF8.Config.ToString();
         FF8.Audio.ToString();
         FF8.Tween.ToString();
         FF8.UI.ToString();

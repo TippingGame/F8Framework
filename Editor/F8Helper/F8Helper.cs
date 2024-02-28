@@ -36,8 +36,8 @@ namespace F8Framework.Core.Editor
                 && selectionRect.Contains(Event.current.mousePosition))
             {
                 string strPath = AssetDatabase.GUIDToAssetPath(guid);
- 
-                if (Path.GetExtension(strPath) == string.Empty) //文件夹
+                
+                if (Directory.Exists(strPath)) //文件夹
                 {
                     Process.Start(Path.GetFullPath(strPath));
                 }

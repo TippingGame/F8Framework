@@ -31,7 +31,7 @@ namespace F8Framework.Core
 
 			if (string.IsNullOrEmpty(localizer.textId))
 			{
-				EditorGUILayout.HelpBox($"请输入 Text ID。", MessageType.Info);
+				EditorGUILayout.HelpBox($"请输入 Text ID", MessageType.Info);
 
 				var postfix = keys.Count > 5 ? $"\n\n<i>还有更多（共 {keys.Count.ToString()} 个ID）</i>" : "";
 				ShowSuggestion(keys.ToList(), postfix);

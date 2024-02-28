@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using F8Framework.Core;
-using F8Framework.ConfigData;
 
 public class DemoExcelTool : MonoBehaviour
 {
@@ -13,16 +12,16 @@ public class DemoExcelTool : MonoBehaviour
     // void Start()
     // {
     //     //读取二进制文件
-    //     F8DataManager.Instance.LoadAll();
-    //     text.text += F8DataManager.Instance.Gettable1ByID(1).category.Length;
-    //     Debug.Log(F8DataManager.Instance.Gettable1ByID(1).category.Length);
-    //     text.text += F8DataManager.Instance.Gettable1ByID(1).price3;
-    //     Debug.Log(F8DataManager.Instance.Gettable1ByID(1).price3);
-    //     text.text += F8DataManager.Instance.Gettable1ByID(1).name;
-    //     Debug.Log(F8DataManager.Instance.Gettable1ByID(1).name);
-    //     if (F8DataManager.Instance.Gettable1ByID(33) != null)
+    //     FF8.Config.LoadAll();
+    //     text.text += FF8.Config.Gettable1ByID(1).category.Length;
+    //     Debug.Log(FF8.Config.Gettable1ByID(1).category.Length);
+    //     text.text += FF8.Config.Gettable1ByID(1).price3;
+    //     Debug.Log(FF8.Config.Gettable1ByID(1).price3);
+    //     text.text += FF8.Config.Gettable1ByID(1).name;
+    //     Debug.Log(FF8.Config.Gettable1ByID(1).name);
+    //     if (FF8.Config.Gettable1ByID(33) != null)
     //     {
-    //         foreach (var VARIABLE in F8DataManager.Instance.Gettable1ByID(33).objfsaads)
+    //         foreach (var VARIABLE in FF8.Config.Gettable1ByID(33).objfsaads)
     //         {
     //             foreach (var VARIABLE2 in VARIABLE)
     //             {
@@ -72,9 +71,9 @@ public class DemoExcelTool : MonoBehaviour
     //     }
     //     //读取Excel文件
     //     ReadExcel.Instance.LoadAllExcelData();
-    //     text.text += F8DataManager.Instance.Gettable1ByID(115).name;
-    //     Debug.Log(F8DataManager.Instance.Gettable1ByID(115).name);
-    //     foreach (var VARIABLE in F8DataManager.Instance.Gettable1ByID(113).llliststr)
+    //     text.text += FF8.Config.Gettable1ByID(115).name;
+    //     Debug.Log(FF8.Config.Gettable1ByID(115).name);
+    //     foreach (var VARIABLE in FF8.Config.Gettable1ByID(113).llliststr)
     //     {
     //         foreach (var VARIABLE2 in VARIABLE)
     //         {

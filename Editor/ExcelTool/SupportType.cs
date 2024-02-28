@@ -200,9 +200,8 @@ namespace F8Framework.Core.Editor
             source.Append("using System.Runtime.Serialization.Formatters.Binary;\n");
             source.Append("using System.IO;\n");
             source.Append("using " + ExcelDataTool.CODE_NAMESPACE + ";\n");
-            source.Append("using F8Framework.Core;\n");
             source.Append("using LitJson;\n\n");
-            source.Append("namespace F8Framework.ConfigData\n");
+            source.Append("namespace F8Framework.Core\n");
             source.Append("{\n");
             source.Append("\tpublic class F8DataManager : Singleton<F8DataManager>\n");
             source.Append("\t{\n");
@@ -215,6 +214,7 @@ namespace F8Framework.Core.Editor
 
             source.Append("\n");
 
+            bool hasLocalizedStrings = false;
             //定义方法
             foreach (Type t in types)
             {
@@ -238,6 +238,30 @@ namespace F8Framework.Core.Editor
                 source.Append("\t\tpublic Dictionary<int, " + typeName + ">" + " Get" + typeNameNotItem + "()\n");
                 source.Append("\t\t{\n");
                 source.Append("\t\t\treturn p_" + t.Name + ".Dict;\n");
+                source.Append("\t\t}\n\n");
+                if (t.Name == "LocalizedStrings")
+                {
+                    hasLocalizedStrings = true;
+                }
+            }
+
+            if (hasLocalizedStrings)
+            {
+                //只加载本地化表
+                source.Append("\t\tpublic void LoadLocalizedStrings()\n");
+                source.Append("\t\t{\n");
+                source.Append("\t\t\tp_LocalizedStrings = Load<LocalizedStrings>(\"LocalizedStrings\") as LocalizedStrings;\n");
+                source.Append("\t\t}\n\n");
+            
+                source.Append("\t\tpublic void LoadLocalizedStringsCallback(Action onLoadComplete)\n");
+                source.Append("\t\t{\n");
+                source.Append("\t\t\tModuleCenter.StartCoroutine(LoadLocalizedStringsIEnumerator(onLoadComplete));\n");
+                source.Append("\t\t}\n\n");
+            
+                source.Append("\t\tpublic IEnumerator LoadLocalizedStringsIEnumerator(Action onLoadComplete)\n");
+                source.Append("\t\t{\n");
+                source.Append("\t\t\tyield return LoadAsync<LocalizedStrings>(\"LocalizedStrings\", result => p_LocalizedStrings = result as LocalizedStrings);\n");
+                source.Append("\t\t\tonLoadComplete?.Invoke();\n");
                 source.Append("\t\t}\n\n");
             }
 
@@ -292,7 +316,7 @@ namespace F8Framework.Core.Editor
             source.Append("\t\t{\n");
             source.Append("\t\t\tIFormatter f = new BinaryFormatter();\n");
             source.Append("\t\t\tTextAsset textAsset = AssetManager.Instance.Load<TextAsset>(name);\n");
-            source.Append("\t\t\tif (textAsset != null)\n");
+            source.Append("\t\t\tif (textAsset == null)\n");
             source.Append("\t\t\t{\n");
             source.Append("\t\t\t\treturn null;\n");
             source.Append("\t\t\t}\n");

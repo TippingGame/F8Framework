@@ -65,9 +65,9 @@ Unity 读取 Excel 的工具
 加载配置方式：
 
 ```C#
-F8DataManager.Instance.LoadAll(); // 同步加载全部配置
+FF8.Config.LoadAll(); // 同步加载全部配置
 
-foreach(var item in F8DataManager.Instance.LoadAllAsync()) // 异步加载全部配置
+foreach(var item in FF8.Config.LoadAllAsync()) // 异步加载全部配置
 {
     yield return item;
 }
@@ -88,13 +88,13 @@ ReadExcel.Instance.LoadAllExcelData(); // 运行时加载 Excel 最新文件
         // 注意：Table 需替换为实际 Sheet 名
         // 注意：name 需替换为实际表头
         // 注意：115 代表您设置的 ID 115 的行
-        LogF8.Log(F8DataManager.Instance.GetTableByID(115).name);
+        LogF8.Log(FF8.Config.GetTableByID(115).name);
 ```
 
 引用类型：
 
 ```C#
-        foreach (var VARIABLE in F8DataManager.Instance.GetTableByID(113).nameArray)
+        foreach (var VARIABLE in FF8.Config.GetTableByID(113).nameArray)
         {
             foreach (var item in VARIABLE)
             {
@@ -148,9 +148,9 @@ ICSharpCode.SharpZipLib.dll\
         }
         //读取Excel文件
         ReadExcel.Instance.LoadAllExcelData();
-        text.text += F8DataManager.Instance.GetfasdffByID(115).name;
-        Debug.Log(F8DataManager.Instance.GetfasdffByID(115).name);
-        foreach (var VARIABLE in F8DataManager.Instance.GetfasdffByID(113).llliststr)
+        text.text += FF8.Config.GetfasdffByID(115).name;
+        Debug.Log(FF8.Config.GetfasdffByID(115).name);
+        foreach (var VARIABLE in FF8.Config.GetfasdffByID(113).llliststr)
         {
             foreach (var VARIABLE2 in VARIABLE)
             {

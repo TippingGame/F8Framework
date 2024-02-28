@@ -35,8 +35,8 @@ namespace F8Framework.Core
 
         public void OnTermination()
         {
-            FF8.Message.RemoveEventListener(MessageEvent.ApplicationFocus, OnApplicationFocus, this);
-            FF8.Message.RemoveEventListener(MessageEvent.NotApplicationFocus, NotApplicationFocus, this);
+            MessageManager.Instance.RemoveEventListener(MessageEvent.ApplicationFocus, OnApplicationFocus, this);
+            MessageManager.Instance.RemoveEventListener(MessageEvent.NotApplicationFocus, NotApplicationFocus, this);
             base.Destroy();
         }
         
@@ -190,8 +190,8 @@ namespace F8Framework.Core
 
         public void AddListenerApplicationFocus()
         {
-            FF8.Message.AddEventListener(MessageEvent.ApplicationFocus, OnApplicationFocus, this);
-            FF8.Message.AddEventListener(MessageEvent.NotApplicationFocus, NotApplicationFocus, this);
+            MessageManager.Instance.AddEventListener(MessageEvent.ApplicationFocus, OnApplicationFocus, this);
+            MessageManager.Instance.AddEventListener(MessageEvent.NotApplicationFocus, NotApplicationFocus, this);
         }
 
         // 当应用程序获得焦点时调用

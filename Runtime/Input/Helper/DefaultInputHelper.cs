@@ -6,7 +6,7 @@ namespace F8Framework.Core
     /// <summary>
     /// 默认的输入管理器助手
     /// </summary>
-    internal sealed class DefaultInputHelper : IInputHelper
+    public sealed class DefaultInputHelper : IInputHelper
     {
         private bool _isEnableInputDevice = true;
         private Dictionary<string, VirtualAxis> _virtualAxes = new Dictionary<string, VirtualAxis>();
