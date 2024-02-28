@@ -27,9 +27,6 @@ namespace F8Framework.Core
         /// <returns>要完成扩展的对象列表。</returns>
         public AssetBundle Load(string assetName, AssetManager.AssetInfo info)
         {
-#if UNITY_WEBGL
-            LogF8.LogError("WebGL平台下请勿同步加载！");
-#endif
             AssetBundle result;
 
             List<string> assetBundlePaths = new List<string>(GetDependenciedAssetBundles(info.AbName));

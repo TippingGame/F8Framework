@@ -59,7 +59,7 @@ namespace F8Framework.Core
                 var instance = property.GetValue(null,null);
                 Action callback = () =>
                 {
-                    LogF8.Log("加载完了啊本地化");
+                    LogF8.LogConfig("加载完本地化表");
                     LoadSuccess();
                 };
                 object[] parameters = new object[] { callback };

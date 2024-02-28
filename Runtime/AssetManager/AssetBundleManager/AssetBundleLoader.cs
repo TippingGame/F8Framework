@@ -102,6 +102,14 @@ namespace F8Framework.Core
             loadType = LoaderType.LOCAL_SYNC;
             if (FileTools.IsLegalHTTPURI(assetBundlePath))
             {
+#if UNITY_WEBGL
+                LogF8.LogError("WebGL平台下请勿同步加载，已经帮你转为异步了！");
+                LoadAsync(
+                    (ab) => {
+                        assetBundleContent = ab;
+                    }
+                );
+#endif
                 DownloadRequest d = new DownloadRequest(assetBundlePath, 0);
                 while (!d.IsFinished) ;
                 assetBundleContent = d.DownloadedAssetBundle;
@@ -656,6 +664,9 @@ namespace F8Framework.Core
             dependentNames.Clear();
         }
         
+        /// <summary>
+        /// 获取已加载完成的依赖项名称数量。
+        /// </summary>
         public int GetDependentNamesLoadFinished()
         {
             int loadFinishedCount = 0;
@@ -670,6 +681,12 @@ namespace F8Framework.Core
             return loadFinishedCount;
         }
         
+        /// <summary>
+        /// 添加依赖项名称。
+        /// </summary>
+        /// <param name="name">要添加的名称。</param>
+        /// <param name="loadFinished">加载是否已完成。</param>
+        /// <returns>添加后的依赖项名称数量。</returns>
         public int AddDependentNames(string name = null, bool loadFinished = false)
         {
             if (name == null)
@@ -690,6 +707,11 @@ namespace F8Framework.Core
             return dependentNames.Count;
         }
 
+        /// <summary>
+        /// 移除依赖项名称。
+        /// </summary>
+        /// <param name="name">要移除的名称。</param>
+        /// <returns>移除后的依赖项名称数量。</returns>
         public int RemoveDependentNames(string name)
         {
             if (dependentNames.TryGetValue(name, out bool loadFinished))
@@ -698,6 +720,11 @@ namespace F8Framework.Core
             return dependentNames.Count;
         }
         
+        /// <summary>
+        /// 添加父级捆绑包名称。
+        /// </summary>
+        /// <param name="name">要添加的名称。</param>
+        /// <returns>添加后的父级捆绑包名称数量。</returns>
         public int AddParentBundle(string name = null)
         {
             if (name == null)
@@ -709,6 +736,11 @@ namespace F8Framework.Core
             return parentBundleNames.Count;
         }
 
+        /// <summary>
+        /// 移除父级捆绑包名称。
+        /// </summary>
+        /// <param name="name">要移除的名称。</param>
+        /// <returns>移除后的父级捆绑包名称数量。</returns>
         public int RemoveParentBundle(string name)
         {
             if (parentBundleNames.Contains(name))
@@ -717,17 +749,30 @@ namespace F8Framework.Core
             return parentBundleNames.Count;
         }
 
+        /// <summary>
+        /// 检查给定名称是否为父级捆绑包。
+        /// </summary>
+        /// <param name="name">要检查的名称。</param>
+        /// <returns>如果是父级捆绑包，则为true；否则为false。</returns>
         public bool IsParentBundle(string name)
         {
             return parentBundleNames.Contains(name);
         }
 
+        /// <summary>
+        /// 检查给定名称是否为最后一个父级捆绑包。
+        /// </summary>
+        /// <param name="name">要检查的名称。</param>
+        /// <returns>如果是最后一个父级捆绑包，则为true；否则为false。</returns>
         public bool IsLastParentBundle(string name)
         {
             return parentBundleNames.Count == 1 &&
                    parentBundleNames.Contains(name);
         }
 
+        /// <summary>
+        /// 清除已加载的数据。
+        /// </summary>
         private void ClearLoadedData()
         {
             loadType = LoaderType.NONE;
@@ -743,6 +788,9 @@ namespace F8Framework.Core
             onExpandFinishedImpl = null;
         }
 
+        /// <summary>
+        /// 清除已卸载的数据。
+        /// </summary>
         private void ClearUnloadData()
         {
             unloadType = LoaderType.NONE;
@@ -751,6 +799,10 @@ namespace F8Framework.Core
             onUnloadFinishedImpl = null;
         }
 
+        /// <summary>
+        /// 当一个展开回调时调用。
+        /// </summary>
+        /// <param name="o">传入的对象。</param>
         private void OnOneExpandCallBack(Object o)
         {
             ++expandCount;
@@ -765,6 +817,10 @@ namespace F8Framework.Core
             }
         }
 
+        /// <summary>
+        /// 获取资产路径列表。
+        /// </summary>
+        /// <returns>资产路径列表。</returns>
         private List<string> GetAssetPaths()
         {
             List<string> paths = new List<string>();
@@ -780,6 +836,11 @@ namespace F8Framework.Core
             return paths;
         }
 
+        /// <summary>
+        /// 设置资产对象。
+        /// </summary>
+        /// <param name="assetPath">资产路径。</param>
+        /// <param name="obj">要设置的对象。</param>
         private void SetAssetObject(string assetPath, Object obj)
         {
             if (assetPath == null ||
@@ -795,7 +856,7 @@ namespace F8Framework.Core
                 assetObjects.Add(assetPath, obj);
             }
         }
-        
+
         /// <summary>
         /// 异步加载请求。
         /// </summary>
