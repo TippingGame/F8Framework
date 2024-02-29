@@ -73,7 +73,7 @@ namespace F8Framework.Core
 		public IEnumerator LoadLocalizedStringsIEnumerator(Action onLoadComplete)
 		{
 			yield return LoadAsync<LocalizedStrings>("LocalizedStrings", result => p_LocalizedStrings = result as LocalizedStrings);
-		onLoadComplete?.Invoke();
+			onLoadComplete?.Invoke();
 		}
 
 		public void LoadAll()
@@ -110,13 +110,13 @@ namespace F8Framework.Core
 			onLoadComplete?.Invoke();
 		}
 
-		private System.Object Load<T>(string name)
+		public T Load<T>(string name)
 		{
 			IFormatter f = new BinaryFormatter();
 			TextAsset textAsset = AssetManager.Instance.Load<TextAsset>(name);
 			if (textAsset == null)
 			{
-				return null;
+				return default(T);
 			}
 #if UNITY_WEBGL
 			T obj = JsonMapper.ToObject<T>(textAsset.text);
@@ -124,11 +124,12 @@ namespace F8Framework.Core
 #else
 			using (MemoryStream memoryStream = new MemoryStream(textAsset.bytes))
 			{
-				return f.Deserialize(memoryStream);
+				return (T)f.Deserialize(memoryStream);
 			}
 #endif
 		}
-		private IEnumerator LoadAsync<T>(string name, Action<object> callback)
+
+		public IEnumerator LoadAsync<T>(string name, Action<T> callback)
 		{
 			IFormatter f = new BinaryFormatter();
 			var load = AssetManager.Instance.LoadAsyncCoroutine<TextAsset>(name);
@@ -142,7 +143,7 @@ namespace F8Framework.Core
 #else
 				using (Stream s = new MemoryStream(textAsset.bytes))
 				{
-					object obj = f.Deserialize(s);
+					T obj = (T)f.Deserialize(s);
 					callback(obj);
 				}
 #endif

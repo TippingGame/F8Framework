@@ -14,8 +14,10 @@ namespace F8Framework.Core.Editor
         public static void BuildAllAB()
         {
             AssetDatabase.RemoveUnusedAssetBundleNames();
-            
-            FileTools.SafeDeleteDir(FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/AssetMap");
+
+            string assetMapPath = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/AssetMap";
+            FileTools.SafeDeleteDir(assetMapPath);
+            FileTools.CheckDirAndCreateWhenNeeded(assetMapPath);
             AssetDatabase.Refresh();
             AssetDatabase.SaveAssets();
             

@@ -101,6 +101,7 @@ namespace F8Framework.Core
             LocalizationSettings.LoadLanguageSettings();
             ChangeLanguage(CurrentLanguageName ?? "");
         }
+        
         /// <summary>
         /// 更改当前语言。
         /// </summary>

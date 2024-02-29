@@ -17,7 +17,7 @@ Unity Timer组件，提供Timer、FrameTimer两种计时器，暂停/恢复，�
     void Start()
     {
         // 普通Timer,传入自身this，每1秒执行一次，延迟0秒后开始，执行3次(-1表示循环)
-        string timeid = FF8.Timer.AddTimer(this, 1f, 0, 3, () =>
+        int timeid = FF8.Timer.AddTimer(this, 1f, 0f, 3, () =>
         {
             LogF8.Log("tick");
         }, () =>
@@ -26,7 +26,7 @@ Unity Timer组件，提供Timer、FrameTimer两种计时器，暂停/恢复，�
         });
         
         // FrameTimer,传入自身this，每1帧执行一次，延迟0帧后开始，循环执行(-1表示循环)
-        timeid = FF8.Timer.AddTimerFrame(this, 1f, 0, -1, () =>
+        timeid = FF8.Timer.AddTimerFrame(this, 1f, 0f, -1, () =>
         {
             LogF8.Log("tick");
         }, () =>

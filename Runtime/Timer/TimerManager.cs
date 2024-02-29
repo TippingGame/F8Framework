@@ -7,9 +7,9 @@ namespace F8Framework.Core
     [UpdateRefresh]
     public class TimerManager : ModuleSingleton<TimerManager>, IModule
     {
-        private Dictionary<string, Timer> times = new Dictionary<string, Timer>(); // 存储计时器的字典
-        private HashSet<string> deleteTimes = new HashSet<string>(); // 存储要删除的计时器ID的哈希集合
-        private Dictionary<string, Timer> addTimes = new Dictionary<string, Timer>(); // 存储要添加的计时器
+        private Dictionary<int, Timer> times = new Dictionary<int, Timer>(); // 存储计时器的字典
+        private HashSet<int> deleteTimes = new HashSet<int>(); // 存储要删除的计时器ID的哈希集合
+        private Dictionary<int, Timer> addTimes = new Dictionary<int, Timer>(); // 存储要添加的计时器
         private long initTime; // 初始化时间
         private long serverTime; // 服务器时间
         private long tempTime; // 临时时间
@@ -57,33 +57,28 @@ namespace F8Framework.Core
 
             foreach (var pair in times)
             {
-                string id = pair.Value.ID;
+                Timer timer = pair.Value;
+                int id = timer.ID;
 
-                if (pair.Value.IsFrameTimer ? pair.Value.Update(frameTime) : pair.Value.Update(dt)) // 根据计时器类型更新计时器
+                if (timer.IsFrameTimer ? timer.Update(frameTime) : timer.Update(dt)) // 根据计时器类型更新计时器
                 {
-                    if (pair.Value.IsFinish || pair.Value.Handle == null || pair.Value.Handle.Equals(null)) // 若计时器已经完成，若对象为空，标记计时器为完成，并将其ID添加到待删除列表
+                    if (timer.IsFinish || timer.Handle == null || timer.Handle.Equals(null)) // 若计时器已经完成，若对象为空，标记计时器为完成，并将其ID添加到待删除列表
                     {
                         deleteTimes.Add(pair.Key);
                         continue;
                     }
-                    int field = pair.Value.Field; // 获取计时器剩余字段值
+                    int field = timer.Field; // 获取计时器剩余字段值
                     field = field > 0 ? field - 1 : field; // 减少计时器字段值
                     if (field == 0) // 若字段值为0，触发onSecond事件，并执行OnTimerComplete
                     {
-                        pair.Value.Field = field; // 更新计时器剩余字段值
-                        if (pair.Value.OnSecond is { } onSecond)
-                        {
-                            onSecond.Invoke();
-                        }
+                        timer.Field = field; // 更新计时器剩余字段值
+                        timer.OnSecond?.Invoke();
                         OnTimerComplete(id);
                     }
                     else
                     {
-                        pair.Value.Field = field; // 更新计时器剩余字段值
-                        if (pair.Value.OnSecond is { } onSecond)
-                        {
-                            onSecond.Invoke();
-                        }
+                        timer.Field = field; // 更新计时器剩余字段值
+                        timer.OnSecond?.Invoke();
                     }
                 }
             }
@@ -96,7 +91,7 @@ namespace F8Framework.Core
             deleteTimes.Clear();
         }
 
-       private void OnTimerComplete(string id)
+       private void OnTimerComplete(int id)
         {
             if (times.TryGetValue(id, out Timer timer)) // 根据ID获取计时器
             {
@@ -113,25 +108,25 @@ namespace F8Framework.Core
         }
 
         // 注册一个计时器并返回其ID
-        public string AddTimer(object handle, float step = 1f, float delay = 0f, int field = 0, Action onSecond = null, Action onComplete = null)
+        public int AddTimer(object handle, float step = 1f, float delay = 0f, int field = 0, Action onSecond = null, Action onComplete = null)
         {
-            string id = Guid.NewGuid().ToString(); // 生成一个唯一的ID
+            int id = Guid.NewGuid().GetHashCode(); // 生成一个唯一的ID
             Timer timer = new Timer(handle, id, step, delay, field, onSecond, onComplete, false); // 创建一个计时器对象
             addTimes.Add(id, timer);
             return id;
         }
 
         // 注册一个以帧为单位的计时器并返回其ID
-        public string AddTimerFrame(object handle, float step = 1f, float delay = 0f, int field = 0, Action onSecond = null, Action onComplete = null)
+        public int AddTimerFrame(object handle, float step = 1f, float delay = 0f, int field = 0, Action onSecond = null, Action onComplete = null)
         {
-            string id = Guid.NewGuid().ToString(); // 生成一个唯一的ID
+            int id = Guid.NewGuid().GetHashCode(); // 生成一个唯一的ID
             Timer timer = new Timer(handle, id, step, delay, field, onSecond, onComplete, true); // 创建一个以帧为单位的计时器对象
             addTimes.Add(id, timer);
             return id;
         }
 
         // 根据ID注销计时器
-        public void RemoveTimer(string id)
+        public void RemoveTimer(int id)
         {
             if (id == null)
             {

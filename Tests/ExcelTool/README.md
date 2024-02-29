@@ -62,7 +62,7 @@ Unity 读取 Excel 的工具
 
 **在使用 Excel 数据前，需要执行**：
 
-加载配置方式：
+加载二进制或者json配置方式：
 
 ```C#
 FF8.Config.LoadAll(); // 同步加载全部配置
@@ -84,17 +84,30 @@ ReadExcel.Instance.LoadAllExcelData(); // 运行时加载 Excel 最新文件
 值类型，譬如 `int/float/string`，请参考[C# 类型系统 - Microsoft Document](https://learn.microsoft.com/zh-cn/dotnet/csharp/fundamentals/types/#value-types)：
 
 ```C#
-        // 注意：GetTableByID 方法为自动生成的。
-        // 注意：Table 需替换为实际 Sheet 名
+        // 注意：GetSheet1ByID 方法为自动生成的。
+        // 注意：Sheet1 需替换为实际 Sheet 名
         // 注意：name 需替换为实际表头
-        // 注意：115 代表您设置的 ID 115 的行
-        LogF8.Log(FF8.Config.GetTableByID(115).name);
+        // 注意：2 代表您设置的 ID 2 的行
+        // 单个表单个数据
+        LogF8.Log(FF8.Config.GetSheet1ByID(2).name);
+        
+        // 单个表全部数据
+        foreach (var item in FF8.Config.GetSheet1())
+        {
+            LogF8.Log(item.Key);
+            LogF8.Log(item.Value.name);
+        }
+        
+        // 指定名字加载
+        Sheet1 sheet1 = new Sheet1();
+        sheet1 = FF8.Config.Load<Sheet1>("Sheet1");
+        LogF8.Log(sheet1.Dict[2].name);
 ```
 
 引用类型：
 
 ```C#
-        foreach (var VARIABLE in FF8.Config.GetTableByID(113).nameArray)
+        foreach (var VARIABLE in FF8.Config.GetSheet1ByID(2).price)
         {
             foreach (var item in VARIABLE)
             {
@@ -124,9 +137,10 @@ ICSharpCode.SharpZipLib.dll\
 **由于 Android 资源都在包内，在 Android 上使用，需要先复制到可读写文件夹中再进行读取**
 
 ```C#
+    // 方式二：运行时读取Excel
     IEnumerator Start()
     {
-        //由于安卓资源都在包内，需要先复制到可读写文件夹1
+        // 由于安卓资源都在包内，需要先复制到可读写文件夹1
         string assetPath = URLSetting.STREAMINGASSETS_URL + "config";
         string[] paths = null;
         WWW www = new WWW(assetPath + "/fileindex.txt");
@@ -139,27 +153,34 @@ ICSharpCode.SharpZipLib.dll\
         else
         {
             string ss = www.text;
-            paths = ss.Split("\n", StringSplitOptions.RemoveEmptyEntries);
+            // 去除夹杂的空行
+            string[] lines = ss.Split('\n');
+            List<string> nonEmptyLines = new List<string>();
+    
+            foreach (string line in lines)
+            {
+                string trimmedLine = line.Trim();
+    
+                if (!string.IsNullOrEmpty(trimmedLine))
+                {
+                    nonEmptyLines.Add(trimmedLine);
+                }
+            }
+    
+            paths = nonEmptyLines.ToArray();
         }
-
+    
         for (int i = 0; i < paths.Length; i++)
         {
             yield return CopyAssets(paths[i].Replace("\r", ""));
         }
-        //读取Excel文件
+        // 读取Excel文件
         ReadExcel.Instance.LoadAllExcelData();
-        text.text += FF8.Config.GetfasdffByID(115).name;
-        Debug.Log(FF8.Config.GetfasdffByID(115).name);
-        foreach (var VARIABLE in FF8.Config.GetfasdffByID(113).llliststr)
-        {
-            foreach (var VARIABLE2 in VARIABLE)
-            {
-                text.text += VARIABLE2;
-                Debug.Log(VARIABLE2);
-            }
-        }
+        LogF8.Log(FF8.Config.GetSheet1ByID(1).name);
+        LogF8.Log(FF8.Config.GetSheet1());
     }
-    //由于安卓资源都在包内，需要先复制到可读写文件夹2
+    
+    // 由于安卓资源都在包内，需要先复制到可读写文件夹2
     IEnumerator CopyAssets(string paths)
     {
         string assetPath = URLSetting.STREAMINGASSETS_URL + "config";

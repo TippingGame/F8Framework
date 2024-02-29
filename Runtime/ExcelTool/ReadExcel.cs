@@ -40,6 +40,9 @@ namespace F8Framework.Core
         string INPUT_PATH = UnityEngine.Application.persistentDataPath + "/" + ExcelPath;
 #elif UNITY_IPHONE || UNITY_IOS
         string INPUT_PATH = URLSetting.CS_STREAMINGASSETS_URL + ExcelPath;
+#elif UNITY_WEBGL
+        LogF8.LogError("WebGL暂不支持实时读取Excel");
+        return;
 #else
         string INPUT_PATH = URLSetting.CS_STREAMINGASSETS_URL + ExcelPath;
 #endif

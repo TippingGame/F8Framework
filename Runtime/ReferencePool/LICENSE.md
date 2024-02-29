@@ -1,5 +1,6 @@
 MIT License
 
+Copyright (c) 2013-2021 Jiang Yin
 Copyright (c) 2023-2024 TippingGame tippinggame@163.com
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

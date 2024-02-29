@@ -80,6 +80,8 @@ namespace F8Framework.Core
             sdk = new SDKForAndroid();
 #elif UNITY_IPHONE || UNITY_IOS
             sdk = new SDKForiOS();
+#elif UNITY_WEBGL
+            sdk = new SDKBase();
 #else
             sdk = new SDKBase();
 #endif

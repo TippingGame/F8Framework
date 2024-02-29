@@ -312,13 +312,13 @@ namespace F8Framework.Core.Editor
             source.Append("\t\t}\n\n");
             
             //反序列化
-            source.Append("\t\tprivate System.Object Load<T>(string name)\n");
+            source.Append("\t\tpublic T Load<T>(string name)\n");
             source.Append("\t\t{\n");
             source.Append("\t\t\tIFormatter f = new BinaryFormatter();\n");
             source.Append("\t\t\tTextAsset textAsset = AssetManager.Instance.Load<TextAsset>(name);\n");
             source.Append("\t\t\tif (textAsset == null)\n");
             source.Append("\t\t\t{\n");
-            source.Append("\t\t\t\treturn null;\n");
+            source.Append("\t\t\t\treturn default(T);\n");
             source.Append("\t\t\t}\n");
             source.Append("#if UNITY_WEBGL\n");
             source.Append("\t\t\tT obj = JsonMapper.ToObject<T>(textAsset.text);\n");
@@ -326,12 +326,12 @@ namespace F8Framework.Core.Editor
             source.Append("#else\n");
             source.Append("\t\t\tusing (MemoryStream memoryStream = new MemoryStream(textAsset.bytes))\n");
             source.Append("\t\t\t{\n");
-            source.Append("\t\t\t\treturn f.Deserialize(memoryStream);\n");
+            source.Append("\t\t\t\treturn (T)f.Deserialize(memoryStream);\n");
             source.Append("\t\t\t}\n");
             source.Append("#endif\n");
-            source.Append("\t\t}\n");
+            source.Append("\t\t}\n\n");
             
-            source.Append("\t\tprivate IEnumerator LoadAsync<T>(string name, Action<object> callback)\n");
+            source.Append("\t\tpublic IEnumerator LoadAsync<T>(string name, Action<T> callback)\n");
             source.Append("\t\t{\n");
             source.Append("\t\t\tIFormatter f = new BinaryFormatter();\n");
             source.Append("\t\t\tvar load = AssetManager.Instance.LoadAsyncCoroutine<TextAsset>(name);\n");
@@ -345,7 +345,7 @@ namespace F8Framework.Core.Editor
             source.Append("#else\n");
             source.Append("\t\t\t\tusing (Stream s = new MemoryStream(textAsset.bytes))\n");
             source.Append("\t\t\t\t{\n");
-            source.Append("\t\t\t\t\tobject obj = f.Deserialize(s);\n");
+            source.Append("\t\t\t\t\tT obj = (T)f.Deserialize(s);\n");
             source.Append("\t\t\t\t\tcallback(obj);\n");
             source.Append("\t\t\t\t}\n");
             source.Append("#endif\n");

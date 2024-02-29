@@ -50,6 +50,8 @@ namespace F8Framework.Core
         public static string STREAMINGASSETS_URL = Application.streamingAssetsPath + "/";
 #elif UNITY_IPHONE || UNITY_IOS
         public static string STREAMINGASSETS_URL = "file://" + Application.streamingAssetsPath + "/";
+#elif UNITY_WEBGL
+        public static string STREAMINGASSETS_URL = Application.streamingAssetsPath + "/";
 #else
         public static string STREAMINGASSETS_URL = "file://" + Application.streamingAssetsPath + "/";
 #endif
@@ -60,6 +62,8 @@ namespace F8Framework.Core
 #elif UNITY_ANDROID
         public static string CS_STREAMINGASSETS_URL = "null";
 #elif UNITY_IPHONE || UNITY_IOS
+        public static string CS_STREAMINGASSETS_URL = Application.streamingAssetsPath + "/";
+#elif UNITY_WEBGL
         public static string CS_STREAMINGASSETS_URL = Application.streamingAssetsPath + "/";
 #else
         public static string CS_STREAMINGASSETS_URL = Application.streamingAssetsPath + "/";

@@ -5,7 +5,7 @@
 [![Platform](https://img.shields.io/badge/platform-Win%20%7C%20Android%20%7C%20iOS%20%7C%20Mac%20%7C%20Linux%20%7C%20WebGL-orange)]() 
 
 ## 简介（希望自己点击F8，就能开始制作游戏，不想多余的事）
-Unity F8GameObjectPool组件，对象池管理，预加载，生成/销毁/延迟销毁，生命周期事件监听  
+Unity F8GameObjectPool组件，对象池管理，预加载池化，生成/销毁/延迟销毁，生命周期事件监听  
 
 ## 导入插件（需要首先导入核心）
 注意！内置在->F8Framework核心：https://github.com/TippingGame/F8Framework.git  

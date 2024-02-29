@@ -9,10 +9,10 @@ namespace F8Framework.Core
 	{
 		private class ModuleWrapper
 		{
-			public int Priority { private set; get; }
-			public IModule Module { private set; get; }
-
+			public int Priority = 0;
+			public IModule Module = null;
 			public bool ShouldBeRemoved = false;
+			
 			public ModuleWrapper(IModule module, int priority)
 			{
 				Module = module;
@@ -25,14 +25,6 @@ namespace F8Framework.Core
 		private static List<ModuleWrapper> _comsUpdate = new List<ModuleWrapper>(100);
 		private static List<ModuleWrapper> _comsLateUpdate = new List<ModuleWrapper>(100);
 		private static List<ModuleWrapper> _comsFixedUpdate = new List<ModuleWrapper>(100);
-		// 标记要添加的模块
-		private static List<ModuleWrapper> _comsUpdateToAdd = new List<ModuleWrapper>(100);
-		private static List<ModuleWrapper> _comsLateUpdateToAdd = new List<ModuleWrapper>(100);
-		private static List<ModuleWrapper> _comsFixedUpdateToAdd = new List<ModuleWrapper>(100);
-		// 标记要删除的模块
-		private static List<ModuleWrapper> _comsUpdateToRemove = new List<ModuleWrapper>(100);
-		private static List<ModuleWrapper> _comsLateUpdateToRemove = new List<ModuleWrapper>(100);
-		private static List<ModuleWrapper> _comsFixedUpdateToRemove = new List<ModuleWrapper>(100);
 		
 		private static bool _isDirty = false;
 		private static bool _isDirtyLate = false;
@@ -74,14 +66,6 @@ namespace F8Framework.Core
 		public static void Update()
 		{
 			_frame++;
-
-			// 添加标记的模块
-			foreach (var moduleToAdd in _comsUpdateToAdd)
-			{
-				_comsUpdate.Add(moduleToAdd);
-			}
-			
-			_comsUpdateToAdd.Clear();
 			
 			// 如果有新模块需要重新排序
 			if (_isDirty)
@@ -98,28 +82,20 @@ namespace F8Framework.Core
 						return 1;
 				});
 			}
-			
+
 			// 遍历所有模块
-			foreach (var moduleWrapper in _comsUpdate)
+			for (int i = 0; i < _comsUpdate.Count; i++)
 			{
-				if (moduleWrapper == null || moduleWrapper.Module == null || moduleWrapper.ShouldBeRemoved)
+				if (_comsUpdate[i]?.Module == null || _comsUpdate[i].ShouldBeRemoved)
 				{
-					_comsUpdateToRemove.Add(moduleWrapper);
-					// 如果需要删除该模块，将其标记为删除
+					_comsUpdate.RemoveAt(i);
+					i--;
 					continue;
 				}
-
+				
 				// 执行模块更新
-				moduleWrapper.Module.OnUpdate();
+				_comsUpdate[i].Module.OnUpdate();
 			}
-
-			// 删除标记的模块
-			foreach (var moduleToRemove in _comsUpdateToRemove)
-			{
-				_comsUpdate.Remove(moduleToRemove);
-			}
-			
-			_comsUpdateToRemove.Clear();
 		}
 		
 		/// <summary>
@@ -127,14 +103,6 @@ namespace F8Framework.Core
 		/// </summary>
 		public static void LateUpdate()
 		{
-			// 添加标记的模块
-			foreach (var moduleToAdd in _comsLateUpdateToAdd)
-			{
-				_comsLateUpdate.Add(moduleToAdd);
-			}
-			
-			_comsLateUpdateToAdd.Clear();
-			
 			// 如果有新模块需要重新排序
 			if (_isDirtyLate)
 			{
@@ -152,26 +120,18 @@ namespace F8Framework.Core
 			}
 			
 			// 遍历所有模块
-			foreach (var moduleWrapper in _comsLateUpdate)
+			for (int i = 0; i < _comsLateUpdate.Count; i++)
 			{
-				if (moduleWrapper == null || moduleWrapper.Module == null || moduleWrapper.ShouldBeRemoved)
+				if (_comsLateUpdate[i]?.Module == null || _comsLateUpdate[i].ShouldBeRemoved)
 				{
-					_comsLateUpdateToRemove.Add(moduleWrapper);
-					// 如果需要删除该模块，将其标记为删除
+					_comsLateUpdate.RemoveAt(i);
+					i--;
 					continue;
 				}
-
+				
 				// 执行模块更新
-				moduleWrapper.Module.OnLateUpdate();
+				_comsLateUpdate[i].Module.OnLateUpdate();
 			}
-
-			// 删除标记的模块
-			foreach (var moduleToRemove in _comsLateUpdateToRemove)
-			{
-				_comsLateUpdate.Remove(moduleToRemove);
-			}
-			
-			_comsLateUpdateToRemove.Clear();
 		}
 		
 		/// <summary>
@@ -179,14 +139,6 @@ namespace F8Framework.Core
 		/// </summary>
 		public static void FixedUpdate()
 		{
-			// 添加标记的模块
-			foreach (var moduleToAdd in _comsFixedUpdateToAdd)
-			{
-				_comsFixedUpdate.Add(moduleToAdd);
-			}
-			
-			_comsFixedUpdateToAdd.Clear();
-			
 			// 如果有新模块需要重新排序
 			if (_isDirtyFixed)
 			{
@@ -204,26 +156,18 @@ namespace F8Framework.Core
 			}
 			
 			// 遍历所有模块
-			foreach (var moduleWrapper in _comsFixedUpdate)
+			for (int i = 0; i < _comsFixedUpdate.Count; i++)
 			{
-				if (moduleWrapper == null || moduleWrapper.Module == null || moduleWrapper.ShouldBeRemoved)
+				if (_comsFixedUpdate[i]?.Module == null || _comsFixedUpdate[i].ShouldBeRemoved)
 				{
-					_comsFixedUpdateToRemove.Add(moduleWrapper);
-					// 如果需要删除该模块，将其标记为删除
+					_comsFixedUpdate.RemoveAt(i);
+					i--;
 					continue;
 				}
-
+				
 				// 执行模块更新
-				moduleWrapper.Module.OnFixedUpdate();
+				_comsFixedUpdate[i].Module.OnFixedUpdate();
 			}
-
-			// 删除标记的模块
-			foreach (var moduleToRemove in _comsFixedUpdateToRemove)
-			{
-				_comsFixedUpdate.Remove(moduleToRemove);
-			}
-			
-			_comsFixedUpdateToRemove.Clear();
 		}
 		
 		/// <summary>
@@ -314,17 +258,17 @@ namespace F8Framework.Core
 			});
 			if (typeof(T).GetCustomAttributes(typeof(UpdateRefreshAttribute), false).Length > 0)
 			{
-				_comsUpdateToAdd.Add(wrapper);
+				_comsUpdate.Add(wrapper);
 				_isDirty = true;
 			}
 			if (typeof(T).GetCustomAttributes(typeof(LateUpdateRefreshAttribute), false).Length > 0)
 			{
-				_comsLateUpdateToAdd.Add(wrapper);
+				_comsLateUpdate.Add(wrapper);
 				_isDirtyLate = true;
 			}
 			if (typeof(T).GetCustomAttributes(typeof(FixedUpdateRefreshAttribute), false).Length > 0)
 			{
-				_comsFixedUpdateToAdd.Add(wrapper);
+				_comsFixedUpdate.Add(wrapper);
 				_isDirtyFixed = true;
 			}
 			return module;

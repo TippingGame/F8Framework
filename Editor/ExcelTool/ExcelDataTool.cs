@@ -2,10 +2,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.CSharp;
 using System.CodeDom.Compiler;
-#if !UNITY_WEBGL
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
-#endif
 using System.IO;
 using System;
 using System.Linq;
@@ -13,7 +9,12 @@ using System.Text;
 using UnityEngine;
 using UnityEditor;
 using Excel;
+#if UNITY_WEBGL
 using LitJson;
+#else
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
+#endif
 
 namespace F8Framework.Core.Editor
 {
@@ -65,8 +66,12 @@ namespace F8Framework.Core.Editor
         
         public static void LoadAllExcelData()
         {
-            FileTools.SafeDeleteDir(FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/ConfigData/F8DataManager");
-            FileTools.SafeDeleteDir(FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/ConfigData/F8ExcelDataClass");
+            string F8DataManagerPath = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/ConfigData/F8DataManager";
+            FileTools.SafeDeleteDir(F8DataManagerPath);
+            FileTools.CheckDirAndCreateWhenNeeded(F8DataManagerPath);
+            string F8ExcelDataClassPath = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/ConfigData/F8ExcelDataClass";
+            FileTools.SafeDeleteDir(F8ExcelDataClassPath);
+            FileTools.CheckDirAndCreateWhenNeeded(F8ExcelDataClassPath);
             CreateAsmdefFile();
             string INPUT_PATH = Application.dataPath + ExcelPath;
 

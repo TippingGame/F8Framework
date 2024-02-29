@@ -1,41 +1,42 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using F8Framework.Core;
+using F8Framework.F8ExcelDataClass;
 
 public class DemoExcelTool : MonoBehaviour
 {
-    public Text text;
-    //方式一：
-    // void Start()
-    // {
-    //     //读取二进制文件
-    //     FF8.Config.LoadAll();
-    //     text.text += FF8.Config.Gettable1ByID(1).category.Length;
-    //     Debug.Log(FF8.Config.Gettable1ByID(1).category.Length);
-    //     text.text += FF8.Config.Gettable1ByID(1).price3;
-    //     Debug.Log(FF8.Config.Gettable1ByID(1).price3);
-    //     text.text += FF8.Config.Gettable1ByID(1).name;
-    //     Debug.Log(FF8.Config.Gettable1ByID(1).name);
-    //     if (FF8.Config.Gettable1ByID(33) != null)
-    //     {
-    //         foreach (var VARIABLE in FF8.Config.Gettable1ByID(33).objfsaads)
-    //         {
-    //             foreach (var VARIABLE2 in VARIABLE)
-    //             {
-    //                 text.text += VARIABLE2;
-    //                 Debug.Log(VARIABLE2);
-    //                 Debug.Log(VARIABLE2.GetType());
-    //             }
-    //         }
-    //     }
-    // }
-    //方式二：
+    // 方式一：读取二进制或者json
+    IEnumerator Start()
+    {
+        // 同步加载全部配置
+        FF8.Config.LoadAll();
+        
+        foreach(var item in FF8.Config.LoadAllAsync()) // 异步加载全部配置
+        {
+            yield return item;
+        }
+        
+        // 单个表单个数据
+        LogF8.Log(FF8.Config.GetSheet1ByID(2).name);
+        
+        // 单个表全部数据
+        foreach (var item in FF8.Config.GetSheet1())
+        {
+            LogF8.Log(item.Key);
+            LogF8.Log(item.Value.name);
+        }
+        
+        // 指定名字加载
+        Sheet1 sheet1 = new Sheet1();
+        sheet1 = FF8.Config.Load<Sheet1>("Sheet1");
+        LogF8.Log(sheet1.Dict[2].name);
+    }
+    
+    // // 方式二：运行时读取Excel
     // IEnumerator Start()
     // {
-    //     //由于安卓资源都在包内，需要先复制到可读写文件夹1
+    //     // 由于安卓资源都在包内，需要先复制到可读写文件夹1
     //     string assetPath = URLSetting.STREAMINGASSETS_URL + "config";
     //     string[] paths = null;
     //     WWW www = new WWW(assetPath + "/fileindex.txt");
@@ -69,20 +70,13 @@ public class DemoExcelTool : MonoBehaviour
     //     {
     //         yield return CopyAssets(paths[i].Replace("\r", ""));
     //     }
-    //     //读取Excel文件
+    //     // 读取Excel文件
     //     ReadExcel.Instance.LoadAllExcelData();
-    //     text.text += FF8.Config.Gettable1ByID(115).name;
-    //     Debug.Log(FF8.Config.Gettable1ByID(115).name);
-    //     foreach (var VARIABLE in FF8.Config.Gettable1ByID(113).llliststr)
-    //     {
-    //         foreach (var VARIABLE2 in VARIABLE)
-    //         {
-    //             text.text += VARIABLE2;
-    //             Debug.Log(VARIABLE2);
-    //         }
-    //     }
+    //     LogF8.Log(FF8.Config.GetSheet1ByID(1).name);
+    //     LogF8.Log(FF8.Config.GetSheet1());
     // }
-    // //由于安卓资源都在包内，需要先复制到可读写文件夹2
+    //
+    // // 由于安卓资源都在包内，需要先复制到可读写文件夹2
     // IEnumerator CopyAssets(string paths)
     // {
     //     string assetPath = URLSetting.STREAMINGASSETS_URL + "config";

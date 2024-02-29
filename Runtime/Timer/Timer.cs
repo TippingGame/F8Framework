@@ -7,7 +7,7 @@ namespace F8Framework.Core
         private float elapsedTime = 0f;
         private bool isDelayCompleted = false;
         public object Handle = null;
-        public string ID = "";
+        public int ID = 0;
         public float Step = 1f;
         public float Delay = 0f;
         public int Field = 0;
@@ -17,7 +17,7 @@ namespace F8Framework.Core
         public bool IsFinish = false;
         public bool IsFrameTimer = false;
         
-        public Timer(object handle, string id, float step = 1f, float delay = 0f, int field = 0, Action onSecond = null, Action onComplete = null, bool isFrameTimer = false)
+        public Timer(object handle, int id, float step = 1f, float delay = 0f, int field = 0, Action onSecond = null, Action onComplete = null, bool isFrameTimer = false)
         {
             Handle = handle;
             ID = id;
