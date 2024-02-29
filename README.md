@@ -9,7 +9,7 @@
 > F8 Framework original intention: Just click F8 and start making the game, don't want to be redundant.
 
 ## 简介
-F8 Framework是一个**优雅，轻量，符合直觉的**基于Unity引擎的Game Framework，组件围绕F8一键启动，延迟加载策略减少不必要的资源消耗，框架整体遵循以**极少的使用成本**开发游戏。  
+F8 Framework是一个**优雅，轻量，符合直觉的**基于Unity引擎的Game Framework，组件围绕F8一键启动，**不用繁琐的启动配置**，**最低的心智负担**，框架整体遵循以**极少的使用成本**开发游戏。  
 
 ## 支持版本
 Unity 2021.3.15f1+  
