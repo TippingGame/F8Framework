@@ -128,10 +128,6 @@ namespace F8Framework.Core
         // 根据ID注销计时器
         public void RemoveTimer(int id)
         {
-            if (id == null)
-            {
-                return;
-            }
             if (times.TryGetValue(id, out Timer timer)) // 根据ID获取计时器并标记为完成，将其ID添加到待删除列表
             {
                 timer.IsFinish = true;

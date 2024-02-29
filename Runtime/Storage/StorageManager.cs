@@ -1,3 +1,4 @@
+using LitJson;
 using UnityEngine;
 
 namespace F8Framework.Core
@@ -69,7 +70,7 @@ namespace F8Framework.Core
              if (PlayerPrefs.HasKey(key))
              {
                  string jsonString = PlayerPrefs.GetString(GetKeywords(key, user));
-                 return JsonUtility.FromJson<T>(jsonString);
+                 return JsonMapper.ToObject<T>(jsonString);
              }
 
              return default(T);
@@ -83,7 +84,7 @@ namespace F8Framework.Core
         /// <param name="obj">要写入的对象。</param>
         public void SetObject<T>(string key, T obj, bool user = false)
         {
-            PlayerPrefs.SetString(GetKeywords(key, user), JsonUtility.ToJson(obj));
+            PlayerPrefs.SetString(GetKeywords(key, user), JsonMapper.ToJson(obj));
         }
         
         public void Remove(string key, bool user = false)

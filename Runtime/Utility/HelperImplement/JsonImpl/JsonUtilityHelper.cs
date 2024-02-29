@@ -2,6 +2,9 @@
 using UnityEngine;
 namespace F8Framework.Core
 {
+    /// <summary>
+    /// 别乱用，字典序列化不了
+    /// </summary>
     public class JsonUtilityHelper : Utility.Json.IJsonHelper
     {
         public string ToJson(object obj, bool prettyPrint = false)
