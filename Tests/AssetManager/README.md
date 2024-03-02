@@ -22,8 +22,10 @@ Unity F8AssetManager资产加载组件。
           自动生成索引文件 Assets / F8Framework / AssetMap 目录下面  
 ![image](ui_20240205225637.png)
 ![image](ui_20240205230012.png)
+---------------------------------
 2. 生成AssetBundles目录，自动赋予资产AB名称（已有AB名不会覆盖），打包 AssetBundle，目录 StreamingAssets / AssetBundles / Windows（不同平台例如 Windows / iOS ）  
 ![image](ui_20240205225815.png)
+---------------------------------
 3. 假如没有报错，就可以愉快地使用了  
 
 ### 代码使用方法

@@ -27,7 +27,7 @@ Unity F8Log组件，打印日志，写入文件，上报错误
         
         /*----------Log其他功能----------*/
         // 开启写入log文件
-        F8LogHelper.Instance.OnEnterGame();
+         FF8.LogWriter.OnEnterGame();
         // 开启捕获错误日志
         LogF8.GetCrashErrorMessage();
         // 开始监视代码使用情况
@@ -36,5 +36,8 @@ Unity F8Log组件，打印日志，写入文件，上报错误
         LogF8.Log(LogF8.UseTime);
 ```
 
-## F8DebugConsole使用方法（游戏界面显示log）
-直接拖拽F8DebugConsole.cs，挂载到GameObject  
+## 拓展功能
+1. LogViewer日志显示，内置指令系统、系统状态检测（https://github.com/nhn/gpm.unity.git）  
+* 直接拖动到场景，或制作成资产直接加载，显示按键（键盘输入：波浪号~ / 移动端：五指长按1秒）  
+![image](ui_20240302152501.png)  
+![image](ui_20240302152840.png)

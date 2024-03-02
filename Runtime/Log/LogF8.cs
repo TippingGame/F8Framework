@@ -238,17 +238,32 @@ namespace F8Framework.Core
         public static void LogToMainThread(string s, params object[] p)
         {
             string msg = (p != null && p.Length > 0 ? string.Format(s, p) : s);
-            F8LogHelper.Instance.LogToMainThread(LogType.Log, msg);
+            F8LogWriter.Instance.LogToMainThread(LogType.Log, msg);
         }
-
-        public static void Assert(bool condition, string s, params object[] p)
+        
+        public static void LogException(Exception exception, Object context)
         {
-            if (condition)
-            {
-                return;
-            }
-
-            LogError("Assert failed! Message:\n" + s, p);
+            Debug.LogException(exception, context);
+        }
+        
+        public static void LogException(Exception exception)
+        {
+            Debug.LogException(exception);
+        }
+        
+        public static void LogAssertion(string s, Object context)
+        {
+            Debug.LogAssertion(s, context);
+        }
+        
+        public static void LogAssertion(string s, params object[] p)
+        {
+            Debug.LogAssertion((p != null && p.Length > 0 ? string.Format(s, p) : s));
+        }
+        
+        public static void LogAssertion(object o)
+        {
+            Debug.LogAssertion(o);
         }
 
         public static void LogWarning(string s, Object context)
@@ -284,7 +299,7 @@ namespace F8Framework.Core
         public static void LogErrorToMainThread(string s, params object[] p)
         {
             string msg = (p != null && p.Length > 0 ? string.Format(s, p) : s);
-            F8LogHelper.Instance.LogToMainThread(LogType.Error, msg);
+            F8LogWriter.Instance.LogToMainThread(LogType.Error, msg);
         }
 
 

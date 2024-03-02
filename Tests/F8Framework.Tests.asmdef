@@ -1,0 +1,17 @@
+{
+    "name": "F8Framework.Tests",
+    "rootNamespace": "",
+    "references": [
+        "F8Framework.Core",
+        "Unity.Timeline"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

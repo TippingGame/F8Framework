@@ -1,32 +1,38 @@
 ﻿using UnityEngine;
 using UnityEngine.Timeline;
 
-public class FireController : MonoBehaviour, ITimeControl
+namespace F8Framework.Tests
 {
-	[SerializeField] ParticleSystem particle;
-	[SerializeField] ScaleRandomizer floorLight;
-
-	void Play()
+	public class FireController : MonoBehaviour, ITimeControl
 	{
-		particle.Play();
-		floorLight.Play();
-	}
+		[SerializeField] ParticleSystem particle;
+		[SerializeField] ScaleRandomizer floorLight;
 
-	void Stop()
-	{
-		if (particle)
+		void Play()
 		{
-			particle.Stop();
+			particle.Play();
+			floorLight.Play();
 		}
-		if (floorLight)
+
+		void Stop()
 		{
-			floorLight.Stop();
+			if (particle)
+			{
+				particle.Stop();
+			}
+
+			if (floorLight)
+			{
+				floorLight.Stop();
+			}
 		}
+
+		public void SetTime(double time)
+		{
+		}
+
+		public void OnControlTimeStart() => Play();
+
+		public void OnControlTimeStop() => Stop();
 	}
-
-	public void SetTime(double time) { }
-
-	public void OnControlTimeStart() => Play();
-
-	public void OnControlTimeStop() => Stop();
 }

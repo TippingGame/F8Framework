@@ -6,7 +6,9 @@ namespace F8Framework.Core
     {
         protected virtual void SetComponents()
         {
-            LogF8.Log("首次添加需要点击组件绑定按钮");
+#if UNITY_EDITOR
+            LogF8.Log("首次添加UI代码生成组件绑定脚本，并绑定组件：" + this);
+#endif
         }
         
 #if UNITY_EDITOR
@@ -18,9 +20,17 @@ namespace F8Framework.Core
             GenerateAutoBindComponentsCode();
         }
         
-        public void Reset()
+        protected void Reset()
         {
             Bind();
+        }
+
+        protected void OnValidate()
+        {
+            if (!Application.isPlaying)
+            {
+                Bind();
+            }
         }
         
         private void GenerateAutoBindComponentsCode()
@@ -89,7 +99,7 @@ namespace F8Framework.Core
                         if (!tempDic.TryAdd($"{normalizeName}_{normalizeKey}", 1))
                         {
                             tempDic[$"{normalizeName}_{normalizeKey}"] += 1;
-                            LogF8.LogView("有重名物体：" + normalizeKey);
+                            // LogF8.LogView("有重名物体：" + normalizeKey);
                             normalizeKey += _division + tempDic[$"{normalizeName}_{normalizeKey}"];
                         }
                         

@@ -129,23 +129,18 @@ namespace F8Framework.Core
                 yield break;
             }
 
-            // 发送请求并等待完成
+            // 请求完成后检查是否有错误
             yield return uwr.SendWebRequest();
 
-            // 请求完成后检查是否有错误
-#if UNITY_2020_3_OR_NEWER
+#if UNITY_2020_2_OR_NEWER
             if (uwr.result != UnityWebRequest.Result.Success)
-            {
-                LogF8.LogError($"无法对 URI：{uri} 发起资源包下载请求。错误：{uwr.error}");
-                LoadFail();
-            }
 #else
             if (uwr.isNetworkError || uwr.isHttpError)
+#endif
             {
                 LogF8.LogError($"无法对 URI：{uri} 发起资源包下载请求。错误：{uwr.error}");
                 LoadFail();
             }
-#endif
         }
         
         private void LoadFail()

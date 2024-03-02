@@ -4,7 +4,9 @@
     "references": ["F8Framework.AssetMap",
         "Unity.TextMeshPro",
         "Unity.Timeline",
-        "LitJson"
+        "LitJson",
+        "MessagePack",
+        "SharpCompress"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

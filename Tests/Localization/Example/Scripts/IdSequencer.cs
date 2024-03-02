@@ -3,61 +3,64 @@ using System.Collections;
 using F8Framework.Core;
 using UnityEngine;
 
-public class IdSequencer : MonoBehaviour
+namespace F8Framework.Tests
 {
-    [SerializeField, Header("References")] TextLocalizer textLocalizer;
-    [SerializeField] TextMesh textMesh;
-
-    [SerializeField, Header("Options")] float interval = 3f;
-    [SerializeField] float fadeDuration = 1f;
-    [SerializeField] bool playOnStart = true;
-    [SerializeField] bool loop = true;
-
-    [SerializeField, Header("Set IDs")] string[] Ids;
-
-    Coroutine current;
-    float initialAlpha;
-
-    void Start()
+    public class IdSequencer : MonoBehaviour
     {
-        initialAlpha = textMesh.color.a;
-        if (playOnStart) Play();
-    }
+        [SerializeField, Header("References")] TextLocalizer textLocalizer;
+        [SerializeField] TextMesh textMesh;
 
-    public void Play()
-    {
-        if (current != null) StopCoroutine(current);
-        current = StartCoroutine(Talk());
-    }
+        [SerializeField, Header("Options")] float interval = 3f;
+        [SerializeField] float fadeDuration = 1f;
+        [SerializeField] bool playOnStart = true;
+        [SerializeField] bool loop = true;
 
-    public IEnumerator Talk()
-    {
-        var queue = new Queue(Ids);
-        var wait = new WaitForSeconds(interval);
+        [SerializeField, Header("Set IDs")] string[] Ids;
 
-        while (queue.Count != 0)
+        Coroutine current;
+        float initialAlpha;
+
+        void Start()
         {
-            yield return FadeTo(0f, fadeDuration);
-            textLocalizer.ChangeID(queue.Dequeue().ToString());
-            yield return FadeTo(initialAlpha, fadeDuration);
-            yield return wait;
+            initialAlpha = textMesh.color.a;
+            if (playOnStart) Play();
         }
 
-        current = null;
-
-        if (loop) Play();
-    }
-
-    IEnumerator FadeTo(float alpha, float duration)
-    {
-        var diff = textMesh.color.a - alpha;
-        while (Math.Abs(textMesh.color.a - alpha) > 0.01f)
+        public void Play()
         {
-            var diffPerFrame = diff * duration * Time.deltaTime;
-            var color = textMesh.color;
-            color.a -= diffPerFrame;
-            textMesh.color = color;
-            yield return null;
+            if (current != null) StopCoroutine(current);
+            current = StartCoroutine(Talk());
+        }
+
+        public IEnumerator Talk()
+        {
+            var queue = new Queue(Ids);
+            var wait = new WaitForSeconds(interval);
+
+            while (queue.Count != 0)
+            {
+                yield return FadeTo(0f, fadeDuration);
+                textLocalizer.ChangeID(queue.Dequeue().ToString());
+                yield return FadeTo(initialAlpha, fadeDuration);
+                yield return wait;
+            }
+
+            current = null;
+
+            if (loop) Play();
+        }
+
+        IEnumerator FadeTo(float alpha, float duration)
+        {
+            var diff = textMesh.color.a - alpha;
+            while (Math.Abs(textMesh.color.a - alpha) > 0.01f)
+            {
+                var diffPerFrame = diff * duration * Time.deltaTime;
+                var color = textMesh.color;
+                color.a -= diffPerFrame;
+                textMesh.color = color;
+                yield return null;
+            }
         }
     }
 }

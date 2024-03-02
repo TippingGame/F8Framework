@@ -137,9 +137,9 @@ where T : Component
             var length = childTrans.Length;
             Transform[] trans;
             if (!includeSrc)
-                trans = Utility.Algorithm.FindAll(childTrans, t => t.parent == parentTrans);
+                trans = Util.Algorithm.FindAll(childTrans, t => t.parent == parentTrans);
             else
-                trans = Utility.Algorithm.FindAll(childTrans, t => t.parent == parentTrans && t != @this);
+                trans = Util.Algorithm.FindAll(childTrans, t => t.parent == parentTrans && t != @this);
             var transLength = trans.Length;
             T[] src = new T[transLength];
             int idx = 0;

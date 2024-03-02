@@ -1,0 +1,113 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: logviewer_atlas
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings:
+    - serializedVersion: 2
+      m_BuildTarget: DefaultTexturePlatform
+      m_MaxTextureSize: 256
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: -1
+      m_TextureCompression: 1
+      m_CompressionQuality: 50
+      m_CrunchedCompression: 0
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 0
+      m_AndroidETC2FallbackOverride: 0
+    packingSettings:
+      serializedVersion: 2
+      padding: 4
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 1
+      enableTightPacking: 0
+    variantMultiplier: 1
+    packables:
+    - {fileID: 2800000, guid: f2c6c28d2c7975b4a9a7809d0c760f59, type: 3}
+    - {fileID: 2800000, guid: ab14ea359e57fab41bff6f9723b70dd3, type: 3}
+    - {fileID: 2800000, guid: 44dc87d5ed528754e944204e80192898, type: 3}
+    - {fileID: 2800000, guid: abfba4bd761f08643a0fc6a84e1f0e98, type: 3}
+    - {fileID: 2800000, guid: 02714c8a3f65c944c9690d46041a69df, type: 3}
+    - {fileID: 2800000, guid: d8f0a0fd667443745a727c97fea230ef, type: 3}
+    - {fileID: 2800000, guid: 4dd32d69f7cedba4eb1b56b6faf69fb7, type: 3}
+    - {fileID: 2800000, guid: 8514a9ba9aa85ed4c9c3279aa50b4eb8, type: 3}
+    - {fileID: 2800000, guid: 954816475f6b0b84eaecf2c7c282cea8, type: 3}
+    - {fileID: 2800000, guid: cd2fbed76a940b94b89724eea934262b, type: 3}
+    - {fileID: 2800000, guid: 2570ea6cee91bd742a15f2b40f1b652e, type: 3}
+    - {fileID: 2800000, guid: f1d4ba7308f272140854d74d4236ec11, type: 3}
+    - {fileID: 2800000, guid: 9f2eda023186fa140aed41d5d8ac4487, type: 3}
+    - {fileID: 2800000, guid: 39b8889bfcd52aa48b9c2009ff6cc064, type: 3}
+    - {fileID: 2800000, guid: 5d6755022bbc4064a849fe63011ff6d7, type: 3}
+    - {fileID: 2800000, guid: 5aebb87e8bfd80542ba096a1eea1392a, type: 3}
+    - {fileID: 2800000, guid: cecb47ccd472d734ea065098119993ca, type: 3}
+    - {fileID: 2800000, guid: e1d8debeeb1c36246a283a245def858e, type: 3}
+    - {fileID: 2800000, guid: 55bd087c987e09748b0850fdb70879f8, type: 3}
+    - {fileID: 2800000, guid: 025058d67d6f884439606958ff2d7b36, type: 3}
+    - {fileID: 2800000, guid: 15a66dca1b54e0f4ba4a8ae92104d0f0, type: 3}
+    totalSpriteSurfaceArea: 22760
+    bindAsDefault: 1
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 5d6755022bbc4064a849fe63011ff6d7, type: 3}
+  - {fileID: 21300000, guid: 9f2eda023186fa140aed41d5d8ac4487, type: 3}
+  - {fileID: 21300000, guid: f1d4ba7308f272140854d74d4236ec11, type: 3}
+  - {fileID: 21300000, guid: ab14ea359e57fab41bff6f9723b70dd3, type: 3}
+  - {fileID: 21300000, guid: 44dc87d5ed528754e944204e80192898, type: 3}
+  - {fileID: 21300000, guid: 025058d67d6f884439606958ff2d7b36, type: 3}
+  - {fileID: 21300000, guid: 954816475f6b0b84eaecf2c7c282cea8, type: 3}
+  - {fileID: 21300000, guid: cd2fbed76a940b94b89724eea934262b, type: 3}
+  - {fileID: 21300000, guid: 4dd32d69f7cedba4eb1b56b6faf69fb7, type: 3}
+  - {fileID: 21300000, guid: 02714c8a3f65c944c9690d46041a69df, type: 3}
+  - {fileID: 21300000, guid: 8514a9ba9aa85ed4c9c3279aa50b4eb8, type: 3}
+  - {fileID: 21300000, guid: 15a66dca1b54e0f4ba4a8ae92104d0f0, type: 3}
+  - {fileID: 21300000, guid: 39b8889bfcd52aa48b9c2009ff6cc064, type: 3}
+  - {fileID: 21300000, guid: 2570ea6cee91bd742a15f2b40f1b652e, type: 3}
+  - {fileID: 21300000, guid: 55bd087c987e09748b0850fdb70879f8, type: 3}
+  - {fileID: 21300000, guid: cecb47ccd472d734ea065098119993ca, type: 3}
+  - {fileID: 21300000, guid: f2c6c28d2c7975b4a9a7809d0c760f59, type: 3}
+  - {fileID: 21300000, guid: abfba4bd761f08643a0fc6a84e1f0e98, type: 3}
+  - {fileID: 21300000, guid: d8f0a0fd667443745a727c97fea230ef, type: 3}
+  - {fileID: 21300000, guid: 5aebb87e8bfd80542ba096a1eea1392a, type: 3}
+  - {fileID: 21300000, guid: e1d8debeeb1c36246a283a245def858e, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - wait_spin_0
+  - dropdown_arrow
+  - Knob
+  - close
+  - filter
+  - wait_spin_5
+  - unity
+  - white
+  - refresh
+  - logtype_info
+  - tab_bg
+  - setting
+  - check_mark
+  - white_round
+  - wait_spin_4
+  - wait_spin_2
+  - arrow
+  - logtype_error
+  - logtype_warning
+  - wait_spin_1
+  - wait_spin_3
+  m_Tag: logviewer_atlas
+  m_IsVariant: 0

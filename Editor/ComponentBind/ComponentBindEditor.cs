@@ -14,7 +14,7 @@ namespace F8Framework.Core.Editor
                 var targetObject = (ComponentBind)o;
                 if (GUILayout.Button("组件绑定"))
                 {
-                    (targetObject).Reset();
+                    (targetObject).Bind();
                 }
             }
         }

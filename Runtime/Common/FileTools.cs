@@ -446,6 +446,75 @@ namespace F8Framework.Core
             }
         }
 
+        public static bool SafeCopyDirectory(string sourceDirName, string destDirName, bool copySubDirs)
+        {
+            try
+            {
+                DirectoryInfo dir = new DirectoryInfo(sourceDirName);
+                if (dir.Exists == false)
+                {
+                    throw new DirectoryNotFoundException(
+                        "Source directory does not exist or could not be found: "
+                        + sourceDirName);
+                }
+
+                DirectoryInfo[] dirs = dir.GetDirectories();
+                if (Directory.Exists(destDirName) == false)
+                {
+                    Directory.CreateDirectory(destDirName);
+                }
+
+                FileInfo[] files = dir.GetFiles();
+                foreach (FileInfo file in files)
+                {
+                    string temppath = Path.Combine(destDirName, file.Name);
+                    file.CopyTo(temppath, true);
+                }
+
+                if (copySubDirs == true)
+                {
+                    foreach (DirectoryInfo subdir in dirs)
+                    {
+                        string temppath = Path.Combine(destDirName, subdir.Name);
+                        SafeCopyDirectory(subdir.FullName, temppath, copySubDirs);
+                    }
+                }
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                LogF8.LogError(string.Format("SafeCopyDirectory failed! sourceDirName = {0}, destDirName = {1}, with err = {2}",
+                    sourceDirName, destDirName, ex.Message));
+                return false;
+            }
+        }
+        
+        public static void MoveFile(string source, string dest, bool overwrite = true)
+        {
+            var directoryInfo = new FileInfo(dest).Directory;
+            if (directoryInfo != null)
+            {
+                var targetPath = directoryInfo.FullName;
+
+                if (Directory.Exists(targetPath) == false)
+                {
+                    Directory.CreateDirectory(targetPath);
+                }
+            }
+
+            if (File.Exists(source) == true)
+            {
+                if (overwrite == true)
+                {
+                    if (File.Exists(dest) == true)
+                    {
+                        File.Delete(dest);
+                    }
+                }
+                File.Move(source, dest);
+            }
+        }
+        
         public static byte[] Encypt(byte[] targetData, byte key)
         {
             var result = new byte[targetData.Length];

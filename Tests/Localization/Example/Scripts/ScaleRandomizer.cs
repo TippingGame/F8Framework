@@ -2,45 +2,48 @@
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class ScaleRandomizer : MonoBehaviour
+namespace F8Framework.Tests
 {
-	[SerializeField] float minScale, maxScale, interval;
-	float elapsedTime;
-	Vector3 targetScale;
-	bool isPlaying;
-
-	void Update()
+	public class ScaleRandomizer : MonoBehaviour
 	{
-		if (!isPlaying) return;
+		[SerializeField] float minScale, maxScale, interval;
+		float elapsedTime;
+		Vector3 targetScale;
+		bool isPlaying;
 
-		elapsedTime += Time.deltaTime;
-
-		if (elapsedTime > interval)
+		void Update()
 		{
-			elapsedTime = 0f;
-			targetScale = Random.Range(minScale, maxScale) * Vector3.one;
+			if (!isPlaying) return;
+
+			elapsedTime += Time.deltaTime;
+
+			if (elapsedTime > interval)
+			{
+				elapsedTime = 0f;
+				targetScale = Random.Range(minScale, maxScale) * Vector3.one;
+			}
+
+			transform.localScale = Vector3.Lerp(transform.localScale, targetScale, 0.5f);
 		}
 
-		transform.localScale = Vector3.Lerp(transform.localScale, targetScale, 0.5f);
-	}
-
-	public void Play()
-	{
-		isPlaying = true;
-	}
-
-	public void Stop()
-	{
-		isPlaying = false;
-		StartCoroutine(FadeStop());
-	}
-
-	IEnumerator FadeStop()
-	{
-		while (Vector3.Distance(transform.localScale, Vector3.zero) > 0.01f)
+		public void Play()
 		{
-			transform.localScale = Vector3.Lerp(transform.localScale, Vector3.zero, 0.5f);
-			yield return null;
+			isPlaying = true;
+		}
+
+		public void Stop()
+		{
+			isPlaying = false;
+			StartCoroutine(FadeStop());
+		}
+
+		IEnumerator FadeStop()
+		{
+			while (Vector3.Distance(transform.localScale, Vector3.zero) > 0.01f)
+			{
+				transform.localScale = Vector3.Lerp(transform.localScale, Vector3.zero, 0.5f);
+				yield return null;
+			}
 		}
 	}
 }

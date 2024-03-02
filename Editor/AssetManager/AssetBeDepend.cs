@@ -83,7 +83,7 @@ namespace F8Framework.Core.Editor
                 if (!referenceCacheList.Contains(file))
                 {
                     referenceCacheList.Add(file);
-                    LogF8.LogAsset(filePath + "   被:" + file + "    引用");
+                    LogF8.LogAsset(filePath + "---->被：<color=#FFFF00>" + file + "</color> 引用");
                 }
             }
         

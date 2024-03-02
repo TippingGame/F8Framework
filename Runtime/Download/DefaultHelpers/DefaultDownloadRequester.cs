@@ -14,8 +14,9 @@ namespace F8Framework.Core
         /// <param name="callback">回调</param>
         public void GetUriFileSizeAsync(string uri, Action<long> callback)
         {
-            Utility.Unity.StartCoroutine(EnumGetFileSize(uri, callback));
+            Util.Unity.StartCoroutine(EnumGetFileSize(uri, callback));
         }
+
         /// <summary>
         /// 获取多个URL地址下的所有文件的总和大小；
         /// 若获取到，则回调传入正确的数值，否则就传入-1；
@@ -24,8 +25,9 @@ namespace F8Framework.Core
         /// <param name="callback">回调</param>
         public void GetUriFilesSizeAsync(string[] uris, Action<long> callback)
         {
-            Utility.Unity.StartCoroutine(EnumGetMultiFilesSize(uris, callback));
+            Util.Unity.StartCoroutine(EnumGetMultiFilesSize(uris, callback));
         }
+
         IEnumerator EnumGetMultiFilesSize(string[] uris, Action<long> callback)
         {
             long overallSize = 0;
@@ -38,8 +40,10 @@ namespace F8Framework.Core
                         overallSize += size;
                 });
             }
+
             callback?.Invoke(overallSize);
         }
+
         IEnumerator EnumGetFileSize(string uri, Action<long> callback)
         {
             using (UnityWebRequest request = UnityWebRequest.Head(uri))
@@ -47,7 +51,8 @@ namespace F8Framework.Core
                 yield return request.SendWebRequest();
                 string size = request.GetResponseHeader("Content-Length");
 #if UNITY_2020_1_OR_NEWER
-                if (request.result != UnityWebRequest.Result.ConnectionError && request.result != UnityWebRequest.Result.ProtocolError)
+                if (request.result != UnityWebRequest.Result.ConnectionError &&
+                    request.result != UnityWebRequest.Result.ProtocolError)
 #elif UNITY_2018_1_OR_NEWER
                 if (!request.isNetworkError && !request.isHttpError)
 #endif

@@ -35,8 +35,10 @@ namespace F8Framework.Core
         private static Localization _localization;
         // SDK管理
         private static SDKManager _sdkManager;
+        // 下载管理器
+        private static DownloadManager _downloadManager;
         // 日志助手
-        private static F8LogHelper _logHelper;
+        private static F8LogWriter _logWriter;
         
         public static MessageManager Message
         {
@@ -188,13 +190,23 @@ namespace F8Framework.Core
             }
         }
         
-        public static F8LogHelper LogHelper
+        public static DownloadManager Download
         {
             get
             {
-                if (_logHelper == null)
-                    _logHelper = ModuleCenter.CreateModule<F8LogHelper>();
-                return _logHelper;
+                if (_downloadManager == null)
+                    _downloadManager = ModuleCenter.CreateModule<DownloadManager>();
+                return _downloadManager;
+            }
+        }
+        
+        public static F8LogWriter LogWriter
+        {
+            get
+            {
+                if (_logWriter == null)
+                    _logWriter = ModuleCenter.CreateModule<F8LogWriter>();
+                return _logWriter;
             }
         }
         

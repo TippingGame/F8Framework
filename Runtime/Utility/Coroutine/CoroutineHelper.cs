@@ -352,7 +352,7 @@ namespace F8Framework.Core
                     }
                     catch (Exception e)
                     {
-                        Utility.Debug.LogError(e);
+                        LogF8.LogException(e);
                     }
                     removalDelayTaskList.Add(task);
                 }
@@ -389,7 +389,7 @@ namespace F8Framework.Core
                     }
                     catch (Exception e)
                     {
-                        Utility.Debug.LogError(e);
+                        LogF8.LogException(e);
                         triggered = true;
                     }
                 }
@@ -401,7 +401,7 @@ namespace F8Framework.Core
                     }
                     catch (Exception e)
                     {
-                        Utility.Debug.LogError(e);
+                        LogF8.LogException(e);
                     }
                     removalConditionTaskList.Add(task);
                 }

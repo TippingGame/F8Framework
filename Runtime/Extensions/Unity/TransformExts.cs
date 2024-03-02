@@ -196,9 +196,9 @@ namespace F8Framework.Core
             var childTrans = parentTrans.GetComponentsInChildren<Transform>();
             var length = childTrans.Length;
             if (!includeSrc)
-                return Utility.Algorithm.FindAll(childTrans, t => t.parent == parentTrans && t != @this);
+                return Util.Algorithm.FindAll(childTrans, t => t.parent == parentTrans && t != @this);
             else
-                return Utility.Algorithm.FindAll(childTrans, t => t.parent == parentTrans);
+                return Util.Algorithm.FindAll(childTrans, t => t.parent == parentTrans);
         }
         public static Transform FindPeer(this Transform @this, string name)
         {
@@ -249,9 +249,9 @@ namespace F8Framework.Core
             var length = childTrans.Length;
             Transform[] trans;
             if (!includeSrc)
-                trans = Utility.Algorithm.FindAll(childTrans, t => t.parent == parentTrans);
+                trans = Util.Algorithm.FindAll(childTrans, t => t.parent == parentTrans);
             else
-                trans = Utility.Algorithm.FindAll(childTrans, t => t.parent == parentTrans && t != @this);
+                trans = Util.Algorithm.FindAll(childTrans, t => t.parent == parentTrans && t != @this);
             var transLength = trans.Length;
             T[] src = new T[transLength];
             int idx = 0;

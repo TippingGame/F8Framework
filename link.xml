@@ -11,6 +11,8 @@
   <assembly fullname="ICSharpCode.SharpZipLib" preserve="all" />
   <assembly fullname="Excel" preserve="all" />
   <assembly fullname="LitJson" preserve="all" />
+  <assembly fullname="MessagePack" preserve="all" />
+  <assembly fullname="SharpCompress" preserve="all" />
   <assembly fullname="F8Framework.F8ExcelDataClass" preserve="all" />
   <assembly fullname="F8Framework.AssetMap" preserve="all" />
   <assembly fullname="F8Framework.Core" preserve="all" />
