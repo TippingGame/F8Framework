@@ -34,10 +34,11 @@ Unity 2021.3.15f1+
 * [13. 下载管理器（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Download/README.md) - 支持localhost与http地址文件的下载，可**本地写入、监听下载进度、断点续传**，支持动态添加、移除、暂停、恢复下载。
 * [14. UI界面管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/UI/README.md) - 处理界面加载、打开、关闭、查询、层级控制、自定义动画、自动获取组件索引。UI界面分为三大类：**普通UI、模态弹窗、非模态弹窗**。
 * [15. 输入系统管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Input/README.md) - 使用同一套代码，通过自定义输入设备，适配多平台，可热切换输入设备，或同时启用多套输入设备。
-* [16. 游戏流程管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Procedure/README.md) - 自定义流程节点 ProcedureNode，控制游戏流程的，添加/运行/轮询/移除。
-* [17. 本地数据存储（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Storage/README.md) - 本地数据存储/读取。
-* [18. SDK接入管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/README.md) - 与**原生平台交互**，接入多个平台或者渠道SDK，登录/退出/切换/支付/视频广告/退出游戏/原生Toast。
-* [19. 网络连接与通信（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/AssetManager/README.md) - 待添加
+* [16. 高速本地缓存（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/CacheStorage/README.md) - 高速本地缓存，下载并缓存byte、json、text、Texture等可序列化资产，设置缓存数量、大小、存活时间，清理缓存。
+* [17. 游戏流程管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Procedure/README.md) - 自定义流程节点 ProcedureNode，控制游戏流程的，添加/运行/轮询/移除。
+* [18. 本地数据存储（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Storage/README.md) - 本地数据存储/读取。
+* [19. SDK接入管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/README.md) - 与**原生平台交互**，接入多个平台或者渠道SDK，登录/退出/切换/支付/视频广告/退出游戏/原生Toast。
+* [20. 网络连接与通信（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/AssetManager/README.md) - 待添加
 
 ## 使用步骤
 
