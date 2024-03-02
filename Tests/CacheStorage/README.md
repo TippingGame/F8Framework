@@ -30,11 +30,13 @@ Unity F8CacheStorage组件，高速本地缓存，下载并缓存byte、json、t
             double removeCycle = 1;
             
             // 初始化，参数为 0 则功能不启用
-            GpmCacheStorage.Initialize(maxCount, maxSize, reRequestTime, defaultRequestType, unusedPeriodTime, removeCycle);
+            CacheStorage.Initialize(maxCount, maxSize, reRequestTime, defaultRequestType, unusedPeriodTime, removeCycle);
             
             // 请求Request
             string url = "";
-            CacheRequestOperation cro = GpmCacheStorage.Request(url, (GpmCacheResult result) =>
+            // 自定义类型，默认使用初始化的类型
+            CacheRequestType requestType = CacheRequestType.ALWAYS;
+            CacheRequestOperation cro = CacheStorage.Request(url, requestType, (CacheResult result) =>
             {
                 // success
                 if (result.IsSuccess() == true)
@@ -63,7 +65,7 @@ Unity F8CacheStorage组件，高速本地缓存，下载并缓存byte、json、t
             cro.Cancel();
             
             // http请求
-            GpmCacheStorage.RequestHttpCache(url, (GpmCacheResult result) =>
+            CacheStorage.RequestHttpCache(url, (CacheResult result) =>
             {
                 if (result.IsSuccess() == true)
                 {
@@ -72,7 +74,7 @@ Unity F8CacheStorage组件，高速本地缓存，下载并缓存byte、json、t
             });
             
             // 请求Texture
-            GpmCacheStorage.GetCachedTexture(url, (CachedTexture cachedTexture) =>
+            CacheStorage.GetCachedTexture(url, (CachedTexture cachedTexture) =>
             {
                 if (cachedTexture != null)
                 {
@@ -93,17 +95,17 @@ Unity F8CacheStorage组件，高速本地缓存，下载并缓存byte、json、t
             });
             
             // 移除缓存
-            GpmCacheStorage.RemoveCache(url);
+            CacheStorage.RemoveCache(url);
             
             // 清空缓存
-            GpmCacheStorage.ClearCache();
+            CacheStorage.ClearCache();
         }
         
         // 协程形式
         public IEnumerator Something()
         {
             string url = "";
-            CacheRequestOperation cro = GpmCacheStorage.Request(url, (GpmCacheResult result) =>
+            CacheRequestOperation cro = CacheStorage.Request(url, (CacheResult result) =>
             {
                 if (result.IsSuccess() == true)
                 {
@@ -117,5 +119,6 @@ Unity F8CacheStorage组件，高速本地缓存，下载并缓存byte、json、t
             }
         }
 ```
-
+## 拓展功能
+1. 高速本地缓存（https://github.com/nhn/gpm.unity.git）  
 
