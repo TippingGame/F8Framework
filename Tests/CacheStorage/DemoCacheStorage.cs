@@ -7,6 +7,8 @@ namespace F8Framework.Tests
 {
     public class DemoCacheStorage : MonoBehaviour
     {
+        string url = "https://raw.githubusercontent.com/TippingGame/F8Framework/main/Tests/AssetManager/ui_20240216212631.png";
+        
         void Start()
         {
             // 缓存最大数量，超出后删除优先级低的资源
@@ -25,9 +27,7 @@ namespace F8Framework.Tests
             // 初始化，参数为 0 则功能不启用
             CacheStorage.Initialize(maxCount, maxSize, reRequestTime, defaultRequestType, unusedPeriodTime, removeCycle);
             
-            // 请求Request
-            string url = "";
-            // 自定义类型，默认使用初始化的类型
+            // 请求Request，自定义类型，默认使用初始化的类型
             CacheRequestType requestType = CacheRequestType.ALWAYS;
             CacheRequestOperation cro = CacheStorage.Request(url, requestType, (CacheResult result) =>
             {

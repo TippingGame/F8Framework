@@ -1,10 +1,9 @@
 using UnityEngine;
 using System;
+using RequestCallback = System.Action<F8Framework.Core.CacheResult>;
 
 namespace F8Framework.Core
 {
-    using RequestCallback = Action<CacheResult>;
-
     [Serializable]
     public class CacheInfo : IComparable<CacheInfo>
     {

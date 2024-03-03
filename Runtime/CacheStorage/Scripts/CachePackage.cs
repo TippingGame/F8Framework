@@ -4,11 +4,10 @@ using UnityEngine;
 using System;
 using System.IO;
 using System.Linq;
+using RequestCallback = System.Action<F8Framework.Core.CacheResult>;
 
 namespace F8Framework.Core
 {
-    using RequestCallback = Action<CacheResult>;
-
     public enum CacheRequestType
     {
         ALWAYS,

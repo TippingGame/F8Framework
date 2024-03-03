@@ -348,59 +348,5 @@ namespace F8Framework.Core
 			}
 			return maxPriority; // 大于等于零
 		}
-
-		#region 协程相关
-		/// <summary>
-		/// 开启一个协程
-		/// </summary>
-		public static Coroutine StartCoroutine(IEnumerator coroutine)
-		{
-			if (_behaviour == null)
-				LogF8.LogError($"{nameof(ModuleCenter)} 未初始化。使用 ModuleCenter.Initialize");
-			return _behaviour.StartCoroutine(coroutine);
-		}
-
-		/// <summary>
-		/// 停止一个协程
-		/// </summary>
-		public static void StopCoroutine(Coroutine coroutine)
-		{
-			if (_behaviour == null)
-				LogF8.LogError($"{nameof(ModuleCenter)} 未初始化。使用 ModuleCenter.Initialize");
-			_behaviour.StopCoroutine(coroutine);
-		}
-
-
-		/// <summary>
-		/// 开启一个协程
-		/// </summary>
-		public static void StartCoroutine(string methodName)
-		{
-			if (_behaviour == null)
-				LogF8.LogError($"{nameof(ModuleCenter)} 未初始化。使用 ModuleCenter.Initialize");
-			_behaviour.StartCoroutine(methodName);
-		}
-
-		/// <summary>
-		/// 停止一个协程
-		/// </summary>
-		public static void StopCoroutine(string methodName)
-		{
-			if (_behaviour == null)
-				LogF8.LogError($"{nameof(ModuleCenter)} 未初始化。使用 ModuleCenter.Initialize");
-			_behaviour.StopCoroutine(methodName);
-		}
-
-
-		/// <summary>
-		/// 停止所有协程
-		/// </summary>
-		public static void StopAllCoroutines()
-		{
-			if (_behaviour == null)
-				LogF8.LogError($"{nameof(ModuleCenter)} 未初始化。使用 ModuleCenter.Initialize");
-			_behaviour.StopAllCoroutines();
-		}
-		#endregion
 	}
 }

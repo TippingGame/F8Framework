@@ -7,11 +7,11 @@ namespace F8Framework.Core
         
         // 全局消息
         private static MessageManager _message;
-        // 输入管理
+        // 输入管理-->使用了消息模块
         private static InputManager _inputManager;
         // 本地存储
         private static StorageManager _storage;
-        // 游戏时间管理
+        // 游戏时间管理-->使用了消息模块
         private static TimerManager _timer;
         // 流程管理
         private static ProcedureManager _procedure;
@@ -19,21 +19,19 @@ namespace F8Framework.Core
         private static FSMManager _fsm;
         // 游戏对象池
         private static GameObjectPool _gameObjectPool;
-        // 游戏对象池全局设置
-        private static F8PoolGlobal _poolGlobal;
         // 资产管理
         private static AssetManager _asset;
-        // 读取配置表
+        // 读取配置表-->使用了资产模块
         private static F8DataManager _config;
-        // 音频管理
+        // 音频管理-->使用了资产模块
         private static AudioManager _audio;
         // 补间动画
         private static Tween _tween;
-        // UI界面管理
+        // UI界面管理-->使用了资产模块
         private static UIManager _ui;
-        // 本地化
+        // 本地化-->使用了配置模块-->使用了资产模块
         private static Localization _localization;
-        // SDK管理
+        // SDK管理-->使用了消息模块
         private static SDKManager _sdkManager;
         // 下载管理器
         private static DownloadManager _downloadManager;
@@ -48,6 +46,11 @@ namespace F8Framework.Core
                     _message = ModuleCenter.CreateModule<MessageManager>();
                 return _message;
             }
+            set
+            {
+                if (_message == null)
+                    _message = value;
+            }
         }
 
         public static InputManager Input
@@ -57,6 +60,11 @@ namespace F8Framework.Core
                 if (_inputManager == null)
                     _inputManager = ModuleCenter.CreateModule<InputManager>(new DefaultInputHelper());
                 return _inputManager;
+            }
+            set
+            {
+                if (_inputManager == null)
+                    _inputManager = value;
             }
         }
         
@@ -68,6 +76,11 @@ namespace F8Framework.Core
                     _storage = ModuleCenter.CreateModule<StorageManager>();
                 return _storage;
             }
+            set
+            {
+                if (_storage == null)
+                    _storage = value;
+            }
         }
 
         public static TimerManager Timer
@@ -77,6 +90,11 @@ namespace F8Framework.Core
                 if (_timer == null)
                     _timer = ModuleCenter.CreateModule<TimerManager>();
                 return _timer;
+            }
+            set
+            {
+                if (_timer == null)
+                    _timer = value;
             }
         }
 
@@ -88,6 +106,11 @@ namespace F8Framework.Core
                     _procedure = ModuleCenter.CreateModule<ProcedureManager>();
                 return _procedure;
             }
+            set
+            {
+                if (_procedure == null)
+                    _procedure = value;
+            }
         }
 
         public static FSMManager FSM
@@ -98,6 +121,11 @@ namespace F8Framework.Core
                     _fsm = ModuleCenter.CreateModule<FSMManager>();
                 return _fsm;
             }
+            set
+            {
+                if (_fsm == null)
+                    _fsm = value;
+            }
         }
 
         public static GameObjectPool GameObjectPool
@@ -105,18 +133,20 @@ namespace F8Framework.Core
             get
             {
                 if (_gameObjectPool == null)
+                {
                     _gameObjectPool = ModuleCenter.CreateModule<GameObjectPool>();
+                    ModuleCenter.CreateModule<F8PoolGlobal>();
+                }
+                    
                 return _gameObjectPool;
             }
-        }
-        
-        public static F8PoolGlobal PoolGlobal
-        {
-            get
+            set
             {
-                if (_poolGlobal == null)
-                    _poolGlobal = ModuleCenter.CreateModule<F8PoolGlobal>();
-                return _poolGlobal;
+                if (_gameObjectPool == null)
+                {
+                    _gameObjectPool = value;
+                    ModuleCenter.CreateModule<F8PoolGlobal>();
+                }
             }
         }
 
@@ -128,6 +158,11 @@ namespace F8Framework.Core
                     _asset = ModuleCenter.CreateModule<AssetManager>();
                 return _asset;
             }
+            set
+            {
+                if (_asset == null)
+                    _asset = value;
+            }
         }
         
         public static F8DataManager Config
@@ -135,8 +170,13 @@ namespace F8Framework.Core
             get
             {
                 if (_config == null)
-                    _config = F8DataManager.Instance;
+                    _config = ModuleCenter.CreateModule<F8DataManager>();
                 return _config;
+            }
+            set
+            {
+                if (_config == null)
+                    _config = value;
             }
         }
         
@@ -148,6 +188,11 @@ namespace F8Framework.Core
                     _audio = ModuleCenter.CreateModule<AudioManager>();
                 return _audio;
             }
+            set
+            {
+                if (_audio == null)
+                    _audio = value;
+            }
         }
 
         public static Tween Tween
@@ -157,6 +202,11 @@ namespace F8Framework.Core
                 if (_tween == null)
                     _tween = ModuleCenter.CreateModule<Tween>();
                 return _tween;
+            }
+            set
+            {
+                if (_tween == null)
+                    _tween = value;
             }
         }
 
@@ -168,6 +218,11 @@ namespace F8Framework.Core
                     _ui = ModuleCenter.CreateModule<UIManager>();
                 return _ui;
             }
+            set
+            {
+                if (_ui == null)
+                    _ui = value;
+            }
         }
 
         public static Localization Local
@@ -177,6 +232,11 @@ namespace F8Framework.Core
                 if (_localization == null)
                     _localization = ModuleCenter.CreateModule<Localization>();
                 return _localization;
+            }
+            set
+            {
+                if (_localization == null)
+                    _localization = value;
             }
         }
         
@@ -188,6 +248,11 @@ namespace F8Framework.Core
                     _sdkManager = ModuleCenter.CreateModule<SDKManager>();
                 return _sdkManager;
             }
+            set
+            {
+                if (_sdkManager == null)
+                    _sdkManager = value;
+            }
         }
         
         public static DownloadManager Download
@@ -198,6 +263,11 @@ namespace F8Framework.Core
                     _downloadManager = ModuleCenter.CreateModule<DownloadManager>();
                 return _downloadManager;
             }
+            set
+            {
+                if (_downloadManager == null)
+                    _downloadManager = value;
+            }
         }
         
         public static F8LogWriter LogWriter
@@ -207,6 +277,11 @@ namespace F8Framework.Core
                 if (_logWriter == null)
                     _logWriter = ModuleCenter.CreateModule<F8LogWriter>();
                 return _logWriter;
+            }
+            set
+            {
+                if (_logWriter == null)
+                    _logWriter = value;
             }
         }
         

@@ -1,7 +1,7 @@
+using System;
+
 namespace F8Framework.Core
 {
-    using System;
-
     /// <summary>
     /// The GpmCacheStorage class is core of CacheStorage service.
     /// </summary>

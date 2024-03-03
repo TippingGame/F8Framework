@@ -51,6 +51,7 @@ namespace F8Framework.Core
         }
 
         static Stack<IEnumerator> enumeratorStack = new Stack<IEnumerator>(32);
+
         private bool MoveNext()
         {
             IEnumerator enumerator = routine;
@@ -85,10 +86,10 @@ namespace F8Framework.Core
 
             return result;
         }
-        
+
         private bool CheckMoveNext(IEnumerator enumerator)
         {
-            if (current is EditorCoroutine )
+            if (current is EditorCoroutine)
             {
                 if ((current as EditorCoroutine).IsDone == true)
                 {

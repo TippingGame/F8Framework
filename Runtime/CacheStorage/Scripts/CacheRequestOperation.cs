@@ -1,10 +1,9 @@
 ﻿using System;
 using UnityEngine;
+using RequestCallback = System.Action<F8Framework.Core.CacheResult>;
 
 namespace F8Framework.Core
 {
-    using RequestCallback = Action<CacheResult>;
-
     public class CacheRequestOperation : CustomYieldInstruction
     {
         private CacheInfo info;

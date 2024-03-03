@@ -11,22 +11,22 @@ namespace F8Framework.Tests
 			ModuleCenter.Initialize(this);
 
 			// 按顺序创建模块
-			FF8.Message.ToString();
-			FF8.Storage.ToString();
-			FF8.Timer.ToString();
-			FF8.Procedure.ToString();
-			FF8.FSM.ToString();
-			FF8.GameObjectPool.ToString();
-			FF8.PoolGlobal.ToString();
-			FF8.Asset.ToString();
-			FF8.Config.ToString();
-			FF8.Audio.ToString();
-			FF8.Tween.ToString();
-			FF8.UI.ToString();
-			FF8.Local.ToString();
-			FF8.SDK.ToString();
-			FF8.Download.ToString();
-			FF8.LogWriter.ToString();
+			FF8.Message = ModuleCenter.CreateModule<MessageManager>();
+			FF8.Input = ModuleCenter.CreateModule<InputManager>(new DefaultInputHelper());
+			FF8.Storage = ModuleCenter.CreateModule<StorageManager>();
+			FF8.Timer = ModuleCenter.CreateModule<TimerManager>();
+			FF8.Procedure = ModuleCenter.CreateModule<ProcedureManager>();
+			FF8.FSM = ModuleCenter.CreateModule<FSMManager>();
+			FF8.GameObjectPool = ModuleCenter.CreateModule<GameObjectPool>();
+			FF8.Asset = ModuleCenter.CreateModule<AssetManager>();
+			FF8.Config = ModuleCenter.CreateModule<F8DataManager>();
+			FF8.Audio = ModuleCenter.CreateModule<AudioManager>();
+			FF8.Tween = ModuleCenter.CreateModule<Tween>();
+			FF8.UI = ModuleCenter.CreateModule<UIManager>();
+			FF8.Local = ModuleCenter.CreateModule<Localization>();
+			FF8.SDK = ModuleCenter.CreateModule<SDKManager>();
+			FF8.Download = ModuleCenter.CreateModule<DownloadManager>();
+			FF8.LogWriter = ModuleCenter.CreateModule<F8LogWriter>();
 		}
 
 		void Update()

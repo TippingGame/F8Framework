@@ -203,7 +203,7 @@ namespace F8Framework.Core.Editor
             source.Append("using LitJson;\n\n");
             source.Append("namespace F8Framework.Core\n");
             source.Append("{\n");
-            source.Append("\tpublic class F8DataManager : Singleton<F8DataManager>\n");
+            source.Append("\tpublic class F8DataManager : ModuleSingleton<F8DataManager>, IModule\n");
             source.Append("\t{\n");
 
             //定义变量
@@ -255,7 +255,7 @@ namespace F8Framework.Core.Editor
             
                 source.Append("\t\tpublic void LoadLocalizedStringsCallback(Action onLoadComplete)\n");
                 source.Append("\t\t{\n");
-                source.Append("\t\t\tModuleCenter.StartCoroutine(LoadLocalizedStringsIEnumerator(onLoadComplete));\n");
+                source.Append("\t\t\tUtil.Unity.StartCoroutine(LoadLocalizedStringsIEnumerator(onLoadComplete));\n");
                 source.Append("\t\t}\n\n");
             
                 source.Append("\t\tpublic IEnumerator LoadLocalizedStringsIEnumerator(Action onLoadComplete)\n");
@@ -298,7 +298,7 @@ namespace F8Framework.Core.Editor
             //异步加载所有配置表
             source.Append("\t\tpublic void LoadAllAsyncCallback(Action onLoadComplete)\n");
             source.Append("\t\t{\n");
-            source.Append("\t\t\tModuleCenter.StartCoroutine(LoadAllAsyncIEnumerator(onLoadComplete));\n");
+            source.Append("\t\t\tUtil.Unity.StartCoroutine(LoadAllAsyncIEnumerator(onLoadComplete));\n");
             source.Append("\t\t}\n\n");
             
             //异步加载所有配置表
@@ -350,6 +350,26 @@ namespace F8Framework.Core.Editor
             source.Append("\t\t\t\t}\n");
             source.Append("#endif\n");
             source.Append("\t\t\t}\n");
+            source.Append("\t\t}\n\n");
+            source.Append("\t\tpublic void OnInit(object createParam)\n");
+            source.Append("\t\t{\n");
+            source.Append("\t\t\t\n");
+            source.Append("\t\t}\n\n");
+            source.Append("\t\tpublic void OnUpdate()\n");
+            source.Append("\t\t{\n");
+            source.Append("\t\t\t\n");
+            source.Append("\t\t}\n\n");
+            source.Append("\t\tpublic void OnLateUpdate()\n");
+            source.Append("\t\t{\n");
+            source.Append("\t\t\t\n");
+            source.Append("\t\t}\n\n");
+            source.Append("\t\tpublic void OnFixedUpdate()\n");
+            source.Append("\t\t{\n");
+            source.Append("\t\t\t\n");
+            source.Append("\t\t}\n\n");
+            source.Append("\t\tpublic void OnTermination()\n");
+            source.Append("\t\t{\n");
+            source.Append("\t\t\tbase.Destroy();\n");
             source.Append("\t\t}\n");
             source.Append("\t}\n");
             source.Append("}");

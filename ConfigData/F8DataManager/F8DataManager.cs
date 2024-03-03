@@ -15,7 +15,7 @@ using LitJson;
 
 namespace F8Framework.Core
 {
-	public class F8DataManager : Singleton<F8DataManager>
+	public class F8DataManager : ModuleSingleton<F8DataManager>, IModule
 	{
 		private Sheet1 p_Sheet1;
 		private Sheet2 p_Sheet2;
@@ -67,7 +67,7 @@ namespace F8Framework.Core
 
 		public void LoadLocalizedStringsCallback(Action onLoadComplete)
 		{
-			ModuleCenter.StartCoroutine(LoadLocalizedStringsIEnumerator(onLoadComplete));
+			Util.Unity.StartCoroutine(LoadLocalizedStringsIEnumerator(onLoadComplete));
 		}
 
 		public IEnumerator LoadLocalizedStringsIEnumerator(Action onLoadComplete)
@@ -99,7 +99,7 @@ namespace F8Framework.Core
 
 		public void LoadAllAsyncCallback(Action onLoadComplete)
 		{
-			ModuleCenter.StartCoroutine(LoadAllAsyncIEnumerator(onLoadComplete));
+			Util.Unity.StartCoroutine(LoadAllAsyncIEnumerator(onLoadComplete));
 		}
 
 		public IEnumerator LoadAllAsyncIEnumerator(Action onLoadComplete)
@@ -148,6 +148,31 @@ namespace F8Framework.Core
 				}
 #endif
 			}
+		}
+
+		public void OnInit(object createParam)
+		{
+			
+		}
+
+		public void OnUpdate()
+		{
+			
+		}
+
+		public void OnLateUpdate()
+		{
+			
+		}
+
+		public void OnFixedUpdate()
+		{
+			
+		}
+
+		public void OnTermination()
+		{
+			base.Destroy();
 		}
 	}
 }

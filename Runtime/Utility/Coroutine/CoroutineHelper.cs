@@ -14,10 +14,12 @@ namespace F8Framework.Core
             public float Delay;
             public float CurrentTime;
             public Action Action;
+
             public bool Equals(DelayTask other)
             {
                 return other.TaskId == this.TaskId;
             }
+
             public void Clear()
             {
                 TaskId = -1;
@@ -26,6 +28,7 @@ namespace F8Framework.Core
                 Action = null;
             }
         }
+
         class ConditionTask : IEquatable<ConditionTask>, IReference
         {
             public long TaskId;
@@ -33,10 +36,12 @@ namespace F8Framework.Core
             public float CurrentTime;
             public Func<bool> Condition;
             public Action Action;
+
             public bool Equals(ConditionTask other)
             {
                 return other.TaskId == this.TaskId;
             }
+
             public void Clear()
             {
                 TaskId = -1;
@@ -46,33 +51,39 @@ namespace F8Framework.Core
                 Action = null;
             }
         }
+
         class CoroutineActionTask : IReference
         {
             public Action Action;
             public long TaskId;
+
             public IEnumerator Task()
             {
                 Action?.Invoke();
                 yield return null;
             }
+
             public void Clear()
             {
                 TaskId = -1;
                 Action = null;
             }
         }
+
         class CoroutineTask : IReference
         {
             public IEnumerator Enumerator;
             public Action<Coroutine> Callback;
             public long TaskId;
+
             public void Clear()
             {
                 TaskId = -1;
                 Enumerator = null;
-                Callback=null;
+                Callback = null;
             }
         }
+
         List<CoroutineTask> routineList = new List<CoroutineTask>();
         static long taskIndex = 0;
         readonly Dictionary<long, DelayTask> delayTaskDict = new Dictionary<long, DelayTask>();
@@ -83,7 +94,9 @@ namespace F8Framework.Core
         readonly List<ConditionTask> conditionTaskList = new List<ConditionTask>();
         readonly List<ConditionTask> removalConditionTaskList = new List<ConditionTask>();
 
-        readonly Dictionary<long, CoroutineActionTask> coroutineActionTaskDict = new Dictionary<long, CoroutineActionTask>();
+        readonly Dictionary<long, CoroutineActionTask> coroutineActionTaskDict =
+            new Dictionary<long, CoroutineActionTask>();
+
         readonly List<CoroutineActionTask> coroutineActionTaskList = new List<CoroutineActionTask>();
         bool runningCoroutineTask;
         Coroutine coroutineActionPtr;
@@ -109,6 +122,7 @@ namespace F8Framework.Core
             delayTaskDict.Add(delayTask.TaskId, delayTask);
             return delayTask.TaskId;
         }
+
         /// <summary>
         /// 添加条件任务。包含超时机制，超时自动抛弃任务，不触发。
         /// </summary>
@@ -132,6 +146,7 @@ namespace F8Framework.Core
             conditionTaskDict.Add(conditionTask.TaskId, conditionTask);
             return conditionTask.TaskId;
         }
+
         /// <summary>
         /// 移除延迟任务，已触发的则自动移除
         /// </summary>
@@ -144,6 +159,7 @@ namespace F8Framework.Core
                 ReferencePool.Release(task);
             }
         }
+
         /// <summary>
         /// 移除条件任务
         /// </summary>
@@ -156,6 +172,7 @@ namespace F8Framework.Core
                 ReferencePool.Release(task);
             }
         }
+
         public void StopAllDelayTask()
         {
             var length = delayTaskList.Count;
@@ -164,9 +181,11 @@ namespace F8Framework.Core
                 var task = delayTaskList[i];
                 ReferencePool.Release(task);
             }
+
             delayTaskList.Clear();
             delayTaskDict.Clear();
         }
+
         public void StopAllConditionTask()
         {
             var length = conditionTaskList.Count;
@@ -175,9 +194,11 @@ namespace F8Framework.Core
                 var task = conditionTaskList[i];
                 ReferencePool.Release(task);
             }
+
             conditionTaskList.Clear();
             conditionTaskDict.Clear();
         }
+
         /// <summary>
         /// 添加协程任务，每个任务之间完成会相隔一帧
         /// </summary>
@@ -195,8 +216,10 @@ namespace F8Framework.Core
                 StartCoroutine(RunCoroutineActionTask());
                 runningCoroutineTask = true;
             }
+
             return taskId;
         }
+
         /// <summary>
         /// 移除任务
         /// </summary>
@@ -209,6 +232,7 @@ namespace F8Framework.Core
                 ReferencePool.Release(coroutineTask);
             }
         }
+
         /// <summary>
         /// 停止所有协程事件任务
         /// </summary>
@@ -219,15 +243,18 @@ namespace F8Framework.Core
                 StopCoroutine(coroutineActionPtr);
                 runningCoroutineTask = false;
             }
+
             var length = coroutineActionTaskList.Count;
             for (int i = 0; i < length; i++)
             {
                 var coroutineTask = coroutineActionTaskList[i];
                 ReferencePool.Release(coroutineTask);
             }
+
             coroutineActionTaskDict.Clear();
             coroutineActionTaskList.Clear();
         }
+
         /// <summary>
         /// 条件协程；
         /// </summary>
@@ -238,6 +265,7 @@ namespace F8Framework.Core
         {
             return StartCoroutine(EnumPredicateCoroutine(handler, callBack));
         }
+
         /// <summary>
         /// 嵌套协程；
         /// </summary>
@@ -248,6 +276,7 @@ namespace F8Framework.Core
         {
             return StartCoroutine(EnumPredicateNestCoroutine(predicateHandler, nestHandler));
         }
+
         /// <summary>
         /// 延时协程；
         /// </summary>
@@ -258,14 +287,17 @@ namespace F8Framework.Core
         {
             return StartCoroutine(EnumDelay(delay, callBack));
         }
+
         public Coroutine StartCoroutine(Action handler)
         {
             return StartCoroutine(EnumCoroutine(handler));
         }
+
         public Coroutine StartCoroutine(Action handler, Action callback)
         {
             return StartCoroutine(EnumCoroutine(handler, callback));
         }
+
         /// <summary>
         /// 嵌套协程
         /// </summary>
@@ -276,6 +308,7 @@ namespace F8Framework.Core
         {
             return StartCoroutine(EnumCoroutine(routine, callBack));
         }
+
         public void AddCoroutine(IEnumerator routine, Action<Coroutine> callback)
         {
             var task = ReferencePool.Acquire<CoroutineTask>();
@@ -283,37 +316,44 @@ namespace F8Framework.Core
             task.Callback = callback;
             routineList.Add(task);
         }
+
         void Update()
         {
             RefreshRoutineTask();
             RefreshDelayTask();
             RefreshConditionTask();
         }
+
         IEnumerator EnumDelay(float delay, Action callBack)
         {
             yield return new WaitForSeconds(delay);
             callBack?.Invoke();
         }
+
         IEnumerator EnumCoroutine(Coroutine routine, Action callBack)
         {
             yield return routine;
             callBack?.Invoke();
         }
+
         IEnumerator EnumCoroutine(Action handler)
         {
             handler?.Invoke();
             yield return null;
         }
+
         IEnumerator EnumCoroutine(Action handler, Action callack)
         {
             yield return StartCoroutine(handler);
             callack?.Invoke();
         }
+
         IEnumerator EnumPredicateCoroutine(Func<bool> handler, Action callBack)
         {
             yield return new WaitUntil(handler);
             callBack();
         }
+
         /// <summary>
         /// 嵌套协程执行体
         /// </summary>
@@ -324,6 +364,7 @@ namespace F8Framework.Core
             yield return new WaitUntil(predicateHandler);
             yield return StartCoroutine(EnumCoroutine(nestHandler));
         }
+
         void RefreshRoutineTask()
         {
             while (routineList.Count > 0)
@@ -335,6 +376,7 @@ namespace F8Framework.Core
                 ReferencePool.Release(task);
             }
         }
+
         void RefreshDelayTask()
         {
             removalDelayTaskList.Clear();
@@ -354,9 +396,11 @@ namespace F8Framework.Core
                     {
                         LogF8.LogException(e);
                     }
+
                     removalDelayTaskList.Add(task);
                 }
             }
+
             var removeCount = removalDelayTaskList.Count;
             for (int i = 0; i < removeCount; i++)
             {
@@ -364,6 +408,7 @@ namespace F8Framework.Core
                 RemoveDelayTask(removeTask.TaskId);
             }
         }
+
         void RefreshConditionTask()
         {
             removalConditionTaskList.Clear();
@@ -378,6 +423,7 @@ namespace F8Framework.Core
                     removalConditionTaskList.Add(task);
                     continue;
                 }
+
                 bool triggered = false;
                 if (task.Condition == null)
                     triggered = true;
@@ -393,6 +439,7 @@ namespace F8Framework.Core
                         triggered = true;
                     }
                 }
+
                 if (triggered)
                 {
                     try
@@ -403,9 +450,11 @@ namespace F8Framework.Core
                     {
                         LogF8.LogException(e);
                     }
+
                     removalConditionTaskList.Add(task);
                 }
             }
+
             var removeCount = removalConditionTaskList.Count;
             for (int i = 0; i < removeCount; i++)
             {
@@ -413,6 +462,7 @@ namespace F8Framework.Core
                 RemoveConditionTask(removeTask.TaskId);
             }
         }
+
         IEnumerator RunCoroutineActionTask()
         {
             runningCoroutineTask = true;
@@ -423,8 +473,10 @@ namespace F8Framework.Core
                 yield return coroutineTask.Task();
                 ReferencePool.Release(coroutineTask);
             }
+
             runningCoroutineTask = false;
         }
+
         /// <summary>
         /// 生成任务Id
         /// </summary>
