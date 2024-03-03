@@ -1,20 +1,16 @@
-﻿namespace F8Framework.Core
-{
-    using System;
-    using UnityEngine;
+﻿using System;
+using UnityEngine;
 
+namespace F8Framework.Core
+{
     public class LogViewer : SingletonMono<LogViewer>
     {
-        [Header("5指长按启用")]
-        public bool         gestureEnable   = true;
+        [Header("5指长按启用")] public bool gestureEnable = true;
 
-        [Space(5)]
-
-        [Header("发送邮件")]
+        [Space(5)] [Header("发送邮件")]
         // public MailData     mailSetting     = null;
-        
-        private Viewer      viewer          = null;
-        
+        private Viewer viewer = null;
+
         protected override void Init()
         {
             Initialize();
@@ -34,7 +30,7 @@
         {
             Function.Instance.AddCommand(instance, methodName);
         }
-        
+
         public void Show()
         {
             viewer.Show();

@@ -1,22 +1,22 @@
-﻿namespace F8Framework.Core
-{
-    using UnityEngine;
-    using UnityEngine.UI;
+﻿using UnityEngine;
+using UnityEngine.UI;
 
+namespace F8Framework.Core
+{
     public class Popup : SingletonMono<Popup>
     {
-        public RectTransform    popupTransform = null;
-        public Text             title          = null;
-        public Text             message        = null;
+        public RectTransform popupTransform = null;
+        public Text title = null;
+        public Text message = null;
 
-        public float            minWidth       = 200;
-        public float            maxWidth       = 730;
+        public float minWidth = 200;
+        public float maxWidth = 730;
 
-        public float            baseHeigt      = 80;
-        public float            minHeight      = 100;
-        public float            maxHeight      = 620;
-        
-        public float margin                    = 18;
+        public float baseHeigt = 80;
+        public float minHeight = 100;
+        public float maxHeight = 620;
+
+        public float margin = 18;
 
         protected override void Init()
         {
@@ -25,8 +25,8 @@
 
         public void ShowPopup(string message, string title = "")
         {
-            this.message.text   = message;
-            this.title.text     = title;
+            this.message.text = message;
+            this.title.text = title;
             Show(true);
         }
 
@@ -44,7 +44,7 @@
                 float width = minWidth;
                 float height = minHeight;
 
-                if(width < this.title.preferredWidth + margin)
+                if (width < this.title.preferredWidth + margin)
                 {
                     width = this.title.preferredWidth + margin;
                 }
@@ -54,7 +54,7 @@
                     width = this.message.preferredWidth + margin;
                 }
 
-                if(width > maxWidth)
+                if (width > maxWidth)
                 {
                     width = maxWidth;
                 }

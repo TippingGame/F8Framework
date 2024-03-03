@@ -1,8 +1,8 @@
-﻿namespace F8Framework.Core
-{
-    using System.Text;
-    using UnityEngine.UI;
+﻿using System.Text;
+using UnityEngine.UI;
 
+namespace F8Framework.Core
+{
     public class CommandItemData : InfiniteScrollData
     {
         public Function.CommandData commandData = null;
@@ -11,7 +11,7 @@
     public class CommandItem : InfiniteScrollItem
     {
         public Text commandName = null;
-        
+
         public override void UpdateData(InfiniteScrollData scrollData)
         {
             base.UpdateData(scrollData);
@@ -28,6 +28,7 @@
                 {
                     sb.AppendFormat("{0},", commandData.parameters[index].GetType().Name);
                 }
+
                 sb.Replace(",", ")", sb.Length - 1, 1);
             }
 
@@ -42,5 +43,4 @@
             commandData.methodInfo.Invoke(commandData.instance, commandData.parameters);
         }
     }
-
 }

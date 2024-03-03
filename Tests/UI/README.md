@@ -1,11 +1,11 @@
-# F8UIManager
+# F8 UIManager
 
 [![license](http://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT) 
 [![Unity Version](https://img.shields.io/badge/unity-2021.3.15f1-blue)](https://unity.com) 
 [![Platform](https://img.shields.io/badge/platform-Win%20%7C%20Android%20%7C%20iOS%20%7C%20Mac%20%7C%20Linux%20%7C%20WebGL-orange)]() 
 
 ## 简介（希望自己点击F8，就能开始制作游戏，不想多余的事）
-Unity F8UIManager界面管理组件，处理界面加载，打开，关闭，查询，层级控制，自定义动画，自动获取组件索引。  
+Unity F8 UIManager界面管理组件，处理界面加载，打开，关闭，查询，层级控制，自定义动画，自动获取组件索引。  
 UI界面分为三大类：  
 1.普通UI  
 2.模态弹窗（只显示最老的窗口，关闭后自动显示下一个新窗口）  

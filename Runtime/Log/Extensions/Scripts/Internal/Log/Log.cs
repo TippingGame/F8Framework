@@ -1,16 +1,16 @@
-﻿namespace F8Framework.Core
-{
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.IO;
-    using System.Linq;
-    using System.Net.Mail;
-    using System.Text;
-    using UnityEngine;
-    using UnityEngine.SceneManagement;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using System.Net.Mail;
+using System.Text;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
+namespace F8Framework.Core
+{
     public class Log : SingletonMono<Log>
     {
         public class LogData
@@ -31,6 +31,7 @@
                 this.stackTrace = stackTrace;
                 this.type = type;
             }
+
             public string condition;
             public string stackTrace;
             public LogType type;
@@ -106,7 +107,6 @@
 
         public void SendFullLogToMail(SendCompletedEventHandler callback)
         {
-            
             WriteFullLogToFile(exception =>
             {
                 if (exception != null)
@@ -128,13 +128,16 @@
                     try
                     {
                         stream = File.Open(logFilePath, FileMode.Open);
-                        Function.Instance.SendMail(string.Format(LogConst.LOGMAIL_SUBJECT_FORMAT, Application.productName, DateTime.Now.ToString("G")),
-                                                    LogConst.LOGMAIL_BODY, stream, LogConst.LOGFILE_NAME, (object sender, AsyncCompletedEventArgs e) =>
-                                                    {
-                                                        clearStream();
+                        Function.Instance.SendMail(
+                            string.Format(LogConst.LOGMAIL_SUBJECT_FORMAT, Application.productName,
+                                DateTime.Now.ToString("G")),
+                            LogConst.LOGMAIL_BODY, stream, LogConst.LOGFILE_NAME,
+                            (object sender, AsyncCompletedEventArgs e) =>
+                            {
+                                clearStream();
 
-                                                        callback(sender, e);
-                                                    });
+                                callback(sender, e);
+                            });
                     }
                     catch (Exception e)
                     {
@@ -152,7 +155,8 @@
             {
                 try
                 {
-                    using (var stream = new FileStream(logFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite | FileShare.Delete))
+                    using (var stream = new FileStream(logFilePath, FileMode.Create, FileAccess.ReadWrite,
+                               FileShare.ReadWrite | FileShare.Delete))
                     {
                         using (var writer = new StreamWriter(stream))
                         {
@@ -169,14 +173,13 @@
                 }
             }));
         }
-        
+
         IEnumerator GetFullLogInformation(Action<string> callback)
         {
             LogData[] logData = null;
 
             lock (logLock)
             {
-                
                 logData = new LogData[fullLogs.Values.Count];
                 fullLogs.Values.CopyTo(logData, 0);
             }
@@ -188,7 +191,8 @@
                 yield return null;
 
                 log = logData[index];
-                logInformation.AppendFormat("=> [{0}] [{1}] {2} [Play time : {3}] [Scene : {4}]", log.logType.ToString(), log.localTime.ToString("G"), log.message, log.playTime, log.sceneName);
+                logInformation.AppendFormat("=> [{0}] [{1}] {2} [Play time : {3}] [Scene : {4}]",
+                    log.logType.ToString(), log.localTime.ToString("G"), log.message, log.playTime, log.sceneName);
                 logInformation.AppendLine();
                 logInformation.AppendLine(log.stackTrace);
                 logInformation.AppendLine().AppendLine();
@@ -201,7 +205,8 @@
         {
             var result = new StringBuilder();
 
-            result.AppendFormat("{0}{1}{2}{3}", LogConst.CATEGORY_DELIMITER, category, LogConst.CATEGORY_DELIMITER, message);
+            result.AppendFormat("{0}{1}{2}{3}", LogConst.CATEGORY_DELIMITER, category, LogConst.CATEGORY_DELIMITER,
+                message);
 
             return result.ToString();
         }
@@ -238,7 +243,7 @@
         public void SetCurrentCategory(string category)
         {
             lock (logLock)
-            {                
+            {
                 if (currentCategory.Equals(category, StringComparison.Ordinal) == true)
                 {
                     return;
@@ -359,9 +364,10 @@
                 {
                     kvp.Value.Clear();
                 }
+
                 logCategories.Clear();
                 currentLogs.Clear();
-                
+
                 ClearLogCountPerType();
             }
         }
@@ -390,7 +396,7 @@
                     }
                 }
 
-                if(receivedLog != null)
+                if (receivedLog != null)
                 {
                     UnityLogReceived(receivedLog);
                 }
@@ -454,7 +460,7 @@
 
             AddToCategory(data, category, currentLogKey);
             AddToCurrentLog(data, category);
-            
+
             logCountPerType[data.logType] += 1;
 
             if (logNotificationCallback != null)
@@ -510,7 +516,8 @@
                     return;
                 }
 
-                bool isDefaultCategory = currentCategory.Equals(LogConst.DEFAULT_CATEGORY_NAME, StringComparison.Ordinal);
+                bool isDefaultCategory =
+                    currentCategory.Equals(LogConst.DEFAULT_CATEGORY_NAME, StringComparison.Ordinal);
                 bool isCurrentCategory = currentCategory.Equals(category, StringComparison.Ordinal);
                 if (isDefaultCategory == false && isCurrentCategory == false)
                 {
@@ -539,7 +546,8 @@
             }
             else
             {
-                if (message.IndexOf(logFilter, filterIgnoreCase == true ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal) != -1)
+                if (message.IndexOf(logFilter,
+                        filterIgnoreCase == true ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal) != -1)
                 {
                     return true;
                 }
@@ -552,8 +560,8 @@
 
         private void ParsingCategoryInLog(string original, ref string message, ref string category)
         {
-            category    = LogConst.DEFAULT_CATEGORY_NAME;
-            message     = original;
+            category = LogConst.DEFAULT_CATEGORY_NAME;
+            message = original;
 
             if (original.StartsWith(LogConst.CATEGORY_DELIMITER, StringComparison.Ordinal) == true)
             {

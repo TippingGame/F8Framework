@@ -1,24 +1,24 @@
-﻿namespace F8Framework.Core
-{
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using UnityEngine;
-    using UnityEngine.UI;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
+using UnityEngine;
+using UnityEngine.UI;
 
+namespace F8Framework.Core
+{
     public class ConsoleLogView : LogViewBase
     {
-        public  Dropdown            categoryDropdown    = null;
-        public  Transform           addonMenuRoot       = null;
-        public  LogTypeView         logTypeView         = null;
-        public  LogList             logList             = null;
-        public  Text                stackTrace          = null;
-        public  Transform           selectLogAddonMenuRoot = null;
+        public Dropdown categoryDropdown = null;
+        public Transform addonMenuRoot = null;
+        public LogTypeView logTypeView = null;
+        public LogList logList = null;
+        public Text stackTrace = null;
+        public Transform selectLogAddonMenuRoot = null;
 
-        private int                 showLogCount        = 0;
-        private int                 categoryCount       = 0;
-        private bool                showPlayTime        = true;
-        private bool                showSceneName       = true;
-        private MultiLayout         multiLayout         = null;
+        private int showLogCount = 0;
+        private int categoryCount = 0;
+        private bool showPlayTime = true;
+        private bool showSceneName = true;
+        private MultiLayout multiLayout = null;
 
         public interface IConsolMenuAddon
         {
@@ -29,7 +29,7 @@
         {
             GameObject CreateUI(Transform parent, System.Func<string> getStackTrace);
         }
-        
+
 
         public override void InitializeView()
         {
@@ -87,7 +87,7 @@
 
             ResetShowLog();
         }
-        
+
         public void SendMail()
         {
             // WaitUi.Instance.ShowUi(true);
@@ -176,7 +176,9 @@
         {
             logTypeView.SetLogCount(LogType.Log, Log.Instance.GetLogCount(LogType.Log));
             logTypeView.SetLogCount(LogType.Warning, Log.Instance.GetLogCount(LogType.Warning));
-            logTypeView.SetLogCount(LogType.Error, Log.Instance.GetLogCount(LogType.Error) + Log.Instance.GetLogCount(LogType.Exception) + Log.Instance.GetLogCount(LogType.Assert));
+            logTypeView.SetLogCount(LogType.Error,
+                Log.Instance.GetLogCount(LogType.Error) + Log.Instance.GetLogCount(LogType.Exception) +
+                Log.Instance.GetLogCount(LogType.Assert));
         }
 
         private void UpdateCategory()
@@ -230,16 +232,16 @@
         {
             var adapters = Function.Instance.GetAdapters();
 
-            foreach(var adapter in adapters)
+            foreach (var adapter in adapters)
             {
-                if(adapter is IConsolMenuAddon)
+                if (adapter is IConsolMenuAddon)
                 {
                     var addOn = adapter as IConsolMenuAddon;
 
                     addOn.CreateUI(addonMenuRoot);
                 }
 
-                if(adapter is ISelectLogAddon)
+                if (adapter is ISelectLogAddon)
                 {
                     var addOn = adapter as ISelectLogAddon;
 

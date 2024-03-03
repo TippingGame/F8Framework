@@ -1,11 +1,11 @@
-# F8FSM
+# F8 FSM
 
 [![license](http://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT) 
 [![Unity Version](https://img.shields.io/badge/unity-2021.3.15f1-blue)](https://unity.com) 
 [![Platform](https://img.shields.io/badge/platform-Win%20%7C%20Android%20%7C%20iOS%20%7C%20Mac%20%7C%20Linux%20%7C%20WebGL-orange)]() 
 
 ## 简介（希望自己点击F8，就能开始制作游戏，不想多余的事）
-Unity F8FSM有限状态机组件。
+Unity F8 FSM有限状态机组件。
 1. 通过继承有限状态机状态 FSMState 和状态切换 FSMSwitch，控制状态机，添加/切换/轮询/销毁。
 
 ## 导入插件（需要首先导入核心）

@@ -8,7 +8,7 @@
         /// <summary>
         ///https://stackoverflow.com/questions/13582409/http-client-timeout-and-server-timeout
         /// </summary>
-        static int downloadTimeout = 30;
+        static int downloadTimeout = 300;
 
         /// <summary>
         /// 终止时删除下载中的文件

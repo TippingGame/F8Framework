@@ -1,9 +1,9 @@
-﻿namespace F8Framework.Core
-{
-    using System;
-    using UnityEngine;
-    using UnityEngine.UI;
+﻿using System;
+using UnityEngine;
+using UnityEngine.UI;
 
+namespace F8Framework.Core
+{
     public class TabLogView : LogViewBase
     {
         public enum TabIndex
@@ -19,12 +19,12 @@
             public Image tabBg = null;
         }
 
-        
-        public  Tab[]       tab             = null;
 
-        private TabIndex    currentIndex    = TabIndex.CONSOLE;
-        private Color       bgSelectColor   = new Color(0.2745f, 0.2745f, 0.2745f);
-        private Color       bgNormalColor   = new Color(0.16f, 0.16f, 0.16f);
+        public Tab[] tab = null;
+
+        private TabIndex currentIndex = TabIndex.CONSOLE;
+        private Color bgSelectColor = new Color(0.2745f, 0.2745f, 0.2745f);
+        private Color bgNormalColor = new Color(0.16f, 0.16f, 0.16f);
 
         public override void InitializeView()
         {
@@ -47,5 +47,4 @@
             currentIndex = tabIndex;
         }
     }
-
 }

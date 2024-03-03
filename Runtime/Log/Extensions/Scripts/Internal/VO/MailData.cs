@@ -1,7 +1,7 @@
-﻿namespace F8Framework.Core
-{
-    using System;
+﻿using System;
 
+namespace F8Framework.Core
+{
     [Serializable]
     public class MailData
     {

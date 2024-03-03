@@ -1,8 +1,8 @@
-﻿namespace F8Framework.Core
-{
-    using UnityEngine;
-    using UnityEngine.UI;
+﻿using UnityEngine;
+using UnityEngine.UI;
 
+namespace F8Framework.Core
+{
     public class SystemViewInfo : MonoBehaviour
     {
         public Text infoHeading = null;

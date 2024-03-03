@@ -1,13 +1,13 @@
-﻿namespace F8Framework.Core
-{
-    using UnityEngine;
-    using UnityEngine.UI;
+﻿using UnityEngine;
+using UnityEngine.UI;
 
+namespace F8Framework.Core
+{
     public class WaitUi : SingletonMono<WaitUi>
     {
-        public GameObject       bg          = null;
-        public GameObject       icon        = null;
-        public Text             message     = null;
+        public GameObject bg = null;
+        public GameObject icon = null;
+        public Text message = null;
 
         protected override void Init()
         {

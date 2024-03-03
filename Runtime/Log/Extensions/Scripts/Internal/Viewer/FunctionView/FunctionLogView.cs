@@ -1,7 +1,7 @@
-﻿namespace F8Framework.Core
-{
-    using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
+namespace F8Framework.Core
+{
     public class FunctionLogView : LogViewBase
     {
         public CommandList commandList = null;

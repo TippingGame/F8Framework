@@ -1,7 +1,7 @@
-﻿namespace F8Framework.Core
-{
-    using UnityEngine;
+﻿using UnityEngine;
 
+namespace F8Framework.Core
+{
     public class LogViewBase : MonoBehaviour
     {
         public virtual void InitializeView()
@@ -20,5 +20,4 @@
         {
         }
     }
-
 }

@@ -1,17 +1,17 @@
-﻿namespace F8Framework.Core
-{
-    using System;
-    using System.Collections.Generic;
-    using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
 
+namespace F8Framework.Core
+{
     public class LogList : MonoBehaviour
     {
-        public  GameObject          toBottomButton  = null;
+        public GameObject toBottomButton = null;
 
-        private LogItemData         selectItemData  = null;
-        private Action<Log.LogData> selectCallback  = null;
-        private InfiniteScroll      infiniteScroll  = null;
-        private List<LogItemData>   logItemDatas    = new List<LogItemData>();
+        private LogItemData selectItemData = null;
+        private Action<Log.LogData> selectCallback = null;
+        private InfiniteScroll infiniteScroll = null;
+        private List<LogItemData> logItemDatas = new List<LogItemData>();
 
         private void Awake()
         {
@@ -77,11 +77,11 @@
         {
             LogItemData itemData = new LogItemData()
             {
-                logData         = data,
-                index           = logItemDatas.Count,
-                showPlayTime    = showPlayTime,
-                showSceneName   = showSceneName,
-                isSelect        = false
+                logData = data,
+                index = logItemDatas.Count,
+                showPlayTime = showPlayTime,
+                showSceneName = showSceneName,
+                isSelect = false
             };
 
             logItemDatas.Add(itemData);
@@ -111,7 +111,7 @@
             }
 
             selectItemData = itemData;
-            selectCallback(selectItemData.logData);           
+            selectCallback(selectItemData.logData);
         }
 
         public void MoveToBottom()
@@ -124,5 +124,4 @@
             toBottomButton.SetActive(enable);
         }
     }
-
 }

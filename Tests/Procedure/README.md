@@ -1,11 +1,11 @@
-# F8Procedure
+# F8 Procedure
 
 [![license](http://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT) 
 [![Unity Version](https://img.shields.io/badge/unity-2021.3.15f1-blue)](https://unity.com) 
 [![Platform](https://img.shields.io/badge/platform-Win%20%7C%20Android%20%7C%20iOS%20%7C%20Mac%20%7C%20Linux%20%7C%20WebGL-orange)]() 
 
 ## 简介（希望自己点击F8，就能开始制作游戏，不想多余的事）
-Unity F8Procedure游戏流程管理组件。
+Unity F8 Procedure游戏流程管理组件。
 1. 通过继承流程节点 ProcedureNode，控制游戏流程的，添加/运行/轮询/移除。
 
 ## 导入插件（需要首先导入核心）

@@ -1,19 +1,19 @@
-﻿namespace F8Framework.Core
-{
-    using UnityEngine;
-    using UnityEngine.UI;
+﻿using UnityEngine;
+using UnityEngine.UI;
 
+namespace F8Framework.Core
+{
     public class LogTypeView : MonoBehaviour
     {
-        public  Image           logTypeBg           = null;
-        public  Image           warningTypeBg       = null;
-        public  Image           errorTypeBg         = null;
-        public  Text            logCount            = null;
-        public  Text            warningCount        = null;
-        public  Text            errorCount          = null;
+        public Image logTypeBg = null;
+        public Image warningTypeBg = null;
+        public Image errorTypeBg = null;
+        public Text logCount = null;
+        public Text warningCount = null;
+        public Text errorCount = null;
 
-        private Color           logTypeEnableColor  = new Color(0.3f, 0.3f, 0.3f);
-        private Color           logTypeDisableColor = new Color(0.172f, 0.172f, 0.172f);
+        private Color logTypeEnableColor = new Color(0.3f, 0.3f, 0.3f);
+        private Color logTypeDisableColor = new Color(0.172f, 0.172f, 0.172f);
 
         public void SetLogCount(LogType type, int count)
         {
@@ -21,20 +21,20 @@
             switch (type)
             {
                 case LogType.Log:
-                    {
-                        typeText = logCount;
-                        break;
-                    }
+                {
+                    typeText = logCount;
+                    break;
+                }
                 case LogType.Warning:
-                    {
-                        typeText = warningCount;
-                        break;
-                    }
+                {
+                    typeText = warningCount;
+                    break;
+                }
                 case LogType.Error:
-                    {
-                        typeText = errorCount;
-                        break;
-                    }
+                {
+                    typeText = errorCount;
+                    break;
+                }
             }
 
             if (typeText != null)
@@ -53,23 +53,23 @@
         public void SetTypeEnable(LogType type, bool enable)
         {
             Image typeImage = null;
-            switch(type)
+            switch (type)
             {
                 case LogType.Log:
-                    {
-                        typeImage = logTypeBg;
-                        break;
-                    }
+                {
+                    typeImage = logTypeBg;
+                    break;
+                }
                 case LogType.Warning:
-                    {
-                        typeImage = warningTypeBg;
-                        break;
-                    }
+                {
+                    typeImage = warningTypeBg;
+                    break;
+                }
                 case LogType.Error:
-                    {
-                        typeImage = errorTypeBg;
-                        break;
-                    }
+                {
+                    typeImage = errorTypeBg;
+                    break;
+                }
             }
 
             if (typeImage != null)
@@ -83,5 +83,4 @@
             image.color = color;
         }
     }
-
 }

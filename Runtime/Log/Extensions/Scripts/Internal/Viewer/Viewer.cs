@@ -1,37 +1,36 @@
 ﻿using UnityEngine.Serialization;
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace F8Framework.Core
 {
-    using UnityEngine;
-    using UnityEngine.UI;
-
     public class Viewer : MonoBehaviour
     {
-        public GameObject           pannel                  = null;
-        [FormerlySerializedAs("tabView")] public TabLogView              tabLogView                 = null;
-        [FormerlySerializedAs("consoleView")] public ConsoleLogView          consoleLogView             = null;
-        [FormerlySerializedAs("functionView")] public FunctionLogView         functionLogView            = null;
-        [FormerlySerializedAs("systemView")] public SystemLogView           systemLogView              = null;
-                
-        private CanvasGroup         canvasGroup             = null;
-        private CanvasScaler        canvasScaler            = null;
-        private ScreenOrientation   orientation             = ScreenOrientation.LandscapeLeft;
-        private Vector2             portraitResolution      = new Vector2(800.0f, 1280.0f);
-        private Vector2             landscapeResolution     = new Vector2(1200.0f, 800.0f);
-        private int                 screenWidth             = 0;
-        private int                 screenHeight            = 0;
+        public GameObject pannel = null;
+        [FormerlySerializedAs("tabView")] public TabLogView tabLogView = null;
+        [FormerlySerializedAs("consoleView")] public ConsoleLogView consoleLogView = null;
+        [FormerlySerializedAs("functionView")] public FunctionLogView functionLogView = null;
+        [FormerlySerializedAs("systemView")] public SystemLogView systemLogView = null;
 
-        private bool                gestureEnable           = false;
-        private bool                isTouchBegin            = false;
-        private float               touchTime               = 0f;
+        private CanvasGroup canvasGroup = null;
+        private CanvasScaler canvasScaler = null;
+        private ScreenOrientation orientation = ScreenOrientation.LandscapeLeft;
+        private Vector2 portraitResolution = new Vector2(800.0f, 1280.0f);
+        private Vector2 landscapeResolution = new Vector2(1200.0f, 800.0f);
+        private int screenWidth = 0;
+        private int screenHeight = 0;
+
+        private bool gestureEnable = false;
+        private bool isTouchBegin = false;
+        private float touchTime = 0f;
 
         private void Awake()
         {
-            canvasGroup     = GetComponent<CanvasGroup>();
-            canvasScaler    = GetComponent<CanvasScaler>();
+            canvasGroup = GetComponent<CanvasGroup>();
+            canvasScaler = GetComponent<CanvasScaler>();
 
-            screenWidth     = Screen.width;
-            screenHeight    = Screen.height;
+            screenWidth = Screen.width;
+            screenHeight = Screen.height;
         }
 
         public void Initialize()
@@ -92,7 +91,7 @@ namespace F8Framework.Core
         private void Update()
         {
             if (pannel.activeSelf == false && gestureEnable == true)
-            {                
+            {
                 CheckGesture(true);
                 CheckKey(true);
             }
@@ -107,13 +106,13 @@ namespace F8Framework.Core
 
         private void UpdateResolution()
         {
-            int currentWidth    = Screen.width;
-            int currentHeight   = Screen.height;
+            int currentWidth = Screen.width;
+            int currentHeight = Screen.height;
 
             if (screenWidth != currentWidth || screenHeight != currentHeight)
             {
-                screenWidth     = currentWidth;
-                screenHeight    = currentHeight;
+                screenWidth = currentWidth;
+                screenHeight = currentHeight;
 
                 consoleLogView.UpdateResolution();
             }
@@ -124,7 +123,9 @@ namespace F8Framework.Core
 #if !UNITY_EDITOR && (UNITY_ANDROID || UNITY_IOS)
             ScreenOrientation newOrientation = Screen.orientation;
 #else
-            ScreenOrientation newOrientation = Screen.width >= Screen.height ? ScreenOrientation.LandscapeLeft : ScreenOrientation.Portrait;
+            ScreenOrientation newOrientation = Screen.width >= Screen.height
+                ? ScreenOrientation.LandscapeLeft
+                : ScreenOrientation.Portrait;
 #endif
 
             if (orientation != newOrientation)
@@ -142,21 +143,21 @@ namespace F8Framework.Core
 
                 consoleLogView.SetOrientation(orientation);
                 systemLogView.SetOrientation(orientation);
-            }            
+            }
         }
 
         private void CheckGesture(bool show)
         {
-            if(Input.touchCount == ViewerConst.GESTURE_TOUCH_COUNT)
+            if (Input.touchCount == ViewerConst.GESTURE_TOUCH_COUNT)
             {
-                if(isTouchBegin == false)
+                if (isTouchBegin == false)
                 {
                     isTouchBegin = true;
                     touchTime = Time.unscaledTime;
                 }
                 else
                 {
-                    if(Time.unscaledTime - touchTime >= ViewerConst.GESTURE_TOUCH_TIME_INTERVAL)
+                    if (Time.unscaledTime - touchTime >= ViewerConst.GESTURE_TOUCH_TIME_INTERVAL)
                     {
                         isTouchBegin = false;
                         touchTime = 0;
@@ -173,7 +174,7 @@ namespace F8Framework.Core
 
         private void CheckKey(bool show)
         {
-            if(Input.GetKeyDown(KeyCode.BackQuote) == true)
+            if (Input.GetKeyDown(KeyCode.BackQuote) == true)
             {
                 Show(show);
             }

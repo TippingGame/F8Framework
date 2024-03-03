@@ -1,12 +1,11 @@
-﻿namespace F8Framework.Core
-{
-    using UnityEngine;
-    using System.Collections.Generic;
+﻿using UnityEngine;
+using System.Collections.Generic;
 
+namespace F8Framework.Core
+{
     public class SystemViewInfoGroup : MonoBehaviour
     {
-        [SerializeField]
-        private SystemViewInfo info = null;
+        [SerializeField] private SystemViewInfo info = null;
 
         private List<SystemViewInfo> infoList = new List<SystemViewInfo>();
 
@@ -19,10 +18,11 @@
 
         public void ClearInfo()
         {
-            for(int i=0;i<infoList.Count;i++)
+            for (int i = 0; i < infoList.Count; i++)
             {
                 infoList[i].gameObject.SetActive(false);
             }
+
             infoCount = 0;
         }
 

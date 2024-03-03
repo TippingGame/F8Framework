@@ -1,40 +1,40 @@
-﻿namespace F8Framework.Core
-{
-    using UnityEngine;
-    using UnityEngine.UI;
+﻿using UnityEngine;
+using UnityEngine.UI;
 
+namespace F8Framework.Core
+{
     public class LogItemData : InfiniteScrollData
     {
-        public Log.LogData  logData         = null;
-        public int          index           = 0;
-        public bool         showPlayTime    = true;
-        public bool         showSceneName   = true;
-        public bool         isSelect        = false;
+        public Log.LogData logData = null;
+        public int index = 0;
+        public bool showPlayTime = true;
+        public bool showSceneName = true;
+        public bool isSelect = false;
     }
 
 
     public class LogItem : InfiniteScrollItem
     {
-        public Image        bg              = null;
-        public Texture[]    logType         = null;
-        public RawImage     icon            = null;
-        public Text         localTime       = null;
-        public Text         message         = null;
-        public Text         playTime        = null;
-        public Text         sceneName       = null;
-        public GameObject   scene           = null;
+        public Image bg = null;
+        public Texture[] logType = null;
+        public RawImage icon = null;
+        public Text localTime = null;
+        public Text message = null;
+        public Text playTime = null;
+        public Text sceneName = null;
+        public GameObject scene = null;
 
-        
-        public int playTimeCollumSize       = 58;
+
+        public int playTimeCollumSize = 58;
 
         public RectTransform sceneCullum;
-        public int sceneColumnSize          = 137;
+        public int sceneColumnSize = 137;
 
-        private Color       bgSelectColor   = new Color(0.243f, 0.372f, 0.588f);
-        private Color       bgNormalColor1  = new Color(0.215f, 0.215f, 0.215f);
-        private Color       bgNormalColor2  = new Color(0.235f, 0.235f, 0.235f);
-        private Color       bgNormalColor;
-        
+        private Color bgSelectColor = new Color(0.243f, 0.372f, 0.588f);
+        private Color bgNormalColor1 = new Color(0.215f, 0.215f, 0.215f);
+        private Color bgNormalColor2 = new Color(0.235f, 0.235f, 0.235f);
+        private Color bgNormalColor;
+
         public void ShowPlayTime(bool show)
         {
             playTime.gameObject.SetActive(show);
@@ -85,15 +85,15 @@
         {
             base.UpdateData(scrollData);
 
-            LogItemData itemData    = (LogItemData)scrollData;
-            Log.LogData logData     = itemData.logData;
+            LogItemData itemData = (LogItemData)scrollData;
+            Log.LogData logData = itemData.logData;
 
             SetIcon(logData.logType);
 
-            localTime.text  = string.Format("[{0}]", logData.localTime.ToString("HH:mm:ss"));
-            message.text    = logData.message;
-            playTime.text   = logData.playTime;
-            sceneName.text  = logData.sceneName;
+            localTime.text = string.Format("[{0}]", logData.localTime.ToString("HH:mm:ss"));
+            message.text = logData.message;
+            playTime.text = logData.playTime;
+            sceneName.text = logData.sceneName;
 
             if (itemData.index % 2 == 0)
             {
@@ -111,23 +111,23 @@
 
         private void SetIcon(LogType type)
         {
-            switch(type)
+            switch (type)
             {
                 case LogType.Log:
-                    {
-                        icon.texture = logType[0];
-                        break;
-                    }
+                {
+                    icon.texture = logType[0];
+                    break;
+                }
                 case LogType.Warning:
-                    {
-                        icon.texture = logType[1];
-                        break;
-                    }
+                {
+                    icon.texture = logType[1];
+                    break;
+                }
                 default:
-                    {
-                        icon.texture = logType[2];
-                        break;
-                    }
+                {
+                    icon.texture = logType[2];
+                    break;
+                }
             }
         }
 

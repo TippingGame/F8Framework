@@ -1,7 +1,7 @@
-﻿namespace F8Framework.Core
-{
-    using UnityEngine;
+﻿using UnityEngine;
 
+namespace F8Framework.Core
+{
     public class CommandList : MonoBehaviour
     {
         private InfiniteScroll infiniteScroll = null;
