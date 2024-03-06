@@ -58,7 +58,7 @@ namespace F8Framework.Tests
             float loadProgress2 = FF8.Asset.GetLoadProgress();
 
             // 同步卸载资产
-            FF8.Asset.Unload("Cube", false); //根据AbPath卸载资产，如果设置为 true，将卸载目标依赖的所有资源。
+            FF8.Asset.Unload("Cube", false); //根据AbPath卸载资产，如果设置为 true，完全卸载。
 
             // 步卸载资产
             FF8.Asset.UnloadAsync("Cube", false, () =>

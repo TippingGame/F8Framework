@@ -36,7 +36,10 @@ namespace F8Framework.Core
                 return;
             }
             m_instace = this as T;
-            DontDestroyOnLoad(gameObject);
+            if (this.transform == this.transform.root)
+            {
+                DontDestroyOnLoad(gameObject);
+            }
             Init();
         }
         protected virtual void Init()

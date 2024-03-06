@@ -12,7 +12,8 @@ namespace F8Framework.Core
     public class AssetBundleLoader
     {
         private string assetBundlePath = "";
-        private string assetName = "";
+        private string abName = "";
+        private readonly string keyword = URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
         private List<string> assetPaths = new List<string>();
         private AssetBundle assetBundleContent;
         private Dictionary<string, Object> assetObjects = new Dictionary<string, Object>();
@@ -75,13 +76,12 @@ namespace F8Framework.Core
         /// 初始化加载程序。
         /// 派生类型的初始化行为可以通过重写来实现。
         /// </summary>
-        /// <param name="assetName">资源名称。</param>
         /// <param name="assetBundlePath">资产捆绑包的路径。</param>
-        public virtual void Init(string assetName, string assetBundlePath)
+        public virtual void Init(string assetBundlePath)
         {
             Clear();
-            this.assetName = assetName;
             this.assetBundlePath = assetBundlePath;
+            this.abName = GetSubPath(this.assetBundlePath).ToLower();
             assetPaths = GetAssetPaths();
         }
 
@@ -292,15 +292,15 @@ namespace F8Framework.Core
         /// <summary>
         /// 同步卸载资产。
         /// </summary>
-        /// <param name="unloadAllRelated">
+        /// <param name="unloadAllLoadedObjects">
         /// 如果设置为true，则目标所依赖的所有资产也将被卸载，
         /// 否则将仅卸载目标资产。
         /// </param>
-        public virtual void Unload(bool unloadAllRelated = true)
+        public virtual void Unload(bool unloadAllLoadedObjects = false)
         {
             if (assetBundleContent != null)
             {
-                assetBundleContent.Unload(unloadAllRelated);
+                assetBundleContent.Unload(unloadAllLoadedObjects);
                 ClearLoadedData();
             }
 
@@ -310,12 +310,12 @@ namespace F8Framework.Core
         /// <summary>
         /// 异步卸载资产。
         /// </summary>
-        /// <param name="unloadAllRelated">
+        /// <param name="unloadAllLoadedObjects">
         /// 如果设置为true，则目标所依赖的所有资产也将被卸载，
         /// 否则将仅卸载目标资产。
         /// </param>
         /// <param name="callback">异步卸载完成的回调。</param>
-        public virtual void UnloadAsync(bool unloadAllRelated = true, OnUnloadFinished callback = null)
+        public virtual void UnloadAsync(bool unloadAllLoadedObjects = false, OnUnloadFinished callback = null)
         {
             if (assetBundleContent == null)
                 assetBundleUnloadState = LoaderState.FINISHED;
@@ -326,7 +326,7 @@ namespace F8Framework.Core
             {
                 assetBundleUnloadState = LoaderState.WORKING;
                 unloadType = LoaderType.LOCAL_ASYNC;
-                assetBundleUnloadRequest = assetBundleContent.UnloadAsync(unloadAllRelated);
+                assetBundleUnloadRequest = assetBundleContent.UnloadAsync(unloadAllLoadedObjects);
                 ClearLoadedData();
             }
         }
@@ -631,16 +631,15 @@ namespace F8Framework.Core
         /// <summary>
         /// 清除加载程序内容。
         /// </summary>
-        /// <param name="unloadAllRelated">
-        /// 如果设置为true，则目标所依赖的所有资产也将被卸载，
-        /// 否则将仅卸载目标资产。
+        /// <param name="unloadAllLoadedObjects">
+        /// 完全卸载。
         /// </param>
-        public void Clear(bool unloadAllRelated = false)
+        public void Clear(bool unloadAllLoadedObjects = false)
         {
             assetBundlePath = "";
             assetPaths.Clear();
             if (assetBundleContent != null)
-                Unload(unloadAllRelated);
+                Unload(unloadAllLoadedObjects);
 
             loadType = LoaderType.NONE;
             unloadType = LoaderType.NONE;
@@ -825,17 +824,36 @@ namespace F8Framework.Core
         {
             List<string> paths = new List<string>();
             
-            if (AssetBundleMap.Mappings.TryGetValue(assetName, out AssetBundleMap.AssetMapping assetmpping))
+            foreach (var values in AssetBundleMap.Mappings.Values)
             {
-                foreach (var assetPath in assetmpping.AssetPath)
+                if (values.AbName == abName)
                 {
-                    paths.Add(assetPath);
+                    foreach (var assetPath in values.AssetPath)
+                    {
+                        if (!paths.Contains(assetPath))
+                            paths.Add(assetPath);
+                    }
                 }
             }
             
             return paths;
         }
-
+        
+        private string GetSubPath(string fullPath)
+        {
+            int index = fullPath.IndexOf(keyword);
+            if (index != -1)
+            {
+                // 找到关键词的位置，截取之后的部分
+                return fullPath.Substring(index + keyword.Length);
+            }
+            else
+            {
+                // 没有找到关键词，返回原始路径
+                return fullPath;
+            }
+        }
+        
         /// <summary>
         /// 设置资产对象。
         /// </summary>

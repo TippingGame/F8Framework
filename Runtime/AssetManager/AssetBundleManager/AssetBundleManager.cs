@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Text.RegularExpressions;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -28,7 +27,7 @@ namespace F8Framework.Core
         /// <param name="assetName">资产名称。</param>
         /// <param name="info">资产信息。</param>
         /// <returns>要完成扩展的对象列表。</returns>
-        public AssetBundle Load(string assetName, AssetManager.AssetInfo info)
+        public AssetBundle Load(string assetName, ref AssetManager.AssetInfo info)
         {
             AssetBundle result;
 
@@ -53,7 +52,7 @@ namespace F8Framework.Core
                 else
                 {
                     loader = new AssetBundleLoader();
-                    loader.Init(assetName, assetBundlePath);
+                    loader.Init(assetBundlePath);
                     loader.AddParentBundle(info.AssetBundlePath);
 
                     assetBundleLoaders.Add(assetBundlePath, loader);
@@ -109,7 +108,7 @@ namespace F8Framework.Core
                 else
                 {
                     loader = new AssetBundleLoader();
-                    loader.Init(assetName, assetBundlePath);
+                    loader.Init(assetBundlePath);
                     loader.AddParentBundle(info.AssetBundlePath);
 
                     assetBundleLoaders.Add(assetBundlePath, loader);
@@ -162,7 +161,7 @@ namespace F8Framework.Core
                 else
                 {
                     loader = new AssetBundleLoader();
-                    loader.Init(assetName, assetBundlePath);
+                    loader.Init(assetBundlePath);
                     loader.AddParentBundle(info.AssetBundlePath);
 
                     assetBundleLoaders.Add(assetBundlePath, loader);
@@ -191,24 +190,19 @@ namespace F8Framework.Core
         /// 通过资源包路径同步卸载。
         /// </summary>
         /// <param name="assetBundlePath">资源包的路径。</param>
-        /// <param name="unloadAllRelated">
-        /// 如果设置为 true，将卸载目标依赖的所有资源，
-        /// 否则只卸载目标资源本身。
+        /// <param name="unloadAllLoadedObjects">
+        /// 完全卸载。
         /// </param>
         public void Unload(
             string assetBundlePath,
-            bool unloadAllRelated = false
+            bool unloadAllLoadedObjects = false
         ){
             List<AssetBundleLoader> bundleLoaders = GetRelatedLoaders(assetBundlePath);
             foreach (AssetBundleLoader loader in bundleLoaders)
             {
-                bool isClearNeeded = 
-                    unloadAllRelated ||
-                    loader.IsLastParentBundle(assetBundlePath);
-                
                 loader.RemoveParentBundle(assetBundlePath);
                 loader.RemoveDependentNames(assetBundlePath);
-                loader.Unload(isClearNeeded);
+                loader.Unload(unloadAllLoadedObjects);
             }
         }
 
@@ -216,13 +210,12 @@ namespace F8Framework.Core
         /// 通过现有的资源包加载器同步卸载。
         /// </summary>
         /// <param name="loader">用于卸载的资源包加载器。</param>
-        /// <param name="unloadAllRelated">
-        /// 如果设置为 true，将卸载目标依赖的所有资源，
-        /// 否则只卸载目标资源本身。
+        /// <param name="unloadAllLoadedObjects">
+        /// 完全卸载。
         /// </param>
         public void Unload(
             AssetBundleLoader loader,
-            bool unloadAllRelated = false
+            bool unloadAllLoadedObjects = false
         ){
             if (loader == null)
                 return;
@@ -240,7 +233,7 @@ namespace F8Framework.Core
 
                 foreach (string key in keys)
                 {
-                    Unload(key, unloadAllRelated);
+                    Unload(key, unloadAllLoadedObjects);
                 }
             }
             else
@@ -253,13 +246,12 @@ namespace F8Framework.Core
         /// 通过已加载的资源包同步卸载。
         /// </summary>
         /// <param name="ab">已加载的资源包。</param>
-        /// <param name="unloadAllRelated">
-        /// 如果设置为 true，将卸载目标依赖的所有资源，
-        /// 否则只卸载目标资源本身。
+        /// <param name="unloadAllLoadedObjects">
+        /// 完全卸载。
         /// </param>
         public void Unload(
             AssetBundle ab,
-            bool unloadAllRelated = false
+            bool unloadAllLoadedObjects = false
         ){
             if (ab == null)
                 return;
@@ -275,12 +267,12 @@ namespace F8Framework.Core
 
             foreach (string key in keys)
             {
-                Unload(key, unloadAllRelated);
+                Unload(key, unloadAllLoadedObjects);
             }
 
             if (keys.Count == 0 && ab != null)
             {
-                ab.Unload(unloadAllRelated);
+                ab.Unload(unloadAllLoadedObjects);
             }
         }
 
@@ -288,14 +280,13 @@ namespace F8Framework.Core
         /// 通过资源包路径异步卸载。
         /// </summary>
         /// <param name="assetBundlePath">资源包的路径。</param>
-        /// <param name="unloadAllRelated">
-        /// 如果设置为 true，将卸载目标依赖的所有资源，
-        /// 否则只卸载目标资源本身。
+        /// <param name="unloadAllLoadedObjects">
+        /// 完全卸载。
         /// </param>
         /// <param name="callback">异步卸载完成时的回调函数。</param>
         public void UnloadAsync(
             string assetBundlePath,
-            bool unloadAllRelated = false,
+            bool unloadAllLoadedObjects = false,
             AssetBundleLoader.OnUnloadFinished callback = null
         ){
             List<AssetBundleLoader> bundleLoaders = GetRelatedLoaders(assetBundlePath);
@@ -303,12 +294,8 @@ namespace F8Framework.Core
 
             foreach (AssetBundleLoader loader in bundleLoaders)
             {
-                bool isClearNeeded =
-                    unloadAllRelated ||
-                    loader.IsLastParentBundle(assetBundlePath);
-
                 loader.UnloadAsync(
-                    isClearNeeded,
+                    unloadAllLoadedObjects,
                     () => {
                         ++unloadedCount;
                         if (unloadedCount == bundleLoaders.Count)
@@ -330,14 +317,13 @@ namespace F8Framework.Core
         /// 通过现有的资源包加载器异步卸载。
         /// </summary>
         /// <param name="loader">用于卸载的资源包加载器。</param>
-        /// <param name="unloadAllRelated">
-        /// 如果设置为 true，将卸载目标依赖的所有资源，
-        /// 否则只卸载目标资源本身。
+        /// <param name="unloadAllLoadedObjects">
+        /// 完全卸载。
         /// </param>
         /// <param name="callback">异步卸载完成时的回调函数。</param>
         public void UnloadAsync(
             AssetBundleLoader loader,
-            bool unloadAllRelated = false,
+            bool unloadAllLoadedObjects = false,
             AssetBundleLoader.OnUnloadFinished callback = null
         ){
             if (loader == null)
@@ -356,12 +342,12 @@ namespace F8Framework.Core
 
                 foreach (string key in keys)
                 {
-                    UnloadAsync(key, unloadAllRelated, callback);
+                    UnloadAsync(key, unloadAllLoadedObjects, callback);
                 }
             }
             else
             {
-                loader.UnloadAsync(unloadAllRelated, callback);
+                loader.UnloadAsync(unloadAllLoadedObjects, callback);
             }
         }
 
@@ -369,14 +355,13 @@ namespace F8Framework.Core
         /// 通过已加载的资源包异步卸载。
         /// </summary>
         /// <param name="ab">已加载的资源包。</param>
-        /// <param name="unloadAllRelated">
-        /// 如果设置为 true，将卸载目标依赖的所有资源，
-        /// 否则只卸载目标资源本身。
+        /// <param name="unloadAllLoadedObjects">
+        /// 完全卸载。
         /// </param>
         /// <param name="callback">异步卸载完成时的回调函数。</param>
         public void UnloadAsync(
             AssetBundle ab,
-            bool unloadAllRelated = false,
+            bool unloadAllLoadedObjects = false,
             AssetBundleLoader.OnUnloadFinished callback = null
         ){
             if (ab == null)
@@ -393,12 +378,12 @@ namespace F8Framework.Core
 
             foreach (string key in keys)
             {
-                UnloadAsync(key, unloadAllRelated, callback);
+                UnloadAsync(key, unloadAllLoadedObjects, callback);
             }
 
             if (keys.Count <= 0 && ab != null)
             {
-                AsyncOperation op = ab.UnloadAsync(unloadAllRelated);
+                AsyncOperation op = ab.UnloadAsync(unloadAllLoadedObjects);
                 if (op != null && callback != null)
                     op.completed +=
                         (op) => callback();

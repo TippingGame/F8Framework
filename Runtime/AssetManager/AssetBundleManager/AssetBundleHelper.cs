@@ -112,6 +112,10 @@ namespace F8Framework.Core
             {
                 return SourceType.PERSISTENT_DATA_PATH;
             }
+            else if (FileTools.IsLegalHTTPURI(assetBundleFullName))
+            {
+                return SourceType.REMOTE_ADDRESS;
+            }
             else
             {
                 return SourceType.NONE;

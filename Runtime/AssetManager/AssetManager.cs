@@ -19,7 +19,7 @@ namespace F8Framework.Core
         private ResourcesManager _resourcesManager;
         
         //资产信息
-        public class AssetInfo
+        public struct AssetInfo
         {
             //目标资产类型
             public readonly AssetTypeEnum AssetType;
@@ -49,25 +49,6 @@ namespace F8Framework.Core
                 AssetBundlePathWithoutAb = assetBundlePathWithoutAb;
             }
 
-            //如果信息合法，则该值为真
-            public bool IsLegal
-            {
-                get
-                {
-                    if (AssetType == AssetTypeEnum.NONE)
-                        return false;
-
-                    if (AssetType == AssetTypeEnum.RESOURCE &&
-                        AssetPath == null)
-                        return false;
-
-                    if (AssetType == AssetTypeEnum.ASSET_BUNDLE &&
-                        (AssetPath == null || AssetBundlePath == null))
-                        return false;
-
-                    return true;
-                }
-            }
         }
              //资产访问标志
             [System.Flags]
@@ -104,6 +85,25 @@ namespace F8Framework.Core
                     _isEditorMode = value;
                 }
             }
+            
+            
+            //如果信息合法，则该值为真
+            public bool IsLegal(ref AssetInfo assetInfo)
+            {
+                if (assetInfo.AssetType == AssetTypeEnum.NONE)
+                    return false;
+
+                if (assetInfo.AssetType == AssetTypeEnum.RESOURCE &&
+                    assetInfo.AssetPath == null)
+                    return false;
+
+                if (assetInfo.AssetType == AssetTypeEnum.ASSET_BUNDLE &&
+                    (assetInfo.AssetPath == null || assetInfo.AssetBundlePath == null))
+                    return false;
+
+                return true;
+            }
+            
             /// <summary>
             /// 根据提供的资产路径和访问选项推断资产类型。
             /// </summary>
@@ -124,36 +124,36 @@ namespace F8Framework.Core
                 else if (accessMode.HasFlag(AssetAccessMode.UNKNOWN))
                 {
                     AssetInfo r = GetAssetInfoFromAssetBundle(assetName);
-                    if (r == null)
+                    if (!IsLegal(ref r))
                     {
                         r = GetAssetInfoFromResource(assetName);
                     }
 
-                    if (r != null && r.IsLegal)
+                    if (IsLegal(ref r))
                     {
                         return r;
                     }
                     else
                     {
                         LogF8.LogError("AssetBundle和Resource都找不到指定资源可用的索引：" + assetName);
-                        return null;
+                        return new AssetInfo();
                     }
                 }
                 else if (accessMode.HasFlag(AssetAccessMode.REMOTE_ASSET_BUNDLE))
                 {
                     AssetInfo r = GetAssetInfoFromAssetBundle(assetName, true);
 
-                    if (r != null && r.IsLegal)
+                    if (IsLegal(ref r))
                     {
                         return r;
                     }
                     else
                     {
                         LogF8.LogError("AssetBundle找不到指定远程资源可用的索引：" + assetName);
-                        return null;
+                        return new AssetInfo();
                     }
                 }
-                return null;
+                return new AssetInfo();
             }
 
             /// <summary>
@@ -306,7 +306,7 @@ namespace F8Framework.Core
             {
                 
                 AssetInfo info = GetAssetInfo(assetName, mode);
-                if (info == null || !info.IsLegal)
+                if (!IsLegal(ref info))
                     return null;
                 
                 if (info.AssetType == AssetTypeEnum.RESOURCE)
@@ -332,7 +332,7 @@ namespace F8Framework.Core
                     if (ab == null ||
                         ab.AssetBundleContent == null)
                     {
-                        AssetBundleManager.Instance.Load(assetName, info);
+                        AssetBundleManager.Instance.Load(assetName, ref info);
                         ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePath);
                     }
                 
@@ -359,7 +359,7 @@ namespace F8Framework.Core
                 AssetAccessMode mode = AssetAccessMode.UNKNOWN)
             {
                 AssetInfo info = GetAssetInfo(assetName, mode);
-                if (info == null || !info.IsLegal)
+                if (!IsLegal(ref info))
                     return;
                 
                 if (info.AssetType == AssetTypeEnum.RESOURCE)
@@ -384,8 +384,9 @@ namespace F8Framework.Core
                         AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePathWithoutAb + abName);
                         if (ab == null || ab.AssetBundleContent == null)
                         {
+                            AssetInfo assetInfo = new AssetInfo(info.AssetType, new []{assetPath}, info.AssetBundlePathWithoutAb, abName);
                             AssetBundleManager.Instance.Load(Path.GetFileNameWithoutExtension(assetPath), 
-                                new AssetInfo(info.AssetType, new []{assetPath}, info.AssetBundlePathWithoutAb, abName));
+                                ref assetInfo);
                         }
                     }
                 }
@@ -404,7 +405,7 @@ namespace F8Framework.Core
                 AssetAccessMode mode = AssetAccessMode.UNKNOWN)
             {
                 AssetInfo info = GetAssetInfo(assetName, mode);
-                if (info == null || !info.IsLegal)
+                if (!IsLegal(ref info))
                     return null;
 
                 if (info.AssetType == AssetTypeEnum.RESOURCE)
@@ -430,7 +431,7 @@ namespace F8Framework.Core
                     if (ab == null ||
                         ab.AssetBundleContent == null)
                     {
-                        AssetBundleManager.Instance.Load(assetName, info);
+                        AssetBundleManager.Instance.Load(assetName, ref info);
                         ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePath);
                     }
             
@@ -458,7 +459,7 @@ namespace F8Framework.Core
                 AssetAccessMode mode = AssetAccessMode.UNKNOWN)
             {
                 AssetInfo info = GetAssetInfo(assetName, mode);
-                if (info == null || !info.IsLegal)
+                if (!IsLegal(ref info))
                     return null;
 
                 if (info.AssetType == AssetTypeEnum.RESOURCE)
@@ -484,7 +485,7 @@ namespace F8Framework.Core
                     if (ab == null ||
                         ab.AssetBundleContent == null)
                     {
-                        AssetBundleManager.Instance.Load(assetName, info);
+                        AssetBundleManager.Instance.Load(assetName, ref info);
                         ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePath);
                     }
             
@@ -514,7 +515,7 @@ namespace F8Framework.Core
                 where T : Object
             {
                 AssetInfo info = GetAssetInfo(assetName, mode);
-                if (info == null || !info.IsLegal)
+                if (!IsLegal(ref info))
                 {
                     End();
                     return;
@@ -578,7 +579,7 @@ namespace F8Framework.Core
             public IEnumerator LoadAsyncCoroutine<T>(string assetName, AssetAccessMode mode = AssetAccessMode.UNKNOWN) where T : Object
             {
                 AssetInfo info = GetAssetInfo(assetName, mode);
-                if (info == null || !info.IsLegal)
+                if (!IsLegal(ref info))
                 {
                     yield break;
                 }
@@ -640,7 +641,7 @@ namespace F8Framework.Core
                 AssetAccessMode mode = AssetAccessMode.UNKNOWN)
             {
                 AssetInfo info = GetAssetInfo(assetName, mode);
-                if (info == null || !info.IsLegal)
+                if (!IsLegal(ref info))
                 {
                     End();
                     return;
@@ -715,7 +716,7 @@ namespace F8Framework.Core
             public IEnumerable LoadDirAsyncCoroutine(string assetName, AssetAccessMode mode = AssetAccessMode.UNKNOWN)
             {
                 AssetInfo info = GetAssetInfo(assetName, mode);
-                if (info == null || !info.IsLegal)
+                if (!IsLegal(ref info))
                 {
                     yield break;
                 }
@@ -787,7 +788,7 @@ namespace F8Framework.Core
                 AssetAccessMode mode = AssetAccessMode.UNKNOWN)
             {
                 AssetInfo info = GetAssetInfo(assetName, mode);
-                if (info == null || !info.IsLegal)
+                if (!IsLegal(ref info))
                 {
                     End();
                     return;
@@ -855,7 +856,7 @@ namespace F8Framework.Core
                 AssetAccessMode mode = AssetAccessMode.UNKNOWN)
             {
                 AssetInfo info = GetAssetInfo(assetName, mode);
-                if (info == null || !info.IsLegal)
+                if (!IsLegal(ref info))
                 {
                     End();
                     return;
@@ -923,7 +924,7 @@ namespace F8Framework.Core
                 {
                     LogF8.LogError("Resource都找不到指定资源可用的索引：" + assetName);
                 }
-                return null;
+                return new AssetInfo();
             }
             
             private AssetInfo GetAssetInfoFromAssetBundle(string assetName, bool remote = false, bool showTip = false)
@@ -944,18 +945,17 @@ namespace F8Framework.Core
                 {
                     LogF8.LogError("AssetBundle都找不到指定资源可用的索引：" + assetName);
                 }
-                return null;
+                return new AssetInfo();
             }
             
             /// <summary>
             /// 通过资源名称同步卸载。
             /// </summary>
             /// <param name="assetName">资源名称。</param>
-            /// <param name="unloadAllRelated">
-            /// 如果设置为 true，将卸载目标依赖的所有资源，
-            /// 否则只卸载目标资源本身。
+            /// <param name="unloadAllLoadedObjects">
+            /// 完全卸载。
             /// </param>
-            public void Unload(string assetName, bool unloadAllRelated = false)
+            public void Unload(string assetName, bool unloadAllLoadedObjects = false)
             {
 #if UNITY_EDITOR
                 if (_isEditorMode)
@@ -964,17 +964,17 @@ namespace F8Framework.Core
                 }
 #endif
                 AssetInfo ab = GetAssetInfoFromAssetBundle(assetName);
-                if (ab != null && ab.IsLegal)
+                if (IsLegal(ref ab))
                 {
-                    AssetBundleManager.Instance.Unload(ab.AssetBundlePath, unloadAllRelated);
+                    AssetBundleManager.Instance.Unload(ab.AssetBundlePath, unloadAllLoadedObjects);
                 }
                 AssetInfo abRemote = GetAssetInfoFromAssetBundle(assetName, true);
-                if (abRemote != null && abRemote.IsLegal)
+                if (IsLegal(ref abRemote))
                 {
-                    AssetBundleManager.Instance.Unload(abRemote.AssetBundlePath, unloadAllRelated);
+                    AssetBundleManager.Instance.Unload(abRemote.AssetBundlePath, unloadAllLoadedObjects);
                 }
                 AssetInfo res = GetAssetInfoFromResource(assetName);
-                if (res != null && res.IsLegal)
+                if (IsLegal(ref res))
                 {
                     ResourcesManager.Instance.Unload(res.AssetPath[0]);
                 }
@@ -984,12 +984,11 @@ namespace F8Framework.Core
             /// 通过资源名称异步卸载。
             /// </summary>
             /// <param name="assetName">资源名称。</param>
-            /// <param name="unloadAllRelated">
-            /// 如果设置为 true，将卸载目标依赖的所有资源，
-            /// 否则只卸载目标资源本身。
+            /// <param name="unloadAllLoadedObjects">
+            /// 完全卸载。
             /// </param>
             /// <param name="callback">异步卸载完成时的回调函数。</param>
-            public void UnloadAsync(string assetName, bool unloadAllRelated = false, AssetBundleLoader.OnUnloadFinished callback = null)
+            public void UnloadAsync(string assetName, bool unloadAllLoadedObjects = false, AssetBundleLoader.OnUnloadFinished callback = null)
             {
 #if UNITY_EDITOR
                 if (_isEditorMode)
@@ -998,14 +997,14 @@ namespace F8Framework.Core
                 }
 #endif
                 AssetInfo ab = GetAssetInfoFromAssetBundle(assetName);
-                if (ab != null && ab.IsLegal)
+                if (IsLegal(ref ab))
                 {
-                    AssetBundleManager.Instance.UnloadAsync(ab.AssetBundlePath, unloadAllRelated, callback);
+                    AssetBundleManager.Instance.UnloadAsync(ab.AssetBundlePath, unloadAllLoadedObjects, callback);
                 }
                 AssetInfo abRemote = GetAssetInfoFromAssetBundle(assetName, true);
-                if (abRemote != null && abRemote.IsLegal)
+                if (IsLegal(ref abRemote))
                 {
-                    AssetBundleManager.Instance.UnloadAsync(abRemote.AssetBundlePath, unloadAllRelated, callback);
+                    AssetBundleManager.Instance.UnloadAsync(abRemote.AssetBundlePath, unloadAllLoadedObjects, callback);
                 }
             }
             
@@ -1029,7 +1028,7 @@ namespace F8Framework.Core
                 List<string> assetBundlePaths = new List<string>();
 
                 AssetInfo ab = GetAssetInfoFromAssetBundle(assetName);
-                if (ab != null && ab.IsLegal)
+                if (IsLegal(ref ab))
                 {
                     if (ab.AssetPath.Length > 1)
                     {
@@ -1046,7 +1045,7 @@ namespace F8Framework.Core
                 }
 
                 AssetInfo abRemote = GetAssetInfoFromAssetBundle(assetName, true);
-                if (abRemote != null && abRemote.IsLegal)
+                if (IsLegal(ref abRemote))
                 {
                     if (abRemote.AssetPath.Length > 1)
                     {
@@ -1063,7 +1062,7 @@ namespace F8Framework.Core
                 }
 
                 AssetInfo res = GetAssetInfoFromResource(assetName);
-                if (res != null && res.IsLegal)
+                if (IsLegal(ref res))
                 {
                     float resProgress = ResourcesManager.Instance.GetLoadProgress(res.AssetPath[0]);
                     if (resProgress > -1f)
