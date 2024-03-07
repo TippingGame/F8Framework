@@ -321,7 +321,7 @@ namespace F8Framework.Core.Editor
             source.Append("\t\t\t\treturn default(T);\n");
             source.Append("\t\t\t}\n");
             source.Append("#if UNITY_WEBGL\n");
-            source.Append("\t\t\tT obj = JsonMapper.ToObject<T>(textAsset.text);\n");
+            source.Append("\t\t\tT obj = Util.LitJson.ToObject<T>(textAsset.text);\n");
             source.Append("\t\t\treturn obj;\n");
             source.Append("#else\n");
             source.Append("\t\t\tusing (MemoryStream memoryStream = new MemoryStream(textAsset.bytes))\n");
@@ -340,7 +340,7 @@ namespace F8Framework.Core.Editor
             source.Append("\t\t\tif (textAsset != null)\n");
             source.Append("\t\t\t{\n");
             source.Append("#if UNITY_WEBGL\n");
-            source.Append("\t\t\t\tT obj = JsonMapper.ToObject<T>(textAsset.text);\n");
+            source.Append("\t\t\t\tT obj = Util.LitJson.ToObject<T>(textAsset.text);\n");
             source.Append("\t\t\t\tcallback(obj);\n");
             source.Append("#else\n");
             source.Append("\t\t\t\tusing (Stream s = new MemoryStream(textAsset.bytes))\n");

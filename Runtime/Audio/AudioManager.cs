@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Audio;
 
 namespace F8Framework.Core
 {
@@ -20,13 +21,17 @@ namespace F8Framework.Core
         private AudioMusic _audioMusicBtnClick;
         
         private AudioMusic _audioMusicUISound;
-       
-        private AudioEffect _audioMusicAudioEffect;
+        
+        private AudioMusic _audioMusicAudioEffect;
+        
+        private AudioEffect _audioMusicAudioEffect3D;
+        private AudioMixerGroup _audioEffectMixerGroup;
         
         private float _volumeAudioEffect = 1f;
         private bool _switchAudioEffect = true;
 
         private Transform _transform;
+        private AudioMixer _audioMixer;
         public void OnInit(object createParam)
         {
             _transform = this.transform;
@@ -58,7 +63,14 @@ namespace F8Framework.Core
             _audioMusicUISound.MusicSource.playOnAwake = false;
             _audioMusicUISound.MusicSource.loop = false;
             
-            _audioMusicAudioEffect = new AudioEffect();
+            GameObject gameObjectAudioEffect = new GameObject("AudioEffect", typeof(AudioSource));
+            gameObjectAudioEffect.transform.SetParent(_transform);
+            _audioMusicAudioEffect = new AudioMusic();
+            _audioMusicAudioEffect.MusicSource = gameObjectAudioEffect.GetComponent<AudioSource>();
+            _audioMusicAudioEffect.MusicSource.playOnAwake = false;
+            _audioMusicAudioEffect.MusicSource.loop = false;
+            
+            _audioMusicAudioEffect3D = new AudioEffect();
 
             _volumeMusic = StorageManager.Instance.GetFloat("_volumeMusic", 1f);
             _switchMusic = StorageManager.Instance.GetBool("_switchMusic", true);
@@ -70,12 +82,28 @@ namespace F8Framework.Core
             _switchAudioEffect = StorageManager.Instance.GetBool("_switchAudioEffect", true);
         }
 
+        /// <summary>
+        /// 设置AudioMixer混音组
+        /// </summary>
+        /// <param name="audioMixer"></param>
+        public void SetAudioMixer(AudioMixer audioMixer)
+        {
+            _audioMusic.MusicSource.outputAudioMixerGroup = audioMixer.FindMatchingGroups("Master/Music")[0];
+            _audioMusicVoice.MusicSource.outputAudioMixerGroup = audioMixer.FindMatchingGroups("Master/Voice")[0];
+            _audioMusicBtnClick.MusicSource.outputAudioMixerGroup = audioMixer.FindMatchingGroups("Master/SoundFx")[0];
+            _audioMusicUISound.MusicSource.outputAudioMixerGroup = audioMixer.FindMatchingGroups("Master/SoundFx")[0];
+            _audioMusicAudioEffect.MusicSource.outputAudioMixerGroup = audioMixer.FindMatchingGroups("Master/SoundFx")[0];
+            _audioEffectMixerGroup = audioMixer.FindMatchingGroups("Master/SoundFx")[0];
+            _audioMixer = audioMixer;
+        }
+        
         public void OnUpdate()
         {
             _audioMusic.Tick();
             _audioMusicVoice.Tick();
             _audioMusicBtnClick.Tick();
             _audioMusicUISound.Tick();
+            _audioMusicAudioEffect.Tick();
         }
         
         public void OnLateUpdate()
@@ -237,6 +265,7 @@ namespace F8Framework.Core
                 StorageManager.Instance.SetFloat("_volumeAudioEffect", value);
                 _audioMusicBtnClick.MusicSource.volume = value;
                 _audioMusicUISound.MusicSource.volume = value;
+                _audioMusicAudioEffect.MusicSource.volume = value;
             }
         }
 
@@ -258,6 +287,7 @@ namespace F8Framework.Core
                 {
                     _audioMusicBtnClick.MusicSource.Stop();
                     _audioMusicUISound.MusicSource.Stop();
+                    _audioMusicAudioEffect.MusicSource.Stop();
                 }
             }
         }
@@ -309,17 +339,41 @@ namespace F8Framework.Core
             _audioMusicUISound.MusicSource.loop = loop;
             _audioMusicUISound.Priority = priority;
         }
+                
+        /*----------音效特效----------*/
+        
+        // 设置音效特效播放完成回调
+        public void SetAudioEffectComplete(Action callback)
+        {
+            _audioMusicAudioEffect.OnComplete = callback;
+        }
+
+        // 播放音效特效
+        public void PlayAudioEffect(string assetName, Action callback = null, bool loop = false, int priority = 0)
+        {
+            if (!_switchAudioEffect)
+            {
+                return;
+            }
+            if (priority < _audioMusicAudioEffect.Priority)
+            {
+                return;
+            }
+            _audioMusicAudioEffect.Load(assetName, callback);
+            _audioMusicAudioEffect.MusicSource.loop = loop;
+            _audioMusicAudioEffect.Priority = priority;
+        }
         
         /*----------3D音效特效----------*/
-        public void PlayAudioEffect(string assetName, Vector3? position = null, float volume = 1f, Action callback = null)
+        public void PlayAudioEffect3D(string assetName, bool isRandom = false, Vector3? audioListenerPosition = null, float volume = 1f, Action callback = null)
         {
             if (!_switchAudioEffect)
             {
                 return ;
             }
-            Vector3 actualPosition = position.GetValueOrDefault(_transform.position);
+            Vector3 actualPosition = audioListenerPosition.GetValueOrDefault(_transform.position);
             float actualVolume = volume * _volumeAudioEffect;
-            _audioMusicAudioEffect.Load(assetName, actualPosition, actualVolume, callback);
+            _audioMusicAudioEffect3D.Load(assetName, actualPosition, actualVolume, callback, _audioEffectMixerGroup, isRandom);
         }
         
         /*----------全局控制----------*/
@@ -344,6 +398,20 @@ namespace F8Framework.Core
             _audioMusicVoice.MusicSource.Stop();
             _audioMusicBtnClick.MusicSource.Stop();
             _audioMusicUISound.MusicSource.Stop();
+        }
+        
+        private float Remap01ToDB(float linearVolume)
+        {
+            // 如果音量为0或负数，将其调整为一个非常小的正数，以避免对数计算错误
+            if (linearVolume <= 0.0f)
+            {
+                linearVolume = 0.0001f;
+            }
+
+            // 将线性音量值转换为分贝值
+            float dbVolume = Mathf.Log10(linearVolume) * 20.0f;
+
+            return dbVolume;
         }
     }
 }

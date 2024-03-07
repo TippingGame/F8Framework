@@ -119,7 +119,7 @@ namespace F8Framework.Core
 				return default(T);
 			}
 #if UNITY_WEBGL
-			T obj = JsonMapper.ToObject<T>(textAsset.text);
+			T obj = Util.LitJson.ToObject<T>(textAsset.text);
 			return obj;
 #else
 			using (MemoryStream memoryStream = new MemoryStream(textAsset.bytes))
@@ -138,7 +138,7 @@ namespace F8Framework.Core
 			if (textAsset != null)
 			{
 #if UNITY_WEBGL
-				T obj = JsonMapper.ToObject<T>(textAsset.text);
+				T obj = Util.LitJson.ToObject<T>(textAsset.text);
 				callback(obj);
 #else
 				using (Stream s = new MemoryStream(textAsset.bytes))

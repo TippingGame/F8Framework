@@ -351,7 +351,7 @@ namespace F8Framework.Core.Editor
             }
 #if UNITY_WEBGL
             // 序列化对象
-            string json = JsonMapper.ToJson(container);
+            string json = Util.LitJson.ToJson(container);
             // 写入到文件
             string filePath = BinDataPath + "/" + container.GetType().Name + ".json";
             File.WriteAllText(filePath, json);

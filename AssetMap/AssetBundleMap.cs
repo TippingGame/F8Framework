@@ -24,6 +24,10 @@ namespace F8Framework.AssetMap
        }
        
        private static Dictionary<string, AssetMapping> mappings = new Dictionary<string, AssetMapping> {
+          {"2852", new AssetMapping("audio/2852", new []{"Assets/AssetBundles/Audio/2852.wav"})},
+          {"button1", new AssetMapping("audio/button1", new []{"Assets/AssetBundles/Audio/button1.wav"})},
+          {"大风-WQ20070525", new AssetMapping("audio/大风-wq20070525", new []{"Assets/AssetBundles/Audio/大风-WQ20070525.mp3"})},
+          {"笛子1-mcx20070508", new AssetMapping("audio/笛子1-mcx20070508", new []{"Assets/AssetBundles/Audio/笛子1-mcx20070508.wav"})},
           {"00029-3980031510mat", new AssetMapping("materials/00029-3980031510mat", new []{"Assets/AssetBundles/Materials/00029-3980031510mat.mat"})},
           {"00031-1829375853mat", new AssetMapping("materials/00031-1829375853mat", new []{"Assets/AssetBundles/Materials/00031-1829375853mat.mat"})},
           {"Cube", new AssetMapping("prefabs/pf2/cube2sdfwe", new []{"Assets/AssetBundles/Prefabs/Cube.prefab", "Assets/AssetBundles/Prefabs/Cube1.prefab", "Assets/AssetBundles/Prefabs/Cube2.prefab", "Assets/AssetBundles/Prefabs/Video1.prefab", "Assets/AssetBundles/Prefabs/pf2/Cube1fsdf.prefab", "Assets/AssetBundles/Prefabs/pf2/Cube2sdfwe.prefab", "Assets/AssetBundles/Prefabs/pf2/Cubeljk.prefab"})},
@@ -41,6 +45,7 @@ namespace F8Framework.AssetMap
           {"Cube1fsdf", new AssetMapping("prefabs/pf2/cube2sdfwe", new []{"Assets/AssetBundles/Prefabs/Cube.prefab", "Assets/AssetBundles/Prefabs/Cube1.prefab", "Assets/AssetBundles/Prefabs/Cube2.prefab", "Assets/AssetBundles/Prefabs/Video1.prefab", "Assets/AssetBundles/Prefabs/pf2/Cube1fsdf.prefab", "Assets/AssetBundles/Prefabs/pf2/Cube2sdfwe.prefab", "Assets/AssetBundles/Prefabs/pf2/Cubeljk.prefab"})},
           {"Cube2sdfwe", new AssetMapping("prefabs/pf2/cube2sdfwe", new []{"Assets/AssetBundles/Prefabs/Cube.prefab", "Assets/AssetBundles/Prefabs/Cube1.prefab", "Assets/AssetBundles/Prefabs/Cube2.prefab", "Assets/AssetBundles/Prefabs/Video1.prefab", "Assets/AssetBundles/Prefabs/pf2/Cube1fsdf.prefab", "Assets/AssetBundles/Prefabs/pf2/Cube2sdfwe.prefab", "Assets/AssetBundles/Prefabs/pf2/Cubeljk.prefab"})},
           {"Cubeljk", new AssetMapping("prefabs/pf2/cube2sdfwe", new []{"Assets/AssetBundles/Prefabs/Cube.prefab", "Assets/AssetBundles/Prefabs/Cube1.prefab", "Assets/AssetBundles/Prefabs/Cube2.prefab", "Assets/AssetBundles/Prefabs/Video1.prefab", "Assets/AssetBundles/Prefabs/pf2/Cube1fsdf.prefab", "Assets/AssetBundles/Prefabs/pf2/Cube2sdfwe.prefab", "Assets/AssetBundles/Prefabs/pf2/Cubeljk.prefab"})},
+          {"Audio", new AssetMapping("audio", new []{"Assets/AssetBundles/Audio/2852.wav", "Assets/AssetBundles/Audio/button1.wav", "Assets/AssetBundles/Audio/大风-WQ20070525.mp3", "Assets/AssetBundles/Audio/笛子1-mcx20070508.wav"})},
           {"Config", new AssetMapping("config", new []{""})},
           {"Materials", new AssetMapping("materials", new []{"Assets/AssetBundles/Materials/00029-3980031510mat.mat", "Assets/AssetBundles/Materials/00031-1829375853mat.mat"})},
           {"Prefabs", new AssetMapping("prefabs", new []{"Assets/AssetBundles/Prefabs/Cube.prefab", "Assets/AssetBundles/Prefabs/Cube1.prefab", "Assets/AssetBundles/Prefabs/Cube2.prefab", "Assets/AssetBundles/Prefabs/Video1.prefab"})},
