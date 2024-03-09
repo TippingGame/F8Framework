@@ -6,8 +6,6 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using F8Framework.Core.Editor;
-using F8Framework.Core.Editor;
 
 #if (UNITY_EDITOR_LINUX || UNITY_EDITOR_OSX)
 using System.Text;

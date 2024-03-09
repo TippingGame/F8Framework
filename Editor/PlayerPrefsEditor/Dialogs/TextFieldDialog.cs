@@ -1,6 +1,4 @@
-﻿using F8Framework.Core.Editor;
-using F8Framework.Core.Editor;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;

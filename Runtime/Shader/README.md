@@ -1,0 +1,1 @@
+TMP_SDF-Mobile SoftMasking 需要移动到TextMesh Pro/Shaders文件夹下使用
