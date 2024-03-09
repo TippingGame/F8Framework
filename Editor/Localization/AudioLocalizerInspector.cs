@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace F8Framework.Core
+namespace F8Framework.Core.Editor
 {
 	[CustomEditor(typeof(AudioLocalizer))]
 	public class AudioLocalizerInspector : UnityEditor.Editor

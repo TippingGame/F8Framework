@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace F8Framework.Core
+namespace F8Framework.Core.Editor
 {
 	[CustomEditor(typeof(TextLocalizer))]
 	public class TextLocalizerInspector : UnityEditor.Editor

@@ -1,6 +1,6 @@
 ﻿using UnityEditor;
 
-namespace F8Framework.Core
+namespace F8Framework.Core.Editor
 {
 	public static class TMPIntegrationSwitcher
 	{

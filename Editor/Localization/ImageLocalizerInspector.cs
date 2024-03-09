@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace F8Framework.Core
+namespace F8Framework.Core.Editor
 {
 	[CustomEditor(typeof(ImageLocalizer))]
 	public class ImageLocalizerInspector : UnityEditor.Editor

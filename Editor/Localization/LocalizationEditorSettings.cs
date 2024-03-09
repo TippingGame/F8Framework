@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace F8Framework.Core
+namespace F8Framework.Core.Editor
 {
 	public class LocalizationEditorSettings
 	{
