@@ -174,12 +174,13 @@ namespace F8Framework.Core
                     }
                 }
                 lastLoader = loader; // 获取最后一个 loader
-                yield return loader.LoadAsyncCoroutine();
+                yield return loader.LoadAsyncCoroutine(); // 这里会比update快一点，所以展开资产时有机会还未加载完
                 ++loadedCount;
                 lastLoader.AddDependentNames(assetBundlePath, true);
                 if (loadedCount == assetBundlePaths.Count)
                 {
                     // 所有依赖项加载完成后，加载主资源
+                    // 这里会比update快一点，所以展开资产时有机会assetBundle还未加载完
                     yield return lastLoader.ExpandAsyncCoroutine();
                     yield break;
                 }
@@ -200,8 +201,11 @@ namespace F8Framework.Core
             List<AssetBundleLoader> bundleLoaders = GetRelatedLoaders(assetBundlePath);
             foreach (AssetBundleLoader loader in bundleLoaders)
             {
-                loader.RemoveParentBundle(assetBundlePath);
-                loader.RemoveDependentNames(assetBundlePath);
+                if (unloadAllLoadedObjects)
+                {
+                    loader.RemoveParentBundle(assetBundlePath);
+                    loader.RemoveDependentNames(assetBundlePath);
+                }
                 loader.Unload(unloadAllLoadedObjects);
             }
         }
@@ -238,7 +242,7 @@ namespace F8Framework.Core
             }
             else
             {
-                loader.Clear();
+                loader.Clear(unloadAllLoadedObjects);
             }
         }
 
@@ -302,8 +306,11 @@ namespace F8Framework.Core
                         {
                             foreach (AssetBundleLoader l in bundleLoaders)
                             {
-                                l.RemoveParentBundle(assetBundlePath);
-                                l.RemoveDependentNames(assetBundlePath);
+                                if (unloadAllLoadedObjects)
+                                {
+                                    l.RemoveParentBundle(assetBundlePath);
+                                    l.RemoveDependentNames(assetBundlePath);
+                                }
                             }
 
                             callback?.Invoke();

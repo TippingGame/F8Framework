@@ -49,8 +49,6 @@ namespace F8Framework.Core
             if (isDestroy)
             {
                 Destroy(gameObject);
-                // 释放界面相关资源
-                // AssetManager.Instance.Unload(viewParams.PrefabPath);
             }
             else
             {

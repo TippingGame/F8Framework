@@ -24,10 +24,8 @@ namespace F8Framework.Core
                 {
                     if (coroutineHelper == null)
                     {
-                        var go = new GameObject("CoroutineHelper");
-                        go.hideFlags = HideFlags.HideInHierarchy;
-                        GameObject.DontDestroyOnLoad(go);
-                        coroutineHelper = go.AddComponent<CoroutineHelper>();
+                        MonoBehaviour mono = ModuleCenter.GetBehaviour();
+                        coroutineHelper = mono.gameObject.AddComponent<CoroutineHelper>();
                     }
 
                     return coroutineHelper;

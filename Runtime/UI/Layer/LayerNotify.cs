@@ -25,6 +25,8 @@ namespace F8Framework.Core
         {
             AssetManager.Instance.LoadAsync<GameObject>(viewParams.PrefabPath, (res) =>
             {
+                AssetManager.Instance.Unload(viewParams.PrefabPath, false);
+                
                 GameObject childObject = Instantiate(res);
                 viewParams.Go = childObject;
             

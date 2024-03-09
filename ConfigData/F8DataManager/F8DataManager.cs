@@ -118,6 +118,7 @@ namespace F8Framework.Core
 			{
 				return default(T);
 			}
+			AssetManager.Instance.Unload(name, false);
 #if UNITY_WEBGL
 			T obj = Util.LitJson.ToObject<T>(textAsset.text);
 			return obj;
@@ -137,6 +138,7 @@ namespace F8Framework.Core
 			TextAsset textAsset = AssetManager.Instance.GetAssetObject<TextAsset>(name);
 			if (textAsset != null)
 			{
+				AssetManager.Instance.Unload(name, false);
 #if UNITY_WEBGL
 				T obj = Util.LitJson.ToObject<T>(textAsset.text);
 				callback(obj);

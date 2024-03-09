@@ -79,7 +79,7 @@ namespace F8Framework.Core
         /// <param name="assetBundlePath">资产捆绑包的路径。</param>
         public virtual void Init(string assetBundlePath)
         {
-            Clear();
+            Clear(true);
             this.assetBundlePath = assetBundlePath;
             this.abName = GetSubPath(this.assetBundlePath).ToLower();
             assetPaths = GetAssetPaths();
@@ -164,6 +164,12 @@ namespace F8Framework.Core
             }
         }
 
+        /// <summary>
+        /// 协程加载资产，
+        /// 这里会比update快一点，
+        /// 所以展开资产时有机会还未加载完。
+        /// </summary>
+        /// <returns></returns>
         public IEnumerator LoadAsyncCoroutine()
         {
             ClearUnloadData();
@@ -244,7 +250,7 @@ namespace F8Framework.Core
         /// </summary>
         public virtual void ExpandAsync(OnExpandFinished callback = null)
         {
-            if (!assetBundleContent)
+            if (assetBundleContent == null)
             {
                 assetBundleExpandState = LoaderState.NONE;
                 return;
@@ -253,7 +259,7 @@ namespace F8Framework.Core
             if (assetBundleExpandState == LoaderState.FINISHED &&
                 assetObjects.Count != assetPaths.Count)
                 assetBundleExpandState = LoaderState.NONE;
-
+            
             onExpandFinished += callback;
 
             if (assetBundleExpandState == LoaderState.NONE)
@@ -267,14 +273,20 @@ namespace F8Framework.Core
             }
         }
 
+        /// <summary>
+        /// 协程展开资源，
+        /// 这里会比update快一点，
+        /// 有机会assetBundle还未加载完，所以就没有展开。
+        /// </summary>
+        /// <returns></returns>
         public IEnumerator ExpandAsyncCoroutine()
         {
-            if (!assetBundleContent)
+            if (assetBundleContent == null)
             {
                 assetBundleExpandState = LoaderState.NONE;
                 yield break;
             }
-
+            
             if (assetBundleExpandState == LoaderState.FINISHED && assetObjects.Count != assetPaths.Count)
                 assetBundleExpandState = LoaderState.NONE;
 
@@ -301,7 +313,10 @@ namespace F8Framework.Core
             if (assetBundleContent != null)
             {
                 assetBundleContent.Unload(unloadAllLoadedObjects);
-                ClearLoadedData();
+                if (unloadAllLoadedObjects)
+                {
+                    ClearLoadedData();
+                }
             }
 
             assetBundleUnloadState = LoaderState.FINISHED;
@@ -540,7 +555,7 @@ namespace F8Framework.Core
             {
                 yield break;
             }
-
+            
             AssetBundleRequest rq = assetBundleContent.LoadAssetAsync(assetPath);
             yield return rq;
 
@@ -786,7 +801,7 @@ namespace F8Framework.Core
             onLoadFinishedImpl = null;
             onExpandFinishedImpl = null;
         }
-
+        
         /// <summary>
         /// 清除已卸载的数据。
         /// </summary>

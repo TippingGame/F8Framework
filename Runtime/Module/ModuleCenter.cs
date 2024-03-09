@@ -348,5 +348,15 @@ namespace F8Framework.Core
 			}
 			return maxPriority; // 大于等于零
 		}
+		
+		/// <summary>
+		/// 获取初始化MonoBehaviour
+		/// </summary>
+		public static MonoBehaviour GetBehaviour()
+		{
+			if (_behaviour == null)
+				LogF8.LogError($"{nameof(ModuleCenter)} 未初始化。使用 ModuleCenter.Initialize");
+			return _behaviour;
+		}
 	}
 }
