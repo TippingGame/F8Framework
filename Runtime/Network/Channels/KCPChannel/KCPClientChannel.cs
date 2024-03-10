@@ -23,7 +23,7 @@ namespace F8Framework.Core
     /// </summary>
     public class KcpClientChannel : INetworkClientChannel
     {
-        ///<inheritdoc/>
+        
         public string ChannelName { get; set; }
 
         KcpClient client;
@@ -52,11 +52,11 @@ namespace F8Framework.Core
             add { onError += value; }
             remove { onError -= value; }
         }
-        ///<inheritdoc/>
+        
         public bool IsConnect { get { return client.connected; } }
-        ///<inheritdoc/>
+        
         public int Port { get; private set; }
-        ///<inheritdoc/>
+        
         public string Host { get; private set; }
         
         protected KcpConfig config = new KcpConfig(
@@ -98,19 +98,19 @@ namespace F8Framework.Core
                 config
             );
         }
-        ///<inheritdoc/>
+        
         public void Connect(string host, int port)
         {
             this.Host = host;
             this.Port = port;
             client.Connect(Host, (ushort)port);
         }
-        ///<inheritdoc/>
+        
         public void TickRefresh()
         {
             client?.Tick();
         }
-        ///<inheritdoc/>
+        
         public bool SendMessage(byte[] data)
         {
             return SendMessage(KcpReliableType.Reliable, data);
@@ -138,7 +138,7 @@ namespace F8Framework.Core
             }
             return true;
         }
-        ///<inheritdoc/>
+        
         public void Close()
         {
             client.Disconnect();

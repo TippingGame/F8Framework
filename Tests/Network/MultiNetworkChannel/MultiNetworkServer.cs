@@ -27,11 +27,12 @@ namespace F8Framework.Tests
             kcpServerChannel.OnConnected += KcpServer_OnConnected;
             kcpServerChannel.OnDataReceived += KcpServer_OnDataReceived;
             kcpServerChannel.OnDisconnected += KcpServer_OnDisconnected;
+            
             //channel的TickRefresh函数可自定义管理轮询，networkManager的作用是存放通道并调用TickRefresh。
             //由于存在多种网络方案的原因，通道对应的具体事件需要由使用者自定义解析，框架不提供具体数据。
             //这里将server加入networkManager，由networkManager管理通道的轮询
-            // CosmosEntry.NetworkManager.AddChannel(kcpServerChannel);
-            // CosmosEntry.NetworkManager.AddChannel(tcpServerChannel);
+            // FF8.Network.AddChannel(kcpServerChannel);
+            // FF8.Network.AddChannel(tcpServerChannel);
 
             btnTcpStartServer?.onClick.AddListener(TcpStartServer);
             btnTcpStopServer?.onClick.AddListener(TcpStopServer);
@@ -42,13 +43,11 @@ namespace F8Framework.Tests
 
         void Update()
         {
-            //channel的TickRefresh函数可自定义管理轮询，networkManager的作用是存放通道并调用TickRefresh。
-            //由于存在多种网络方案的原因，通道对应的具体事件需要由使用者自定义解析，框架不提供具体数据。
-            //这里保留client，由update管理轮询
-            tcpServerChannel.TickRefresh();
+            //这里为了测试server，由update管理轮询
             kcpServerChannel.TickRefresh();
+            tcpServerChannel.TickRefresh();
         }
-
+        
         #region TCP_SERVER
 
         void TcpStartServer()

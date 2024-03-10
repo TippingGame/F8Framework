@@ -16,6 +16,7 @@ namespace F8Framework.Tests
 			FF8.Storage = ModuleCenter.CreateModule<StorageManager>();
 			FF8.Timer = ModuleCenter.CreateModule<TimerManager>();
 			FF8.Procedure = ModuleCenter.CreateModule<ProcedureManager>();
+			FF8.Network = ModuleCenter.CreateModule<NetworkManager>();
 			FF8.FSM = ModuleCenter.CreateModule<FSMManager>();
 			FF8.GameObjectPool = ModuleCenter.CreateModule<GameObjectPool>();
 			FF8.Asset = ModuleCenter.CreateModule<AssetManager>();

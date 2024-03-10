@@ -48,13 +48,13 @@ namespace F8Framework.Core
             add { onError += value; }
             remove { onError -= value; }
         }
-        ///<inheritdoc/>
+        
         public int Port { get; private set; }
-        ///<inheritdoc/>
+        
         public bool Active { get { return server.IsActive(); } }
-        ///<inheritdoc/>
+        
         public string ChannelName { get; set; }
-        ///<inheritdoc/>
+        
         public string Host { get { return server.IPAddress; } }
         
         protected KcpConfig config = new KcpConfig(
@@ -97,7 +97,7 @@ namespace F8Framework.Core
                 config
             );
         }
-        ///<inheritdoc/>
+        
         public bool Start()
         {
             if (Active)
@@ -105,18 +105,18 @@ namespace F8Framework.Core
             server.Start((ushort)Port);
             return true;
         }
-        ///<inheritdoc/>
+        
         public void TickRefresh()
         {
             server.Tick();
         }
-        ///<inheritdoc/>
+        
         public bool Disconnect(int connectionId)
         {
             server.Disconnect(connectionId);
             return true;
         }
-        ///<inheritdoc/>
+        
         public bool SendMessage(int connectionId, byte[] data)
         {
             return SendMessage(KcpReliableType.Reliable, connectionId, data);
@@ -137,12 +137,12 @@ namespace F8Framework.Core
             }
             return true;
         }
-        ///<inheritdoc/>
+        
         public string GetConnectionAddress(int connectionId)
         {
             return server.GetClientEndPoint(connectionId).Address.ToString();
         }
-        ///<inheritdoc/>
+        
         public void Close()
         {
             server.Stop();

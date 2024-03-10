@@ -6,9 +6,9 @@ namespace F8Framework.Core
     {
         Client client;
         Action onAbort;
-        ///<inheritdoc/>
+        
         public string ChannelName { get; set; }
-        ///<inheritdoc/>
+        
         public bool IsConnect { get { return client.Connected; } }
         public event Action OnAbort
         {
@@ -31,9 +31,9 @@ namespace F8Framework.Core
             add { client.OnDisconnected += value; }
             remove { client.OnDisconnected -= value; }
         }
-        ///<inheritdoc/>
+        
         public int Port { get; private set; }
-        ///<inheritdoc/>
+        
         public string Host { get; private set; }
         public TcpClientChannel(string channelName)
         {
@@ -43,7 +43,7 @@ namespace F8Framework.Core
             Telepathy.Log.Warning = (s) => LogF8.LogWarning(s);
             Telepathy.Log.Error = (s) => LogF8.LogError(s);
         }
-        ///<inheritdoc/>
+        
         public void Connect(string host, int port)
         {
             this.Host = host;
@@ -51,25 +51,25 @@ namespace F8Framework.Core
             client.Connect(Host, Port);
             client.OnData = OnReceiveDataHandler;
         }
-        ///<inheritdoc/>
+        
         public void TickRefresh()
         {
             client.Tick(100);
         }
-        ///<inheritdoc/>
+        
         public bool SendMessage(byte[] data)
         {
             var segment = new ArraySegment<byte>(data);
             return client.Send(segment);
         }
-        ///<inheritdoc/>
+        
         public void Disconnect()
         {
             client.Disconnect();
             client.OnData = null;
             onDataReceived = null;
         }
-        ///<inheritdoc/>
+        
         public void Close()
         {
             Disconnect();
