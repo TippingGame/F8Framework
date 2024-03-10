@@ -36,7 +36,13 @@ namespace F8Framework.Core
         private void GenerateAutoBindComponentsCode()
         {
             string scriptPath = GetScriptPath(this);
-
+            
+            // 不是C#脚本就返回
+            if (!System.IO.Path.GetExtension(scriptPath).Equals(".cs", System.StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+            
             // Load the prefab
             GameObject prefab = gameObject;
 
@@ -120,7 +126,13 @@ namespace F8Framework.Core
             }
 
             // 将生成的代码插入到脚本中
-            string scriptContent = System.IO.File.ReadAllText(scriptPath);
+            string scriptContent;
+            using (System.IO.StreamReader reader = new System.IO.StreamReader(scriptPath))
+            {
+                scriptContent = reader.ReadToEnd();
+                // 关闭文件句柄
+                reader.Close();
+            }
 
             // 使用正则表达式匹配并替换注释之间的内容
             string pattern = @"// 自动获取组件（自动生成，不能删除）(.*?)// 自动获取组件（自动生成，不能删除）";
@@ -144,7 +156,12 @@ namespace F8Framework.Core
                 scriptContent = scriptContent.Replace("\r\n", "\n").Replace("\r", "\n");
                 
                 // 保存脚本文件
-                System.IO.File.WriteAllText(scriptPath, scriptContent);
+                using (System.IO.StreamWriter writer = new System.IO.StreamWriter(scriptPath, false)) // 第二个参数表示是否覆盖已有内容，这里设置为 false 表示覆盖
+                {
+                    writer.Write(scriptContent);
+                    // 关闭文件句柄
+                    writer.Close();
+                }
 
                 UnityEditor.AssetDatabase.Refresh();
                 

@@ -320,6 +320,7 @@ namespace F8Framework.Core.Editor
             source.Append("\t\t\t{\n");
             source.Append("\t\t\t\treturn default(T);\n");
             source.Append("\t\t\t}\n");
+            source.Append("\t\t\tAssetManager.Instance.Unload(name, false);\n");
             source.Append("#if UNITY_WEBGL\n");
             source.Append("\t\t\tT obj = Util.LitJson.ToObject<T>(textAsset.text);\n");
             source.Append("\t\t\treturn obj;\n");
@@ -339,6 +340,7 @@ namespace F8Framework.Core.Editor
             source.Append("\t\t\tTextAsset textAsset = AssetManager.Instance.GetAssetObject<TextAsset>(name);\n");
             source.Append("\t\t\tif (textAsset != null)\n");
             source.Append("\t\t\t{\n");
+            source.Append("\t\t\t\tAssetManager.Instance.Unload(name, false);\n");
             source.Append("#if UNITY_WEBGL\n");
             source.Append("\t\t\t\tT obj = Util.LitJson.ToObject<T>(textAsset.text);\n");
             source.Append("\t\t\t\tcallback(obj);\n");
