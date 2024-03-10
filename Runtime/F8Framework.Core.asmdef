@@ -6,7 +6,10 @@
         "Unity.Timeline",
         "LitJson",
         "MessagePack",
-        "SharpCompress"
+        "SharpCompress",
+        "kcp",
+        "Telepathy",
+        "SimpleWebTransport"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

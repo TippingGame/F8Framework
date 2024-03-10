@@ -147,7 +147,7 @@ ICSharpCode.SharpZipLib.dll\
         yield return www;
         if (www.error != null)
         {
-            Debug.Log(www.error);
+            LogF8.Log(www.error);
             yield return null;
         }
         else
@@ -189,7 +189,7 @@ ICSharpCode.SharpZipLib.dll\
         yield return www;
         if(www.error != null)
         {
-            Debug.Log(www.error);
+            LogF8.Log(www.error);
             yield return null;
         }
         else

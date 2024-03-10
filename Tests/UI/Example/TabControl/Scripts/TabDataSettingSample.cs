@@ -71,7 +71,7 @@ namespace F8Framework.Tests
             TabDataSettingSampleData data = (TabDataSettingSampleData)selectedTab.GetData();
             if (data != null)
             {
-                Debug.Log("Selected : " + data.name);
+                LogF8.Log("Selected : " + data.name);
             }
             
         }

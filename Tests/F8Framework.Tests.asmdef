@@ -3,7 +3,8 @@
     "rootNamespace": "",
     "references": [
         "F8Framework.Core",
-        "Unity.Timeline"
+        "Unity.Timeline",
+        "SimpleWebTransport"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -45,7 +45,7 @@ namespace F8Framework.Tests
         //     yield return www;
         //     if (www.error != null)
         //     {
-        //         Debug.Log(www.error);
+        //         LogF8.Log(www.error);
         //         yield return null;
         //     }
         //     else
@@ -87,7 +87,7 @@ namespace F8Framework.Tests
         //     yield return www;
         //     if(www.error != null)
         //     {
-        //         Debug.Log(www.error);
+        //         LogF8.Log(www.error);
         //         yield return null;
         //     }
         //     else
