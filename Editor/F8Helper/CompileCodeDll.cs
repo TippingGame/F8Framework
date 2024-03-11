@@ -107,7 +107,6 @@ namespace F8Framework.Serialization
 
             LogF8.Log("已编译 " + path + "/<color=#FFFF00>" + dllName + ".dll</color>");
             AssetDatabase.Refresh();
-            AssetDatabase.SaveAssets();
             return cr.CompiledAssembly;
         }
     }

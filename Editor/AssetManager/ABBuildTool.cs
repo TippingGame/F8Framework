@@ -14,19 +14,6 @@ namespace F8Framework.Core.Editor
         public static void BuildAllAB()
         {
             AssetDatabase.RemoveUnusedAssetBundleNames();
-
-            string assetMapPath = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/AssetMap";
-            FileTools.SafeDeleteDir(assetMapPath);
-            FileTools.CheckDirAndCreateWhenNeeded(assetMapPath);
-            AssetDatabase.Refresh();
-            AssetDatabase.SaveAssets();
-            
-            LogF8.LogAsset("生成AssetBundleMap.cs，生成ResourceMap.cs，生成F8Framework.AssetMap.asmdef");
-            GenerateAssetNames();
-            GenerateResourceNames();
-            CreateAsmdefFile();
-            AssetDatabase.Refresh();
-            AssetDatabase.SaveAssets();
             
             // 获取“StreamingAssets”文件夹路径（不一定这个文件夹，可自定义）            
             string strABOutPAthDir = URLSetting.GetAssetBundlesOutPath();
@@ -35,10 +22,24 @@ namespace F8Framework.Core.Editor
             DeleteRemovedAssetBundles();
 
             FileTools.CheckDirAndCreateWhenNeeded(strABOutPAthDir);
+            AssetDatabase.Refresh();
             
             LogF8.LogAsset("打包AssetBundle：" + URLSetting.GetAssetBundlesOutPath() + "  当前打包平台：" + EditorUserBuildSettings.activeBuildTarget);
             // 打包生成AB包 (目标平台自动根据当前平台设置，WebGL不可使用BuildAssetBundleOptions.None压缩)
             BuildPipeline.BuildAssetBundles(strABOutPAthDir, BuildAssetBundleOptions.ChunkBasedCompression, EditorUserBuildSettings.activeBuildTarget);
+            AssetDatabase.Refresh();
+            // BuildAssetBundles会打断ReLoadScript，修改脚本要放在之后
+            
+            string assetMapPath = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/AssetMap";
+            FileTools.SafeDeleteDir(assetMapPath);
+            FileTools.CheckDirAndCreateWhenNeeded(assetMapPath);
+            AssetDatabase.Refresh();
+            
+            LogF8.LogAsset("生成AssetBundleMap.cs，生成ResourceMap.cs，生成F8Framework.AssetMap.asmdef");
+            GenerateAssetNames();
+            GenerateResourceNames();
+            CreateAsmdefFile();
+            AssetDatabase.Refresh();
             
             LogF8.LogAsset("打包成功!");
         }
@@ -98,7 +99,6 @@ namespace F8Framework.Core.Editor
                 }
             }
             AssetDatabase.Refresh();
-            AssetDatabase.SaveAssets();
         }
         
         public static void RecordAssetsAndDirectories(string basePath, string rootPath, List<string> assetPaths, bool removeExtension = false)

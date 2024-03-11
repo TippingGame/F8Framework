@@ -126,7 +126,6 @@ namespace F8Framework.Core.Editor
             //编译代码,生成包含所有数据表内数据类型的dll
             Assembly assembly = CompileCode(codeList.ToArray());
             AssetDatabase.Refresh();
-            AssetDatabase.SaveAssets();
             //准备序列化数据
             string BinDataPath = Application.dataPath + BinDataFolder; //序列化后的数据存放路径
             if (Directory.Exists(BinDataPath)) Directory.Delete(BinDataPath, true); //删除旧的数据文件
@@ -143,7 +142,6 @@ namespace F8Framework.Core.Editor
             }
             ScriptGenerator.CreateDataManager(assembly);
             AssetDatabase.Refresh();
-            AssetDatabase.SaveAssets();
             LogF8.LogConfig("<color=yellow>导表成功!</color>");
         }
 
