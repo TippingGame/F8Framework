@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace F8Framework.Core
 {
@@ -9,7 +10,8 @@ namespace F8Framework.Core
         ConcurrentDictionary<string, INetworkChannel> channelDict;
         ConcurrentDictionary<string, INetworkChannel> addChannelDict;
         ConcurrentDictionary<string, INetworkChannel> deleteChannelDict;
-
+        private Thread netRun;
+        
         public int NetworkChannelCount => channelDict.Count;
 
         public bool AddChannel(INetworkChannel channel)
@@ -73,19 +75,40 @@ namespace F8Framework.Core
             addChannelDict = new ConcurrentDictionary<string, INetworkChannel>();
             deleteChannelDict = new ConcurrentDictionary<string, INetworkChannel>();
         }
+
+        /// <summary>
+        /// 开启Update线程
+        /// </summary>
+        public void StartThread()
+        {
+            netRun = new Thread(new ThreadStart(ThreadOnUpdate));
+            netRun.Start();
+        }   
         
         /// <summary>
-        /// 利用多核性能
+        /// Update线程
         /// </summary>
-        public void ThreadOnUpdate()
+        private void ThreadOnUpdate()
         {
-            
+            while (true)
+            {
+                Update();
+                Thread.Sleep(1);
+            }
         }
         
         /// <summary>
         /// Update只能利用单个CPU核心
         /// </summary>
         public void OnUpdate()
+        {
+            if (netRun == null)
+            {
+                Update();
+            }
+        }
+
+        private void Update()
         {
             // 首先处理待删除字典
             foreach (var delete in deleteChannelDict)
@@ -108,7 +131,7 @@ namespace F8Framework.Core
                 channel.TickRefresh();
             }
         }
-
+        
         public void OnLateUpdate()
         {
             
