@@ -864,6 +864,13 @@ namespace F8Framework.Core
             return manifest.GetAllDependencies(abName);
         }
 
+        public Hash128 GetAssetBundleHash(string abName)
+        {
+            if (manifest == null)
+                return default(Hash128);
+            return manifest.GetAssetBundleHash(abName);
+        }
+        
         private List<AssetBundleLoader> GetRelatedLoaders(string assetBundlePath)
         {
             List<AssetBundleLoader> result = new List<AssetBundleLoader>();

@@ -32,6 +32,7 @@ namespace F8Framework.Core
             
                 DelegateComponent comp = childObject.AddComponent<DelegateComponent>();
                 viewParams.DelegateComponent = comp;
+                viewParams.BaseView = childObject.GetComponent<BaseView>();
                 comp.ViewParams = viewParams;
             
                 CreateNode(viewParams);

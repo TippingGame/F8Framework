@@ -81,8 +81,14 @@ namespace F8Framework.Core
         /// </summary>
         public void StartThread()
         {
-            netRun = new Thread(new ThreadStart(ThreadOnUpdate));
-            netRun.Start();
+#if UNITY_WEBGL
+            LogF8.LogError("WebGL不支持.Net多线程");
+#endif
+            if (netRun == null)
+            {
+                netRun = new Thread(new ThreadStart(ThreadOnUpdate));
+                netRun.Start();
+            }
         }   
         
         /// <summary>

@@ -35,5 +35,6 @@ namespace F8Framework.Core
         public bool Valid;
         public GameObject Go;
         public DelegateComponent DelegateComponent;
+        public BaseView BaseView;
     }
 }

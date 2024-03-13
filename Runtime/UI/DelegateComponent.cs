@@ -9,7 +9,8 @@ namespace F8Framework.Core
         public void Add()
         {
             // 触发窗口组件上添加到父节点后的事件
-            ApplyComponentsFunction("Added", ViewParams.Params, ViewParams.UIid);
+            ViewParams.BaseView.Added(ViewParams.UIid, ViewParams.Params);
+            
             if (ViewParams.Callbacks != null && ViewParams.Callbacks.OnAdded != null)
             {
                 ViewParams.Callbacks.OnAdded(ViewParams.Params, ViewParams.UIid);
@@ -22,7 +23,7 @@ namespace F8Framework.Core
             if (ViewParams.Valid)
             {
                 // 触发窗口组件上移除之前的事件
-                ApplyComponentsFunction("BeforeRemove");
+                ViewParams.BaseView.BeforeRemove();
 
                 // 通知外部对象窗口组件上移除之前的事件（关闭窗口前的关闭动画处理）
                 if (ViewParams.Callbacks != null && ViewParams.Callbacks.OnBeforeRemove != null)
@@ -63,37 +64,9 @@ namespace F8Framework.Core
         private void OnDestroy()
         {
             // 触发窗口组件上窗口移除之后的事件
-            ApplyComponentsFunction("Removed");
+            ViewParams.BaseView.Removed();
 
             ViewParams = null;
-        }
-
-        private void ApplyComponentsFunction(string functionName, object parameters = null, int uiId = 0)
-        {
-            foreach (var component in gameObject.GetComponents<BaseView>())
-            {
-                var methodInfo = component.GetType().GetMethod(functionName);
-                if (methodInfo == null)
-                {
-                    continue;
-                }
-
-                if (functionName == "Added")
-                {
-                    if (parameters == null)
-                    {
-                        methodInfo.Invoke(component, new object[] { uiId, null });
-                    }
-                    else
-                    {
-                        methodInfo.Invoke(component, new object[] { parameters, uiId });
-                    }
-                }
-                else
-                {
-                    methodInfo.Invoke(component, null);
-                }
-            }
         }
     }
 }

@@ -109,10 +109,11 @@ namespace F8Framework.Core
                         assetBundleContent = ab;
                     }
                 );
-#endif
+#else
                 DownloadRequest d = new DownloadRequest(assetBundlePath, 0);
                 while (!d.IsFinished) ;
                 assetBundleContent = d.DownloadedAssetBundle;
+#endif
             }
             else
             {
