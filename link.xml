@@ -13,6 +13,9 @@
   <assembly fullname="LitJson" preserve="all" />
   <assembly fullname="MessagePack" preserve="all" />
   <assembly fullname="SharpCompress" preserve="all" />
+  <assembly fullname="kcp" preserve="all" />
+  <assembly fullname="SimpleWebTransport" preserve="all" />
+  <assembly fullname="Telepathy" preserve="all" />
   <assembly fullname="F8Framework.F8ExcelDataClass" preserve="all" />
   <assembly fullname="F8Framework.AssetMap" preserve="all" />
   <assembly fullname="F8Framework.Core" preserve="all" />
