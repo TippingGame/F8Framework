@@ -1,20 +1,10 @@
 ﻿using System.Linq;
-using UnityEditor;
 using UnityEngine;
 
 namespace F8Framework.Core.Editor
 {
 	public static class Slicer
 	{
-		[MenuItem("Assets/（F8UI界面管理功能）/（图片九宫格 Auto9Slice.asset）", false, -1)]
-		private static void CreateScriptObject()
-		{
-			Auto9SliceTester auto9SliceTester = ScriptableObject.CreateInstance<Auto9SliceTester>();
-			ProjectWindowUtil.CreateAsset(auto9SliceTester, "Auto9Slice.asset");
-			AssetDatabase.SaveAssets();
-			AssetDatabase.Refresh();
-		}
-		
 		public static SlicedTexture Slice(Texture2D texture, SliceOptions options)
 		{
 			return (new Runner(texture, options).Run());

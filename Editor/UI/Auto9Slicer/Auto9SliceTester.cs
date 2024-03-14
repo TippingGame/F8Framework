@@ -1,48 +1,62 @@
-using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
 namespace F8Framework.Core.Editor
 {
-    public class Auto9SliceTester : ScriptableObject
+    public class Auto9SliceTester : UnityEditor.Editor
     {
-        public SliceOptions Options => options;
-        [SerializeField] private SliceOptions options = new SliceOptions();
+        public static SliceOptions Options => options;
+        private static SliceOptions options = new SliceOptions();
 
-        public bool CreateBackup => createBackup;
-        [SerializeField] private bool createBackup = false;
+        public static bool CreateBackup => createBackup;
+        private static bool createBackup = false;
 
-        public void Run()
+        private static List<string> texture2DList;
+
+        [MenuItem("Assets/（F8UI界面管理功能）/（图片自动切割九宫格）", false, 101)]
+        public static void Auto9Slice()
         {
-            var directoryPath = Path.GetDirectoryName(AssetDatabase.GetAssetPath(this));
-            if (directoryPath == null) throw new Exception($"directoryPath == null");
+            texture2DList = new List<string>();
 
-            var fullDirectoryPath = Path.Combine(Path.GetDirectoryName(Application.dataPath) ?? "", directoryPath);
-            var targets = Directory.GetFiles(fullDirectoryPath)
-                .Select(Path.GetFileName)
-                .Where(x => x.EndsWith(".png") || x.EndsWith(".jpg") || x.EndsWith(".jpeg"))
-                .Where(x => !x.Contains(".original"))
-                .Select(x => Path.Combine(directoryPath, x))
-                .Select(x => (Path: x, Texture: AssetDatabase.LoadAssetAtPath<Texture2D>(x)))
-                .Where(x => x.Item2 != null)
-                .ToArray();
+            // 获取所有选中 文件、文件夹的 GUID
+            string[] guids = Selection.assetGUIDs;
 
-            foreach (var target in targets)
+            foreach (var guid in guids)
             {
-                var importer = AssetImporter.GetAtPath(target.Path);
+                // 将 GUID 转换为 路径
+                string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+                if (AssetDatabase.LoadMainAssetAtPath(assetPath) is Texture2D tex)
+                {
+                    if (!assetPath.Contains(".original"))
+                    {
+                        texture2DList.Add(assetPath);
+                    }
+                }
+            }
+
+            foreach (var target in texture2DList)
+            {
+                var importer = AssetImporter.GetAtPath(target);
                 if (importer is TextureImporter textureImporter)
                 {
-                    if (textureImporter.spriteBorder != Vector4.zero) continue;
-                    var fullPath = Path.Combine(Path.GetDirectoryName(Application.dataPath) ?? "", target.Path);
+                    if (textureImporter.spriteBorder != Vector4.zero)
+                    {
+                        LogF8.Log($"已设置九宫格，跳过 {Path.GetFileName(target)}");
+                        continue;
+                    }
+
+                    var fullPath = Path.Combine(Path.GetDirectoryName(Application.dataPath) ?? "", target);
                     var bytes = File.ReadAllBytes(fullPath);
 
                     // バックアップ
                     if (CreateBackup)
                     {
                         var fileName = Path.GetFileNameWithoutExtension(fullPath);
-                        File.WriteAllBytes(Path.Combine(Path.GetDirectoryName(fullPath) ?? "", fileName + ".original" + Path.GetExtension(fullPath)), bytes);
+                        File.WriteAllBytes(
+                            Path.Combine(Path.GetDirectoryName(fullPath) ?? "",
+                                fileName + ".original" + Path.GetExtension(fullPath)), bytes);
                     }
 
                     // importerのreadable設定に依らずに読み込むために直接読む
@@ -56,22 +70,11 @@ namespace F8Framework.Core.Editor
                     if (fullPath.EndsWith(".jpg")) File.WriteAllBytes(fullPath, slicedTexture.Texture.EncodeToJPG());
                     if (fullPath.EndsWith(".jpeg")) File.WriteAllBytes(fullPath, slicedTexture.Texture.EncodeToJPG());
 
-                    LogF8.Log($"Auto 9Slice {Path.GetFileName(target.Path)} = {textureImporter.spriteBorder}");
+                    LogF8.Log($"图片九宫格切割完成！{Path.GetFileName(target)} = {textureImporter.spriteBorder}");
                 }
             }
 
             AssetDatabase.Refresh();
-        }
-    }
-
-    [CustomEditor(typeof(Auto9SliceTester))]
-    public class Auto9SliceTesterEditor : UnityEditor.Editor
-    {
-        public override void OnInspectorGUI()
-        {
-            base.OnInspectorGUI();
-            EditorGUILayout.Space(20);
-            if (GUILayout.Button("Run")) ((Auto9SliceTester) target).Run();
         }
     }
 }
