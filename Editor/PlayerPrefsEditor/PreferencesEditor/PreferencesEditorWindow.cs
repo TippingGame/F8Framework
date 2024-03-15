@@ -70,16 +70,16 @@ namespace F8Framework.Core.Editor
 #elif UNITY_EDITOR_OSX
         private readonly char[] invalidFilenameChars = { '$', '%', '&', '\\', '/', ':', '<', '>', '|', '~' };
 #endif
-        [UnityEditor.MenuItem("开发工具/PlayerPrefs Editor _F5", false, 99)]
+        [UnityEditor.MenuItem("开发工具/PlayerPrefs Editor", false, 103)]
         static void ShowWindow()
         {
             if (HasOpenInstances<PreferencesEditorWindow>())
             {
-                GetWindow<PreferencesEditorWindow>(false, "Prefs Editor").Close();
+                GetWindow<PreferencesEditorWindow>("Prefs Editor").Close();
             }
             else
             {
-                PreferencesEditorWindow window = EditorWindow.GetWindow<PreferencesEditorWindow>(false, "Prefs Editor");
+                PreferencesEditorWindow window = EditorWindow.GetWindow<PreferencesEditorWindow>("Prefs Editor");
                 window.minSize = new Vector2(270.0f, 300.0f);
                 window.name = "Prefs Editor";
 

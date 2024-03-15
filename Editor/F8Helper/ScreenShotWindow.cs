@@ -12,7 +12,14 @@ namespace F8Framework.Core.Editor
         [UnityEditor.MenuItem("开发工具/截图工具", false, 102)]
         private static void Capture()
         {
-            EditorWindow.GetWindow<CaptureWindow>("截图工具");
+            if (HasOpenInstances<CaptureWindow>())
+            {
+                EditorWindow.GetWindow<CaptureWindow>("截图工具").Close();
+            }
+            else
+            {
+                EditorWindow.GetWindow<CaptureWindow>("截图工具");
+            }
         }
 
         private void OnGUI()
