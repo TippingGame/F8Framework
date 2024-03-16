@@ -21,6 +21,7 @@ namespace F8Framework.AssetMap
           {"LiberationSans SDF", "Fonts & Materials/LiberationSans SDF"},
           {"EmojiOne", "Sprite Assets/EmojiOne"},
           {"Default Style Sheet", "Style Sheets/Default Style Sheet"},
+          {"GameVersion", "GameVersion"},
        };
    }
 }

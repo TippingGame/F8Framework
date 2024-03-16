@@ -111,6 +111,9 @@ namespace F8Framework.Core.Editor
             float step = 1f;
             FileIndex.Clear();
             FileTools.SafeDeleteFile(URLSetting.CS_STREAMINGASSETS_URL + FileIndexFile);
+            FileTools.SafeDeleteFile(URLSetting.CS_STREAMINGASSETS_URL + FileIndexFile + ".meta");
+            AssetDatabase.Refresh();
+            FileTools.CheckFileAndCreateDirWhenNeeded(URLSetting.CS_STREAMINGASSETS_URL + FileIndexFile);
             foreach (string item in files)
             {
                 step++;
@@ -156,12 +159,6 @@ namespace F8Framework.Core.Editor
         {
             FileIndex.Append(condition);
             if (FileIndex.Length <= 0) return;
-            if (!File.Exists(URLSetting.CS_STREAMINGASSETS_URL + FileIndexFile))
-            {
-                var fs = File.Create(URLSetting.CS_STREAMINGASSETS_URL + FileIndexFile);
-                fs.Close();
-            }
-
             using (var sw = File.AppendText(URLSetting.CS_STREAMINGASSETS_URL + FileIndexFile))
             {
                 sw.WriteLine(FileIndex.ToString());

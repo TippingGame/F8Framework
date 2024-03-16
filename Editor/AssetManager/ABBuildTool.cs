@@ -38,17 +38,12 @@ namespace F8Framework.Core.Editor
             AssetDatabase.Refresh();
             
             // BuildAssetBundles会打断ReLoadScript，修改脚本要放在之后
-            string assetMapPath = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/AssetMap";
-            FileTools.SafeDeleteDir(assetMapPath);
-            FileTools.CheckDirAndCreateWhenNeeded(assetMapPath);
-            AssetDatabase.Refresh();
-            
             WriteAssetNames();
             WriteResourceNames();
             CreateAsmdefFile();
             AssetDatabase.Refresh();
             
-            LogF8.LogAsset("打包成功!");
+            LogF8.LogAsset("资产打包成功!");
         }
 
         public static void DeleteRemovedAssetBundles()
@@ -297,6 +292,12 @@ namespace F8Framework.Core.Editor
 
         private static void WriteAssetNames()
         {
+            string assetMapPath = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/AssetMap/AssetBundleMap.cs";
+            FileTools.SafeDeleteFile(assetMapPath);
+            FileTools.SafeDeleteFile(assetMapPath + ".meta");
+            FileTools.CheckFileAndCreateDirWhenNeeded(assetMapPath);
+            AssetDatabase.Refresh();
+            
             string AssetBundleMapPath = Application.dataPath + "/F8Framework/AssetMap/AssetBundleMap.cs";
                 
             FileTools.CheckFileAndCreateDirWhenNeeded(AssetBundleMapPath);
@@ -371,6 +372,12 @@ namespace F8Framework.Core.Editor
         
         private static void WriteResourceNames()
         {
+            string resourceMapPath = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/AssetMap/ResourceMap.cs";
+            FileTools.SafeDeleteFile(resourceMapPath);
+            FileTools.SafeDeleteFile(resourceMapPath + ".meta");
+            FileTools.CheckFileAndCreateDirWhenNeeded(resourceMapPath);
+            AssetDatabase.Refresh();
+            
             string ResourceMapPath = Application.dataPath + "/F8Framework/AssetMap/ResourceMap.cs";
                 
             FileTools.CheckFileAndCreateDirWhenNeeded(ResourceMapPath);
@@ -380,6 +387,12 @@ namespace F8Framework.Core.Editor
         
         public static void CreateAsmdefFile()
         {
+            string AssetMapasmdefPath = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/AssetMap/F8Framework.AssetMap.asmdef";
+            FileTools.SafeDeleteFile(AssetMapasmdefPath);
+            FileTools.SafeDeleteFile(AssetMapasmdefPath + ".meta");
+            FileTools.CheckFileAndCreateDirWhenNeeded(AssetMapasmdefPath);
+            AssetDatabase.Refresh();
+            
             // 创建.asmdef文件的路径
             string asmdefPath = Application.dataPath + "/F8Framework/AssetMap/F8Framework.AssetMap.asmdef";
             
