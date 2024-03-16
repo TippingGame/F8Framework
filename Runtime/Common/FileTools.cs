@@ -1,6 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using UnityEngine;
 
 namespace F8Framework.Core
 {
@@ -11,6 +15,85 @@ namespace F8Framework.Core
             pIndex += 1;
             if (pIndex > pMax)
                 pIndex = pMin;
+        }
+        
+        // 生成文件的MD5
+        public static string CreateMd5ForFile(string filename)
+        {
+            try
+            {
+                FileStream file = new FileStream(filename, FileMode.Open);
+                MD5 md5 = new MD5CryptoServiceProvider();
+                byte[] retVal = md5.ComputeHash(file);
+                file.Close();
+
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < retVal.Length; i++)
+                {
+                    sb.Append(retVal[i].ToString("x2"));
+                }
+
+                return sb.ToString();
+            }
+            catch (System.Exception ex)
+            {
+                LogF8.LogException(ex);
+                return null;
+            }
+        }
+        
+        /// <summary>
+        /// 获取文件夹下所有文件大小
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        public static int GetAllFileSize(string filePath)
+        {
+            int sum = 0;
+            if (!Directory.Exists(filePath))
+            {
+                return 0;
+            }
+
+            DirectoryInfo dti = new DirectoryInfo(filePath);
+
+            FileInfo[] fi = dti.GetFiles();
+
+            for (int i = 0; i < fi.Length; ++i )
+            {
+                sum += Convert.ToInt32(fi[i].Length / 1024);
+            }
+
+            DirectoryInfo[] di = dti.GetDirectories();
+
+            if (di.Length > 0)
+            {
+                for (int i = 0; i < di.Length; i++)
+                {
+                    sum += GetAllFileSize(di[i].FullName);
+                }
+            }
+            return sum;
+        }
+
+        /// <summary>
+        /// 获取指定文件大小
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        public static long GetFileSize(string filePath)
+        {
+            long sum = 0;
+            if (!File.Exists(filePath))
+            {
+                return 0;
+            }
+            else
+            {
+                FileInfo files = new FileInfo(filePath);
+                sum += files.Length;
+            }
+            return sum;
         }
         
         public static string TruncatePath(string fullPath, int levels)

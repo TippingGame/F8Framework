@@ -1145,6 +1145,8 @@ namespace F8Framework.Core
             {
                 _assetBundleManager = ModuleCenter.CreateModule<AssetBundleManager>();
                 _resourcesManager = ModuleCenter.CreateModule<ResourcesManager>();
+                AssetBundleMap.Mappings = Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(Resources.Load<TextAsset>("AssetBundleMap").ToString());
+                ResourceMap.Mappings = Util.LitJson.ToObject<Dictionary<string, string>>(Resources.Load<TextAsset>("ResourceMap").ToString());
             }
 
             public void OnUpdate()

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using F8Framework.AssetMap;
 using UnityEditor;
 using UnityEngine;
 
@@ -11,9 +12,6 @@ namespace F8Framework.Core.Editor
 {
     public class ABBuildTool : ScriptableObject
     {
-        private static StringBuilder codeStrAssetNames;
-        private static StringBuilder codeStrResourceNames;
-        
         public static void BuildAllAB()
         {
             AssetDatabase.RemoveUnusedAssetBundleNames();
@@ -21,14 +19,6 @@ namespace F8Framework.Core.Editor
             // 获取“StreamingAssets”文件夹路径（不一定这个文件夹，可自定义）            
             string strABOutPAthDir = URLSetting.GetAssetBundlesOutPath();
             
-            LogF8.LogAsset("生成AssetBundleMap.cs，生成ResourceMap.cs，生成F8Framework.AssetMap.asmdef");
-            GenerateAssetNames();
-            GenerateResourceNames();
-            AssetDatabase.Refresh();
-            
-            // 清理多余文件夹和ab
-            DeleteRemovedAssetBundles();
-
             FileTools.CheckDirAndCreateWhenNeeded(strABOutPAthDir);
             AssetDatabase.Refresh();
             
@@ -37,10 +27,12 @@ namespace F8Framework.Core.Editor
             BuildPipeline.BuildAssetBundles(strABOutPAthDir, BuildAssetBundleOptions.ChunkBasedCompression, EditorUserBuildSettings.activeBuildTarget);
             AssetDatabase.Refresh();
             
-            // BuildAssetBundles会打断ReLoadScript，修改脚本要放在之后
-            WriteAssetNames();
-            WriteResourceNames();
-            CreateAsmdefFile();
+            // 清理多余文件夹和ab
+            DeleteRemovedAssetBundles();
+            
+            LogF8.LogAsset("生成AssetBundleMap.json，生成ResourceMap.json");
+            GenerateAssetNames();
+            GenerateResourceNames();
             AssetDatabase.Refresh();
             
             LogF8.LogAsset("资产打包成功!");
@@ -169,6 +161,9 @@ namespace F8Framework.Core.Editor
                 
                 List<string> tempNames = new List<string>();
                 Dictionary<string, List<string>> tempNamesDirectory = new Dictionary<string, List<string>>();
+
+                Dictionary<string, AssetBundleMap.AssetMapping> mappings =
+                    new Dictionary<string, AssetBundleMap.AssetMapping>();
                 
                 // 创建文本文件
                 StringBuilder codeStr = new StringBuilder(
@@ -184,17 +179,31 @@ namespace F8Framework.Core.Editor
                     "       {\n" +
                     "           public string AbName;\n" +
                     "           public string[] AssetPath;\n" +
+                    "           public string Version;\n" +
+                    "           public string Size;\n" +
+                    "           public string MD5;\n" +
+                    "           public string Package;\n" +
                     "       \n" +
-                    "           public AssetMapping(string abName, string[] assetPath)\n" +
+                    "           public AssetMapping(string abName, string[] assetPath, string version, string size, string md5, string package)\n" +
                     "           {\n" +
                     "               AbName = abName;\n" +
                     "               AssetPath = assetPath;\n" +
+                    "               Version = version;\n" +
+                    "               Size = size;\n" +
+                    "               MD5 = md5;\n" +
+                    "               Package = package;\n" +
+                    "           }\n" +
+                    "       \n" +
+                    "           public AssetMapping()\n" +
+                    "           {\n" +
+                    "               \n" +
                     "           }\n" +
                     "       }\n" +
                     "       \n" +
                     "       public static Dictionary<string, AssetMapping> Mappings\n" +
                     "       {\n" +
                     "           get => mappings;\n" +
+                    "           set => mappings = value;\n" +
                     "       }\n" +
                     "       \n" +
                     "       private static Dictionary<string, AssetMapping> mappings = new Dictionary<string, AssetMapping> {\n");
@@ -255,7 +264,11 @@ namespace F8Framework.Core.Editor
                         mappingLine += string.Join(", ", assetPathsForAbName.Select(p => "\"" + p + "\"")); // 添加所有资源路径
                         mappingLine += "})},\n";
 
-                        codeStr.Append(mappingLine);
+                        LogF8.LogAsset(AssetBundleHelper.GetAssetBundleFullName() + abName.ToLower());
+                        mappings.Add(fileNameWithoutExtension, new AssetBundleMap.AssetMapping(abName.ToLower(), assetPathsForAbName.ToArray(),
+                            "1.0.0", FileTools.GetFileSize(AssetBundleHelper.GetAssetBundleFullName() + abName.ToLower()).ToString(), FileTools.CreateMd5ForFile(filePath), "0"));
+                        
+                        // codeStr.Append(mappingLine);
                     }
                     else if (Directory.Exists(filePath)) // 文件夹
                     {
@@ -264,6 +277,7 @@ namespace F8Framework.Core.Editor
                         string[] assetPaths = Directory.GetFiles(filePath, "*", SearchOption.TopDirectoryOnly)
                             .Where(path => !path.EndsWith(".meta", StringComparison.OrdinalIgnoreCase) && !path.EndsWith(".DS_Store", StringComparison.OrdinalIgnoreCase))
                             .ToArray();
+                        string[] fileDirectoryPaths = assetPaths;
                         for (int i = 0; i < assetPaths.Length; i++)
                         {
                             assetPaths[i] = GetAssetPath(assetPaths[i]);
@@ -277,8 +291,10 @@ namespace F8Framework.Core.Editor
                         }
                         tempNames.Add(fileNameWithoutExtension);
                             
-                        codeStr.Append(string.Format("          {{\"{0}\", new AssetMapping(\"{1}\", new []{{\"{2}\"}})}},\n", fileNameWithoutExtension, abName.ToLower(), string.Join("\", \"", assetPaths)));
+                        // codeStr.Append(string.Format("          {{\"{0}\", new AssetMapping(\"{1}\", new []{{\"{2}\"}})}},\n", fileNameWithoutExtension, abName.ToLower(), string.Join("\", \"", assetPaths)));
 
+                        mappings.Add(fileNameWithoutExtension, new AssetBundleMap.AssetMapping(abName.ToLower(), assetPaths,
+                            "1.0.0", "0", "0", "0"));
                     }
                 }
 
@@ -286,23 +302,16 @@ namespace F8Framework.Core.Editor
                 codeStr.Append("   }\n");
                 codeStr.Append("}");
 
-                codeStrAssetNames = codeStr;
+                string assetMapPath = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/AssetMap/Resources/AssetBundleMap.json";
+                FileTools.SafeDeleteFile(assetMapPath);
+                FileTools.SafeDeleteFile(assetMapPath + ".meta");
+                FileTools.CheckFileAndCreateDirWhenNeeded(assetMapPath);
+                AssetDatabase.Refresh();
+                
+                string AssetBundleMapPath = Application.dataPath + "/F8Framework/AssetMap/Resources/AssetBundleMap.json";
+                FileTools.CheckFileAndCreateDirWhenNeeded(AssetBundleMapPath);
+                FileTools.SafeWriteAllText(AssetBundleMapPath, Util.LitJson.ToJson(mappings));
             }
-        }
-
-        private static void WriteAssetNames()
-        {
-            string assetMapPath = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/AssetMap/AssetBundleMap.cs";
-            FileTools.SafeDeleteFile(assetMapPath);
-            FileTools.SafeDeleteFile(assetMapPath + ".meta");
-            FileTools.CheckFileAndCreateDirWhenNeeded(assetMapPath);
-            AssetDatabase.Refresh();
-            
-            string AssetBundleMapPath = Application.dataPath + "/F8Framework/AssetMap/AssetBundleMap.cs";
-                
-            FileTools.CheckFileAndCreateDirWhenNeeded(AssetBundleMapPath);
-                
-            File.WriteAllText(AssetBundleMapPath, codeStrAssetNames.ToString());
         }
         
         public static void GenerateResourceNames()
@@ -319,12 +328,14 @@ namespace F8Framework.Core.Editor
                 "       public static Dictionary<string, string> Mappings\n" +
                 "       {\n" +
                 "           get => mappings;\n" +
+                "           set => mappings = value;\n" +
                 "       }\n" +
                 "       \n" +
                 "       private static Dictionary<string, string> mappings = new Dictionary<string, string> {\n");
 
             string[] dics = Directory.GetDirectories(Application.dataPath, "Resources", SearchOption.AllDirectories);
             List<string> tempNames = new List<string>();
+            Dictionary<string, string> mappings = new Dictionary<string, string>();
             foreach (string dic in dics)
             {
                 if (!Directory.Exists(dic))
@@ -359,7 +370,9 @@ namespace F8Framework.Core.Editor
                     }
                     tempNames.Add(fileNameWithoutExtension);
                     
-                    codeStr.Append(string.Format("          {{\"{0}\", \"{1}\"}},\n", fileNameWithoutExtension, realPath));
+                    // codeStr.Append(string.Format("          {{\"{0}\", \"{1}\"}},\n", fileNameWithoutExtension, realPath));
+                    
+                    mappings.Add(fileNameWithoutExtension, realPath);
                 }
             }
 
@@ -367,22 +380,15 @@ namespace F8Framework.Core.Editor
             codeStr.Append("   }\n");
             codeStr.Append("}");
 
-            codeStrResourceNames = codeStr;
-        }
-        
-        private static void WriteResourceNames()
-        {
-            string resourceMapPath = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/AssetMap/ResourceMap.cs";
+            string resourceMapPath = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/AssetMap/Resources/ResourceMap.json";
             FileTools.SafeDeleteFile(resourceMapPath);
             FileTools.SafeDeleteFile(resourceMapPath + ".meta");
             FileTools.CheckFileAndCreateDirWhenNeeded(resourceMapPath);
             AssetDatabase.Refresh();
             
-            string ResourceMapPath = Application.dataPath + "/F8Framework/AssetMap/ResourceMap.cs";
-                
+            string ResourceMapPath = Application.dataPath + "/F8Framework/AssetMap/Resources/ResourceMap.json";
             FileTools.CheckFileAndCreateDirWhenNeeded(ResourceMapPath);
-                
-            File.WriteAllText(ResourceMapPath, codeStrResourceNames.ToString());
+            FileTools.SafeWriteAllText(ResourceMapPath, Util.LitJson.ToJson(mappings));
         }
         
         public static void CreateAsmdefFile()
@@ -413,7 +419,7 @@ namespace F8Framework.Core.Editor
 }";
 
             // 将内容写入.asmdef文件
-            File.WriteAllText(asmdefPath, asmdefContent);
+            FileTools.SafeWriteAllText(asmdefPath, asmdefContent);
         }
 
 

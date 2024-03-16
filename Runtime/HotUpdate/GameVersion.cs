@@ -6,11 +6,20 @@ namespace F8Framework.Core
     {
         public string Version;
         public List<string> SubPackage;
+        public bool EnableHotUpdate;
+        public string HotUpdateURL;
 
-        public GameVersion(string version, List<string> subPackage = null)
+        public GameVersion(string version, List<string> subPackage = null, bool enableHotUpdate = false, string hotUpdateURL = null)
         {
-            this.Version = version;
-            this.SubPackage = subPackage;
+            Version = version;
+            SubPackage = subPackage;
+            EnableHotUpdate = enableHotUpdate;
+            HotUpdateURL = hotUpdateURL;
+        }
+        
+        public GameVersion()
+        {
+            
         }
     }
 }

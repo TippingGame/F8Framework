@@ -61,7 +61,7 @@ namespace F8Framework.Core.Editor
 }";
 
             // 将内容写入.asmdef文件
-            File.WriteAllText(asmrefPath, asmdefContent);
+            FileTools.SafeWriteAllText(asmrefPath, asmdefContent);
         }
         
         public static void LoadAllExcelData()
@@ -350,7 +350,7 @@ namespace F8Framework.Core.Editor
             string json = Util.LitJson.ToJson(container);
             // 写入到文件
             string filePath = BinDataPath + "/" + container.GetType().Name + ".json";
-            File.WriteAllText(filePath, json);
+            FileTools.SafeWriteAllText(filePath, json);
             // 记录日志
             LogF8.LogConfig("已序列化 " + BinDataPath + "/<color=#FFFF00>" + container.GetType().Name + ".json</color>");
 #else

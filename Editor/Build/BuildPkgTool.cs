@@ -25,7 +25,7 @@ namespace F8Framework.Core.Editor
         public static string BuildPath = "";
         private static string fromVersion = "1.0.0";
         private static string toVersion = "1.0.0";
-        private static string codeVersion = "0";
+        private static string codeVersion = "1";
         private static bool enableHotUpdate = false;
         private static string hotUpdateURL = "http://127.0.0.1:6789";
         
@@ -109,6 +109,7 @@ namespace F8Framework.Core.Editor
                 if (options[index].ToString() != EditorPrefs.GetString(_exportPlatformKey, ""))
                 {
                     EditorPrefs.SetString(_exportPlatformKey, options[index].ToString());
+                    EditorUserBuildSettings.SwitchActiveBuildTarget(GetBuildTargetGroup(options[index]), options[index]);
                 }
                 buildTarget = options[index];
             }
@@ -229,6 +230,40 @@ namespace F8Framework.Core.Editor
             GUILayout.Space(5);
             GUILayout.Label("【打包游戏】", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, fontSize = 16 });
             GUILayout.Space(10);
+            
+            GUILayout.BeginHorizontal();
+            bool enableHotUpdatesValue = EditorPrefs.GetBool(_enableHotUpdateKey, false);
+            enableHotUpdate = EditorGUILayout.Toggle("全量资源打包进游戏", enableHotUpdatesValue);
+            if (enableHotUpdatesValue != enableHotUpdate)
+            {
+                EditorPrefs.SetBool(_enableHotUpdateKey, enableHotUpdate);
+            }
+            GUILayout.EndHorizontal();
+            GUILayout.Space(10);
+            
+            GUILayout.BeginHorizontal();
+            bool enableHotUpdatesValue2 = EditorPrefs.GetBool(_enableHotUpdateKey, false);
+            enableHotUpdate = EditorGUILayout.Toggle("手动选择资源包,分隔符：_", enableHotUpdatesValue2);
+            if (enableHotUpdatesValue2 != enableHotUpdate)
+            {
+                EditorPrefs.SetBool(_enableHotUpdateKey, enableHotUpdate);
+            }
+            EditorGUILayout.TextField("0_1_2_3");
+            GUILayout.FlexibleSpace(); // 添加 FlexibleSpace 来实现左对齐
+            GUILayout.EndHorizontal();
+            GUILayout.Space(10);
+            
+            GUILayout.BeginHorizontal();
+            bool enableHotUpdatesValue3 = EditorPrefs.GetBool(_enableHotUpdateKey, false);
+            enableHotUpdate = EditorGUILayout.Toggle("空资源包", enableHotUpdatesValue3);
+            if (enableHotUpdatesValue3 != enableHotUpdate)
+            {
+                EditorPrefs.SetBool(_enableHotUpdateKey, enableHotUpdate);
+            }
+            GUILayout.EndHorizontal();
+            GUILayout.Space(10);
+            
+            
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("打包游戏", NormalWidth))
             {
@@ -289,7 +324,7 @@ namespace F8Framework.Core.Editor
             FileTools.CheckFileAndCreateDirWhenNeeded(GameVersionPath);
             AssetDatabase.Refresh();
             
-            GameVersion gameVersion = new GameVersion(toVersion);
+            GameVersion gameVersion = new GameVersion(toVersion, subPackage: null, enableHotUpdate, hotUpdateURL);
             // 写入到文件
             string filePath = Application.dataPath + "/F8Framework/AssetMap/Resources/GameVersion.json";
             // 序列化对象
@@ -297,9 +332,25 @@ namespace F8Framework.Core.Editor
             FileTools.SafeDeleteFile(filePath);
             UnityEditor.AssetDatabase.Refresh();
             FileTools.CheckFileAndCreateDirWhenNeeded(filePath);
-            File.WriteAllText(filePath, json);
+            FileTools.SafeWriteAllText(filePath, json);
             LogF8.LogAsset("写入游戏版本： " + gameVersion.Version);
             UnityEditor.AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
+        }
+        
+        private static BuildTargetGroup GetBuildTargetGroup(BuildTarget target)
+        {
+            BuildTargetGroup targetGroup = BuildPipeline.GetBuildTargetGroup(target);
+
+            if (targetGroup != BuildTargetGroup.Unknown)
+            {
+                LogF8.Log($"BuildTarget {target} is in BuildTargetGroup {targetGroup}");
+                return targetGroup;
+            }
+            else
+            {
+                LogF8.LogError($"Could not find BuildTargetGroup for BuildTarget {target}");
+                return default;
+            }
         }
         
         private static string GetScriptPath()
