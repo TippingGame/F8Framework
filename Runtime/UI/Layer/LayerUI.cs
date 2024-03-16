@@ -11,7 +11,9 @@ namespace F8Framework.Core
         
         private Canvas _canvas;
         private CanvasScaler _canvasScaler;
+        public CanvasScaler CanvasScaler => _canvasScaler;
         private GraphicRaycaster _graphicRaycaster;
+        public GraphicRaycaster GraphicRaycaster => _graphicRaycaster;
         
         private void Awake()
         {

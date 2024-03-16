@@ -11,12 +11,20 @@ namespace F8Framework.Core.Editor
 {
     public class ABBuildTool : ScriptableObject
     {
+        private static StringBuilder codeStrAssetNames;
+        private static StringBuilder codeStrResourceNames;
+        
         public static void BuildAllAB()
         {
             AssetDatabase.RemoveUnusedAssetBundleNames();
             
             // 获取“StreamingAssets”文件夹路径（不一定这个文件夹，可自定义）            
             string strABOutPAthDir = URLSetting.GetAssetBundlesOutPath();
+            
+            LogF8.LogAsset("生成AssetBundleMap.cs，生成ResourceMap.cs，生成F8Framework.AssetMap.asmdef");
+            GenerateAssetNames();
+            GenerateResourceNames();
+            AssetDatabase.Refresh();
             
             // 清理多余文件夹和ab
             DeleteRemovedAssetBundles();
@@ -28,16 +36,15 @@ namespace F8Framework.Core.Editor
             // 打包生成AB包 (目标平台自动根据当前平台设置，WebGL不可使用BuildAssetBundleOptions.None压缩)
             BuildPipeline.BuildAssetBundles(strABOutPAthDir, BuildAssetBundleOptions.ChunkBasedCompression, EditorUserBuildSettings.activeBuildTarget);
             AssetDatabase.Refresh();
-            // BuildAssetBundles会打断ReLoadScript，修改脚本要放在之后
             
+            // BuildAssetBundles会打断ReLoadScript，修改脚本要放在之后
             string assetMapPath = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/AssetMap";
             FileTools.SafeDeleteDir(assetMapPath);
             FileTools.CheckDirAndCreateWhenNeeded(assetMapPath);
             AssetDatabase.Refresh();
             
-            LogF8.LogAsset("生成AssetBundleMap.cs，生成ResourceMap.cs，生成F8Framework.AssetMap.asmdef");
-            GenerateAssetNames();
-            GenerateResourceNames();
+            WriteAssetNames();
+            WriteResourceNames();
             CreateAsmdefFile();
             AssetDatabase.Refresh();
             
@@ -284,12 +291,17 @@ namespace F8Framework.Core.Editor
                 codeStr.Append("   }\n");
                 codeStr.Append("}");
 
-                string AssetBundleMapPath = Application.dataPath + "/F8Framework/AssetMap/AssetBundleMap.cs";
-                
-                FileTools.CheckFileAndCreateDirWhenNeeded(AssetBundleMapPath);
-                
-                File.WriteAllText(AssetBundleMapPath, codeStr.ToString());
+                codeStrAssetNames = codeStr;
             }
+        }
+
+        private static void WriteAssetNames()
+        {
+            string AssetBundleMapPath = Application.dataPath + "/F8Framework/AssetMap/AssetBundleMap.cs";
+                
+            FileTools.CheckFileAndCreateDirWhenNeeded(AssetBundleMapPath);
+                
+            File.WriteAllText(AssetBundleMapPath, codeStrAssetNames.ToString());
         }
         
         public static void GenerateResourceNames()
@@ -353,12 +365,17 @@ namespace F8Framework.Core.Editor
             codeStr.Append("       };\n");
             codeStr.Append("   }\n");
             codeStr.Append("}");
-            
+
+            codeStrResourceNames = codeStr;
+        }
+        
+        private static void WriteResourceNames()
+        {
             string ResourceMapPath = Application.dataPath + "/F8Framework/AssetMap/ResourceMap.cs";
                 
             FileTools.CheckFileAndCreateDirWhenNeeded(ResourceMapPath);
                 
-            File.WriteAllText(ResourceMapPath, codeStr.ToString());
+            File.WriteAllText(ResourceMapPath, codeStrResourceNames.ToString());
         }
         
         public static void CreateAsmdefFile()

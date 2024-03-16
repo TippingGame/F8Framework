@@ -16,6 +16,12 @@ namespace F8Framework.Core.Editor
             AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
         }
         
+        [MenuItem("开发工具/Excel导表-F8")]
+        public static void LoadAllExcelData()
+        {
+            ExcelDataTool.LoadAllExcelData();
+        }
+        
         [MenuItem("开发工具/打包AssetBundles目录资源-F8")]
         public static void BuildAssetBundles()
         {
@@ -48,12 +54,6 @@ namespace F8Framework.Core.Editor
  
                 Event.current.Use();
             }
-        }
-
-        [MenuItem("开发工具/Excel导表-F8")]
-        public static void LoadAllExcelData()
-        {
-            ExcelDataTool.LoadAllExcelData();
         }
     }
 }

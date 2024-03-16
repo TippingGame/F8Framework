@@ -73,6 +73,7 @@ namespace F8Framework.Core.Editor
             FileTools.SafeDeleteDir(F8ExcelDataClassPath);
             FileTools.CheckDirAndCreateWhenNeeded(F8ExcelDataClassPath);
             CreateAsmdefFile();
+            AssetDatabase.Refresh();
             string INPUT_PATH = Application.dataPath + ExcelPath;
 
             if (!Directory.Exists(INPUT_PATH))
