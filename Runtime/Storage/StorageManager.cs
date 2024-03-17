@@ -11,7 +11,7 @@ namespace F8Framework.Core
             _id = id;
         }
 
-        public string GetKeywords(string key, bool user = false)
+        private string GetKeywords(string key, bool user = false)
         {
             return user ? $"{key}_{_id}" : key;
         }

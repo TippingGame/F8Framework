@@ -229,7 +229,7 @@ namespace F8Framework.Core
 				priority = ++minPriority;
 			}
 
-			LogF8.LogModule($"创建游戏模块: {typeof(T)}");
+			LogF8.LogModule($"创建游戏模块: {typeof(T).Name}");
 
 			T module = null;
 

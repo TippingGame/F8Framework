@@ -32,6 +32,13 @@ namespace F8Framework.Core
 
         private Transform _transform;
         private AudioMixer _audioMixer;
+
+        private const string _volumeMusicKey = "VolumeMusicKey";
+        private const string _switchMusicKey = "SwitchMusicKey";
+        private const string _volumeVoiceKey = "VolumeVoiceKey";
+        private const string _switchVoiceKey = "SwitchVoiceKey";
+        private const string _volumeAudioEffectKey = "VolumeAudioEffect";
+        private const string _switchAudioEffectKey = "SwitchAudioEffect";
         public void OnInit(object createParam)
         {
             _transform = this.transform;
@@ -72,14 +79,14 @@ namespace F8Framework.Core
             
             _audioMusicAudioEffect3D = new AudioEffect();
 
-            _volumeMusic = StorageManager.Instance.GetFloat("_volumeMusic", 1f);
-            _switchMusic = StorageManager.Instance.GetBool("_switchMusic", true);
+            _volumeMusic = StorageManager.Instance.GetFloat(_volumeMusicKey, 1f);
+            _switchMusic = StorageManager.Instance.GetBool(_switchMusicKey, true);
             
-            _volumeVoice = StorageManager.Instance.GetFloat("_volumeVoice", 1f);
-            _switchVoice = StorageManager.Instance.GetBool("_switchVoice", true);
+            _volumeVoice = StorageManager.Instance.GetFloat(_volumeVoiceKey, 1f);
+            _switchVoice = StorageManager.Instance.GetBool(_switchVoiceKey, true);
             
-            _volumeAudioEffect = StorageManager.Instance.GetFloat("_volumeAudioEffect", 1f);
-            _switchAudioEffect = StorageManager.Instance.GetBool("_switchAudioEffect", true);
+            _volumeAudioEffect = StorageManager.Instance.GetFloat(_volumeAudioEffectKey, 1f);
+            _switchAudioEffect = StorageManager.Instance.GetBool(_switchAudioEffectKey, true);
         }
 
         /// <summary>
@@ -161,7 +168,7 @@ namespace F8Framework.Core
             set
             {
                 _volumeMusic = value;
-                StorageManager.Instance.SetFloat("_volumeMusic", value);
+                StorageManager.Instance.SetFloat(_volumeMusicKey, value);
                 _audioMusic.MusicSource.volume = value;
             }
         }
@@ -179,7 +186,7 @@ namespace F8Framework.Core
             set
             {
                 _switchMusic = value;
-                StorageManager.Instance.SetBool("_switchMusic", value);
+                StorageManager.Instance.SetBool(_switchMusicKey, value);
                 if (!value)
                 {
                     _audioMusic.MusicSource.Stop();
@@ -227,7 +234,7 @@ namespace F8Framework.Core
             set
             {
                 _volumeVoice = value;
-                StorageManager.Instance.SetFloat("_volumeVoice", value);
+                StorageManager.Instance.SetFloat(_volumeVoiceKey, value);
                 _audioMusicVoice.MusicSource.volume = value;
             }
         }
@@ -245,7 +252,7 @@ namespace F8Framework.Core
             set
             {
                 _switchVoice = value;
-                StorageManager.Instance.SetBool("_switchVoice", value);
+                StorageManager.Instance.SetBool(_switchVoiceKey, value);
                 if (!value)
                 {
                     _audioMusicVoice.MusicSource.Stop();
@@ -262,7 +269,7 @@ namespace F8Framework.Core
             set
             {
                 _volumeAudioEffect = value;
-                StorageManager.Instance.SetFloat("_volumeAudioEffect", value);
+                StorageManager.Instance.SetFloat(_volumeAudioEffectKey, value);
                 _audioMusicBtnClick.MusicSource.volume = value;
                 _audioMusicUISound.MusicSource.volume = value;
                 _audioMusicAudioEffect.MusicSource.volume = value;
@@ -282,7 +289,7 @@ namespace F8Framework.Core
             set
             {
                 _switchAudioEffect = value;
-                StorageManager.Instance.SetBool("_switchAudioEffect", value);
+                StorageManager.Instance.SetBool(_switchAudioEffectKey, value);
                 if (!value)
                 {
                     _audioMusicBtnClick.MusicSource.Stop();

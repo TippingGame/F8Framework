@@ -37,7 +37,7 @@ Unity F8 AssetManager资产加载组件。
         /*-------------------------------------同步加载-------------------------------------*/
         GameObject go = FF8.Asset.Load<GameObject>("Cube");
         
-        // 指定加载模式REMOTE_ASSET_BUNDLE，加载远程AssetBundle资产，需要配置REMOTE_ADDRESS = "http://127.0.0.1:6789/remote"
+        // 指定加载模式REMOTE_ASSET_BUNDLE，加载远程AssetBundle资产，需要配置AssetRemoteAddress = "http://127.0.0.1:6789/remote"
         GameObject go5 = FF8.Asset.Load<GameObject>("Cube", AssetManager.AssetAccessMode.REMOTE_ASSET_BUNDLE);
         
         // 加载文件夹内资产（不遍历所有文件夹）

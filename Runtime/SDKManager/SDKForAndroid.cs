@@ -27,7 +27,7 @@ namespace F8Framework.Core
             }
             catch (System.Exception e)
             {
-                LogF8.LogException(e);
+                LogF8.LogError(e);
             }
         }
 
@@ -46,7 +46,7 @@ namespace F8Framework.Core
             }
             catch (System.Exception e)
             {
-                LogF8.LogException(e);
+                LogF8.LogError(e);
                 return "";
             }
         }

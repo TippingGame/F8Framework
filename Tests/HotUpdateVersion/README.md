@@ -1,0 +1,30 @@
+# F8 HotUpdateVersion
+
+[![license](http://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT) 
+[![Unity Version](https://img.shields.io/badge/unity-2021.3.15f1-blue)](https://unity.com) 
+[![Platform](https://img.shields.io/badge/platform-Win%20%7C%20Android%20%7C%20iOS%20%7C%20Mac%20%7C%20Linux%20%7C%20WebGL-orange)]() 
+
+## 简介（希望自己点击F8，就能开始制作游戏，不想多余的事）
+Unity F8 VersionHotUpdate 热更新版本管理，负责打包，分包，热更新资源。  
+
+## 导入插件（需要首先导入核心）
+注意！内置在->F8Framework核心：https://github.com/TippingGame/F8Framework.git  
+方式一：直接下载文件，放入Unity  
+方式二：Unity->点击菜单栏->Window->Package Manager->点击+号->Add Package from git URL->输入：https://github.com/TippingGame/F8Framework.git  
+
+### 编辑器界面使用
+
+* 选择打包平台，输出路径，版本号，远程资产加载地址，启用热更新，全量打包，分包，空包。
+![image](ui_20240317214323.png)
+--------------------------
+### 代码使用方法
+```C#
+        IEnumerator Start()
+        {
+            // 初始化本地版本
+            FF8.HotUpdate.InitLocalVersion();
+
+            // 初始化远程版本
+            yield return FF8.HotUpdate.InitRemoteVersion();
+        }
+```

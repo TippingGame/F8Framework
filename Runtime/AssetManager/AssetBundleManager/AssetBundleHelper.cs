@@ -10,7 +10,7 @@ namespace F8Framework.Core
     {
         private static string _streamingAssetsPath = Application.streamingAssetsPath + "/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
         private static string _persistentDataPath = Application.persistentDataPath + "/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
-        private static string _remoteAddress = URLSetting.REMOTE_ADDRESS + "/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
+        private static string _remoteAddress = GameConfig.LocalGameVersion.AssetRemoteAddress + "/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
         /// <summary>
         /// 源类型的枚举。
         /// </summary>
@@ -39,9 +39,9 @@ namespace F8Framework.Core
                     assetBundlePath = _persistentDataPath;
                     break;
                 case SourceType.REMOTE_ADDRESS:
-                    if (string.IsNullOrEmpty(URLSetting.REMOTE_ADDRESS))
+                    if (string.IsNullOrEmpty(GameConfig.LocalGameVersion.AssetRemoteAddress))
                     {
-                        LogF8.LogError("加载远程包需要配置远程地址：REMOTE_ADDRESS");
+                        LogF8.LogError("加载远程包需要配置远程地址：AssetRemoteAddress");
                     }
                     assetBundlePath = _remoteAddress;
                     break;

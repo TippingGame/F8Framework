@@ -10,11 +10,11 @@ namespace F8Framework.Core.Editor
         {
             if (HasOpenInstances<BuildPkgToolWindow>())
             {
-                EditorWindow.GetWindow<BuildPkgToolWindow>("打包工具").Close();
+                EditorWindow.GetWindow<BuildPkgToolWindow>("打包工具 F5").Close();
             }
             else
             {
-                BuildPkgToolWindow window = EditorWindow.GetWindow<BuildPkgToolWindow>("打包工具");
+                BuildPkgToolWindow window = EditorWindow.GetWindow<BuildPkgToolWindow>("打包工具 F5");
                 int stringLen = BuildPkgTool.StringLen(BuildPkgTool.BuildPath);
                 window.minSize = new Vector2(Mathf.Max(stringLen * 11f - 250f, 500f), 666f);
             }

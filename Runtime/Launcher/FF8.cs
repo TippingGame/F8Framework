@@ -40,6 +40,12 @@ namespace F8Framework.Core
         // 日志助手
         private static F8LogWriter _logWriter;
         
+        
+        /* ------------------------可选模块------------------------ */
+        // 热更新版本管理
+        private static HotUpdateVersion _hotUpdateVersion;
+        
+        
         public static MessageManager Message
         {
             get
@@ -302,10 +308,20 @@ namespace F8Framework.Core
             }
         }
         
-        /* ------------------------可选模块------------------------ */
-        
-        
-
+        public static HotUpdateVersion HotUpdate
+        {
+            get
+            {
+                if (_hotUpdateVersion == null)
+                    _hotUpdateVersion = ModuleCenter.CreateModule<HotUpdateVersion>();
+                return _hotUpdateVersion;
+            }
+            set
+            {
+                if (_hotUpdateVersion == null)
+                    _hotUpdateVersion = value;
+            }
+        }
     }
 }
 

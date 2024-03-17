@@ -5,8 +5,6 @@ namespace F8Framework.Core
 {
     public class URLSetting
     {
-            public static string REMOTE_ADDRESS = "http://127.0.0.1:6789/remote"; //加载远程资源地址
-            
             public const string AssetBundlesName = "AssetBundles";  // AB包名
             public const string AssetBundlesPath = "Assets/AssetBundles/"; // 打包AB包根路径
             public const string ResourcesPath = "Resources/"; // Resources根路径

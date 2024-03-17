@@ -26,7 +26,10 @@ public class GameLauncher : MonoBehaviour
         FF8.SDK = ModuleCenter.CreateModule<SDKManager>();
         FF8.Download = ModuleCenter.CreateModule<DownloadManager>();
         FF8.LogWriter = ModuleCenter.CreateModule<F8LogWriter>();
+        
 
+        FF8.HotUpdate = ModuleCenter.CreateModule<HotUpdateVersion>();
+        
         StartGame();
     }
     

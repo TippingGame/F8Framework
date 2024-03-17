@@ -14,7 +14,7 @@ namespace F8Framework.Core.Editor
 		{
 			if (HasOpenInstances<LocalizerEditorSettingsWindow>())
 			{
-				GetWindow<LocalizerEditorSettingsWindow>("本地化工具").Close();
+				GetWindow<LocalizerEditorSettingsWindow>("本地化工具 F6").Close();
 			}
 			else
 			{
@@ -28,7 +28,7 @@ namespace F8Framework.Core.Editor
 					}
 				}
 				
-				GetWindow<LocalizerEditorSettingsWindow>("本地化工具");
+				GetWindow<LocalizerEditorSettingsWindow>("本地化工具 F6");
 			}
 		}
 

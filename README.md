@@ -17,7 +17,8 @@ Unity 2021.3.15f1+
 
 ## 文档快速预览 - 1分钟
 ### ----------可选功能----------
-* [1. 热更新版本管理](https://github.com/TippingGame/F8ExcelTool.git) - 待添加
+* [1. 热更新版本管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/HotUpdateVersion/README.md) - 选择打包平台，输出路径，版本号，远程资产加载地址，启用热更新，全量打包，分包，空包。
+* [2. 高速本地缓存（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/CacheStorage/README.md) - 高速本地缓存，下载并缓存byte、json、text、Texture等可序列化资产，设置缓存数量、大小、存活时间，清理缓存。
 ### ----------核心功能----------
 * [1. 配置表（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/ExcelTool/README.md) - 使用Excel作为配置表，兼顾**高性能、高适应性**，点击F8加载手动生成的 Excel 二进制缓存，运行时自动读取最新 Excel，无需频繁导表。
 * [2. 资源加载（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/AssetManager/README.md) - **编辑器下**：点击F8自动生成资产索引/AB名称，自动区分不同平台，清理多余AB和文件夹，Editor模式下减少开发周期。**运行时**：同步/异步加载单个资产，展开文件夹或同一AB下所有资产，自动判断是 Resources / AssetBundle 资产，加载Remote远程资产，获取加载进度，同步打断异步加载。你可以这样加载AssetBundle：**单个资产单个AB、指定文件夹名称（文件夹第一层的AB）、设置多个资产为同一AB名（指定任意资产名）**
@@ -34,11 +35,10 @@ Unity 2021.3.15f1+
 * [13. 下载管理器（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Download/README.md) - 支持localhost与http地址文件的下载，可**本地写入、监听下载进度、断点续传**，支持动态添加、移除、暂停、恢复下载。
 * [14. UI界面管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/UI/README.md) - 处理界面加载、打开、关闭、查询、层级控制、自定义动画、自动获取组件索引。UI界面分为三大类：**普通UI、模态弹窗、非模态弹窗**。
 * [15. 输入系统管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Input/README.md) - 使用同一套代码，通过自定义输入设备，适配多平台，可热切换输入设备，或同时启用多套输入设备。
-* [16. 高速本地缓存（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/CacheStorage/README.md) - 高速本地缓存，下载并缓存byte、json、text、Texture等可序列化资产，设置缓存数量、大小、存活时间，清理缓存。
-* [17. 游戏流程管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Procedure/README.md) - 自定义流程节点 ProcedureNode，控制游戏流程的，添加/运行/轮询/移除。
-* [18. 本地数据存储（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Storage/README.md) - 本地数据存储/读取。
-* [19. SDK接入管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/README.md) - 与**原生平台交互**，接入多个平台或者渠道SDK，登录/退出/切换/支付/视频广告/退出游戏/原生Toast。
-* [20. 网络连接与通信（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Network/README.md) - 使用 KCP / TCP / WebSocket 网络通讯协议建立长连接通道，支持Client端和Server端。
+* [16. 游戏流程管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Procedure/README.md) - 自定义流程节点 ProcedureNode，控制游戏流程的，添加/运行/轮询/移除。
+* [17. 本地数据存储（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Storage/README.md) - 本地数据存储/读取。
+* [18. SDK接入管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/README.md) - 与**原生平台交互**，接入多个平台或者渠道SDK，登录/退出/切换/支付/视频广告/退出游戏/原生Toast。
+* [19. 网络连接与通信（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Network/README.md) - 使用 KCP / TCP / WebSocket 网络通讯协议建立长连接通道，支持Client端和Server端。
 
 ## 使用步骤
 

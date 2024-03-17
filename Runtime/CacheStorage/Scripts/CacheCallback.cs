@@ -28,7 +28,7 @@ namespace F8Framework.Core
                 }
                 catch (Exception exception)
                 {
-                    LogF8.LogException(exception);
+                    LogF8.LogError(exception);
                 }
             }
         }
