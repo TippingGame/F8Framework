@@ -9,8 +9,9 @@ namespace F8Framework.Core
     public static class AssetBundleHelper
     {
         private static string _streamingAssetsPath = Application.streamingAssetsPath + "/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
-        private static string _persistentDataPath = Application.persistentDataPath + "/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
         private static string _remoteAddress = GameConfig.LocalGameVersion.AssetRemoteAddress + "/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
+        private static string _hotUpdatePath = Application.persistentDataPath + HotUpdateVersion.HotUpdateDirName + "/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
+        private static string _packagePath = Application.persistentDataPath + HotUpdateVersion.PackageDirName + "/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
         /// <summary>
         /// 源类型的枚举。
         /// </summary>
@@ -18,7 +19,8 @@ namespace F8Framework.Core
         {
             NONE,
             STREAMING_ASSETS,
-            PERSISTENT_DATA_PATH,
+            HOT_UPDATE_PATH,
+            PACKAGE_PATH,
             REMOTE_ADDRESS
         }
 
@@ -35,8 +37,11 @@ namespace F8Framework.Core
                 case SourceType.STREAMING_ASSETS:
                     assetBundlePath = _streamingAssetsPath;
                     break;
-                case SourceType.PERSISTENT_DATA_PATH:
-                    assetBundlePath = _persistentDataPath;
+                case SourceType.HOT_UPDATE_PATH:
+                    assetBundlePath = _hotUpdatePath;
+                    break;
+                case SourceType.PACKAGE_PATH:
+                    assetBundlePath = _packagePath;
                     break;
                 case SourceType.REMOTE_ADDRESS:
                     if (string.IsNullOrEmpty(GameConfig.LocalGameVersion.AssetRemoteAddress))
@@ -102,15 +107,20 @@ namespace F8Framework.Core
         public static SourceType GetAssetBundleSourceType(string assetBundleFullName)
         {
             string streamingAssetsPath = Application.streamingAssetsPath;
-            string persistentDataPath = Application.persistentDataPath;
+            string hotUpdatePath = Application.persistentDataPath + HotUpdateVersion.HotUpdateDirName;
+            string packagePath = Application.persistentDataPath + HotUpdateVersion.PackageDirName;
 
             if (assetBundleFullName.Contains(streamingAssetsPath))
             {
                 return SourceType.STREAMING_ASSETS;
             }
-            else if (assetBundleFullName.Contains(persistentDataPath))
+            else if (assetBundleFullName.Contains(hotUpdatePath))
             {
-                return SourceType.PERSISTENT_DATA_PATH;
+                return SourceType.HOT_UPDATE_PATH;
+            }
+            else if (assetBundleFullName.Contains(packagePath))
+            {
+                return SourceType.PACKAGE_PATH;
             }
             else if (FileTools.IsLegalHTTPURI(assetBundleFullName))
             {

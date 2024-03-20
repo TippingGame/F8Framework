@@ -835,23 +835,32 @@ namespace F8Framework.Core
             return allLoaderFinished;
         }
 
-        public static string GetAssetBundleCompletePath(string regPath = null)
+        public static string GetAssetBundleCompletePath(string regPath)
         {
-            string persistentABFullPath
-                = AssetBundleHelper.GetAssetBundleFullName(regPath, AssetBundleHelper.SourceType.PERSISTENT_DATA_PATH);
-
-            if (File.Exists(persistentABFullPath))
-                return persistentABFullPath;
+            string fullPath;
+            
+            if (GameConfig.LocalGameVersion.EnableHotUpdate && File.Exists(AssetBundleHelper.GetAssetBundleFullName(regPath, AssetBundleHelper.SourceType.HOT_UPDATE_PATH)))
+            {
+                fullPath = AssetBundleHelper.GetAssetBundleFullName(null, AssetBundleHelper.SourceType.HOT_UPDATE_PATH);
+            }
+            else if (GameConfig.LocalGameVersion.EnablePackage && File.Exists(AssetBundleHelper.GetAssetBundleFullName(regPath, AssetBundleHelper.SourceType.PACKAGE_PATH)))
+            {
+                fullPath = AssetBundleHelper.GetAssetBundleFullName(null, AssetBundleHelper.SourceType.PACKAGE_PATH);
+            }
             else
-                return AssetBundleHelper.GetAssetBundleFullName(regPath, AssetBundleHelper.SourceType.STREAMING_ASSETS);
+            {
+                fullPath = AssetBundleHelper.GetAssetBundleFullName(null, AssetBundleHelper.SourceType.STREAMING_ASSETS);
+            }
+
+            return fullPath;
         }
         
-        public static string GetRemoteAssetBundleCompletePath(string regPath = null)
+        public static string GetRemoteAssetBundleCompletePath()
         {
             if (!string.IsNullOrEmpty(GameConfig.LocalGameVersion.AssetRemoteAddress))
             {
                 string remoteABFullPath
-                    = AssetBundleHelper.GetAssetBundleFullName(regPath, AssetBundleHelper.SourceType.REMOTE_ADDRESS);
+                    = AssetBundleHelper.GetAssetBundleFullName(null, AssetBundleHelper.SourceType.REMOTE_ADDRESS);
                 return remoteABFullPath;
             }
             return null;
@@ -904,7 +913,7 @@ namespace F8Framework.Core
     #if UNITY_EDITOR
             manifestPath = "file://" + manifestPath;
     #endif
-            downloadManifest = new DownloadRequest(manifestPath, 0);
+            downloadManifest = new DownloadRequest(manifestPath, default);
 #else
             string manifestPath = AssetBundleHelper.GetAssetBundleManifestPath();
             if (manifestPath == null)

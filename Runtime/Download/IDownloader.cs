@@ -50,7 +50,7 @@ namespace F8Framework.Core
         /// <param name="downloadByteOffset">下载byte的偏移量，用于断点续传</param>
         /// <param name="downloadAppend">当本地存在时，下载时追加写入</param>
         /// <returns>下载序列号</returns>
-        long AddDownload(string downloadUri, string downloadPath, long downloadByteOffset, bool downloadAppend);
+        long AddDownload(string downloadUri, string downloadPath, long downloadByteOffset = 0, bool downloadAppend = false);
 
         /// <summary>
         /// 移除URI下载；

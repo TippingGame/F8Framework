@@ -13,6 +13,30 @@ namespace F8Framework.Tests
 
             // 初始化远程版本
             yield return FF8.HotUpdate.InitRemoteVersion();
+
+            // 资源热更新
+            FF8.HotUpdate.CheckHotUpdate(() =>
+            {
+                LogF8.Log("完成");
+            }, () =>
+            {
+                LogF8.Log("失败");
+            }, progress =>
+            {
+                LogF8.Log("进度：" + progress);
+            });
+            
+            // 分包加载
+            FF8.HotUpdate.CheckPackageUpdate(() =>
+            {
+                LogF8.Log("完成");
+            }, () =>
+            {
+                LogF8.Log("失败");
+            }, progress =>
+            {
+                LogF8.Log("进度：" + progress);
+            });
         }
     }
 }

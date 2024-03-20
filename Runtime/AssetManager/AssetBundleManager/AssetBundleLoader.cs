@@ -13,6 +13,7 @@ namespace F8Framework.Core
     {
         private string assetBundlePath = "";
         private string abName = "";
+        private Hash128 hash128;
         private readonly string keyword = URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
         private List<string> assetPaths = new List<string>();
         private AssetBundle assetBundleContent;
@@ -82,6 +83,7 @@ namespace F8Framework.Core
             Clear(true);
             this.assetBundlePath = assetBundlePath;
             this.abName = GetSubPath(this.assetBundlePath).ToLower();
+            this.hash128 = AssetBundleManager.Instance.GetAssetBundleHash(this.abName);
             assetPaths = GetAssetPaths();
         }
 
@@ -110,7 +112,7 @@ namespace F8Framework.Core
                     }
                 );
 #else
-                DownloadRequest d = new DownloadRequest(assetBundlePath, 0);
+                DownloadRequest d = new DownloadRequest(assetBundlePath, hash128);
                 while (!d.IsFinished) ;
                 assetBundleContent = d.DownloadedAssetBundle;
 #endif
@@ -143,7 +145,7 @@ namespace F8Framework.Core
                 if (FileTools.IsLegalHTTPURI(assetBundlePath))
                 {
                     loadType = LoaderType.REMOTE_ASYNC;
-                    assetBundleDownloadRequest = new DownloadRequest(assetBundlePath, 0);
+                    assetBundleDownloadRequest = new DownloadRequest(assetBundlePath, hash128);
                     if (assetBundleDownloadRequest == null)
                     {
                         assetBundleLoadState = LoaderState.FINISHED;
@@ -183,7 +185,7 @@ namespace F8Framework.Core
                 if (FileTools.IsLegalHTTPURI(assetBundlePath))
                 {
                     loadType = LoaderType.REMOTE_ASYNC;
-                    assetBundleDownloadRequest = new DownloadRequest(assetBundlePath, 0);
+                    assetBundleDownloadRequest = new DownloadRequest(assetBundlePath, hash128);
                     if (assetBundleDownloadRequest == null)
                     {
                         assetBundleLoadState = LoaderState.FINISHED;
@@ -192,7 +194,7 @@ namespace F8Framework.Core
                     }
                     else
                     {
-                        yield return assetBundleDownloadRequest.SendAssetBundleDownloadRequestCoroutine(assetBundlePath, 0);
+                        yield return assetBundleDownloadRequest.SendAssetBundleDownloadRequestCoroutine(assetBundlePath, hash128);
                     }
                 }
                 else

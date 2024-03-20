@@ -937,7 +937,7 @@ namespace F8Framework.Core
                     }
                     else
                     {
-                        return new AssetInfo(AssetTypeEnum.ASSET_BUNDLE, assetmpping.AssetPath, AssetBundleManager.GetAssetBundleCompletePath(), assetmpping.AbName);
+                        return new AssetInfo(AssetTypeEnum.ASSET_BUNDLE, assetmpping.AssetPath, AssetBundleManager.GetAssetBundleCompletePath(assetmpping.AbName), assetmpping.AbName);
                     }
                 }
 

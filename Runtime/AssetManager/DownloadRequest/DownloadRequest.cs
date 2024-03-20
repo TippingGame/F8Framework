@@ -11,6 +11,11 @@ namespace F8Framework.Core
     /// </summary>
     public class DownloadRequest
     {
+        /// <summary>
+        /// 禁用Unity缓存系统在WebGL平台
+        /// </summary>
+        public static bool DisableUnityCacheOnWebGL = false;
+        
         private DownloadType type;
         private UnityWebRequest uwr;
         
@@ -47,11 +52,11 @@ namespace F8Framework.Core
         /// </param>
         public DownloadRequest(
             string uri,
-            uint version,
+            Hash128 hash,
             uint crc = 0)
         {
             type = DownloadType.ASSET_BUNDLE;
-            SendAssetBundleDownloadRequest(uri, version, crc);
+            SendAssetBundleDownloadRequest(uri, hash, crc);
         }
 
         /// <summary>
@@ -83,16 +88,16 @@ namespace F8Framework.Core
             }
         }
 
-        private void SendAssetBundleDownloadRequest(string uri, uint version = 0, uint crc = 0)
+        private void SendAssetBundleDownloadRequest(string uri, Hash128 hash = default, uint crc = 0)
         {
             try
             {
                 if (FileTools.IsLegalURI(uri))
                 {
-                    if (version == 0)
-                        uwr = UnityWebRequestAssetBundle.GetAssetBundle(uri);
+                    if (hash == default || DisableUnityCacheOnWebGL)
+                        uwr = UnityWebRequestAssetBundle.GetAssetBundle(uri, crc);
                     else
-                        uwr = UnityWebRequestAssetBundle.GetAssetBundle(uri, version, crc);
+                        uwr = UnityWebRequestAssetBundle.GetAssetBundle(uri, hash, crc);
                     uwr.SendWebRequest();
                 }
                 else
@@ -106,7 +111,7 @@ namespace F8Framework.Core
             }
         }
         
-        public IEnumerator SendAssetBundleDownloadRequestCoroutine(string uri, uint version = 0, uint crc = 0)
+        public IEnumerator SendAssetBundleDownloadRequestCoroutine(string uri, Hash128 hash = default, uint crc = 0)
         {
             if (!FileTools.IsLegalURI(uri))
             {
@@ -117,10 +122,10 @@ namespace F8Framework.Core
 
             try
             {
-                if (version == 0)
-                    uwr = UnityWebRequestAssetBundle.GetAssetBundle(uri);
+                if (hash == default || DisableUnityCacheOnWebGL)
+                    uwr = UnityWebRequestAssetBundle.GetAssetBundle(uri, crc);
                 else
-                    uwr = UnityWebRequestAssetBundle.GetAssetBundle(uri, version, crc);
+                    uwr = UnityWebRequestAssetBundle.GetAssetBundle(uri, hash, crc);
             }
             catch (Exception e)
             {

@@ -4,7 +4,8 @@
     "references": [
         "F8Framework.Core",
         "F8Framework.AssetMap",
-        "LitJson"
+        "LitJson",
+        "SharpCompress"
     ],
     "includePlatforms": [
         "Editor"

@@ -11,6 +11,8 @@ namespace F8Framework.Core
     public class Downloader : IDownloader
     {
         static long downloadId = 0;
+        
+        private static int downloadTimeout = 0;
 
         #region events
 
@@ -20,6 +22,15 @@ namespace F8Framework.Core
         Action<DonwloadUpdateEventArgs> onDownloadOverall;
         Action<DownloadTasksCompletedEventArgs> onAllDownloadTaskCompleted;
 
+        /// <summary>
+        /// 设置超时时间，默认为无超时时间
+        /// </summary>
+        public int DownloadTimeout
+        {
+            get { return downloadTimeout; }
+            set { downloadTimeout = value; }
+        }
+        
         /// <summary>
         /// 下载开始事件；
         /// </summary>
@@ -156,8 +167,10 @@ namespace F8Framework.Core
         /// <param name="downloadByteOffset">下载偏移字节。</param>
         /// <param name="downloadAppend">是否追加下载。</param>
         /// <returns>新添加的下载任务的唯一标识符。</returns>
-        public long AddDownload(string downloadUri, string downloadPath, long downloadByteOffset, bool downloadAppend)
+        public long AddDownload(string downloadUri, string downloadPath, long downloadByteOffset = 0, bool downloadAppend = false)
         {
+            Util.Text.IsStringValid(downloadUri, "URI is invalid !");
+            Util.Text.IsStringValid(downloadPath, "DownloadPath is invalid !");
             // 创建新的下载任务
             var downloadTask = new DownloadTask(downloadId++, downloadUri, downloadPath, downloadByteOffset,
                 downloadAppend);
@@ -166,6 +179,17 @@ namespace F8Framework.Core
             pendingTasks.Add(downloadTask);
             downloadTaskCount++;
             return downloadTask.DownloadId;
+        }
+        
+        /// <summary>
+        /// 移除指定唯一标识符的下载任务。
+        /// </summary>
+        /// <param name="downloadIds">要移除的下载任务的唯一标识符。</param>
+        public void RemoveDownloads(long[] downloadIds)
+        {
+            var length = downloadIds.Length;
+            for (int i = 0; i < length; i++)
+                RemoveDownload(downloadIds[i]);
         }
         
         /// <summary>
@@ -283,7 +307,7 @@ namespace F8Framework.Core
                 request.SetRequestHeader("Range", "bytes=" + downloadTask.DownloadByteOffset + "-");
                 request.downloadHandler = handler;
                 unityWebRequest = request;
-                request.timeout = DownloadDataProxy.DownloadTimeout;
+                request.timeout = downloadTimeout;
                 request.redirectLimit = DownloadDataProxy.RedirectLimit;
                 {
                     var timeSpan = DateTime.Now - fileDownloadStartTime;
@@ -351,7 +375,7 @@ namespace F8Framework.Core
             {
                 //这部分通过header获取需要下载的文件大小
                 unityWebRequest = request;
-                request.timeout = DownloadDataProxy.DownloadTimeout;
+                request.timeout = downloadTimeout;
                 request.redirectLimit = DownloadDataProxy.RedirectLimit;
                 yield return request.SendWebRequest();
 #if UNITY_2020_1_OR_NEWER

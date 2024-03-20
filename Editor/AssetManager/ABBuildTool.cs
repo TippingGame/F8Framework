@@ -12,7 +12,6 @@ namespace F8Framework.Core.Editor
 {
     public class ABBuildTool : ScriptableObject
     {
-        private static string _packageSplit = "Package_";
         private static Dictionary<string, AssetBundleMap.AssetMapping> assetMapping;
         private static Dictionary<string, string> resourceMapping;
         public static void BuildAllAB()
@@ -284,8 +283,8 @@ namespace F8Framework.Core.Editor
                             }
                         }
                         assetMapping.Add(fileNameWithoutExtension, new AssetBundleMap.AssetMapping(abName.ToLower(), assetPathsForAbName.ToArray(),
-                            BuildPkgTool.ToVersion, FileTools.GetFileSize(AssetBundleHelper.GetAssetBundleFullName() + abName.ToLower()).ToString(),
-                            FileTools.CreateMd5ForFile(AssetBundleHelper.GetAssetBundleFullName() + abName.ToLower()), GetPackage(filePath)));
+                            BuildPkgTool.ToVersion, FileTools.GetFileSize(AssetBundleHelper.GetAssetBundleFullName(abName.ToLower())).ToString(),
+                            FileTools.CreateMd5ForFile(AssetBundleHelper.GetAssetBundleFullName(abName.ToLower())), GetPackage(filePath)));
                         
                         // codeStr.Append(mappingLine);
                     }
@@ -472,11 +471,11 @@ namespace F8Framework.Core.Editor
             foreach (var package in packages)
             {
                 // 判断地址中是否包含"Package_"
-                int index = package.IndexOf(_packageSplit);
+                int index = package.IndexOf(HotUpdateVersion.PackageSplit);
                 if (index != -1)
                 {
                     // 如果包含，则获取"Package_"后面的所有数据
-                    string part = package.Substring(index + _packageSplit.Length);
+                    string part = package.Substring(index + HotUpdateVersion.PackageSplit.Length);
                     return part;
                 }
             }
