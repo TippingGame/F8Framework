@@ -12,7 +12,6 @@
   <assembly fullname="Excel" preserve="all" />
   <assembly fullname="LitJson" preserve="all" />
   <assembly fullname="MessagePack" preserve="all" />
-  <assembly fullname="SharpCompress" preserve="all" />
   <assembly fullname="kcp" preserve="all" />
   <assembly fullname="SimpleWebTransport" preserve="all" />
   <assembly fullname="Telepathy" preserve="all" />

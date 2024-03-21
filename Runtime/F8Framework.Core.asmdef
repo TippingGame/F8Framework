@@ -8,7 +8,6 @@
         "Excel",
         "LitJson",
         "MessagePack",
-        "SharpCompress",
         "kcp",
         "Telepathy",
         "SimpleWebTransport"

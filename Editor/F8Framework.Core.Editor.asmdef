@@ -6,8 +6,7 @@
         "F8Framework.AssetMap",
         "ICSharpCode.SharpZipLib",
         "Excel",
-        "LitJson",
-        "SharpCompress"
+        "LitJson"
     ],
     "includePlatforms": [
         "Editor"
