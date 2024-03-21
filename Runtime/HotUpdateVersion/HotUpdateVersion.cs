@@ -181,6 +181,10 @@ namespace F8Framework.Core
 
         public void OnTermination()
         {
+            hotUpdateDownloader.CancelDownload();
+            hotUpdateDownloader = null;
+            PackageDownloader.CancelDownload();
+            PackageDownloader = null;
             base.Destroy();
         }
     }
