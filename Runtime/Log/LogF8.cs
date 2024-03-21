@@ -79,6 +79,36 @@ namespace F8Framework.Core
             Debug.Log(o);
         }
 
+        public static void LogUtil(string s, Object context)
+        {
+            LogColor("[工具日志]", new Color(0.86f, 0.55f, 0.92f), s, context);
+        }
+        
+        public static void LogUtil(string s, params object[] p)
+        {
+            LogColor("[工具日志]", new Color(0.86f, 0.55f, 0.92f), s, p);
+        }
+        
+        public static void LogUtil(object o)
+        {
+            LogColor("[工具日志]", new Color(0.86f, 0.55f, 0.92f), o);
+        }
+        
+        public static void LogVersion(string s, Object context)
+        {
+            LogColor("[版本日志]", new Color(1.0f, 0.62f, 0.35f), s, context);
+        }
+        
+        public static void LogVersion(string s, params object[] p)
+        {
+            LogColor("[版本日志]", new Color(1.0f, 0.62f, 0.35f), s, p);
+        }
+        
+        public static void LogVersion(object o)
+        {
+            LogColor("[版本日志]", new Color(1.0f, 0.62f, 0.35f), o);
+        }
+        
         public static void LogSDK(string s, Object context)
         {
             LogColor("[SDK日志]", new Color(1.0f, 0.63f, 0.66f), s, context);

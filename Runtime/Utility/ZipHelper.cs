@@ -23,7 +23,7 @@ namespace F8Framework.Core
                 void OnFinished(string result);
             }
             
-            public class ZipResult : ZipHelper.IZipCallback
+            public class ZipResult : IZipCallback
             {
                 public bool OnPreZip(ZipEntry entry)
                 {
@@ -39,12 +39,12 @@ namespace F8Framework.Core
 
                 public void OnPostZip(ZipEntry entry)
                 {
-                    // LogF8.Log("OnPostZip : " + _entry.Name);
+                    // LogF8.LogUtil("OnPostZip : " + _entry.Name);
                 }
 
                 public void OnFinished(string result)
                 {
-                    LogF8.Log("Zip Finished : " + result);
+                    LogF8.LogUtil("Zip Finished : " + result);
                 }
             }
             
@@ -139,7 +139,7 @@ namespace F8Framework.Core
                     LogF8.LogError("文件解压发生错误：" + ex);
                     return result;
                 }
-                LogF8.Log("Zip解压完成：" + sourceFile);
+                LogF8.LogUtil("Zip解压完成：" + sourceFile);
                 GC.Collect();
                 return result;
             }
@@ -228,7 +228,7 @@ namespace F8Framework.Core
 
                     zipStream.Close();
                 }
-                LogF8.Log("Zip解压完成：" + sourceFile);
+                LogF8.LogUtil("Zip解压完成：" + sourceFile);
                 GC.Collect();
             }
             

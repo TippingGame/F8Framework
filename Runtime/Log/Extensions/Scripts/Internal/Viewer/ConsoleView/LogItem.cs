@@ -91,7 +91,7 @@ namespace F8Framework.Core
             SetIcon(logData.logType);
 
             localTime.text = string.Format("[{0}]", logData.localTime.ToString("HH:mm:ss"));
-            message.text = logData.message;
+            message.text = logData.message.Replace(" ", "\u00A0");
             playTime.text = logData.playTime;
             sceneName.text = logData.sceneName;
 

@@ -124,7 +124,7 @@ namespace F8Framework.Core
                 if (!dir.Exists)
                 {
                     dir.Create();
-                    LogF8.Log("Path:" + path + "Folder is created ");
+                    LogF8.LogUtil("Path:" + path + "Folder is created ");
                 }
             }
 

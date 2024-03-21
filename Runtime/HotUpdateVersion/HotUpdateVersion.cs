@@ -62,7 +62,7 @@ namespace F8Framework.Core
             // 设置热更下载器回调
             hotUpdateDownloader.OnDownloadSuccess += (eventArgs) =>
             {
-                LogF8.Log($"获取热更资源完成：{eventArgs.DownloadInfo.DownloadUrl}");
+                LogF8.LogVersion($"获取热更资源完成：{eventArgs.DownloadInfo.DownloadUrl}");
             };
             hotUpdateDownloader.OnDownloadFailure += (eventArgs) =>
             {
@@ -71,7 +71,7 @@ namespace F8Framework.Core
             };
             hotUpdateDownloader.OnDownloadStart += (eventArgs) =>
             {
-                LogF8.Log($"开始获取热更资源：{eventArgs.DownloadInfo.DownloadUrl}");
+                LogF8.LogVersion($"开始获取热更资源：{eventArgs.DownloadInfo.DownloadUrl}");
             };
             hotUpdateDownloader.OnDownloadOverallProgress += (eventArgs) =>
             {
@@ -80,12 +80,12 @@ namespace F8Framework.Core
 
                 // 计算进度百分比
                 float progress = currentTaskIndex / taskCount * 100f;
-                // LogF8.Log(progress);
+                // LogF8.LogVersion(progress);
                 overallProgress?.Invoke(progress);
             };
             hotUpdateDownloader.OnAllDownloadTaskCompleted += (eventArgs) =>
             {
-                LogF8.Log($"所有热更资源获取完成：{eventArgs.TimeSpan}");
+                LogF8.LogVersion($"所有热更资源获取完成：{eventArgs.TimeSpan}");
                 completed?.Invoke();
             };
             
@@ -115,7 +115,7 @@ namespace F8Framework.Core
             // 设置分包下载器回调
             PackageDownloader.OnDownloadSuccess += (eventArgs) =>
             {
-                LogF8.Log($"获取分包资源完成：{eventArgs.DownloadInfo.DownloadUrl}");
+                LogF8.LogVersion($"获取分包资源完成：{eventArgs.DownloadInfo.DownloadUrl}");
 #if UNITY_WEBGL
                 // 使用协程
 				Util.Unity.StartCoroutine(Util.ZipHelper.UnZipFileCoroutine(eventArgs.DownloadInfo.DownloadPath,
@@ -133,7 +133,7 @@ namespace F8Framework.Core
             };
             PackageDownloader.OnDownloadStart += (eventArgs) =>
             {
-                LogF8.Log($"开始获分包资源：{eventArgs.DownloadInfo.DownloadUrl}");
+                LogF8.LogVersion($"开始获分包资源：{eventArgs.DownloadInfo.DownloadUrl}");
             };
             PackageDownloader.OnDownloadOverallProgress += (eventArgs) =>
             {
@@ -142,12 +142,12 @@ namespace F8Framework.Core
 
                 // 计算进度百分比
                 float progress = currentTaskIndex / taskCount * 100f;
-                // LogF8.Log(progress);
+                // LogF8.LogVersion(progress);
                 overallProgress?.Invoke(progress);
             };
             PackageDownloader.OnAllDownloadTaskCompleted += (eventArgs) =>
             {
-                LogF8.Log($"所有分包资源获取完成，用时：{eventArgs.TimeSpan}");
+                LogF8.LogVersion($"所有分包资源获取完成，用时：{eventArgs.TimeSpan}");
                 completed?.Invoke();
             };
         

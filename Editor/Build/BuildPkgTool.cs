@@ -65,7 +65,7 @@ namespace F8Framework.Core.Editor
             if (File.Exists(path))
             {
                 System.Diagnostics.Process.Start(path);
-                LogF8.Log("已运行导出的游戏：" + path);
+                LogF8.LogVersion("已运行导出的游戏：" + path);
             }
             else
             {
@@ -103,7 +103,7 @@ namespace F8Framework.Core.Editor
                     LogF8.LogError($"build pkg fail : {buildReport.summary.result}");
                 }
 
-                LogF8.LogAsset("游戏全量包打包成功! " + locationPathName);
+                LogF8.LogVersion("游戏全量包打包成功! " + locationPathName);
             }
             
             if (_enableOptionalPackage)
@@ -118,7 +118,7 @@ namespace F8Framework.Core.Editor
                 string[] paths = { BuildPath + HotUpdateVersion.PackageDirName };
                 Util.ZipHelper.Zip(paths, BuildPath + HotUpdateVersion.PackageDirName + ".zip", HotUpdateVersion.PackageDirName, zipCb);
                 
-                LogF8.LogAsset("分包输出目录：" + BuildPath + HotUpdateVersion.PackageDirName +".zip" + " ，手动上传至CDN资源服务器。");
+                LogF8.LogVersion("分包输出目录：" + BuildPath + HotUpdateVersion.PackageDirName +".zip" + " ，手动上传至CDN资源服务器。");
                 AssetDatabase.Refresh();
                 string locationPathName = BuildPath + "/" + _buildTarget.ToString() + "_Optional_" + ToVersion  + "/" + appName;
                 EditorPrefs.SetString(_locationPathNameKey, locationPathName);
@@ -130,7 +130,7 @@ namespace F8Framework.Core.Editor
                 }
                 FileTools.SafeCopyDirectory(toPath, Application.streamingAssetsPath, true);
                 FileTools.SafeDeleteDir(toPath);
-                LogF8.LogAsset("游戏分包打包成功! " + locationPathName);
+                LogF8.LogVersion("游戏分包打包成功! " + locationPathName);
             }
             
             if (_enableNullPackage)
@@ -150,7 +150,7 @@ namespace F8Framework.Core.Editor
                 }
                 FileTools.SafeCopyDirectory(toPath, URLSetting.GetAssetBundlesOutPath(), true, new[] { URLSetting.GetPlatformName(), URLSetting.GetPlatformName() + ".manifest" });
                 FileTools.SafeDeleteDir(toPath);
-                LogF8.LogAsset("游戏空包打包成功! " + locationPathName);
+                LogF8.LogVersion("游戏空包打包成功! " + locationPathName);
             }
             
             AssetDatabase.Refresh();
@@ -540,7 +540,7 @@ namespace F8Framework.Core.Editor
             UnityEditor.AssetDatabase.Refresh();
             FileTools.CheckFileAndCreateDirWhenNeeded(filePath);
             FileTools.SafeWriteAllText(filePath, json);
-            LogF8.LogAsset("写入游戏版本： " + gameVersion.Version);
+            LogF8.LogVersion("写入游戏版本： " + gameVersion.Version);
             UnityEditor.AssetDatabase.Refresh();
         }
         

@@ -46,6 +46,7 @@ namespace F8Framework.Core
 #else
         string INPUT_PATH = URLSetting.CS_STREAMINGASSETS_URL + ExcelPath;
 #endif
+            LogF8.LogConfig(INPUT_PATH);
             if (string.IsNullOrEmpty(INPUT_PATH))
             {
                 throw new Exception("请先设置数据表路径！");

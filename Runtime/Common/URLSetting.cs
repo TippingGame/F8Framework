@@ -44,8 +44,8 @@ namespace F8Framework.Core
 #if UNITY_EDITOR || UNITY_STANDALONE
         public static string STREAMINGASSETS_URL = "file://" + Application.streamingAssetsPath + "/";
 #elif UNITY_ANDROID
-        //public static string STREAMINGASSETS_URL = "jar:file://" + Application.dataPath + "!/assets/";
-        public static string STREAMINGASSETS_URL = Application.streamingAssetsPath + "/";
+        public static string STREAMINGASSETS_URL = "jar:file://" + Application.dataPath + "!/assets/";
+        // public static string STREAMINGASSETS_URL = Application.streamingAssetsPath + "/";
 #elif UNITY_IPHONE || UNITY_IOS
         public static string STREAMINGASSETS_URL = "file://" + Application.streamingAssetsPath + "/";
 #elif UNITY_WEBGL

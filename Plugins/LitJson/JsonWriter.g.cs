@@ -383,6 +383,7 @@ namespace LitJson
             context.ExpectingValue = false;
         }
 
+#pragma warning disable CS3021
         [CLSCompliant(false)]
         public void Write (ulong number)
         {
@@ -393,7 +394,7 @@ namespace LitJson
 
             context.ExpectingValue = false;
         }
-
+#pragma warning restore CS3021
         public void WriteArrayEnd ()
         {
             DoValidation (Condition.InArray);

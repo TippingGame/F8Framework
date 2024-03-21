@@ -4,6 +4,8 @@
     "references": ["F8Framework.AssetMap",
         "Unity.TextMeshPro",
         "Unity.Timeline",
+        "ICSharpCode.SharpZipLib",
+        "Excel",
         "LitJson",
         "MessagePack",
         "SharpCompress",
