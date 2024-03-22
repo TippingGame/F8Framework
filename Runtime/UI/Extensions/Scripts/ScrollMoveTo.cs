@@ -9,7 +9,7 @@ namespace F8Framework.Core
 
         void SetScrollPosition(Vector2 position);
 
-        Vector2 GetMovePosition(int dataIndex, MoveToType moveToType);
+        Vector2 GetMovePosition(int itemIndex, MoveToType moveToType);
 
         Vector2 GetMovePosition(float scrollRate);
     }
@@ -35,7 +35,7 @@ namespace F8Framework.Core
 
         public ScrollType scrollType;
         
-        public int dataIndex;
+        public int itemIndex;
         public MoveToType moveToType;
 
         public float scrollRate = 0;
@@ -50,10 +50,10 @@ namespace F8Framework.Core
         
         private Vector2 start;
         
-        public void Set(int dataIndex, MoveToType moveToType, float time)
+        public void Set(int itemIndex, MoveToType moveToType, float time)
         {
             this.scrollType = ScrollType.INDEX;
-            this.dataIndex = dataIndex;
+            this.itemIndex = itemIndex;
             this.moveToType = moveToType;
 
             this.time = time;
@@ -97,7 +97,7 @@ namespace F8Framework.Core
             Vector2 end;
             if (scrollType == ScrollType.INDEX)
             {
-                end = scroll.GetMovePosition(dataIndex, moveToType);
+                end = scroll.GetMovePosition(itemIndex, moveToType);
             }
             else if (scrollType == ScrollType.RATE)
             {

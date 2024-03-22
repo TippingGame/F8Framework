@@ -1,14 +1,69 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.Events;
-using DataContext = F8Framework.Core.InfiniteScrollItem.DataContext;
 
 namespace F8Framework.Core
 {
     public partial class InfiniteScroll
     {
+        public class DataContext
+        {
+            public DataContext(InfiniteScrollData data, int index)
+            {
+                this.index = index;
+                this.data = data;
+            }
+
+            internal InfiniteScrollData data;
+            internal int index = -1;
+
+            internal int itemIndex = -1;
+
+            internal float offset = 0;
+
+            internal bool needUpdateItemData = true;
+
+            internal float scrollItemSize = 0;
+
+            internal InfiniteScrollItem itemObject;
+
+            public bool IsNeedUpdateItemData()
+            {
+                return needUpdateItemData;
+            }
+
+            public void UnlinkItem(bool notifyEvent = false)
+            {
+                if (itemObject != null)
+                {
+                    itemObject.ClearData(notifyEvent);
+                    itemObject = null;
+                }
+
+                itemIndex = -1;
+            }
+
+            public void UpdateData(InfiniteScrollData data)
+            {
+                this.data = data;
+                needUpdateItemData = true;
+            }
+
+            public float GetItemSize()
+            {
+                return scrollItemSize;
+            }
+
+            public void SetItemSize(float value)
+            {
+                scrollItemSize = value;
+            }
+        }
+
         protected List<DataContext> dataList = new List<DataContext>();
+        protected int itemCount = 0;
+
+        protected bool needUpdateItemList = true;
 
         protected int selectDataIndex = -1;
         protected Action<InfiniteScrollData> selectCallback = null;
@@ -20,7 +75,10 @@ namespace F8Framework.Core
                 Initialize();
             }
 
-            return dataList.FindIndex((context) => { return context.data.Equals(data); });
+            return dataList.FindIndex((context) =>
+            {
+                return context.data.Equals(data);
+            });
         }
 
         public int GetDataCount()
@@ -28,92 +86,45 @@ namespace F8Framework.Core
             return dataList.Count;
         }
 
-
         public InfiniteScrollData GetData(int index)
         {
-            DataContext context = GetDataContext(index);
-            if (context != null)
-            {
-                return context.data;
-            }
-            else
-            {
-                return null;
-            }
+            return dataList[index].data;
         }
 
-        internal DataContext GetDataContext(int index)
+        public List<InfiniteScrollData> GetDataList()
         {
-            if (isInitialize == false)
-            {
-                Initialize();
-            }
+            List<InfiniteScrollData> list = new List<InfiniteScrollData>();
 
-            if (IsValidDataIndex(index) == true)
+            for(int index = 0; index < dataList.Count; index++)
             {
-                return dataList[index];
+                list.Add(dataList[index].data);
             }
-            else
-            {
-                return null;
-            }
+            return list;
         }
 
-        internal DataContext GetDataContext(InfiniteScrollData data)
+        public List<InfiniteScrollData> GetItemList()
         {
-            if (isInitialize == false)
+            List<InfiniteScrollData> list = new List<InfiniteScrollData>();
+
+            for (int index = 0; index < dataList.Count; index++)
             {
-                Initialize();
-            }
-
-            return dataList.Find((context) => { return context.data.Equals(data); });
-        }
-
-        protected void AddData(InfiniteScrollData data)
-        {
-            dataList.Add(new DataContext(data, dataList.Count));
-        }
-
-        protected void InsertData(InfiniteScrollData data, int insertIndex)
-        {
-            if (insertIndex < 0 || insertIndex > dataList.Count)
-            {
-                throw new ArgumentOutOfRangeException();
-            }
-
-            if (insertIndex < dataList.Count)
-            {
-                for (int dataIndex = insertIndex; dataIndex < dataList.Count; dataIndex++)
+                if(dataList[index].itemIndex != -1)
                 {
-                    dataList[dataIndex].index++;
+                    list.Add(dataList[index].data);
                 }
-
-                dataList.Insert(insertIndex, new DataContext(data, insertIndex));
             }
-            else
-            {
-                dataList.Add(new DataContext(data, dataList.Count));
-            }
+            return list;
         }
 
-        protected bool IsValidDataIndex(int index)
+        public int GetItemCount()
         {
-            return (index >= 0 && index < dataList.Count) ? true : false;
+            return itemCount;
         }
 
-        public float GetItemSize(Vector2 sizeDelta)
+        public int GetItemIndex(InfiniteScrollData data)
         {
-            float itemSize = 0.0f;
-            if (IsVersical() == true)
-            {
-                itemSize = sizeDelta.y;
-            }
-            else
-            {
-                itemSize = sizeDelta.x;
-            }
-
-            return itemSize;
+            var context = GetDataContext(data);
+            return context.itemIndex;
         }
 
         public void AddSelectCallback(Action<InfiniteScrollData> callback)
@@ -136,6 +147,161 @@ namespace F8Framework.Core
             selectCallback -= callback;
         }
 
+        public void OnChangeActiveItem(int dataIndex, bool active)
+        {
+            onChangeActiveItem.Invoke(dataIndex, active);
+        }
+
+        protected DataContext GetDataContext(InfiniteScrollData data)
+        {
+            if (isInitialize == false)
+            {
+                Initialize();
+            }
+
+            return dataList.Find((context) =>
+            {
+                return context.data.Equals(data);
+            });
+        }
+
+        protected DataContext GetContextFromItem(int itemIndex)
+        {
+            if (isInitialize == false)
+            {
+                Initialize();
+            }
+
+            if (IsValidItemIndex(itemIndex) == true)
+            {
+                return GetItem(itemIndex);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        protected void AddData(InfiniteScrollData data)
+        {
+            DataContext addData = new DataContext(data, dataList.Count);
+            InitFitContext(addData);
+
+            dataList.Add(addData);
+
+            CheckItemAfterAddData(addData);
+        }
+
+        private bool CheckItemAfterAddData(DataContext addData)
+        {
+            if (onFilter != null &&
+                onFilter(addData.data) == true)
+            {
+                return false;
+            }
+
+            int itemIndex = 0;
+            if (itemCount > 0)
+            {
+                for (int dataIndex = addData.index - 1; dataIndex >= 0; dataIndex--)
+                {
+                    if (dataList[dataIndex].itemIndex != -1)
+                    {
+                        itemIndex = dataList[dataIndex].itemIndex + 1;
+                        break;
+                    }
+                }
+            }
+
+            addData.itemIndex = itemIndex;
+            itemCount++;
+
+            for (int dataIndex = addData.index+1; dataIndex < dataList.Count; dataIndex++)
+            {
+                if (dataList[dataIndex].itemIndex != -1)
+                {
+                    dataList[dataIndex].itemIndex++;
+                }
+            }
+            
+            needReBuildLayout = true;
+
+            return true;
+        }
+
+        protected void InsertData(InfiniteScrollData data, int insertIndex)
+        {
+            if (insertIndex < 0 || insertIndex > dataList.Count)
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+
+            if (insertIndex < dataList.Count)
+            {
+                DataContext addData = new DataContext(data, insertIndex);
+                InitFitContext(addData);
+                
+                for (int dataIndex = insertIndex; dataIndex < dataList.Count; dataIndex++)
+                {
+                    dataList[dataIndex].index++;
+                }
+
+                dataList.Insert(insertIndex, addData);
+
+                CheckItemAfterAddData(addData);
+            }
+            else
+            {
+                AddData(data);
+            }
+        }
+
+        protected void InitFitContext(DataContext context)
+        {
+            float size = layout.GetMainSize(defaultItemPrefabSize);
+            if (dynamicItemSize == true)
+            {
+                float ItemSize = context.GetItemSize();
+                if (ItemSize != 0)
+                {
+                    size = ItemSize;
+                }
+            }
+
+            context.SetItemSize(size);
+        }
+
+        protected bool IsValidDataIndex(int index)
+        {
+            return (index >= 0 && index < dataList.Count) ? true : false;
+        }
+
+        protected bool IsValidItemIndex(int index)
+        {
+            return (index >= 0 && index < itemCount) ? true : false;
+        }
+
+        protected void BuildItemList()
+        {
+            itemCount = 0;
+            for (int i = 0; i < dataList.Count; i++)
+            {
+                DataContext context = dataList[i];
+
+                if (onFilter != null &&
+                     onFilter(context.data) == true)
+                {
+                    context.UnlinkItem(false);
+
+                    continue;
+                }
+                context.itemIndex = itemCount;
+                itemCount++;
+            }
+
+            needReBuildLayout = true;
+        }
+        
         private void OnSelectItem(InfiniteScrollData data)
         {
             int dataIndex = GetDataIndex(data);
@@ -147,19 +313,6 @@ namespace F8Framework.Core
                 {
                     selectCallback(data);
                 }
-            }
-        }
-
-        public void OnChangeActiveItem(int dataIndex, bool active)
-        {
-            onChangeActiveItem.Invoke(dataIndex, active);
-        }
-
-        [Serializable]
-        public class ItemActiveEvent : UnityEvent<int, bool>
-        {
-            public ItemActiveEvent()
-            {
             }
         }
     }

@@ -107,9 +107,7 @@ namespace F8Framework.Core
                     {
                         if (handler(array[i]).CompareTo(handler(array[j])) < 0)
                         {
-                            T temp = array[i];
-                            array[i] = array[j];
-                            array[j] = temp;
+                            (array[i], array[j]) = (array[j], array[i]);
                         }
                     }
                 }
@@ -131,9 +129,7 @@ namespace F8Framework.Core
                     {
                         if (handler(array[i]).CompareTo(handler(array[j])) > 0)
                         {
-                            T temp = array[i];
-                            array[i] = array[j];
-                            array[j] = temp;
+                            (array[i], array[j]) = (array[j], array[i]);
                         }
                     }
                 }
@@ -154,9 +150,7 @@ namespace F8Framework.Core
                     {
                         if (comparison(array[i], array[j]) < 0)
                         {
-                            T temp = array[i];
-                            array[i] = array[j];
-                            array[j] = temp;
+                            (array[i], array[j]) = (array[j], array[i]);
                         }
                     }
                 }
@@ -177,9 +171,7 @@ namespace F8Framework.Core
                     {
                         if (comparison(array[i], array[j]) > 0)
                         {
-                            T temp = array[i];
-                            array[i] = array[j];
-                            array[j] = temp;
+                            (array[i], array[j]) = (array[j], array[i]);
                         }
                     }
                 }
@@ -382,6 +374,26 @@ namespace F8Framework.Core
             }
 
             /// <summary>
+            /// 随机在范围内生成一个long
+            /// </summary>
+            /// <param name="minValue">随机取值最小区间</param>
+            /// <param name="maxValue">随机取值最大区间</param>
+            /// <returns>生成的long</returns>
+            public static long RandomRange(long minValue, long maxValue)
+            {
+                if (minValue >= maxValue)
+                    throw new ArgumentNullException("RandomRange : minValue is greater than or equal to maxValue");
+                byte[] buf = new byte[8];
+                random.NextBytes(buf);
+                long longRand = BitConverter.ToInt64(buf, 0);
+                // 计算随机值范围
+                long range = maxValue - minValue + 1;
+                // 将随机值映射到指定范围内
+                long result = (long)Math.Floor(longRand / (double)long.MaxValue * range) + minValue;
+                return result;
+            }
+            
+            /// <summary>
             /// 返回一个0.0~1.0之间的随机数
             /// </summary>
             /// <returns>随机数</returns>
@@ -398,9 +410,7 @@ namespace F8Framework.Core
             /// <param name="rhs">第二个需要交换的值</param>
             public static void Swap<T>(ref T lhs, ref T rhs)
             {
-                T t3 = lhs;
-                lhs = rhs;
-                rhs = t3;
+                (lhs, rhs) = (rhs, lhs);
             }
 
             /// <summary>
@@ -412,9 +422,7 @@ namespace F8Framework.Core
             /// <param name="rhs">序号B</param>
             public static void Swap<T>(IList<T> array, int lhs, int rhs)
             {
-                T temp = array[lhs];
-                array[lhs] = array[rhs];
-                array[rhs] = temp;
+                (array[lhs], array[rhs]) = (array[rhs], array[lhs]);
             }
 
             /// <summary>
@@ -558,10 +566,28 @@ namespace F8Framework.Core
                     int randomIndex = random.Next(0, i + 1);
 
                     // 交换元素位置
-                    T temp = array[i];
-                    array[i] = array[randomIndex];
-                    array[randomIndex] = temp;
+                    (array[i], array[randomIndex]) = (array[randomIndex], array[i]);
                 }
+            }
+            
+            /// <summary>
+            /// 是否是奇数
+            /// </summary>
+            /// <param name="value">检测的值</param>
+            /// <returns>是否是奇数</returns>
+            public static bool IsOdd(long value)
+            {
+                return !Convert.ToBoolean(value & 0x1);
+            }
+            
+            /// <summary>
+            /// 是否是偶数
+            /// </summary>
+            /// <param name="value">检测的值</param>
+            /// <returns>是否是偶数</returns>
+            public static bool IsEven(long value)
+            {
+                return Convert.ToBoolean(value & 0x1);
             }
         }
     }

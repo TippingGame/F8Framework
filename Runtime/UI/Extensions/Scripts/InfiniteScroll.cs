@@ -2,45 +2,24 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
-using System.Collections.Generic;
-using DataContext = F8Framework.Core.InfiniteScrollItem.DataContext;
 
 namespace F8Framework.Core
 {
     public partial class InfiniteScroll : MonoBehaviour
     {
-        public InfiniteScrollItem itemPrefab = null;
-        public int padding = 0;
-        public int space = 0;
-        public bool dynamicItemSize = false;
+        protected bool                          isInitialize            = false;
 
-        public ScrollLayout layout = new ScrollLayout();
+        protected RectTransform                 content                 = null;
 
-        protected bool isInitialize = false;
-        protected RectTransform content = null;
-        protected Vector2 anchorMin = Vector2.zero;
-        protected Vector2 anchorMax = Vector2.zero;
+        private bool                            changeValue             = false;
 
-        protected float itemPivot = 0.0f;
+        [Header("Event", order = 4)]
+        public ChangeValueEvent                 onChangeValue           = new ChangeValueEvent();
+        public ItemActiveEvent                  onChangeActiveItem      = new ItemActiveEvent();
+        public StateChangeEvent                 onStartLine             = new StateChangeEvent();
+        public StateChangeEvent                 onEndLine               = new StateChangeEvent();
 
-        protected bool processing = false;
-        protected bool isDirty = true;
-        protected bool isChangedSize = true;
-
-        private int firstDataIndex = 0;
-        private int lastDataIndex = 0;
-        private float firstItemPosition = 0;
-        private float lastItemtPosition = 0;
-
-        private bool isStartLine = true;
-        private bool isEndLine = true;
-
-        private bool changeValue = false;
-
-        public ChangeValueEvent onChangeValue = new ChangeValueEvent();
-        public ItemActiveEvent onChangeActiveItem = new ItemActiveEvent();
-        public StateChangeEvent onStartLine = new StateChangeEvent();
-        public StateChangeEvent onEndLine = new StateChangeEvent();
+        private Predicate<InfiniteScrollData>   onFilter                = null;
 
         private void Awake()
         {
@@ -51,31 +30,28 @@ namespace F8Framework.Core
         {
             if (isInitialize == false)
             {
-                if (content == null)
-                {
-                    content = (RectTransform)transform;
-                }
-
                 scrollRect = GetComponent<ScrollRect>();
                 content = scrollRect.content;
                 viewport = scrollRect.viewport;
-                isVertical = scrollRect.vertical;
 
-                RectTransform itemTransform = (RectTransform)itemPrefab.transform;
-                InitializeItemInformation(itemTransform);
-
-                layout.Initialize(this, isVertical);
-
+                CheckScrollAxis();
                 ClearScrollContent();
 
-                SetItemPivot(defaultItemSize, content.pivot);
+                RectTransform itemTransform = (RectTransform)itemPrefab.transform;
+                defaultItemPrefabSize = itemTransform.sizeDelta;
 
+                itemObjectList.Clear();
                 dataList.Clear();
 
                 scrollRect.onValueChanged.AddListener(OnValueChanged);
 
+                CreateNeedItem();
+
+                CheckScrollData();
+
                 isInitialize = true;
-                isDirty = true;
+
+                needReBuildLayout = true;
             }
         }
 
@@ -87,8 +63,6 @@ namespace F8Framework.Core
             }
 
             AddData(data);
-
-            isChangedSize = true;
 
             UpdateAllData(immediately);
         }
@@ -107,8 +81,6 @@ namespace F8Framework.Core
 
             InsertData(data, insertIndex);
 
-            isChangedSize = true;
-
             UpdateAllData(immediately);
         }
 
@@ -124,11 +96,8 @@ namespace F8Framework.Core
                 AddData(data);
             }
 
-            isChangedSize = true;
-
             UpdateAllData(immediately);
         }
-
         public void InsertData(InfiniteScrollData[] datas, int insertIndex, bool immediately = false)
         {
             if (insertIndex < 0 || insertIndex > dataList.Count)
@@ -145,8 +114,6 @@ namespace F8Framework.Core
             {
                 InsertData(data, insertIndex++);
             }
-
-            isChangedSize = true;
 
             UpdateAllData(immediately);
         }
@@ -172,33 +139,44 @@ namespace F8Framework.Core
 
             if (IsValidDataIndex(dataIndex) == true)
             {
-                foreach (InfiniteScrollItem item in items)
+                selectDataIndex = -1;
+
+                int removeShowIndex = -1;
+                
+                if(dataList[dataIndex].itemIndex != -1)
                 {
-                    if (dataIndex == item.GetDataIndex())
+                    removeShowIndex = dataList[dataIndex].itemIndex;
+                }
+                dataList[dataIndex].UnlinkItem(true);
+                dataList.RemoveAt(dataIndex);
+                for(int i= dataIndex; i< dataList.Count;i++)
+                {
+                    dataList[i].index--;
+
+                    if(removeShowIndex != -1)
                     {
-                        item.ClearData(true);
+                        if (dataList[i].itemIndex != -1)
+                        {
+                            dataList[i].itemIndex--;
+                        }
                     }
                 }
 
-                selectDataIndex = -1;
-
-                dataList.RemoveAt(dataIndex);
-                for (int i = dataIndex; i < dataList.Count; i++)
+                if (removeShowIndex != -1)
                 {
-                    dataList[i].index--;
+                    if (removeShowIndex < firstItemIndex)
+                    {
+                        firstItemIndex--;
+                    }
+                    if (removeShowIndex < lastItemIndex)
+                    {
+                        lastItemIndex--;
+                    }
+
+                    itemCount--;
                 }
 
-                if (dataIndex < firstDataIndex)
-                {
-                    firstDataIndex--;
-                }
-
-                if (dataIndex < lastDataIndex)
-                {
-                    lastDataIndex--;
-                }
-
-                isChangedSize = true;
+                needReBuildLayout = true;
 
                 UpdateAllData(immediately);
             }
@@ -211,14 +189,34 @@ namespace F8Framework.Core
                 Initialize();
             }
 
+            itemCount = 0;
             selectDataIndex = -1;
+
             dataList.Clear();
+            lineLayout.Clear();
+            layoutSize = 0;
+            lineCount = 0;
 
             ClearItemsData();
 
-            isChangedSize = false;
+            lastItemIndex = 0;
+            firstItemIndex = 0;
+
+            showLineIndex = 0;
+            showLineCount = 0;
+
+            isStartLine = false;
+            isEndLine = false;
+
+            needUpdateItemList = true;
+            needReBuildLayout = true;
+            isUpdateArea = true;
+
+            onFilter = null;
 
             ClearScrollContent();
+
+            cachedData.Clear();
 
             UpdateAllData(immediately);
         }
@@ -230,12 +228,31 @@ namespace F8Framework.Core
                 Initialize();
             }
 
+            itemCount = 0;
             selectDataIndex = -1;
             dataList.Clear();
+            lineLayout.Clear();
+            layoutSize = 0;
+            lineCount = 0;
 
             ClearItems();
 
-            isChangedSize = false;
+            lastItemIndex = 0;
+            firstItemIndex = 0;
+
+            showLineIndex = 0;
+            showLineCount = 0;
+
+            isStartLine = false;
+            isEndLine = false;
+
+            needUpdateItemList = true;
+            needReBuildLayout = true;
+            isUpdateArea = true;
+
+            onFilter = null;
+
+            cachedData.Clear();
 
             ClearScrollContent();
         }
@@ -247,21 +264,12 @@ namespace F8Framework.Core
                 Initialize();
             }
 
-            DataContext context = GetDataContext(data);
-            if (context != null &&
-                context.index >= 0)
+            var context = GetDataContext(data);
+            if (context != null)
             {
-                if (IsShowDataIndex(context.index) == true)
-                {
-                    InfiniteScrollItem item = GetItemByDataIndex(context.index);
-                    if (item != null)
-                    {
-                        if (item.IsActive() == true)
-                        {
-                            item.UpdateItem(context);
-                        }
-                    }
-                }
+                context.UpdateData(data);
+
+                needReBuildLayout = true;
             }
         }
 
@@ -272,82 +280,38 @@ namespace F8Framework.Core
                 Initialize();
             }
 
-            SetDirty();
+            needReBuildLayout = true;
+            isUpdateArea = true;
+
+            CreateNeedItem();
+
             if (immediately == true)
             {
                 UpdateShowItem(true);
             }
         }
 
-        public bool IsVersical()
+        public void SetFilter(Predicate<InfiniteScrollData> onFilter)
         {
-            return isVertical;
+            this.onFilter = onFilter;
+            needUpdateItemList = true;
         }
 
-        protected float GetViewportSize()
+        public float GetViewportSize()
         {
-            float size = 0;
-            if (isVertical == true)
-            {
-                size = viewport.rect.height;
-            }
-            else
-            {
-                size = viewport.rect.width;
-            }
-
-            return size;
+            return layout.GetMainSize(viewport);
         }
 
-        protected void ResizeContent()
+        public float GetContentSize()
         {
-            Vector2 currentSize = content.sizeDelta;
-            float size = GetItemTotalSize();
+            UpdateContentSize();
 
-            if (isVertical == true)
-            {
-                content.sizeDelta = new Vector2(currentSize.x, size);
-            }
-            else
-            {
-                content.sizeDelta = new Vector2(size, currentSize.y);
-            }
+            return layout.GetMainSize(content);
         }
 
-        protected float GetContentSize()
+        public float GetContentPosition()
         {
-            if (isChangedSize == true)
-            {
-                ResizeContent();
-            }
-
-
-            float size = 0;
-            if (isVertical == true)
-            {
-                size = content.rect.height;
-            }
-            else
-            {
-                size = content.rect.width;
-            }
-
-            return size;
-        }
-
-        protected float GetContentPosition()
-        {
-            float position = 0;
-            if (isVertical == true)
-            {
-                position = content.anchoredPosition.y;
-            }
-            else
-            {
-                position = -content.anchoredPosition.x;
-            }
-
-            return position;
+            return layout.GetAxisPosition(content);
         }
 
         public void ResizeScrollView()
@@ -357,253 +321,62 @@ namespace F8Framework.Core
                 Initialize();
             }
 
-            CheckNeedMoreItem();
+            UpdateContentSize();
+        }
+        
+        public float GetItemPosition(int itemIndex)
+        {
+            float distance = GetItemDistance(itemIndex);
+
+            return -layout.GetAxisPostionFromOffset(distance);
         }
 
-        public float GetItemPosition(int dataIndex)
+        public void RefreshScroll()
         {
-            float itemPivot = GetItemPivot();
-            float passingItemSize = GetItemSizeSumToIndex(dataIndex);
-
-            if (isVertical == true)
+            if (isInitialize == false)
             {
-                return itemPivot - passingItemSize;
+                Initialize();
             }
-            else
+
+            if (needUpdateItemList == true)
             {
-                return itemPivot + passingItemSize;
+                BuildItemList();
+
+                needUpdateItemList = false;
             }
-        }
-
-        public int GetItemCount()
-        {
-            return GetDataCount();
-        }
-
-        protected void SetItemPivot(float itemSize, Vector2 pivot)
-        {
-            if (isVertical == true)
-            {
-                itemPivot = itemSize * pivot.y - itemSize - padding;
-            }
-            else
-            {
-                itemPivot = itemSize * pivot.x + padding;
-            }
-        }
-
-        public float GetItemPivot()
-        {
-            return itemPivot;
-        }
-
-
-        protected void RefreshScroll()
-        {
-            if (isDirty == true)
+            if (NeedUpdateItem() == true)
             {
                 UpdateShowItem();
             }
         }
 
+        protected float GetCrossSize()
+        {
+            return layout.GetCrossSize(content.rect);
+        }
+
+        protected void ResizeContent()
+        {
+            cachedData.contentSize = GetItemTotalSize();
+            content.sizeDelta = layout.GetAxisVector(-layout.padding, cachedData.contentSize);
+        }
+
+        protected void UpdateContentSize()
+        {
+            if (needReBuildLayout == true)
+            {
+                BuildLayout();
+                needReBuildLayout = false;
+            }
+        }
+
         protected bool NeedUpdateItem()
         {
-            if (isDirty == true)
-            {
-                return true;
-            }
+            CheckScrollData();
 
-            float contentsPosition = GetContentPosition();
-            if (updatedContentsPosition != contentsPosition)
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        protected void UpdateShowItem(bool forceUpdateData = false)
-        {
-            if (forceUpdateData == false &&
-                processing == true)
-            {
-                return;
-            }
-
-            if (NeedUpdateItem() == false)
-            {
-                return;
-            }
-
-            updatedContentsPosition = GetContentPosition();
-            isDirty = false;
-
-            processing = true;
-
-            int prevFirstDataIndex = firstDataIndex;
-            int prevLastDataIndex = lastDataIndex;
-
-            firstDataIndex = GetShowFirstDataIndex();
-            lastDataIndex = GetShowLastDataIndex();
-
-            if (prevFirstDataIndex != firstDataIndex)
-            {
-                for (int dataIndex = prevFirstDataIndex; dataIndex < firstDataIndex; dataIndex++)
-                {
-                    InfiniteScrollItem item = GetItemByDataIndex(dataIndex);
-                    if (item != null)
-                    {
-                        item.SetActive(false);
-                    }
-                }
-
-                changeValue = true;
-            }
-
-            if (prevLastDataIndex != lastDataIndex)
-            {
-                for (int dataIndex = lastDataIndex + 1; dataIndex <= prevLastDataIndex; dataIndex++)
-                {
-                    InfiniteScrollItem item = GetItemByDataIndex(dataIndex);
-                    if (item != null)
-                    {
-                        item.SetActive(false);
-                    }
-                }
-            }
-
-            int lineIndex = 0;
-
-            float itemPosition = 0;
-            float lineSize = layout.GetLineSize(lineIndex);
-
-            for (int dataIndex = 0; dataIndex < firstDataIndex; ++dataIndex)
-            {
-                int dataLineIndex = layout.GetLineIndex(dataIndex);
-                if (lineIndex != dataLineIndex)
-                {
-                    itemPosition += lineSize + space;
-
-                    lineIndex = dataLineIndex;
-                    lineSize = layout.GetLineSize(lineIndex);
-                }
-            }
-
-            float contentPosition = GetContentPosition();
-            float viewportSize = GetViewportSize();
-
-            for (int dataIndex = firstDataIndex; dataIndex < dataList.Count; ++dataIndex)
-            {
-                int dataLineIndex = layout.GetLineIndex(dataIndex);
-                if (lineIndex != dataLineIndex)
-                {
-                    itemPosition += lineSize + space;
-
-                    lineIndex = dataLineIndex;
-                    lineSize = layout.GetLineSize(lineIndex);
-                }
-
-                if (dataIndex == firstDataIndex)
-                {
-                    firstItemPosition = itemPosition;
-                }
-
-                if (IsShowAfterPosition(itemPosition, contentPosition, viewportSize) == true)
-                {
-                    break;
-                }
-
-                InfiniteScrollItem item = PullItemByDataIndex(dataIndex);
-
-                bool needUpdateData = false;
-
-                if (item.IsActive() == false ||
-                    item.GetDataIndex() != dataIndex)
-                {
-                    item.SetData(dataIndex);
-
-                    needUpdateData = true;
-
-                    changeValue = true;
-                }
-
-                if (needUpdateData == true || forceUpdateData == true)
-                {
-                    item.UpdateItem(dataList[dataIndex]);
-                }
-
-                RectTransform itemTransform = (RectTransform)item.transform;
-                if (item.IsUpdateItemSize() == true)
-                {
-                    float size = GetItemSize(dataIndex);
-                    if (size > 0 &&
-                        size < minItemSize)
-                    {
-                        minItemSize = size;
-                    }
-
-                    layout.FitItemSize(itemTransform, dataIndex, size);
-
-                    isChangedSize = true;
-                    item.UpdatedItemSize();
-                }
-
-                layout.FitItemPosition(itemTransform, dataIndex);
-
-                lastDataIndex = dataIndex;
-                lastItemtPosition = itemPosition;
-            }
-
-            if (prevLastDataIndex != lastDataIndex)
-            {
-                for (int dataIndex = lastDataIndex + 1; dataIndex <= prevLastDataIndex; dataIndex++)
-                {
-                    InfiniteScrollItem item = GetItemByDataIndex(dataIndex);
-                    if (item != null)
-                    {
-                        item.SetActive(false);
-                    }
-                }
-
-                changeValue = true;
-            }
-
-            if (changeValue == true)
-            {
-                onChangeValue.Invoke(firstDataIndex, lastDataIndex, isStartLine, isEndLine);
-                changeValue = false;
-            }
-
-            if (isChangedSize == true)
-            {
-                ResizeContent();
-            }
-
-            isChangedSize = false;
-
-            processing = false;
-        }
-
-        protected bool IsShowDataIndex(int dataIndex)
-        {
-            if (dataIndex >= firstDataIndex && dataIndex <= lastDataIndex)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        protected bool IsShowPosition(float position)
-        {
-            float contentPosition = GetContentPosition();
-            float viewportSize = GetViewportSize();
-
-            float viewPosition = position - contentPosition;
-            if (IsShowBeforePosition(position, contentPosition) == false &&
-                IsShowAfterPosition(position, contentPosition, viewportSize) == false)
+            if (needReBuildLayout == true ||
+                isRebuildLayout == true ||
+                isUpdateArea == true)
             {
                 return true;
             }
@@ -633,70 +406,11 @@ namespace F8Framework.Core
             return false;
         }
 
-        protected int GetShowFirstDataIndex()
-        {
-            return layout.GetLineFirstItemIndex(GetShowFirstLine());
-        }
-
-        protected int GetShowFirstLine()
-        {
-            float contentPosition = GetContentPosition();
-
-            float lastPosition = 0.0f;
-
-            int lineCount = layout.GetLineCount();
-            for (int lineIndex = 0; lineIndex < lineCount; lineIndex++)
-            {
-                lastPosition += layout.GetLineSize(lineIndex);
-
-                if (IsShowBeforePosition(lastPosition, contentPosition) == false)
-                {
-                    return lineIndex;
-                }
-
-                lastPosition += space;
-            }
-
-            return lineCount;
-        }
-
-        protected int GetShowLastDataIndex()
-        {
-            return layout.GetLineLastItemIndex(GetShowLastLine());
-        }
-
-        protected int GetShowLastLine()
-        {
-            float contentPosition = GetContentPosition();
-            float viewportSize = GetViewportSize();
-
-            float linePosition = 0.0f;
-
-            int lineCount = layout.GetLineCount();
-            for (int lineIndex = 0; lineIndex < lineCount; lineIndex++)
-            {
-                if (IsShowAfterPosition(linePosition, contentPosition, viewportSize) == true)
-                {
-                    return lineIndex;
-                }
-
-                linePosition += layout.GetLineSize(lineIndex);
-                linePosition += space;
-            }
-
-            return lineCount;
-        }
-
-        public void SetDirty()
-        {
-            isDirty = true;
-        }
-
         private void Update()
         {
-            if (NeedUpdateItem() == true)
+            if (isInitialize == true)
             {
-                UpdateShowItem();
+                RefreshScroll();
             }
         }
 
@@ -710,6 +424,22 @@ namespace F8Framework.Core
         public class ChangeValueEvent : UnityEvent<int, int, bool, bool>
         {
             public ChangeValueEvent()
+            {
+            }
+        }
+
+        [Serializable]
+        public class ItemActiveEvent : UnityEvent<int, bool>
+        {
+            public ItemActiveEvent()
+            {
+            }
+        }
+
+        [Serializable]
+        public class StateChangeEvent : UnityEvent<bool>
+        {
+            public StateChangeEvent()
             {
             }
         }

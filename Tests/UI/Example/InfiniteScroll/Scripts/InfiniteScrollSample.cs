@@ -1,7 +1,7 @@
-﻿using F8Framework.Core;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using F8Framework.Core;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,6 +17,8 @@ namespace F8Framework.Tests
         public Dropdown moveDataSelect = null;
         public Dropdown moveDataTypeSelect = null;
         public InputField moveDataTime = null;
+        public InputField moveItemSelect = null;
+        public Text itemCount = null;
 
         private int index = 0;
         private int insertCount = 0;
@@ -37,7 +39,22 @@ namespace F8Framework.Tests
                 AddLog(string.Format("horizontal select data : {0}", ((TestItemData)data).index.ToString()));
             });
 
-            moveDataSelect.onValueChanged.AddListener((option) => { MoveTo(option); });
+            moveDataSelect.onValueChanged.AddListener((option) =>
+            {
+                MoveToDataIndex(option);
+            });
+
+            moveItemSelect.onValueChanged.AddListener((text) =>
+            {
+                int index = 0;
+                if (int.TryParse(text, out index) == false)
+                {
+                    AddLog("Time is not Number");
+                }
+
+                MoveToItemIndex(index);
+            });
+            
         }
 
         public void IsMoveToLastData()
@@ -55,7 +72,7 @@ namespace F8Framework.Tests
             verticalScrollList.InsertData(data);
             horizontalScrollList.InsertData(data);
 
-            var options = new List<Dropdown.OptionData>() { new Dropdown.OptionData(index.ToString()) };
+            var options = new List<Dropdown.OptionData>() { new Dropdown.OptionData(data.index.ToString()) };
             moveDataSelect.AddOptions(options);
 
             ++insertCount;
@@ -138,18 +155,10 @@ namespace F8Framework.Tests
 
         private void UpdateDataCount()
         {
-            dataCount.text = string.Format("Data Count : {0}  (insert[{1}] remove[{2}])", dataList.Count, insertCount,
-                removeCount);
+            dataCount.text = string.Format("Data Count : {0}  (insert[{1}] remove[{2}])", dataList.Count, insertCount, removeCount);
+            itemCount.text = verticalScrollList.GetItemCount().ToString();
         }
-
-        public void ResizeScrollVeiw()
-        {
-            verticalScrollList.ResizeScrollView();
-            horizontalScrollList.ResizeScrollView();
-
-            AddLog("Resize Scroll View");
-        }
-
+        
         public void MoveToFirstData()
         {
             verticalScrollList.MoveToFirstData();
@@ -166,7 +175,7 @@ namespace F8Framework.Tests
             AddLog("Move to last data");
         }
 
-        private void MoveTo(int index)
+        private void MoveToItemIndex(int itemIndex)
         {
             float time = 0;
             if (float.TryParse(moveDataTime.text, out time) == false)
@@ -174,20 +183,77 @@ namespace F8Framework.Tests
                 AddLog("Time is not Number");
             }
 
+            verticalScrollList.MoveTo(itemIndex, (InfiniteScroll.MoveToType)moveDataTypeSelect.value, time);
+            horizontalScrollList.MoveTo(itemIndex, (InfiniteScroll.MoveToType)moveDataTypeSelect.value, time);
+
+            AddLog(string.Format("Move to ItemIndex : {0}", itemIndex));
+        }
+        private void MoveToDataIndex(int dataIndex)
+        {
+            float time = 0;
+            if (float.TryParse(moveDataTime.text, out time) == false)
+            {
+                AddLog("Time is not Number");
+            }
+            
             if (UnityEngine.Random.Range(0, 2) == 0)
             {
-                verticalScrollList.MoveTo(index, (InfiniteScroll.MoveToType)moveDataTypeSelect.value, time);
-                horizontalScrollList.MoveTo(index, (InfiniteScroll.MoveToType)moveDataTypeSelect.value, time);
+                verticalScrollList.MoveToFromDataIndex(dataIndex, (InfiniteScroll.MoveToType)moveDataTypeSelect.value, time);
+                horizontalScrollList.MoveToFromDataIndex(dataIndex, (InfiniteScroll.MoveToType)moveDataTypeSelect.value, time);
             }
             else
             {
-                TestItemData data = dataList[index];
+                TestItemData data = dataList[dataIndex];
 
                 verticalScrollList.MoveTo(data, (InfiniteScroll.MoveToType)moveDataTypeSelect.value, time);
                 horizontalScrollList.MoveTo(data, (InfiniteScroll.MoveToType)moveDataTypeSelect.value, time);
             }
 
-            AddLog(string.Format("Move to {0}", index));
+            AddLog(string.Format("Move to DataIndex : {0}", dataIndex));
+        }
+
+        public void FilterOdd()
+        {
+            Predicate<InfiniteScrollData> func = (data) =>
+            {
+                if (data is TestItemData testData)
+                {
+                    return (testData.index % 2) == 0;
+                }
+
+                return false;
+            };
+
+            verticalScrollList.SetFilter(func);
+            horizontalScrollList.SetFilter(func);
+
+            UpdateDataCount();
+        }
+
+        public void FilterEven()
+        {
+            Predicate<InfiniteScrollData> func = (data) =>
+            {
+                if (data is TestItemData testData)
+                {
+                    return (testData.index % 2) == 1;
+                }
+
+                return false;
+            };
+
+            verticalScrollList.SetFilter(func);
+            horizontalScrollList.SetFilter(func);
+
+            UpdateDataCount();
+        }
+
+        public void FilterAll()
+        {
+            verticalScrollList.SetFilter(null);
+            horizontalScrollList.SetFilter(null);
+
+            UpdateDataCount();
         }
 
         private void AddLog(string text)

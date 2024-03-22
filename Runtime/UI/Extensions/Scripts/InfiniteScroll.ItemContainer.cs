@@ -4,262 +4,129 @@ using UnityEngine;
 
 namespace F8Framework.Core
 {
-    public partial class InfiniteScroll : IItemContainer
+    public partial class InfiniteScroll
     {
+        [Header("Scroll Item", order = 2)]
+        public int needItemCount = 0;
+
+        public InfiniteScrollItem itemPrefab = null;
+
+        public bool dynamicItemSize = false;
+
         private const float NEED_MORE_ITEM_RATE = 2;
-        private const float UPDOWN_MULTIPLY = 2.0f;
 
-        private float defaultItemSize = 0.0f;
-        private float minItemSize = 0.0f;
+        private Vector2 defaultItemPrefabSize = Vector2.zero;
 
-        private int needItemNumber = -1;
-        private int madeItemNumber = 0;
-        private List<InfiniteScrollItem> items = new List<InfiniteScrollItem>();
+        private List<InfiniteScrollItem> itemObjectList = new List<InfiniteScrollItem>();
+
+        public float GetItemSize(int itemIndex)
+        {
+            float size = 0;
+
+            if (dynamicItemSize == true)
+            {
+                if (itemIndex < itemCount)
+                {
+                    DataContext context = GetContextFromItem(itemIndex);
+                    if (context != null)
+                    {
+                        size = context.GetItemSize();
+                    }
+                }
+            }
+            else
+            {
+                size = layout.GetMainSize(defaultItemPrefabSize);
+            }
+
+            return size;
+        }
+        public bool IsDynamicItemSize()
+        {
+            return dynamicItemSize;
+        }
 
         private InfiniteScrollItem CreateItem()
         {
-            InfiniteScrollItem item = Instantiate(itemPrefab);
-            RectTransform itemTransform = (RectTransform)item.transform;
+            InfiniteScrollItem itemObject = Instantiate(itemPrefab, content, false);
 
-            itemTransform.anchorMin = anchorMin;
-            itemTransform.anchorMax = anchorMax;
-            itemTransform.pivot = content.pivot;
+            itemObject.Initalize(this, itemObjectList.Count);
+            itemObject.SetActive(false, false);
 
-            if (isVertical == true)
-            {
-                itemTransform.sizeDelta = new Vector2(0, itemTransform.sizeDelta.y);
-            }
-            else
-            {
-                itemTransform.sizeDelta = new Vector2(itemTransform.sizeDelta.x, 0);
-            }
+            itemObject.SetAxis(cachedData.anchorMin, cachedData.anchorMax, cachedData.itemPivot);
 
-            itemTransform.SetParent(content, false);
+            itemObject.AddSelectCallback(OnSelectItem);
+            
+            RectTransform itemTransform = itemObject.rectTransform;
+            itemTransform.sizeDelta = layout.GetAxisVector(layout.GetMainSize(itemTransform.sizeDelta));
 
-            items.Add(item);
+            itemObjectList.Add(itemObject);
 
-            item.Initalize(this, madeItemNumber);
-            item.AddSelectCallback(OnSelectItem);
+            
 
-            ++madeItemNumber;
-
-            item.SetActive(false, false);
-
-            return item;
-        }
-
-        private void InitializeItemInformation(RectTransform itemTransform)
-        {
-            if (isVertical == true)
-            {
-                defaultItemSize = itemTransform.rect.height;
-            }
-            else
-            {
-                defaultItemSize = itemTransform.rect.width;
-            }
-
-            SetItemPivot(defaultItemSize, itemTransform.pivot);
-
-            minItemSize = defaultItemSize;
-            needItemNumber = GetNeedItemNumber();
-
-            items.Clear();
+            return itemObject;
         }
 
         private float GetNeedSize()
         {
-            float needItemSize = 0;
-            if (isVertical == true)
-            {
-                needItemSize = viewport.rect.height * NEED_MORE_ITEM_RATE;
-            }
-            else
-            {
-                needItemSize = viewport.rect.width * NEED_MORE_ITEM_RATE;
-            }
-
-            return needItemSize;
+            return layout.GetMainSize(viewport) * NEED_MORE_ITEM_RATE;
         }
 
         private void CreateNeedItem()
         {
-            int itemCount = GetItemCount();
-            if (madeItemNumber > itemCount)
+            for (int itemNumber = itemObjectList.Count; itemNumber < needItemCount; itemNumber++)
             {
-                return;
-            }
-
-            if (dynamicItemSize == true)
-            {
-                float itemSizeSum = 0;
-                float needItemSize = GetNeedSize();
-
-                if (layout.IsGrid() == true)
-                {
-                    int lineCount = layout.GetLineCount();
-                    for (int lineIndex = 0; lineIndex < lineCount; ++lineIndex)
-                    {
-                        itemSizeSum += layout.GetLineSize(lineIndex);
-
-                        if (lineIndex + 1 < lineCount)
-                        {
-                            itemSizeSum += space;
-                        }
-
-                        if (itemSizeSum > needItemSize)
-                        {
-                            return;
-                        }
-                    }
-                }
-                else
-                {
-                    for (int sizeIndex = 0; sizeIndex < itemCount; ++sizeIndex)
-                    {
-                        itemSizeSum += GetItemSize(sizeIndex);
-
-                        if (sizeIndex + 1 < itemCount)
-                        {
-                            itemSizeSum += space;
-                        }
-
-                        if (itemSizeSum > needItemSize)
-                        {
-                            return;
-                        }
-                    }
-                }
-            }
-            else
-            {
-                if (madeItemNumber > 0 &&
-                    madeItemNumber == needItemNumber)
-                {
-                    return;
-                }
-
-                if (madeItemNumber > itemCount)
-                {
-                    return;
-                }
-            }
-
-            CreateItem();
-        }
-
-        private void CheckNeedMoreItem()
-        {
-            int itemNumber = GetNeedItemNumber();
-
-            if (needItemNumber < itemNumber)
-            {
-                int gap = itemNumber - needItemNumber;
-                needItemNumber = itemNumber;
-
-                if (GetItemCount() > 0)
-                {
-                    firstDataIndex = GetShowFirstDataIndex() + madeItemNumber;
-                    int dataIndex = 0;
-
-                    for (int count = 0; count < gap; ++count)
-                    {
-                        dataIndex = firstDataIndex + count;
-                        CreateNeedItem();
-                    }
-                }
-
-                SetDirty();
+                CreateItem();
             }
         }
 
         private void ClearItemsData()
         {
-            for (int index = 0; index < items.Count; ++index)
+            for (int index = 0; index < itemObjectList.Count; ++index)
             {
-                items[index].ClearData(false);
+                itemObjectList[index].ClearData(false);
             }
         }
 
         private void ClearItems()
         {
             ClearItemsData();
-            for (int index = 0; index < items.Count; ++index)
+            for (int index = 0; index < itemObjectList.Count; ++index)
             {
-                items[index].Clear();
-                GameObject.Destroy(items[index].gameObject);
+                itemObjectList[index].Clear();
+                GameObject.Destroy(itemObjectList[index].gameObject);
             }
-
-            items.Clear();
+            itemObjectList.Clear();
         }
 
-        public float GetItemSize(int dataIndex)
+        private InfiniteScrollItem PullItem(DataContext context)
         {
-            float size = minItemSize;
+            InfiniteScrollItem item = context.itemObject;
 
-            if (dynamicItemSize == true)
+            if( item == null || 
+                item.GetDataIndex() != context.index)
             {
-                if (dataIndex < dataList.Count)
+                context.itemObject = null;
+                int itemObjectIndex = GetItemIndexFromDataIndex(context.index, true);
+                if (itemObjectIndex == -1)
                 {
-                    float ItemSize = dataList[dataIndex].GetItemSize();
-                    if (ItemSize == 0)
-                    {
-                        ItemSize = minItemSize;
-                        dataList[dataIndex].SetItemSize(ItemSize);
-                    }
-
-                    return ItemSize;
+                    item = CreateItem();
                 }
-            }
-            else
-            {
-                size = defaultItemSize;
-            }
-
-            return size;
-        }
-
-        private float GetItemTotalSize()
-        {
-            float itemTotalSize = GetItemSizeSum(GetItemCount());
-
-            return itemTotalSize + padding * UPDOWN_MULTIPLY;
-        }
-
-        private InfiniteScrollItem PullItemByDataIndex(int dataIndex)
-        {
-            InfiniteScrollItem item = null;
-
-            int itemIndex = GetItemIndexByDataIndex(dataIndex, true);
-            if (itemIndex == -1)
-            {
-                item = CreateItem();
-            }
-            else
-            {
-                item = items[itemIndex];
+                else
+                {
+                    item = itemObjectList[itemObjectIndex];
+                }
             }
 
             return item;
         }
 
-        private InfiniteScrollItem GetItemByDataIndex(int dataIndex)
-        {
-            int itemIndex = GetItemIndexByDataIndex(dataIndex, false);
-            if (itemIndex != -1)
-            {
-                return items[itemIndex];
-            }
-
-            return null;
-        }
-
-        private int GetItemIndexByDataIndex(int dataIndex, bool findEmptyIndex = false)
+        private int GetItemIndexFromDataIndex(int dataIndex, bool findEmptyIndex = false)
         {
             int emptyIndex = -1;
-            for (int index = 0; index < items.Count; ++index)
+            for (int index = 0; index < itemObjectList.Count; ++index)
             {
-                if (items[index].GetDataIndex() == dataIndex)
+                if (itemObjectList[index].GetDataIndex() == dataIndex)
                 {
                     return index;
                 }
@@ -267,7 +134,7 @@ namespace F8Framework.Core
                 if (findEmptyIndex == true)
                 {
                     if (emptyIndex == -1 &&
-                        items[index].IsActive() == false)
+                        itemObjectList[index].IsActive() == false )
                     {
                         emptyIndex = index;
                     }
@@ -276,116 +143,18 @@ namespace F8Framework.Core
 
             return emptyIndex;
         }
-
-        public bool IsDynamicItemSize()
-        {
-            return dynamicItemSize;
-        }
-
-        public void OnUpdateItemSize(InfiniteScrollData data, RectTransform itemTransform)
+        
+        internal void OnUpdateItemSize(DataContext context)
         {
             if (dynamicItemSize == true)
             {
-                int dataIndex = GetDataIndex(data);
-
-                if (IsValidDataIndex(dataIndex) == true)
+                if(context.itemObject != null)
                 {
-                    float size = GetItemSize(dataIndex);
-                    if (dataIndex == 0)
-                    {
-                        SetItemPivot(size, itemTransform.pivot);
-                    }
-
-                    if (size > 0)
-                    {
-                        if (minItemSize == 0 ||
-                            minItemSize > size)
-                        {
-                            minItemSize = size;
-                        }
-                    }
-
                     UpdateAllData(false);
                 }
+
+                needReBuildLayout = true;
             }
-        }
-
-        private float GetItemSizeSum(int toIndex)
-        {
-            int itemCount = GetItemCount();
-            if (toIndex >= itemCount)
-            {
-                toIndex = itemCount - 1;
-            }
-
-            float sizeSum = 0.0f;
-
-            int lineCount = layout.GetLineCount(toIndex);
-            if (dynamicItemSize == true)
-            {
-                for (int lineIdx = 0; lineIdx < lineCount; lineIdx++)
-                {
-                    sizeSum += layout.GetLineSize(lineIdx);
-                }
-            }
-            else
-            {
-                sizeSum = defaultItemSize * lineCount;
-            }
-
-            if (lineCount > 0)
-            {
-                int spaceCount = lineCount;
-
-                int maxLineCount = layout.GetLineCount();
-                if (lineCount == maxLineCount)
-                {
-                    spaceCount--;
-                }
-
-                sizeSum = sizeSum + space * spaceCount;
-            }
-
-            return sizeSum;
-        }
-
-        private float GetItemSizeSumToIndex(int toIndex)
-        {
-            int itemCount = GetItemCount();
-            if (toIndex >= itemCount)
-            {
-                toIndex = itemCount - 1;
-            }
-
-            float sizeSum = 0.0f;
-
-            int lineCount = layout.GetLineCount(toIndex) - 1;
-            if (dynamicItemSize == true)
-            {
-                for (int lineIdx = 0; lineIdx < lineCount; lineIdx++)
-                {
-                    sizeSum += layout.GetLineSize(lineIdx);
-                }
-            }
-            else
-            {
-                sizeSum = defaultItemSize * lineCount;
-            }
-
-            if (lineCount > 0)
-            {
-                int spaceCount = lineCount;
-
-                int maxLineCount = layout.GetLineCount();
-                if (lineCount == maxLineCount)
-                {
-                    spaceCount--;
-                }
-
-                sizeSum = sizeSum + space * spaceCount;
-            }
-
-            return sizeSum;
         }
     }
 }

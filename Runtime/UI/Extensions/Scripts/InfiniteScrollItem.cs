@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using DataContext = F8Framework.Core.InfiniteScroll.DataContext;
 
 namespace F8Framework.Core
 {
@@ -9,38 +10,25 @@ namespace F8Framework.Core
 
     public class InfiniteScrollItem : MonoBehaviour
     {
-        public class DataContext
-        {
-            public DataContext(InfiniteScrollData data, int index)
-            {
-                this.index = index;
-                this.data = data;
-            }
-
-            internal InfiniteScrollData data;
-            internal int index = -1;
-
-            internal float scrollItemSize = 0;
-            internal bool updateItemSize = false;
-
-            public float GetItemSize()
-            {
-                return scrollItemSize;
-            }
-
-            public void SetItemSize(float value)
-            {
-                scrollItemSize = value;
-                updateItemSize = true;
-            }
-        }
-
         public bool autoApplySize = false;
 
-        protected RectTransform rectTransform = null;
+        protected RectTransform cachedRectTransform = null;
 
         protected bool activeItem;
         protected InfiniteScroll scroll = null;
+
+        public RectTransform rectTransform
+        {
+            get
+            {
+                if (System.Object.ReferenceEquals(cachedRectTransform, null) == true)
+                {
+                    cachedRectTransform = transform as RectTransform;
+                }
+
+                return cachedRectTransform;
+            }
+        }
 
         protected InfiniteScrollData scrollData
         {
@@ -56,19 +44,31 @@ namespace F8Framework.Core
                 }
             }
         }
-
         protected DataContext dataContext = null;
         protected Action<InfiniteScrollData> selectCallback = null;
         protected Action<InfiniteScrollData, RectTransform> updateSizeCallback = null;
 
-        internal int itemIndex = -1;
+        protected int itemObjectIndex = -1;
 
-        public void Initalize(InfiniteScroll scroll, int itemIndex)
+        internal bool needUpdateItemSize = true;
+        
+        public void Initalize(InfiniteScroll scroll, int itemObjectIndex)
         {
             this.scroll = scroll;
-            this.itemIndex = itemIndex;
-
-            this.rectTransform = transform as RectTransform;
+            this.itemObjectIndex = itemObjectIndex;
+            this.needUpdateItemSize = true;
+        }
+        
+        public int GetItemIndex()
+        {
+            if (dataContext != null)
+            {
+                return dataContext.itemIndex;
+            }
+            else
+            {
+                return -1;
+            }
         }
 
         public int GetDataIndex()
@@ -88,26 +88,6 @@ namespace F8Framework.Core
             return activeItem;
         }
 
-        public bool IsUpdateItemSize()
-        {
-            if (dataContext != null)
-            {
-                return dataContext.updateItemSize;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public void UpdatedItemSize()
-        {
-            if (dataContext != null)
-            {
-                dataContext.updateItemSize = false;
-            }
-        }
-
         public void AddSelectCallback(Action<InfiniteScrollData> callback)
         {
             selectCallback += callback;
@@ -120,6 +100,21 @@ namespace F8Framework.Core
 
         public virtual void UpdateData(InfiniteScrollData scrollData)
         {
+        }
+
+        internal void SetAxis(Vector2 anchorMin, Vector2 anchorMax, Vector2 pivot)
+        {
+            bool autoApplySize = this.autoApplySize;
+
+            this.autoApplySize = false;
+
+            rectTransform.anchorMin = anchorMin;
+            rectTransform.anchorMax = anchorMax;
+            rectTransform.pivot = pivot;
+
+            needUpdateItemSize = true;
+
+            this.autoApplySize = autoApplySize;
         }
 
         protected void OnSelect()
@@ -145,24 +140,21 @@ namespace F8Framework.Core
             }
         }
 
-        public void SetSize(Vector2 sizeDelta, bool notity = true)
+        public void SetSize(float itemSize, bool notity = true)
         {
             if (scrollData == null)
             {
                 return;
             }
 
-            float itemSize = 0;
-            if (scroll.IsVersical() == true)
+            if (scroll != null &&
+                scroll.dynamicItemSize == false)
             {
-                itemSize = sizeDelta.y;
-            }
-            else
-            {
-                itemSize = sizeDelta.x;
+                return;
             }
 
-            if (dataContext.GetItemSize() != itemSize)
+            if (dataContext != null &&
+                dataContext.GetItemSize() != itemSize)
             {
                 dataContext.SetItemSize(itemSize);
 
@@ -170,23 +162,37 @@ namespace F8Framework.Core
                 {
                     OnUpdateItemSize();
                 }
+
+                this.needUpdateItemSize = true;
             }
         }
 
-        internal void SetData(int dataIndex, bool notifyEvent = true)
+        public void SetSize(Vector2 sizeDelta, bool notity = true)
         {
-            this.dataContext = scroll.GetDataContext(dataIndex);
+            if (scrollData == null)
+            {
+                return;
+            }
 
-            SetActive(true, notifyEvent);
+            if (scroll != null &&
+                scroll.dynamicItemSize == false)
+            {
+                return;
+            }
 
-            dataContext.updateItemSize = true;
+            float itemSize = scroll.layout.GetMainSize(sizeDelta);
+            SetSize(itemSize, notity);
         }
 
         internal void ClearData(bool notifyEvent = true)
         {
-            SetActive(false, notifyEvent);
+            SetActive(false, activeItem && notifyEvent);
 
-            this.dataContext = null;
+            if (dataContext != null)
+            {
+                dataContext.itemObject = null;
+                dataContext = null;
+            }
         }
 
         internal void Clear()
@@ -196,14 +202,18 @@ namespace F8Framework.Core
             selectCallback = null;
             updateSizeCallback = null;
         }
-
         internal void UpdateItem(DataContext context)
         {
             this.dataContext = context;
-            this.dataContext.updateItemSize = true;
+            this.dataContext.itemObject = this;
 
             UpdateData(this.dataContext.data);
+
+            this.dataContext.needUpdateItemData = false;
+
+            this.needUpdateItemSize = true;
         }
+
 
         public void AddUpdateSizeCallback(Action<InfiniteScrollData, RectTransform> callback)
         {
@@ -217,9 +227,15 @@ namespace F8Framework.Core
 
         protected void OnUpdateItemSize()
         {
+            if (scroll != null &&
+                scroll.dynamicItemSize == false)
+            {
+                return;
+            }
+
             if (scroll != null)
             {
-                scroll.OnUpdateItemSize(scrollData, rectTransform);
+                scroll.OnUpdateItemSize(dataContext);
             }
 
             if (updateSizeCallback != null)
@@ -228,14 +244,37 @@ namespace F8Framework.Core
             }
         }
 
+        protected bool CanAutoSizeCheck()
+        {
+            if (autoApplySize == false ||
+                activeItem == false)
+            {
+                return false;
+            }
+
+            if(scroll == null)
+            {
+                return false;
+            }
+
+            if( scroll.processing == true || 
+                scroll.anchorUpdate == true)
+            {
+                return false;
+            }
+
+            if (rectTransform == null)
+            {
+                return false;
+            }
+
+            return true;
+        }
         protected void OnRectTransformDimensionsChange()
         {
-            if (autoApplySize == true)
+            if (CanAutoSizeCheck() == true)
             {
-                if (rectTransform != null)
-                {
-                    SetSize(rectTransform.sizeDelta);
-                }
+                SetSize(rectTransform.sizeDelta);
             }
         }
     }

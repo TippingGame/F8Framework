@@ -10,6 +10,8 @@ namespace F8Framework.Core
         private static readonly Random random = new Random();
         public static TValue RemoveLast<TValue>(this List<TValue> @this)
         {
+            if (@this == null || @this.Count == 0)
+                return default(TValue);
             var index = @this.Count - 1;
             var result = @this[index];
             @this.RemoveAt(index);
@@ -17,17 +19,23 @@ namespace F8Framework.Core
         }
         public static TValue RemoveFirst<TValue>(this List<TValue> @this)
         {
+            if (@this == null || @this.Count == 0)
+                return default(TValue);
             var result = @this[0];
             @this.RemoveAt(0);
             return result;
         }
         public static TValue First<TValue>(this List<TValue> @this)
         {
+            if (@this == null || @this.Count == 0)
+                return default(TValue);
             var result = @this[0];
             return result;
         }
         public static TValue Last<TValue>(this List<TValue> @this)
         {
+            if (@this == null || @this.Count == 0)
+                return default(TValue);
             var result = @this[@this.Count - 1];
             return result;
         }
