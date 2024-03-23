@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using F8Framework.AssetMap;
 
 namespace F8Framework.Core
 {
@@ -8,20 +9,18 @@ namespace F8Framework.Core
         public string Version;
         public string AssetRemoteAddress;
         public bool EnableHotUpdate;
-        public string HotUpdateURL;
+        public List<string> HotUpdateVersion;
         public bool EnablePackage;
-        public string PackageURL;
         public List<string> SubPackage;
 
-        public GameVersion(string version, string assetRemoteAddress = null, bool enableHotUpdate = false, string hotUpdateURL = null, 
-            bool enablePackage = false, string packageURL = null, List<string> subPackage = null)
+        public GameVersion(string version, string assetRemoteAddress = null, bool enableHotUpdate = false, 
+            List<string> hotUpdateVersion = null, bool enablePackage = false, List<string> subPackage = null)
         {
             Version = version;
             AssetRemoteAddress = assetRemoteAddress;
             EnableHotUpdate = enableHotUpdate;
-            HotUpdateURL = hotUpdateURL;
+            HotUpdateVersion = hotUpdateVersion;
             EnablePackage = enablePackage;
-            PackageURL = packageURL;
             SubPackage = subPackage;
         }
         
@@ -36,13 +35,14 @@ namespace F8Framework.Core
         public static GameVersion LocalGameVersion = new GameVersion();
 
         public static GameVersion RemoteGameVersion = new GameVersion();
-        
+
+        public static Dictionary<string, AssetBundleMap.AssetMapping> RemoteAssetBundleMap =
+            new Dictionary<string, AssetBundleMap.AssetMapping>();
         /// <summary>
-        /// 判断版本号大小
+        /// 判断版本号大小，1为version1大，-1为version2大，0为一样大
         /// </summary>
-        /// <param name="version1"></param>
-        /// <param name="version2"></param>
-        /// <returns>1为version1大，-1为version2大，0为一样大</returns>
+        /// <param name="version1">版本1</param>
+        /// <param name="version2">版本2</param>
         public static int CompareVersions(string version1, string version2)
         {
             // Split the versions into individual components

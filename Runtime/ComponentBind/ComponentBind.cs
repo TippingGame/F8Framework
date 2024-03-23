@@ -85,7 +85,6 @@ namespace F8Framework.Core
                     foreach (var key in DefaultCodeBindNameTypeConfig.BindNameTypeDict.Keys)
                     {
                         if (!name.Contains(key))
-                            
                             continue;
                         string componentType = DefaultCodeBindNameTypeConfig.BindNameTypeDict[key];
                         if (componentNames == null)

@@ -43,7 +43,7 @@ namespace F8Framework.Core
         
         /* ------------------------可选模块------------------------ */
         // 热更新版本管理
-        private static HotUpdateVersion _hotUpdateVersion;
+        private static HotUpdateManager _hotUpdateManager;
         
         
         public static MessageManager Message
@@ -308,18 +308,18 @@ namespace F8Framework.Core
             }
         }
         
-        public static HotUpdateVersion HotUpdate
+        public static HotUpdateManager HotUpdate
         {
             get
             {
-                if (_hotUpdateVersion == null)
-                    _hotUpdateVersion = ModuleCenter.CreateModule<HotUpdateVersion>();
-                return _hotUpdateVersion;
+                if (_hotUpdateManager == null)
+                    _hotUpdateManager = ModuleCenter.CreateModule<HotUpdateManager>();
+                return _hotUpdateManager;
             }
             set
             {
-                if (_hotUpdateVersion == null)
-                    _hotUpdateVersion = value;
+                if (_hotUpdateManager == null)
+                    _hotUpdateManager = value;
             }
         }
     }

@@ -42,6 +42,7 @@ Unity 读取 Excel 的工具
 ## Excel 示例
 
 值类型 Excel 示例：
+（id 是唯一索引）
 
 | int | long       | float    | double      | str             |
 | --- | ---------- | -------- | ----------- | --------------- |
@@ -118,14 +119,14 @@ ReadExcel.Instance.LoadAllExcelData(); // 运行时加载 Excel 最新文件
 
 ## 使用到的库
 
-Excel.dll\
+Excel.dll（已修改缓存地址为Application.persistentDataPath）  
 I18N.CJK.dll\
 I18N.dll\
 I18N.MidEast.dll\
 I18N.Other.dll\
 I18N.Rare.dll\
 I18N.West.dll\
-ICSharpCode.SharpZipLib.dll\
+[ICSharpCode.SharpZipLib.dll](https://github.com/icsharpcode/SharpZipLib)  
 [LitJson.dll](https://github.com/LitJSON/litjson)（已修改字典Key可以使用int类型）
 
 ## 注意

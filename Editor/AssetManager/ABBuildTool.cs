@@ -333,13 +333,13 @@ namespace F8Framework.Core.Editor
         
         private static void WriteAssetNames()
         {
-            string assetMapPath = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/AssetMap/Resources/AssetBundleMap.json";
+            string assetMapPath = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/AssetMap/Resources/" + nameof(AssetBundleMap) + ".json";
             FileTools.SafeDeleteFile(assetMapPath);
             FileTools.SafeDeleteFile(assetMapPath + ".meta");
             FileTools.CheckFileAndCreateDirWhenNeeded(assetMapPath);
             AssetDatabase.Refresh();
                 
-            string AssetBundleMapPath = Application.dataPath + "/F8Framework/AssetMap/Resources/AssetBundleMap.json";
+            string AssetBundleMapPath = Application.dataPath + "/F8Framework/AssetMap/Resources/" + nameof(AssetBundleMap) + ".json";
             FileTools.CheckFileAndCreateDirWhenNeeded(AssetBundleMapPath);
             FileTools.SafeWriteAllText(AssetBundleMapPath, Util.LitJson.ToJson(assetMapping));
             AssetDatabase.Refresh();
@@ -420,13 +420,13 @@ namespace F8Framework.Core.Editor
         
         private static void WriteResourceNames()
         {
-            string resourceMapPath = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/AssetMap/Resources/ResourceMap.json";
+            string resourceMapPath = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/AssetMap/Resources/" + nameof(ResourceMap) + ".json";
             FileTools.SafeDeleteFile(resourceMapPath);
             FileTools.SafeDeleteFile(resourceMapPath + ".meta");
             FileTools.CheckFileAndCreateDirWhenNeeded(resourceMapPath);
             AssetDatabase.Refresh();
             
-            string ResourceMapPath = Application.dataPath + "/F8Framework/AssetMap/Resources/ResourceMap.json";
+            string ResourceMapPath = Application.dataPath + "/F8Framework/AssetMap/Resources/" + nameof(ResourceMap) + ".json";
             FileTools.CheckFileAndCreateDirWhenNeeded(ResourceMapPath);
             FileTools.SafeWriteAllText(ResourceMapPath, Util.LitJson.ToJson(resourceMapping));
             AssetDatabase.Refresh();
@@ -471,11 +471,11 @@ namespace F8Framework.Core.Editor
             foreach (var package in packages)
             {
                 // 判断地址中是否包含"Package_"
-                int index = package.IndexOf(HotUpdateVersion.PackageSplit);
+                int index = package.IndexOf(HotUpdateManager.PackageSplit);
                 if (index != -1)
                 {
                     // 如果包含，则获取"Package_"后面的所有数据
-                    string part = package.Substring(index + HotUpdateVersion.PackageSplit.Length);
+                    string part = package.Substring(index + HotUpdateManager.PackageSplit.Length);
                     return part;
                 }
             }

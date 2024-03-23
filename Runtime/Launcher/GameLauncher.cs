@@ -28,7 +28,7 @@ public class GameLauncher : MonoBehaviour
         FF8.LogWriter = ModuleCenter.CreateModule<F8LogWriter>();
         
 
-        FF8.HotUpdate = ModuleCenter.CreateModule<HotUpdateVersion>();
+        FF8.HotUpdate = ModuleCenter.CreateModule<HotUpdateManager>();
         
         StartGame();
     }

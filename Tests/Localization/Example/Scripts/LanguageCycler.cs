@@ -30,7 +30,7 @@ namespace F8Framework.Tests
 			FF8.LogWriter = ModuleCenter.CreateModule<F8LogWriter>();
         
 
-			FF8.HotUpdate = ModuleCenter.CreateModule<HotUpdateVersion>();
+			FF8.HotUpdate = ModuleCenter.CreateModule<HotUpdateManager>();
 		}
 
 		void Update()

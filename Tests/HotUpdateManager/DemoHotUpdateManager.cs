@@ -1,10 +1,12 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using F8Framework.Core;
 using UnityEngine;
 
 namespace F8Framework.Tests
 {
-    public class DemoHotUpdateVersion : MonoBehaviour
+    public class DemoHotUpdateManager : MonoBehaviour
     {
         IEnumerator Start()
         {
@@ -13,9 +15,17 @@ namespace F8Framework.Tests
 
             // 初始化远程版本
             yield return FF8.HotUpdate.InitRemoteVersion();
-
+            
+            // 初始化资源版本
+            yield return FF8.HotUpdate.InitAssetVersion();
+            
+            // 检查需要热更的资源，总大小
+            Tuple<List<string>, long> result  = FF8.HotUpdate.CheckHotUpdate();
+            var hotUpdateAssetUrl = result.Item1;
+            var allSize = result.Item2;
+            
             // 资源热更新
-            FF8.HotUpdate.CheckHotUpdate(() =>
+            FF8.HotUpdate.StartHotUpdate(hotUpdateAssetUrl, () =>
             {
                 LogF8.Log("完成");
             }, () =>
@@ -25,9 +35,12 @@ namespace F8Framework.Tests
             {
                 LogF8.Log("进度：" + progress);
             });
+
+            // 检查未加载的分包
+            List<string> subPackage = FF8.HotUpdate.CheckPackageUpdate(GameConfig.LocalGameVersion.SubPackage);
             
             // 分包加载
-            FF8.HotUpdate.CheckPackageUpdate(() =>
+            FF8.HotUpdate.StartPackageUpdate(subPackage, () =>
             {
                 LogF8.Log("完成");
             }, () =>

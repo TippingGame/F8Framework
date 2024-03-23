@@ -10,8 +10,8 @@ namespace F8Framework.Core
     {
         private static string _streamingAssetsPath = Application.streamingAssetsPath + "/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
         private static string _remoteAddress = GameConfig.LocalGameVersion.AssetRemoteAddress + "/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
-        private static string _hotUpdatePath = Application.persistentDataPath + HotUpdateVersion.HotUpdateDirName + "/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
-        private static string _packagePath = Application.persistentDataPath + HotUpdateVersion.PackageDirName + "/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
+        private static string _hotUpdatePath = Application.persistentDataPath + HotUpdateManager.HotUpdateDirName + "/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
+        private static string _packagePath = Application.persistentDataPath + HotUpdateManager.PackageDirName + "/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
         /// <summary>
         /// 源类型的枚举。
         /// </summary>
@@ -107,8 +107,8 @@ namespace F8Framework.Core
         public static SourceType GetAssetBundleSourceType(string assetBundleFullName)
         {
             string streamingAssetsPath = Application.streamingAssetsPath;
-            string hotUpdatePath = Application.persistentDataPath + HotUpdateVersion.HotUpdateDirName;
-            string packagePath = Application.persistentDataPath + HotUpdateVersion.PackageDirName;
+            string hotUpdatePath = Application.persistentDataPath + HotUpdateManager.HotUpdateDirName;
+            string packagePath = Application.persistentDataPath + HotUpdateManager.PackageDirName;
 
             if (assetBundleFullName.Contains(streamingAssetsPath))
             {
