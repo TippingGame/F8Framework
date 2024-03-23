@@ -47,7 +47,7 @@ Unity F8 SDKManager组件，与原生平台交互，接入多个平台或者渠�
 ```
 
 ### 安卓工程使用方法
-* 勾选两个选项  
+* 勾选两个选项 Project Settings -> Player -> Publishing Settings -> Build  
 ![image](ui_20240324030616.png)  
 ------------------------------
 * 勾选自动生成后替换这两个文件 [AndroidManifest.xml](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/AndroidManifest.xml) 和 [mainTemplate.gradle](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/mainTemplate.gradle)  
