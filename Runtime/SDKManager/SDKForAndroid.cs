@@ -6,7 +6,6 @@ namespace F8Framework.Core
     {
         private AndroidJavaClass androidJavaClass;
         private AndroidJavaObject androidJavaObject;
-        private AndroidJavaClass toastClass;
 
         public SDKForAndroid() : base()
         {
@@ -160,11 +159,14 @@ namespace F8Framework.Core
 
         public override void Toast(string msg)
         {
-            int durationFlag = 1; // durationFlag: Toast.LENGTH_SHORT=0, Toast.LENGTH_LONG=1
-            toastClass ??= new AndroidJavaClass("android.widget.Toast");
-            AndroidJavaObject toast =
-                toastClass.CallStatic<AndroidJavaObject>("makeText", androidJavaObject, msg, durationFlag);
-            toast.Call("show");
+            switch ((SDKManager.Instance.platformId, SDKManager.Instance.channelId))
+            {
+                case ("", ""):
+                    break;
+                default:
+                    Call("AndroidToast", msg);
+                    break;
+            }
         }
     }
 }

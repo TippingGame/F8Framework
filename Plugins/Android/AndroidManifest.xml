@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.TippingGame.UnityAndroidDemo"
+    android:versionCode="1"
+    android:versionName="1.0.0" >
+
+    <uses-sdk android:minSdkVersion="1" />
+
+    <application
+        android:name="android.support.multidex.MultiDexApplication"
+        android:allowBackup="true"
+        android:exported="true"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:supportsRtl="true" >
+
+        <!-- 某些平台适应刘海屏 -->
+        <meta-data
+            android:name="notch.config"
+            android:value="portrait|landscape"
+            tools:node="replace" />
+        <meta-data
+            android:name="android.notch_support"
+            android:value="true"
+            tools:node="replace" />
+        <meta-data
+            android:name="android.max_aspect"
+            android:value="2.4"
+            tools:node="replace" />
+
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
+        <!-- 某些平台适应刘海屏 -->
+
+        <activity
+            android:name="com.TippingGame.UnityAndroidDemo.MoeNativeActivity"
+            android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale|layoutDirection|density"
+            android:exported="true"
+            android:theme="@style/UnityThemeSelector" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <meta-data
+                android:name="unityplayer.UnityActivity"
+                android:value="true" />
+        </activity>
+        <activity
+            android:name="com.TippingGame.UnityAndroidDemo.MainActivity"
+            android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale|layoutDirection|density"
+            android:exported="true"
+            android:theme="@style/UnityThemeSelector" >
+        </activity>
+    </application>
+
+</manifest>

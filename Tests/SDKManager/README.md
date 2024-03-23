@@ -46,4 +46,16 @@ Unity F8 SDKManager组件，与原生平台交互，接入多个平台或者渠�
         FF8.SDK.SDKToast("Native Toast");
 ```
 
+### 安卓工程使用方法
+* 勾选两个选项  
+![image](ui_20240324030616.png)  
+------------------------------
+* 勾选自动生成后替换这两个文件 [AndroidManifest.xml](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/AndroidManifest.xml) 和 [mainTemplate.gradle](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/mainTemplate.gradle)  
+![image](ui_20240324030626.png)
+------------------------------
+[UnityAndroidDemo.zip](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/UnityAndroidDemo.zip) 为安卓工程，用作导出 [UnityAndroidDemo-release.aar](https://github.com/TippingGame/F8Framework/blob/main/Plugins/Android/UnityAndroidDemo-release.aar) 和 [AndroidManifest.xml](https://github.com/TippingGame/F8Framework/blob/main/Plugins/Android/AndroidManifest.xml)  
+1. 导出后，删除aar里 libs/classes.jar  
+2. 删除根目录的 classes.jar 里的 UnityPlayerActivity.java  
+
+
 
