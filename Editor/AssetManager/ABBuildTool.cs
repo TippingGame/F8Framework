@@ -326,6 +326,19 @@ namespace F8Framework.Core.Editor
 
                 if (isWrite)
                 {
+                    // 把总的manifest加上
+                    if (tempNames.Contains(URLSetting.GetPlatformName()))
+                    {
+                        LogF8.LogError("总AssetBundleManifest和其他资产名重复，请检查资产：" + URLSetting.GetPlatformName());
+                    }
+                    else
+                    {
+                        assetMapping.Add(URLSetting.GetPlatformName(), new AssetBundleMap.AssetMapping(URLSetting.GetPlatformName(), new string[]{},
+                            BuildPkgTool.ToVersion, FileTools.GetFileSize(AssetBundleHelper.GetAssetBundleFullName(URLSetting.GetPlatformName())).ToString(),
+                            FileTools.CreateMd5ForFile(AssetBundleHelper.GetAssetBundleFullName(URLSetting.GetPlatformName())), ""));
+                    }
+
+
                     WriteAssetNames();
                 }
             }

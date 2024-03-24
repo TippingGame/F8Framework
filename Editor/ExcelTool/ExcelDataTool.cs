@@ -66,14 +66,6 @@ namespace F8Framework.Core.Editor
         
         public static void LoadAllExcelData()
         {
-            string F8DataManagerPath = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/ConfigData/F8DataManager";
-            FileTools.SafeDeleteDir(F8DataManagerPath);
-            FileTools.CheckDirAndCreateWhenNeeded(F8DataManagerPath);
-            string F8ExcelDataClassPath = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/ConfigData/F8ExcelDataClass";
-            FileTools.SafeDeleteDir(F8ExcelDataClassPath);
-            FileTools.CheckDirAndCreateWhenNeeded(F8ExcelDataClassPath);
-            CreateAsmdefFile();
-            AssetDatabase.Refresh();
             string INPUT_PATH = Application.dataPath + ExcelPath;
 
             if (!Directory.Exists(INPUT_PATH))
@@ -86,10 +78,19 @@ namespace F8Framework.Core.Editor
                 .Where(s => s.EndsWith(".xls") || s.EndsWith(".xlsx")).ToArray();
             if (files == null || files.Length == 0)
             {
-                EditorUtility.DisplayDialog("注意！！！", "\n暂无可以导入的数据表！" + ExcelPath + "目录", "确定");
-                throw new Exception("暂无可以导入的数据表！");
+                EditorUtility.DisplayDialog("注意！！！", "\n暂无可以导入的数据表！首次F8请手动导入，【Demo工作表.xlsx / 本地化.xlsx】两个表格！" + ExcelPath + " 目录", "确定");
+                throw new Exception("暂无可以导入的数据表！首次F8请手动导入，【Demo工作表.xlsx / 本地化.xlsx】两个表格！" + ExcelPath + " 目录");
             }
-
+            
+            string F8DataManagerPath = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/ConfigData/F8DataManager";
+            FileTools.SafeDeleteDir(F8DataManagerPath);
+            FileTools.CheckDirAndCreateWhenNeeded(F8DataManagerPath);
+            string F8ExcelDataClassPath = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/ConfigData/F8ExcelDataClass";
+            FileTools.SafeDeleteDir(F8ExcelDataClassPath);
+            FileTools.CheckDirAndCreateWhenNeeded(F8ExcelDataClassPath);
+            CreateAsmdefFile();
+            AssetDatabase.Refresh();
+            
             if (codeList == null)
             {
                 codeList = new List<string>();

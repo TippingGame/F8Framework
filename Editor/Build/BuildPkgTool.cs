@@ -28,8 +28,8 @@ namespace F8Framework.Core.Editor
         private static string _enablePackageKey = "EnablePackageKey";
         private static string _locationPathNameKey = "LocationPathNameKey";
         
-        public static string BuildPath = "";
-        public static string ToVersion = "1.0.0";
+        private static string _buildPath = "";
+        private static string _toVersion = "1.0.0";
         private static string _codeVersion = "1";
         private static bool _enableHotUpdate = false;
         private static bool _enableFullPackage = true;
@@ -49,12 +49,16 @@ namespace F8Framework.Core.Editor
         private static string[] _optionNames = Array.ConvertAll(_options, option => option.ToString());
         
         private static bool _exportCurrentPlatform = true;
+
+
+        public static string BuildPath => EditorPrefs.GetString(_prefBuildPathKey, null) ?? _buildPath;
+        public static string ToVersion => EditorPrefs.GetString(_toVersionKey, null) ?? _toVersion;
         
         // 构建热更版本
         private static void BuildUpdate()
         {
-            string gameVersionPath = BuildPath + HotUpdateManager.RemoteDirName + "/" + nameof(GameVersion) + ".json";
-            string assetBundleMapPath = BuildPath + HotUpdateManager.RemoteDirName + "/" + nameof(AssetBundleMap) + ".json";
+            string gameVersionPath = _buildPath + HotUpdateManager.RemoteDirName + "/" + nameof(GameVersion) + ".json";
+            string assetBundleMapPath = _buildPath + HotUpdateManager.RemoteDirName + "/" + nameof(AssetBundleMap) + ".json";
             if (!File.Exists(gameVersionPath) || !File.Exists(assetBundleMapPath))
             {
                 LogF8.LogError("请先构建一个游戏版本，再构建热更新文件！~");
@@ -76,7 +80,7 @@ namespace F8Framework.Core.Editor
                 }
             }
             
-            string hotUpdatePath = BuildPath + HotUpdateManager.RemoteDirName + HotUpdateManager.HotUpdateDirName + HotUpdateManager.Separator + ToVersion;
+            string hotUpdatePath = _buildPath + HotUpdateManager.RemoteDirName + HotUpdateManager.HotUpdateDirName + HotUpdateManager.Separator + _toVersion;
 
             FileTools.CheckDirAndCreateWhenNeeded(hotUpdatePath);
             FileTools.SafeClearDir(hotUpdatePath);
@@ -84,15 +88,15 @@ namespace F8Framework.Core.Editor
                 hotUpdatePath);
 
             GameVersion remoteGameVersion = Util.LitJson.ToObject<GameVersion>(FileTools.SafeReadAllText(gameVersionPath));
-            remoteGameVersion.Version = ToVersion;
-            if (!remoteGameVersion.HotUpdateVersion.Contains(ToVersion))
-                remoteGameVersion.HotUpdateVersion.Add(ToVersion);
+            remoteGameVersion.Version = _toVersion;
+            if (!remoteGameVersion.HotUpdateVersion.Contains(_toVersion))
+                remoteGameVersion.HotUpdateVersion.Add(_toVersion);
             FileTools.SafeWriteAllText(gameVersionPath, Util.LitJson.ToJson(remoteGameVersion));
             
             FileTools.SafeCopyFile(Application.dataPath + "/F8Framework/AssetMap/Resources/" + nameof(AssetBundleMap) + ".json",
-                BuildPath + HotUpdateManager.RemoteDirName + "/HotUpdate" + HotUpdateManager.Separator + nameof(AssetBundleMap) + ".json");
+                _buildPath + HotUpdateManager.RemoteDirName + "/HotUpdate" + HotUpdateManager.Separator + nameof(AssetBundleMap) + ".json");
             
-            LogF8.LogVersion("构建热更新包版本成功！版本：" + ToVersion);
+            LogF8.LogVersion("构建热更新包版本成功！版本：" + _toVersion);
             
             AssetDatabase.Refresh();
         }
@@ -130,20 +134,21 @@ namespace F8Framework.Core.Editor
                     break;
             }
             
-            PlayerSettings.bundleVersion = ToVersion; // 设置显示版本号
+            PlayerSettings.bundleVersion = _toVersion; // 设置显示版本号
             PlayerSettings.Android.bundleVersionCode = int.Parse(_codeVersion); // 设置 Android 内部版本号
             PlayerSettings.iOS.buildNumber = _codeVersion; // 设置 iOS 内部版本号
 
             // 全量包
             if (_enableFullPackage)
             {
-                string locationPathName = BuildPath + "/" + _buildTarget.ToString() + "_Full_" + ToVersion  + "/" + appName;
+                string locationPathName = _buildPath + "/" + _buildTarget.ToString() + "_Full_" + _toVersion  + "/" + appName;
                 EditorPrefs.SetString(_locationPathNameKey, locationPathName);
+                FileTools.CheckFileAndCreateDirWhenNeeded(locationPathName);
                 BuildReport buildReport =
                     BuildPipeline.BuildPlayer(GetBuildScenes(), locationPathName, _buildTarget, BuildOptions.None);
                 if (buildReport.summary.result != BuildResult.Succeeded)
                 {
-                    LogF8.LogError($"build pkg fail : {buildReport.summary.result}");
+                    LogF8.LogError($"导出失败了，检查一下 Unity 内置的 Build Settings 导出的路径是否存在，Unity 没有给我清理缓存！: {buildReport.summary.result}");
                 }
 
                 LogF8.LogVersion("游戏全量包打包成功! " + locationPathName);
@@ -156,7 +161,7 @@ namespace F8Framework.Core.Editor
                 FileTools.SafeDeleteDir(toPath);
                 Dictionary<string, AssetBundleMap.AssetMapping> mappings = 
                     Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(Resources.Load<TextAsset>(nameof(AssetBundleMap)).ToString());
-                string packagePath = BuildPath + HotUpdateManager.RemoteDirName + HotUpdateManager.PackageDirName;
+                string packagePath = _buildPath + HotUpdateManager.RemoteDirName + HotUpdateManager.PackageDirName;
                 FileTools.SafeDeleteDir(packagePath);
                 // 分别打包Package
                 string[] packages = _optionalPackage.Split(HotUpdateManager.Separator);
@@ -178,13 +183,14 @@ namespace F8Framework.Core.Editor
                 }
                
                 AssetDatabase.Refresh();
-                string locationPathName = BuildPath + "/" + _buildTarget.ToString() + "_Optional_" + ToVersion  + "/" + appName;
+                string locationPathName = _buildPath + "/" + _buildTarget.ToString() + "_Optional_" + _toVersion  + "/" + appName;
                 EditorPrefs.SetString(_locationPathNameKey, locationPathName);
+                FileTools.CheckFileAndCreateDirWhenNeeded(locationPathName);
                 BuildReport buildReport =
                     BuildPipeline.BuildPlayer(GetBuildScenes(), locationPathName, _buildTarget, BuildOptions.None);
                 if (buildReport.summary.result != BuildResult.Succeeded)
                 {
-                    LogF8.LogError($"build pkg fail : {buildReport.summary.result}");
+                    LogF8.LogError($"导出失败了，检查一下 Unity 内置的 Build Settings 导出的路径是否存在，Unity 没有给我清理缓存！: {buildReport.summary.result}");
                 }
 
                 if (Directory.Exists(toPath))
@@ -204,13 +210,14 @@ namespace F8Framework.Core.Editor
                 FileTools.SafeDeleteDir(URLSetting.GetAssetBundlesOutPath(),
                     new[] { URLSetting.GetPlatformName(), URLSetting.GetPlatformName() + ".manifest" });
                 AssetDatabase.Refresh();
-                string locationPathName = BuildPath + "/" + _buildTarget.ToString() + "_Null_" + ToVersion  + "/" + appName;
+                string locationPathName = _buildPath + "/" + _buildTarget.ToString() + "_Null_" + _toVersion  + "/" + appName;
                 EditorPrefs.SetString(_locationPathNameKey, locationPathName);
+                FileTools.CheckFileAndCreateDirWhenNeeded(locationPathName);
                 BuildReport buildReport =
                     BuildPipeline.BuildPlayer(GetBuildScenes(), locationPathName, _buildTarget, BuildOptions.None);
                 if (buildReport.summary.result != BuildResult.Succeeded)
                 {
-                    LogF8.LogError($"build pkg fail : {buildReport.summary.result}");
+                    LogF8.LogError($"导出失败了，检查一下 Unity 内置的 Build Settings 导出的路径是否存在，Unity 没有给我清理缓存！: {buildReport.summary.result}");
                 }
                 FileTools.SafeCopyDirectory(toPath, URLSetting.GetAssetBundlesOutPath(), true, new[] { URLSetting.GetPlatformName(), URLSetting.GetPlatformName() + ".manifest" });
                 FileTools.SafeDeleteDir(toPath);
@@ -271,17 +278,17 @@ namespace F8Framework.Core.Editor
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("点击设置目录", NormalWidth, ButtonHeight))
             {
-                string _buildPath = EditorUtility.OpenFolderPanel("设置打包根目录", BuildPath, BuildPath);
+                string _buildPath = EditorUtility.OpenFolderPanel("设置打包根目录", BuildPkgTool._buildPath, BuildPkgTool._buildPath);
                 if (!string.IsNullOrEmpty(_buildPath))
                 {
-                    BuildPath = _buildPath;
-                    EditorPrefs.SetString(_prefBuildPathKey, BuildPath);
+                    BuildPkgTool._buildPath = _buildPath;
+                    EditorPrefs.SetString(_prefBuildPathKey, BuildPkgTool._buildPath);
                 }
             }
 
-            BuildPath = EditorPrefs.GetString(_prefBuildPathKey, "");
+            _buildPath = EditorPrefs.GetString(_prefBuildPathKey, "");
            
-            GUILayout.Label("输出目录：" + BuildPath);
+            GUILayout.Label("输出目录：" + _buildPath);
             GUILayout.EndHorizontal();
             GUILayout.Space(5);
             GUILayout.Label("-----------------------------------------------------------------------");
@@ -300,10 +307,10 @@ namespace F8Framework.Core.Editor
             string toVersionValue = EditorPrefs.GetString(_toVersionKey, "");
             if (string.IsNullOrEmpty(toVersionValue))
             {
-                toVersionValue = ToVersion;
+                toVersionValue = _toVersion;
             }
-            ToVersion = EditorGUILayout.TextField(toVersionValue);
-            EditorPrefs.SetString(_toVersionKey, ToVersion);
+            _toVersion = EditorGUILayout.TextField(toVersionValue);
+            EditorPrefs.SetString(_toVersionKey, _toVersion);
             GUILayout.EndHorizontal();
             
             GUILayout.Space(10);
@@ -415,13 +422,13 @@ namespace F8Framework.Core.Editor
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("打包游戏", NormalWidth))
             {
-                if (string.IsNullOrEmpty(BuildPath))
+                if (string.IsNullOrEmpty(_buildPath))
                 {
                     EditorUtility.DisplayDialog("打包游戏", "输出目录路径不能为空", "确定");
                 }
                 else
                 {
-                    string countent = "确定构建版本 " + ToVersion;
+                    string countent = "确定构建版本 " + _toVersion;
                     if (EditorUtility.DisplayDialog("打包游戏", countent, "确定", "取消"))
                     {
                         EditorApplication.delayCall += WriteGameVersion;
@@ -434,13 +441,13 @@ namespace F8Framework.Core.Editor
             GUILayout.Space(30);
             if (GUILayout.Button("构建热更新包", NormalWidth))
             {
-                if (string.IsNullOrEmpty(BuildPath))
+                if (string.IsNullOrEmpty(_buildPath))
                 {
                     EditorUtility.DisplayDialog("构建热更新包", "构建热更新包路径不能为空", "确定");
                 }
                 else
                 {
-                    string countent = "确定构建热更新包版本 " + ToVersion;
+                    string countent = "确定构建热更新包版本 " + _toVersion;
                     if (EditorUtility.DisplayDialog("构建热更新包", countent, "确定", "取消"))
                     {
                         EditorApplication.delayCall += F8Helper.F8Run;
@@ -452,7 +459,7 @@ namespace F8Framework.Core.Editor
             GUILayout.Space(30);
             if (GUILayout.Button("打开输出目录", NormalWidth))
             {
-                Process.Start(Path.GetFullPath(BuildPath));
+                Process.Start(Path.GetFullPath(_buildPath));
             }
             
             GUILayout.EndHorizontal();
@@ -461,13 +468,13 @@ namespace F8Framework.Core.Editor
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("打包游戏并运行", NormalWidth))
             {
-                if (string.IsNullOrEmpty(BuildPath))
+                if (string.IsNullOrEmpty(_buildPath))
                 {
                     EditorUtility.DisplayDialog("打包游戏", "输出目录路径不能为空", "确定");
                 }
                 else
                 {
-                    string countent = "确定构建版本 " + ToVersion;
+                    string countent = "确定构建版本 " + _toVersion;
                     if (EditorUtility.DisplayDialog("打包游戏", countent, "确定", "取消"))
                     {
                         EditorApplication.delayCall += WriteGameVersion;
@@ -612,7 +619,7 @@ namespace F8Framework.Core.Editor
             {
                 packageList = new List<string>();
             }
-            GameVersion gameVersion = new GameVersion(ToVersion, _assetRemoteAddress, _enableHotUpdate, new List<string>(), _enablePackage, packageList);
+            GameVersion gameVersion = new GameVersion(_toVersion, _assetRemoteAddress, _enableHotUpdate, new List<string>(), _enablePackage, packageList);
             // 写入到文件
             string gameVersionResourcesPath = Application.dataPath + "/F8Framework/AssetMap/Resources/" + nameof(GameVersion) + ".json";
             // 序列化对象
@@ -622,9 +629,9 @@ namespace F8Framework.Core.Editor
             FileTools.CheckFileAndCreateDirWhenNeeded(gameVersionResourcesPath);
             FileTools.SafeWriteAllText(gameVersionResourcesPath, json);
             // 复制到导出目录
-            FileTools.SafeCopyFile(gameVersionResourcesPath, BuildPath + HotUpdateManager.RemoteDirName + "/" + nameof(GameVersion) + ".json");
+            FileTools.SafeCopyFile(gameVersionResourcesPath, _buildPath + HotUpdateManager.RemoteDirName + "/" + nameof(GameVersion) + ".json");
             string assetBundleMapPath = Application.dataPath + "/F8Framework/AssetMap/Resources/" + nameof(AssetBundleMap) + ".json";
-            FileTools.SafeCopyFile(assetBundleMapPath, BuildPath + HotUpdateManager.RemoteDirName + "/" + nameof(AssetBundleMap) + ".json");
+            FileTools.SafeCopyFile(assetBundleMapPath, _buildPath + HotUpdateManager.RemoteDirName + "/" + nameof(AssetBundleMap) + ".json");
             LogF8.LogVersion("写入游戏版本： " + gameVersion.Version);
             UnityEditor.AssetDatabase.Refresh();
         }
