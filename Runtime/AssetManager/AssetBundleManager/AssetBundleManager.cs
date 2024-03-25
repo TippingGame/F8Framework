@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using F8Framework.AssetMap;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -35,7 +36,7 @@ namespace F8Framework.Core
             
             for (int i = 0; i < assetBundlePaths.Count; i++)
             {
-                assetBundlePaths[i] = info.AssetBundlePathWithoutAb + assetBundlePaths[i];
+                assetBundlePaths[i] = GetAssetBundlePathWithoutAbByAbName(assetBundlePaths[i]) + assetBundlePaths[i];
             }
 
             assetBundlePaths.Add(info.AssetBundlePath);
@@ -92,7 +93,7 @@ namespace F8Framework.Core
 
             for (int i = 0; i < assetBundlePaths.Count; i++)
             {
-                assetBundlePaths[i] = info.AssetBundlePathWithoutAb + assetBundlePaths[i];
+                assetBundlePaths[i] = GetAssetBundlePathWithoutAbByAbName(assetBundlePaths[i]) + assetBundlePaths[i];
             }
             AssetBundleLoader lastLoader = null;
             assetBundlePaths.Add(info.AssetBundlePath);
@@ -145,7 +146,7 @@ namespace F8Framework.Core
 
             for (int i = 0; i < assetBundlePaths.Count; i++)
             {
-                assetBundlePaths[i] = info.AssetBundlePathWithoutAb + assetBundlePaths[i];
+                assetBundlePaths[i] = GetAssetBundlePathWithoutAbByAbName(assetBundlePaths[i]) + assetBundlePaths[i];
             }
             AssetBundleLoader lastLoader = null;
             assetBundlePaths.Add(info.AssetBundlePath);
@@ -835,15 +836,51 @@ namespace F8Framework.Core
             return allLoaderFinished;
         }
 
-        public static string GetAssetBundleCompletePath(string regPath)
+        /// <summary>
+        /// 获取没有ab名的路径，传入assetName
+        /// </summary>
+        /// <param name="assetName"></param>
+        /// <returns></returns>
+        public static string GetAssetBundlePathWithoutAb(string assetName)
         {
             string fullPath;
             
-            if (GameConfig.LocalGameVersion.EnableHotUpdate && File.Exists(AssetBundleHelper.GetAssetBundleFullName(regPath, AssetBundleHelper.SourceType.HOT_UPDATE_PATH)))
+            if (GameConfig.LocalGameVersion.EnableHotUpdate &&
+                AssetBundleMap.Mappings.TryGetValue(assetName, out AssetBundleMap.AssetMapping assetMapping) &&
+                assetMapping != null &&
+                !string.IsNullOrEmpty(assetMapping.Updated))
             {
                 fullPath = AssetBundleHelper.GetAssetBundleFullName(null, AssetBundleHelper.SourceType.HOT_UPDATE_PATH);
             }
-            else if (GameConfig.LocalGameVersion.EnablePackage && File.Exists(AssetBundleHelper.GetAssetBundleFullName(regPath, AssetBundleHelper.SourceType.PACKAGE_PATH)))
+            else if (GameConfig.LocalGameVersion.EnablePackage &&
+                     AssetBundleMap.Mappings.TryGetValue(assetName, out AssetBundleMap.AssetMapping assetMappingPackage) &&
+                     assetMappingPackage != null &&
+                     !string.IsNullOrEmpty(assetMappingPackage.Package))
+            {
+                fullPath = AssetBundleHelper.GetAssetBundleFullName(null, AssetBundleHelper.SourceType.PACKAGE_PATH);
+            }
+            else
+            {
+                fullPath = AssetBundleHelper.GetAssetBundleFullName(null, AssetBundleHelper.SourceType.STREAMING_ASSETS);
+            }
+
+            return fullPath;
+        }
+        
+        /// <summary>
+        /// 获取没有ab名的路径，传入abName
+        /// </summary>
+        /// <param name="abName"></param>
+        /// <returns></returns>
+        public static string GetAssetBundlePathWithoutAbByAbName(string abName)
+        {
+            string fullPath;
+            
+            if (GameConfig.LocalGameVersion.EnableHotUpdate && File.Exists(AssetBundleHelper.GetAssetBundleFullName(abName, AssetBundleHelper.SourceType.HOT_UPDATE_PATH)))
+            {
+                fullPath = AssetBundleHelper.GetAssetBundleFullName(null, AssetBundleHelper.SourceType.HOT_UPDATE_PATH);
+            }
+            else if (GameConfig.LocalGameVersion.EnablePackage && File.Exists(AssetBundleHelper.GetAssetBundleFullName(abName, AssetBundleHelper.SourceType.PACKAGE_PATH)))
             {
                 fullPath = AssetBundleHelper.GetAssetBundleFullName(null, AssetBundleHelper.SourceType.PACKAGE_PATH);
             }

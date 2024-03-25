@@ -107,18 +107,23 @@ namespace F8Framework.Core
         /// 检查需要热更的资源
         /// </summary>
         /// <returns></returns>
-        public Tuple<List<string>, long> CheckHotUpdate()
+        public Tuple<Dictionary<string, string>, long> CheckHotUpdate()
         {
             long allSize = 0;
-            List<string> hotUpdateAssetUrl = new List<string>();
-            if (!GameConfig.LocalGameVersion.EnableHotUpdate)
+            Dictionary<string, string> hotUpdateAssetUrl = new Dictionary<string, string>();
+            if (!GameConfig.LocalGameVersion.EnableHotUpdate) // 启用热更
+            {
+                return Tuple.Create(hotUpdateAssetUrl, allSize);
+            }
+
+            if (GameConfig.RemoteAssetBundleMap.Count <= 0) // 热更资产Map数量
             {
                 return Tuple.Create(hotUpdateAssetUrl, allSize);
             }
             
             int result = GameConfig.CompareVersions(GameConfig.LocalGameVersion.Version,
                 GameConfig.RemoteGameVersion.Version);
-            if (result >= 0) // 无需热更新
+            if (result >= 0) // 此版本无需热更新
             {
                 return Tuple.Create(hotUpdateAssetUrl, allSize);
             }
@@ -134,10 +139,14 @@ namespace F8Framework.Core
                 if (assetMapping == null || resAssetMapping.Value.MD5 != assetMapping.MD5) // 新增资源，MD5不同则需更新
                 {
                     allSize += long.Parse(resAssetMapping.Value.Size);
-                    hotUpdateAssetUrl.Add(resAssetMapping.Value.Version + "/" + URLSetting.AssetBundlesName
+                    hotUpdateAssetUrl.TryAdd(resAssetMapping.Key, resAssetMapping.Value.Version + "/" + URLSetting.AssetBundlesName
                                           + "/" + URLSetting.GetPlatformName() + "/" + resAssetMapping.Value.AbName);
-                    hotUpdateAssetUrl.Add(resAssetMapping.Value.Version + "/" + URLSetting.AssetBundlesName
-                                          + "/" + URLSetting.GetPlatformName() + "/" + resAssetMapping.Value.AbName + ".manifest");
+                    hotUpdateAssetUrl.TryAdd(resAssetMapping.Key + ".manifest", resAssetMapping.Value.Version + "/" + URLSetting.AssetBundlesName
+                                                                               + "/" + URLSetting.GetPlatformName() + "/" + resAssetMapping.Value.AbName + ".manifest");
+                }
+                else if(GameConfig.CompareVersions(assetMapping.Version, resAssetMapping.Value.Version) < 0) // 版本修正
+                {
+                    resAssetMapping.Value.Version = assetMapping.Version;
                 }
             }
             
@@ -151,9 +160,14 @@ namespace F8Framework.Core
         /// <param name="completed"></param>
         /// <param name="failure"></param>
         /// <param name="overallProgress"></param>
-        public void StartHotUpdate(List<string> hotUpdateAssetUrl, Action completed = null, Action failure = null, Action<float> overallProgress = null)
+        public void StartHotUpdate(Dictionary<string, string> hotUpdateAssetUrl, Action completed = null, Action failure = null, Action<float> overallProgress = null)
         {
             if (!GameConfig.LocalGameVersion.EnableHotUpdate)
+            {
+                return;
+            }
+            
+            if (hotUpdateAssetUrl.Count <= 0)
             {
                 return;
             }
@@ -190,12 +204,27 @@ namespace F8Framework.Core
                 LogF8.LogVersion($"所有热更资源获取完成：{eventArgs.TimeSpan}");
                 GameConfig.LocalGameVersion.Version = GameConfig.RemoteGameVersion.Version;
                 GameConfig.LocalGameVersion.HotUpdateVersion = new List<string>();
+                FileTools.SafeWriteAllText(Application.persistentDataPath + "/" + nameof(GameVersion) + ".json",
+                    Util.LitJson.ToJson(GameConfig.LocalGameVersion));
+                foreach (var asssetName in hotUpdateAssetUrl.Keys)
+                {
+                    if (GameConfig.RemoteAssetBundleMap.TryGetValue(asssetName, out AssetBundleMap.AssetMapping assetMapping))
+                    {
+                        if (assetMapping != null)
+                        {
+                            assetMapping.Updated = "1";
+                        }
+                    }
+                }
                 AssetBundleMap.Mappings = GameConfig.RemoteAssetBundleMap;
+                FileTools.SafeWriteAllText(Application.persistentDataPath + "/" + nameof(AssetBundleMap) + ".json",
+                    Util.LitJson.ToJson(AssetBundleMap.Mappings));
+                
                 completed?.Invoke();
             };
             
             // 添加下载清单
-            foreach (var assetUrl in hotUpdateAssetUrl)
+            foreach (var assetUrl in hotUpdateAssetUrl.Values)
             {
                 int index = assetUrl.IndexOf('/');
                 string result = assetUrl.Substring(index + 1);

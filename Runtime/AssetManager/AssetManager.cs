@@ -33,9 +33,6 @@ namespace F8Framework.Core
             //AB名
             public readonly string AbName;
             
-            //AB资产路径不包含AB名
-            public readonly string AssetBundlePathWithoutAb;
-            
             public AssetInfo(
                 AssetTypeEnum assetType,
                 string[] assetPath,
@@ -46,7 +43,6 @@ namespace F8Framework.Core
                 AssetPath = assetPath;
                 AssetBundlePath = assetBundlePathWithoutAb + abName;
                 AbName = abName;
-                AssetBundlePathWithoutAb = assetBundlePathWithoutAb;
             }
 
         }
@@ -380,11 +376,12 @@ namespace F8Framework.Core
                         {
                             continue;
                         }
-                        string abName = Path.ChangeExtension(assetPath, null).Replace(URLSetting.AssetBundlesPath, "").ToLower();
-                        AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePathWithoutAb + abName);
+                        string subAssetName = Path.ChangeExtension(assetPath, null).Replace(URLSetting.AssetBundlesPath, "");
+                        string abName = subAssetName.ToLower();
+                        AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(AssetBundleManager.GetAssetBundlePathWithoutAb(subAssetName) + abName);
                         if (ab == null || ab.AssetBundleContent == null)
                         {
-                            AssetInfo assetInfo = new AssetInfo(info.AssetType, new []{assetPath}, info.AssetBundlePathWithoutAb, abName);
+                            AssetInfo assetInfo = new AssetInfo(info.AssetType, new []{assetPath}, AssetBundleManager.GetAssetBundlePathWithoutAb(subAssetName), abName);
                             AssetBundleManager.Instance.Load(Path.GetFileNameWithoutExtension(assetPath), 
                                 ref assetInfo);
                         }
@@ -668,12 +665,13 @@ namespace F8Framework.Core
                         {
                             continue;
                         }
-                        string abName = Path.ChangeExtension(assetPath, null).Replace(URLSetting.AssetBundlesPath, "").ToLower();
-                        AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePathWithoutAb + abName);
+                        string subAssetName = Path.ChangeExtension(assetPath, null).Replace(URLSetting.AssetBundlesPath, "");
+                        string abName = subAssetName.ToLower();
+                        AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(AssetBundleManager.GetAssetBundlePathWithoutAb(subAssetName) + abName);
                         if (ab == null || ab.AssetBundleContent == null || ab.GetDependentNamesLoadFinished() < ab.AddDependentNames())
                         {
                             AssetBundleManager.Instance.LoadAsync(Path.GetFileNameWithoutExtension(assetPath), 
-                                new AssetInfo(info.AssetType, new []{assetPath}, info.AssetBundlePathWithoutAb, abName), (b) =>
+                                new AssetInfo(info.AssetType, new []{assetPath}, AssetBundleManager.GetAssetBundlePathWithoutAb(subAssetName), abName), (b) =>
                                 {
                                     if (++assetCount >= info.AssetPath.Length)
                                     {
@@ -741,12 +739,13 @@ namespace F8Framework.Core
                         {
                             continue;
                         }
-                        string abName = Path.ChangeExtension(assetPath, null).Replace(URLSetting.AssetBundlesPath, "").ToLower();
-                        AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePathWithoutAb + abName);
+                        string subAssetName = Path.ChangeExtension(assetPath, null).Replace(URLSetting.AssetBundlesPath, "");
+                        string abName = subAssetName.ToLower();
+                        AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(AssetBundleManager.GetAssetBundlePathWithoutAb(subAssetName) + abName);
                         if (ab == null || ab.AssetBundleContent == null || ab.GetDependentNamesLoadFinished() < ab.AddDependentNames())
                         {
                             yield return AssetBundleManager.Instance.LoadAsyncCoroutine(Path.GetFileNameWithoutExtension(assetPath),
-                                new AssetInfo(info.AssetType, new[] { assetPath }, info.AssetBundlePathWithoutAb, abName));
+                                new AssetInfo(info.AssetType, new[] { assetPath }, AssetBundleManager.GetAssetBundlePathWithoutAb(subAssetName), abName));
                             if (++assetCount >= info.AssetPath.Length)
                             {
                                 yield break;
@@ -937,7 +936,7 @@ namespace F8Framework.Core
                     }
                     else
                     {
-                        return new AssetInfo(AssetTypeEnum.ASSET_BUNDLE, assetmpping.AssetPath, AssetBundleManager.GetAssetBundleCompletePath(assetmpping.AbName), assetmpping.AbName);
+                        return new AssetInfo(AssetTypeEnum.ASSET_BUNDLE, assetmpping.AssetPath, AssetBundleManager.GetAssetBundlePathWithoutAb(assetName), assetmpping.AbName);
                     }
                 }
 
@@ -1034,8 +1033,9 @@ namespace F8Framework.Core
                     {
                         foreach (var assetPath in ab.AssetPath)
                         {
-                            string abName = Path.ChangeExtension(assetPath, null).Replace(URLSetting.AssetBundlesPath, "").ToLower();
-                            assetBundlePaths.Add(ab.AssetBundlePathWithoutAb + abName);
+                            string subAssetName = Path.ChangeExtension(assetPath, null).Replace(URLSetting.AssetBundlesPath, "");
+                            string abName = subAssetName.ToLower();
+                            assetBundlePaths.Add(AssetBundleManager.GetAssetBundlePathWithoutAb(subAssetName) + abName);
                         }
                     }
                     else
@@ -1051,8 +1051,9 @@ namespace F8Framework.Core
                     {
                         foreach (var assetPath in abRemote.AssetPath)
                         {
-                            string abName = Path.ChangeExtension(assetPath, null).Replace(URLSetting.AssetBundlesPath, "").ToLower();
-                            assetBundlePaths.Add(abRemote.AssetBundlePathWithoutAb + abName);
+                            string subAssetName = Path.ChangeExtension(assetPath, null).Replace(URLSetting.AssetBundlesPath, "");
+                            string abName = subAssetName.ToLower();
+                            assetBundlePaths.Add(AssetBundleManager.GetAssetBundlePathWithoutAb(subAssetName) + abName);
                         }
                     }
                     else
@@ -1145,7 +1146,16 @@ namespace F8Framework.Core
             {
                 _assetBundleManager = ModuleCenter.CreateModule<AssetBundleManager>();
                 _resourcesManager = ModuleCenter.CreateModule<ResourcesManager>();
-                AssetBundleMap.Mappings = Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(Resources.Load<TextAsset>(nameof(AssetBundleMap)).ToString());
+                if (File.Exists(Application.persistentDataPath + "/" + nameof(AssetBundleMap) + ".json"))
+                {
+                    string json =
+                        FileTools.SafeReadAllText(Application.persistentDataPath + "/" + nameof(AssetBundleMap) + ".json");
+                    AssetBundleMap.Mappings = Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(json);
+                }
+                else
+                {
+                    AssetBundleMap.Mappings = Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(Resources.Load<TextAsset>(nameof(AssetBundleMap)).ToString());
+                }
                 ResourceMap.Mappings = Util.LitJson.ToObject<Dictionary<string, string>>(Resources.Load<TextAsset>(nameof(ResourceMap)).ToString());
             }
 

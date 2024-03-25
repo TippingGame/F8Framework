@@ -433,6 +433,7 @@ namespace F8Framework.Core.Editor
                     {
                         EditorApplication.delayCall += WriteGameVersion;
                         EditorApplication.delayCall += F8Helper.F8Run;
+                        EditorApplication.delayCall += WriteAssetVersion;
                         EditorApplication.delayCall += Build;
                     }
                 }
@@ -479,6 +480,7 @@ namespace F8Framework.Core.Editor
                     {
                         EditorApplication.delayCall += WriteGameVersion;
                         EditorApplication.delayCall += F8Helper.F8Run;
+                        EditorApplication.delayCall += WriteAssetVersion;
                         EditorApplication.delayCall += Build;
                         EditorApplication.delayCall += RunExportedGame;
                     }
@@ -601,6 +603,14 @@ namespace F8Framework.Core.Editor
             AssetDatabase.Refresh();
         }
         
+        // 写入资产版本
+        private static void WriteAssetVersion()
+        {
+            string assetBundleMapPath = Application.dataPath + "/F8Framework/AssetMap/Resources/" + nameof(AssetBundleMap) + ".json";
+            FileTools.SafeCopyFile(assetBundleMapPath, _buildPath + HotUpdateManager.RemoteDirName + "/" + nameof(AssetBundleMap) + ".json");
+            UnityEditor.AssetDatabase.Refresh();
+        }
+
         // 写入游戏版本
         private static void WriteGameVersion()
         {
@@ -630,8 +640,6 @@ namespace F8Framework.Core.Editor
             FileTools.SafeWriteAllText(gameVersionResourcesPath, json);
             // 复制到导出目录
             FileTools.SafeCopyFile(gameVersionResourcesPath, _buildPath + HotUpdateManager.RemoteDirName + "/" + nameof(GameVersion) + ".json");
-            string assetBundleMapPath = Application.dataPath + "/F8Framework/AssetMap/Resources/" + nameof(AssetBundleMap) + ".json";
-            FileTools.SafeCopyFile(assetBundleMapPath, _buildPath + HotUpdateManager.RemoteDirName + "/" + nameof(AssetBundleMap) + ".json");
             LogF8.LogVersion("写入游戏版本： " + gameVersion.Version);
             UnityEditor.AssetDatabase.Refresh();
         }

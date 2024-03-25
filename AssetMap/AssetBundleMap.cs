@@ -14,7 +14,8 @@ namespace F8Framework.AssetMap
            public string Size;
            public string MD5;
            public string Package;
-       
+           public string Updated;
+
            /// <summary>
            /// AB资产信息
            /// </summary>
@@ -24,7 +25,8 @@ namespace F8Framework.AssetMap
            /// <param name="size"></param>
            /// <param name="md5"></param>
            /// <param name="package">使用文件夹区分包，例如Package_0目录下的就是包编号：0。</param>
-           public AssetMapping(string abName, string[] assetPath, string version, string size, string md5, string package)
+           /// <param name="updated"></param>
+           public AssetMapping(string abName, string[] assetPath, string version, string size, string md5, string package, string updated)
            {
                AbName = abName;
                AssetPath = assetPath;
@@ -32,6 +34,7 @@ namespace F8Framework.AssetMap
                Size = size;
                MD5 = md5;
                Package = package;
+               Updated = updated;
            }
            
            public AssetMapping()
