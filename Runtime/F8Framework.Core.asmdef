@@ -1,7 +1,8 @@
 {
     "name": "F8Framework.Core",
     "rootNamespace": "",
-    "references": ["F8Framework.AssetMap",
+    "references": [
+        "F8Framework.AssetMap",
         "Unity.TextMeshPro",
         "Unity.Timeline",
         "ICSharpCode.SharpZipLib",
@@ -10,7 +11,8 @@
         "MessagePack",
         "kcp",
         "Telepathy",
-        "SimpleWebTransport"
+        "SimpleWebTransport",
+        "HybridCLR.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

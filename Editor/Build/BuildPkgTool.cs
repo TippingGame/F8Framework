@@ -639,6 +639,7 @@ namespace F8Framework.Core.Editor
             FileTools.CheckFileAndCreateDirWhenNeeded(gameVersionResourcesPath);
             FileTools.SafeWriteAllText(gameVersionResourcesPath, json);
             // 复制到导出目录
+            FileTools.CheckDirAndCreateWhenNeeded(_buildPath + HotUpdateManager.RemoteDirName);
             FileTools.SafeCopyFile(gameVersionResourcesPath, _buildPath + HotUpdateManager.RemoteDirName + "/" + nameof(GameVersion) + ".json");
             LogF8.LogVersion("写入游戏版本： " + gameVersion.Version);
             UnityEditor.AssetDatabase.Refresh();

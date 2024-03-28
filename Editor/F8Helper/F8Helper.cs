@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.IO;
+﻿using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -10,10 +9,31 @@ namespace F8Framework.Core.Editor
         [MenuItem("开发工具/F8Run _F8")]
         public static void F8Run()
         {
+            GenerateCopyHotUpdateDll();
             LoadAllExcelData();
             BuildAssetBundles();
             
             AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
+        }
+        
+        [MenuItem("开发工具/生成并复制热更新Dll-F8")]
+        public static void GenerateCopyHotUpdateDll()
+        {
+            // HybridCLR.Editor.Commands.PrebuildCommand.GenerateAll();
+            // FileTools.SafeClearDir(Application.dataPath + "/AssetBundles/Code");
+            // FileTools.CheckDirAndCreateWhenNeeded(Application.dataPath + "/AssetBundles/Code");
+            // List<string> hotUpdateDll = new List<string>()
+            // {
+            //     "HotUpdate", // 自行添加需要热更的程序集
+            // };
+            // foreach (var dll in hotUpdateDll)
+            // {
+            //     FileTools.SafeCopyFile(
+            //         HybridCLR.Editor.SettingsUtil.GetHotUpdateDllsOutputDirByTarget(EditorUserBuildSettings.activeBuildTarget) + "/" + dll + ".dll",
+            //         Application.dataPath + "/AssetBundles/Code/" + dll + ".bytes");
+            //     LogF8.LogAsset("生成并复制热更新dll：" + dll);
+            // }
+            // AssetDatabase.Refresh();
         }
         
         [MenuItem("开发工具/Excel导表-F8")]
@@ -43,15 +63,13 @@ namespace F8Framework.Core.Editor
             {
                 string strPath = AssetDatabase.GUIDToAssetPath(guid);
                 
-                if (Directory.Exists(strPath)) //文件夹
+                EditorUtility.RevealInFinder(strPath);
+                
+                UnityEngine.Object obj = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(strPath);
+                if (obj != null)
                 {
-                    Process.Start(Path.GetFullPath(strPath));
+                    EditorGUIUtility.PingObject(obj);
                 }
-                else //文件
-                {
-                    Process.Start(Path.GetDirectoryName(Path.GetFullPath(strPath)) ?? string.Empty);
-                }
- 
                 Event.current.Use();
             }
         }

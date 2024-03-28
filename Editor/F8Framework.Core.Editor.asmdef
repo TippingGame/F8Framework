@@ -6,7 +6,8 @@
         "F8Framework.AssetMap",
         "ICSharpCode.SharpZipLib",
         "Excel",
-        "LitJson"
+        "LitJson",
+        "HybridCLR.Editor"
     ],
     "includePlatforms": [
         "Editor"
