@@ -22,23 +22,26 @@ namespace F8Framework.Core
         {
             try
             {
-                FileStream file = new FileStream(filename, FileMode.Open);
-                MD5 md5 = new MD5CryptoServiceProvider();
-                byte[] retVal = md5.ComputeHash(file);
-                file.Close();
-
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < retVal.Length; i++)
+                using (FileStream file = new FileStream(filename, FileMode.Open))
                 {
-                    sb.Append(retVal[i].ToString("x2"));
-                }
+                    using (MD5 md5 = MD5.Create())
+                    {
+                        byte[] retVal = md5.ComputeHash(file);
 
-                return sb.ToString();
+                        StringBuilder sb = new StringBuilder();
+                        for (int i = 0; i < retVal.Length; i++)
+                        {
+                            sb.Append(retVal[i].ToString("x2"));
+                        }
+
+                        return sb.ToString();
+                    }
+                }
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 LogF8.LogError(ex);
-                return null;
+                return "";
             }
         }
         

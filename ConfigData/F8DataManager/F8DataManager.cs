@@ -70,7 +70,7 @@ namespace F8Framework.Core
 			Util.Unity.StartCoroutine(LoadLocalizedStringsIEnumerator(onLoadComplete));
 		}
 
-		public IEnumerator LoadLocalizedStringsIEnumerator(Action onLoadComplete)
+		public IEnumerator LoadLocalizedStringsIEnumerator(Action onLoadComplete = null)
 		{
 			yield return LoadAsync<LocalizedStrings>("LocalizedStrings", result => p_LocalizedStrings = result as LocalizedStrings);
 			onLoadComplete?.Invoke();

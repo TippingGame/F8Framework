@@ -14,6 +14,10 @@ namespace F8Framework.Core.Editor
     {
         private static Dictionary<string, AssetBundleMap.AssetMapping> assetMapping;
         private static Dictionary<string, string> resourceMapping;
+
+        // 打包后AB名加上MD5（微信小游戏使用）
+        private static bool appendHashToAssetBundleName = false;
+        
         public static void BuildAllAB()
         {
             AssetDatabase.RemoveUnusedAssetBundleNames();
@@ -32,6 +36,7 @@ namespace F8Framework.Core.Editor
             LogF8.LogAsset("打包AssetBundle：" + URLSetting.GetAssetBundlesOutPath() + "  当前打包平台：" + EditorUserBuildSettings.activeBuildTarget);
             // 打包生成AB包 (目标平台自动根据当前平台设置，WebGL不可使用BuildAssetBundleOptions.None压缩)
             BuildPipeline.BuildAssetBundles(strABOutPAthDir, BuildAssetBundleOptions.ChunkBasedCompression, EditorUserBuildSettings.activeBuildTarget);
+           
             AssetDatabase.Refresh();
             
             // 清理多余文件夹和ab
@@ -129,7 +134,14 @@ namespace F8Framework.Core.Editor
                         // It's a file under AssetBundles, record as "Audio/click11"
                         if (removeExtension)
                         {
-                            assetPaths.Add(FileTools.FormatToUnityPath(Path.ChangeExtension(relativePath + "/" + Path.GetFileName(file), null).ToLower()));
+                            if (appendHashToAssetBundleName)
+                            {
+                                assetPaths.Add(FileTools.FormatToUnityPath(Path.ChangeExtension(relativePath + "/" + Path.GetFileName(file), null).ToLower()) + "_" + FileTools.CreateMd5ForFile(file));
+                            }
+                            else
+                            {
+                                assetPaths.Add(FileTools.FormatToUnityPath(Path.ChangeExtension(relativePath + "/" + Path.GetFileName(file), null).ToLower()));
+                            }
                         }
                         else
                         {
@@ -145,7 +157,15 @@ namespace F8Framework.Core.Editor
         {
             AssetImporter ai = AssetImporter.GetAtPath(path);
             // 使用 Path.ChangeExtension 去掉扩展名
-            string bundleName = Path.ChangeExtension(path, null).Replace(URLSetting.AssetBundlesPath, "");
+            string bundleName;
+            if (appendHashToAssetBundleName)
+            {
+                bundleName = Path.ChangeExtension(path, null).Replace(URLSetting.AssetBundlesPath, "") + "_" + FileTools.CreateMd5ForFile(path);
+            }
+            else
+            {
+                bundleName = Path.ChangeExtension(path, null).Replace(URLSetting.AssetBundlesPath, "");
+            }
             if (!ai.assetBundleName.Equals(bundleName) && ai.assetBundleName.IsNullOrEmpty())
             {
                 ai.assetBundleName = bundleName;

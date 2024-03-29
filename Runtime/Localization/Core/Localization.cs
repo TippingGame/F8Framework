@@ -43,11 +43,8 @@ namespace F8Framework.Core
             ReadExcel.Instance.LoadAllExcelData();
             LoadSuccess();
 #elif UNITY_WEBGL
-            F8DataManager.Instance.LoadLocalizedStringsCallback(() =>
-            {
-                LogF8.LogConfig("WebGL异步加载完本地化表");
-                LoadSuccess();
-            });
+            LogF8.LogConfig("由于WebGL异步加载完本地化表，请在创建本地化模块之前加上：yield return F8DataManager.Instance.LoadLocalizedStringsIEnumerator();");
+            LoadSuccess();
 #else
             F8DataManager.Instance.LoadLocalizedStrings();
             LoadSuccess();

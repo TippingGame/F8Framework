@@ -1,1 +1,1 @@
-{"Version":"1.0.0","AssetRemoteAddress":"http://127.0.0.1:6789/Remote","EnableHotUpdate":true,"HotUpdateVersion":[],"EnablePackage":false,"SubPackage":["0","1","2","3"]}
+{"Version":"1.0.0","AssetRemoteAddress":"http://127.0.0.1:6789/Remote","EnableHotUpdate":false,"HotUpdateVersion":[],"EnablePackage":false,"SubPackage":["0","1","2","3"]}

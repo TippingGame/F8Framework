@@ -16,11 +16,7 @@ namespace F8Framework.Core
         
         private AssetBundleManifest manifest;
         private Dictionary<string, AssetBundleLoader> assetBundleLoaders = new Dictionary<string, AssetBundleLoader>();
-#if UNITY_WEBGL
-        private DownloadRequest downloadManifest = null;
-        private bool isDownloadManifest = false;
-#endif
-        
+
         /// <summary>
         /// 通过资产捆绑路径同步加载。
         /// 如果重复加载资产，则将直接从资源池中提供。
@@ -175,13 +171,12 @@ namespace F8Framework.Core
                     }
                 }
                 lastLoader = loader; // 获取最后一个 loader
-                yield return loader.LoadAsyncCoroutine(); // 这里会比update快一点，所以展开资产时有机会还未加载完
+                yield return loader.LoadAsyncCoroutine();
                 ++loadedCount;
                 lastLoader.AddDependentNames(assetBundlePath, true);
                 if (loadedCount == assetBundlePaths.Count)
                 {
                     // 所有依赖项加载完成后，加载主资源
-                    // 这里会比update快一点，所以展开资产时有机会assetBundle还未加载完
                     yield return lastLoader.ExpandAsyncCoroutine();
                     yield break;
                 }
@@ -859,11 +854,15 @@ namespace F8Framework.Core
             {
                 fullPath = AssetBundleHelper.GetAssetBundleFullName(null, AssetBundleHelper.SourceType.PACKAGE_PATH);
             }
+            else if (AssetManager.ForceRemoteAssetBundle)
+            {
+                fullPath = AssetBundleHelper.GetAssetBundleFullName(null, AssetBundleHelper.SourceType.REMOTE_ADDRESS);
+            }
             else
             {
                 fullPath = AssetBundleHelper.GetAssetBundleFullName(null, AssetBundleHelper.SourceType.STREAMING_ASSETS);
             }
-
+            
             return fullPath;
         }
         
@@ -884,11 +883,15 @@ namespace F8Framework.Core
             {
                 fullPath = AssetBundleHelper.GetAssetBundleFullName(null, AssetBundleHelper.SourceType.PACKAGE_PATH);
             }
+            else if (AssetManager.ForceRemoteAssetBundle)
+            {
+                fullPath = AssetBundleHelper.GetAssetBundleFullName(null, AssetBundleHelper.SourceType.REMOTE_ADDRESS);
+            }
             else
             {
                 fullPath = AssetBundleHelper.GetAssetBundleFullName(null, AssetBundleHelper.SourceType.STREAMING_ASSETS);
             }
-
+            
             return fullPath;
         }
         
@@ -941,39 +944,43 @@ namespace F8Framework.Core
             assetBundleLoaders.Clear();
         }
 
+        // WebGL专用异步加载AssetBundleManifest
+        public IEnumerator LoadAssetBundleManifest()  
+        {
+            string manifestPath = AssetBundleHelper.GetAssetBundleManifestPath();
+            if (manifestPath == null)
+                yield break;
+            if (!AssetManager.ForceRemoteAssetBundle)
+            {
+#if UNITY_EDITOR
+                manifestPath = "file://" + manifestPath;
+#endif
+            }
+            DownloadRequest assetBundleDownloadRequest = new DownloadRequest(manifestPath, default);
+            yield return assetBundleDownloadRequest.SendAssetBundleDownloadRequestCoroutine(manifestPath);
+            manifest = assetBundleDownloadRequest.DownloadedAssetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
+            manifest.GetAllAssetBundles();
+        }
+        
         public void OnInit(object createParam)
         {
 #if UNITY_WEBGL
-            string manifestPath = AssetBundleHelper.GetAssetBundleManifestPath();
-            if (manifestPath == null)
-                return;
-    #if UNITY_EDITOR
-            manifestPath = "file://" + manifestPath;
-    #endif
-            downloadManifest = new DownloadRequest(manifestPath, default);
+            LogF8.LogAsset("由于WebGL异步加载AssetBundleManifest，请在创建资产模块之后加上：yield return AssetBundleManager.Instance.LoadAssetBundleManifest();");
 #else
-            string manifestPath = AssetBundleHelper.GetAssetBundleManifestPath();
+            string manifestPath = AssetBundleHelper.GetAssetBundleManifestPath(AssetBundleHelper.SourceType.STREAMING_ASSETS);
             if (manifestPath == null)
                 return;
-            manifest = AssetBundle.LoadFromFile(manifestPath)?.
-                LoadAsset<AssetBundleManifest>("AssetBundleManifest");
-            manifest.GetAllAssetBundles();
+            var assetBundle = AssetBundle.LoadFromFile(manifestPath);
+            if (assetBundle)
+            {
+                manifest = assetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
+                manifest.GetAllAssetBundles();
+            }
 #endif
         }
         
         public void OnUpdate()
         {
-#if UNITY_WEBGL
-            if (isDownloadManifest == false)
-            {
-                if (downloadManifest != null && downloadManifest.IsFinished)
-                {
-                    isDownloadManifest = true;
-                    manifest = downloadManifest.DownloadedAssetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
-                    manifest.GetAllAssetBundles();
-                }
-            }
-#endif
             foreach (AssetBundleLoader loader in assetBundleLoaders.Values)
             {
                 loader.OnUpdate();

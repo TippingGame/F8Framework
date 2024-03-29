@@ -9,8 +9,11 @@ namespace F8Framework.Tests
 		{
 			// 初始化模块中心
 			ModuleCenter.Initialize(this);
-
-			// 按顺序创建模块
+			
+			// 初始化版本
+			FF8.HotUpdate = ModuleCenter.CreateModule<HotUpdateManager>();
+        
+			// 按顺序创建模块，可按需添加
 			FF8.Message = ModuleCenter.CreateModule<MessageManager>();
 			FF8.Input = ModuleCenter.CreateModule<InputManager>(new DefaultInputHelper());
 			FF8.Storage = ModuleCenter.CreateModule<StorageManager>();
@@ -20,17 +23,16 @@ namespace F8Framework.Tests
 			FF8.FSM = ModuleCenter.CreateModule<FSMManager>();
 			FF8.GameObjectPool = ModuleCenter.CreateModule<GameObjectPool>();
 			FF8.Asset = ModuleCenter.CreateModule<AssetManager>();
+			// yield return AssetBundleManager.Instance.LoadAssetBundleManifest(); // WebGL专用
 			FF8.Config = ModuleCenter.CreateModule<F8DataManager>();
 			FF8.Audio = ModuleCenter.CreateModule<AudioManager>();
 			FF8.Tween = ModuleCenter.CreateModule<Tween>();
 			FF8.UI = ModuleCenter.CreateModule<UIManager>();
+			// yield return F8DataManager.Instance.LoadLocalizedStringsIEnumerator(); // WebGL专用
 			FF8.Local = ModuleCenter.CreateModule<Localization>();
 			FF8.SDK = ModuleCenter.CreateModule<SDKManager>();
 			FF8.Download = ModuleCenter.CreateModule<DownloadManager>();
 			FF8.LogWriter = ModuleCenter.CreateModule<F8LogWriter>();
-        
-
-			FF8.HotUpdate = ModuleCenter.CreateModule<HotUpdateManager>();
 		}
 
 		void Update()

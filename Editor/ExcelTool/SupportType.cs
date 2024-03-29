@@ -258,7 +258,7 @@ namespace F8Framework.Core.Editor
                 source.Append("\t\t\tUtil.Unity.StartCoroutine(LoadLocalizedStringsIEnumerator(onLoadComplete));\n");
                 source.Append("\t\t}\n\n");
             
-                source.Append("\t\tpublic IEnumerator LoadLocalizedStringsIEnumerator(Action onLoadComplete)\n");
+                source.Append("\t\tpublic IEnumerator LoadLocalizedStringsIEnumerator(Action onLoadComplete = null)\n");
                 source.Append("\t\t{\n");
                 source.Append("\t\t\tyield return LoadAsync<LocalizedStrings>(\"LocalizedStrings\", result => p_LocalizedStrings = result as LocalizedStrings);\n");
                 source.Append("\t\t\tonLoadComplete?.Invoke();\n");

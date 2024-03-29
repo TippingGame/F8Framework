@@ -59,5 +59,28 @@ Unity F8 SDKManager组件，与原生平台交互，接入多个平台或者渠�
   1. 导出后，删除aar里 libs/classes.jar  
   2. 删除根目录的 classes.jar 里的 UnityPlayerActivity.java  
 
+### iOS工程使用方法
+* 修改这两个文件对接SDK [F8SDKInterfaceUnity.h](https://github.com/TippingGame/F8Framework/blob/main/Plugins/iOS/SDKManager/F8SDKInterfaceUnity.h) 和 [F8SDKInterfaceUnity.mm](https://github.com/TippingGame/F8Framework/blob/main/Plugins/iOS/SDKManager/F8SDKInterfaceUnity.mm)  
 
-
+### 微信小游戏接入方法
+* 导入WebGL转微信小游戏插件 [minigame-unity-webgl-transform](https://github.com/wechat-miniprogram/minigame-unity-webgl-transform)  
+* 修改两个变量为true。
+1. [AssetManager.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/AssetManager/AssetManager.cs)  
+```C#
+//强制更改资产加载模式为远程（微信小游戏使用）
+public static bool ForceRemoteAssetBundle = false;
+```
+2. [ABBuildTool.cs](https://github.com/TippingGame/F8Framework/blob/main/Editor/AssetManager/ABBuildTool.cs)  
+```C#
+// 打包后AB名加上MD5（微信小游戏使用）
+private static bool appendHashToAssetBundleName = false;
+```
+* 解除两个注释。
+1. [GameLauncher.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/Launcher/GameLauncher.cs)  
+```C#
+yield return AssetBundleManager.Instance.LoadAssetBundleManifest(); // WebGL专用
+...
+yield return F8DataManager.Instance.LoadLocalizedStringsIEnumerator(); // WebGL专用
+```
+* 构建设置。
+![image](ui_20240329230924.png)  

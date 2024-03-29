@@ -18,6 +18,9 @@ namespace F8Framework.Core
 
         private ResourcesManager _resourcesManager;
         
+        //强制更改资产加载模式为远程（微信小游戏使用）
+        public static bool ForceRemoteAssetBundle = false;
+        
         //资产信息
         public struct AssetInfo
         {
@@ -64,6 +67,7 @@ namespace F8Framework.Core
                 RESOURCE,
                 ASSET_BUNDLE
             }
+            
             // 是否采用编辑器模式
             private bool _isEditorMode = false;
             public bool IsEditorMode
@@ -109,6 +113,11 @@ namespace F8Framework.Core
             public AssetInfo GetAssetInfo(string assetName,
                 AssetAccessMode accessMode = AssetAccessMode.UNKNOWN)
             {
+                if (ForceRemoteAssetBundle)
+                {
+                    accessMode = AssetAccessMode.REMOTE_ASSET_BUNDLE;
+                }
+                
                 if (accessMode.HasFlag(AssetAccessMode.RESOURCE))
                 {
                     return GetAssetInfoFromResource(assetName, showTip: true);
@@ -930,7 +939,7 @@ namespace F8Framework.Core
             {
                 if (AssetBundleMap.Mappings.TryGetValue(assetName, out AssetBundleMap.AssetMapping assetmpping))
                 {
-                    if (remote)
+                    if (remote || ForceRemoteAssetBundle)
                     {
                         return new AssetInfo(AssetTypeEnum.ASSET_BUNDLE, assetmpping.AssetPath, AssetBundleManager.GetRemoteAssetBundleCompletePath(), assetmpping.AbName);
                     }

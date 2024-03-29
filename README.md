@@ -13,7 +13,7 @@ F8 Framework是一个**优雅，轻量，符合直觉的**基于Unity引擎的Ga
 
 ## 支持版本
 Unity 2021.3.15f1+  
-系统支持：Win/Android/iOS/Mac/Linux/WebGL
+构建可支持：Win / Android / iOS / Mac / Linux / WebGL / 微信小游戏
 
 ## 文档快速预览 - 1分钟
 ### ----------可选功能----------

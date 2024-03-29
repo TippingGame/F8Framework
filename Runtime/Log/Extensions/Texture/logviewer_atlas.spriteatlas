@@ -21,7 +21,7 @@ SpriteAtlas:
       crunchedCompression: 0
       sRGB: 1
     platformSettings:
-    - serializedVersion: 2
+    - serializedVersion: 3
       m_BuildTarget: DefaultTexturePlatform
       m_MaxTextureSize: 256
       m_ResizeAlgorithm: 0
@@ -32,6 +32,7 @@ SpriteAtlas:
       m_AllowsAlphaSplitting: 0
       m_Overridden: 0
       m_AndroidETC2FallbackOverride: 0
+      m_ForceMaximumCompressionQuality_BC6H_BC7: 1
     packingSettings:
       serializedVersion: 2
       padding: 4
@@ -39,6 +40,8 @@ SpriteAtlas:
       allowAlphaSplitting: 0
       enableRotation: 1
       enableTightPacking: 0
+      enableAlphaDilation: 0
+    secondaryTextureSettings: {}
     variantMultiplier: 1
     packables:
     - {fileID: 2800000, guid: f2c6c28d2c7975b4a9a7809d0c760f59, type: 3}
@@ -62,8 +65,9 @@ SpriteAtlas:
     - {fileID: 2800000, guid: 55bd087c987e09748b0850fdb70879f8, type: 3}
     - {fileID: 2800000, guid: 025058d67d6f884439606958ff2d7b36, type: 3}
     - {fileID: 2800000, guid: 15a66dca1b54e0f4ba4a8ae92104d0f0, type: 3}
-    totalSpriteSurfaceArea: 22760
     bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
   m_MasterAtlas: {fileID: 0}
   m_PackedSprites:
   - {fileID: 21300000, guid: 5d6755022bbc4064a849fe63011ff6d7, type: 3}
@@ -109,5 +113,6 @@ SpriteAtlas:
   - logtype_warning
   - wait_spin_1
   - wait_spin_3
+  m_RenderDataMap: {}
   m_Tag: logviewer_atlas
   m_IsVariant: 0

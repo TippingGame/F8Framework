@@ -169,7 +169,7 @@ namespace F8Framework.Core
 
         /// <summary>
         /// 协程加载资产，
-        /// 这里会比update快一点，
+        /// 这里会比update快一点，有必要的话要等待一帧，获取资源时已经有容错处理。
         /// 所以展开资产时有机会还未加载完。
         /// </summary>
         /// <returns></returns>
@@ -278,7 +278,7 @@ namespace F8Framework.Core
 
         /// <summary>
         /// 协程展开资源，
-        /// 这里会比update快一点，
+        /// 这里会比update快一点，有必要的话要等待一帧，获取资源时已经有容错处理。
         /// 有机会assetBundle还未加载完，所以就没有展开。
         /// </summary>
         /// <returns></returns>

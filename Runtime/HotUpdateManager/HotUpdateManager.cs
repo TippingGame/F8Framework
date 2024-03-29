@@ -24,14 +24,13 @@ namespace F8Framework.Core
         
         public void OnInit(object createParam)
         {
-            
+            GameVersion gameVersion = Util.LitJson.ToObject<GameVersion>(Resources.Load<TextAsset>(nameof(GameVersion)).ToString());
+            GameConfig.LocalGameVersion = gameVersion;
         }
         
         // 初始化本地版本
         public void InitLocalVersion()
         {
-            GameVersion gameVersion = Util.LitJson.ToObject<GameVersion>(Resources.Load<TextAsset>(nameof(GameVersion)).ToString());
-            GameConfig.LocalGameVersion = gameVersion;
             if (File.Exists(Application.persistentDataPath + "/" + nameof(GameVersion) + ".json"))
             {
                 string json =
@@ -101,6 +100,15 @@ namespace F8Framework.Core
             }
             webRequest.Dispose();
             webRequest = null;
+        }
+        
+        // 游戏修复，资源清理
+        public void GameRepairAssetClean()
+        {
+            FileTools.SafeClearDir(Application.persistentDataPath + HotUpdateDirName);
+            FileTools.SafeClearDir(Application.persistentDataPath + PackageDirName);
+            FileTools.SafeDeleteFile(Application.persistentDataPath + "/" + nameof(GameVersion) + ".json");
+            FileTools.SafeDeleteFile(Application.persistentDataPath + "/" + nameof(AssetBundleMap) + ".json");
         }
         
         /// <summary>

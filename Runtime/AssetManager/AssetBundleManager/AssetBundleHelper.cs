@@ -8,10 +8,11 @@ namespace F8Framework.Core
     /// </summary>
     public static class AssetBundleHelper
     {
-        private static string _streamingAssetsPath = Application.streamingAssetsPath + "/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
-        private static string _remoteAddress = GameConfig.LocalGameVersion.AssetRemoteAddress + "/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
-        private static string _hotUpdatePath = Application.persistentDataPath + HotUpdateManager.HotUpdateDirName + "/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
-        private static string _packagePath = Application.persistentDataPath + HotUpdateManager.PackageDirName + "/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
+        private static string _streamingAssetsPath => Application.streamingAssetsPath + "/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
+        private static string _remoteAddress => GameConfig.LocalGameVersion.AssetRemoteAddress + "/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
+        private static string _hotUpdatePath => Application.persistentDataPath + HotUpdateManager.HotUpdateDirName + "/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
+        private static string _packagePath => Application.persistentDataPath + HotUpdateManager.PackageDirName + "/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
+        
         /// <summary>
         /// 源类型的枚举。
         /// </summary>
@@ -63,6 +64,10 @@ namespace F8Framework.Core
         /// <returns>正确的路径。</returns>
         public static string GetAssetBundleManifestPath(SourceType type = SourceType.STREAMING_ASSETS)
         {
+            if (AssetManager.ForceRemoteAssetBundle)
+            {
+                type = SourceType.REMOTE_ADDRESS;
+            }
             string platformAssetBundlePath = GetAssetBundlePath(type);
             if (platformAssetBundlePath == null)
                 return null;
@@ -75,9 +80,9 @@ namespace F8Framework.Core
         /// 根据环境获取带后缀的资产捆绑清单文件的路径。
         /// </summary>
         /// <returns>正确的路径。</returns>
-        public static string GetAssetBundleManifestPathWithSuffix()
+        public static string GetAssetBundleManifestPathWithSuffix(SourceType type = SourceType.STREAMING_ASSETS)
         {
-            string manifestPath = GetAssetBundleManifestPath();
+            string manifestPath = GetAssetBundleManifestPath(type);
             if (manifestPath == null)
                 return null;
 
