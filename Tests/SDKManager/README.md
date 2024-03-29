@@ -82,5 +82,5 @@ yield return AssetBundleManager.Instance.LoadAssetBundleManifest(); // WebGL专�
 ...
 yield return F8DataManager.Instance.LoadLocalizedStringsIEnumerator(); // WebGL专用
 ```
-* 构建设置。
+* 构建设置。  
 ![image](ui_20240329230924.png)  
