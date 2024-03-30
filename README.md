@@ -1,3 +1,7 @@
+<div style="text-align:center; margin-top: 20px; margin-bottom: -100px;">
+    <img src="Tests/Logo.png" width="256" height="256" alt="F8Framework">
+</div>
+
 # F8 Framework
 
 [![license](http://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT) 
