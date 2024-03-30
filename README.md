@@ -1,5 +1,5 @@
-<p style="text-align:center; margin-top: 20px; margin-bottom: -100px;">
-    <img src="Tests/Logo.png" width="256" height="256" alt="F8Framework">
+<p align="center">
+    <img src="Tests/Logo.png" width="256" height="256" alt="F8Framework" style="display: block; margin: 20px auto -90px;">
 </p>
 
 # F8 Framework
