@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using F8Framework.AssetMap;
 using UnityEngine;
 
 namespace F8Framework.Core

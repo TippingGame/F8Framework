@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using F8Framework.AssetMap;
 using UnityEditor;
 using UnityEditor.Build.Reporting;
 using UnityEngine;

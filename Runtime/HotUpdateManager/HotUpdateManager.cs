@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using F8Framework.AssetMap;
 using UnityEngine;
 using UnityEngine.Networking;
 

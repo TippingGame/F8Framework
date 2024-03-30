@@ -3,7 +3,6 @@
     "rootNamespace": "",
     "references": [
         "F8Framework.Core",
-        "F8Framework.AssetMap",
         "ICSharpCode.SharpZipLib",
         "Excel",
         "LitJson",

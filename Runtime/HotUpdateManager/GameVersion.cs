@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using F8Framework.AssetMap;
 
 namespace F8Framework.Core
 {

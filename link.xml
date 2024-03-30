@@ -16,6 +16,5 @@
   <assembly fullname="SimpleWebTransport" preserve="all" />
   <assembly fullname="Telepathy" preserve="all" />
   <assembly fullname="F8Framework.F8ExcelDataClass" preserve="all" />
-  <assembly fullname="F8Framework.AssetMap" preserve="all" />
   <assembly fullname="F8Framework.Core" preserve="all" />
 </linker>

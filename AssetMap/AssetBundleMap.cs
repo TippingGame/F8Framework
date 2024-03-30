@@ -2,7 +2,7 @@
 
 using System.Collections.Generic;
 
-namespace F8Framework.AssetMap
+namespace F8Framework.Core
 {
    public static class AssetBundleMap
    {
