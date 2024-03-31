@@ -86,6 +86,9 @@ namespace F8Framework.Core.Editor
                     FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) +
                     "/Tests/Localization/StreamingAssets_config/本地化.xlsx",
                     Application.streamingAssetsPath + "/config/本地化.xlsx");
+                AssetDatabase.Refresh();
+                files = Directory.GetFiles(INPUT_PATH, "*.*", SearchOption.AllDirectories)
+                    .Where(s => s.EndsWith(".xls") || s.EndsWith(".xlsx")).ToArray();
                 LogF8.LogError("暂无可以导入的数据表！自动为你创建：【Demo工作表.xlsx / 本地化.xlsx】两个表格！" + ExcelPath + " 目录");
             }
             
