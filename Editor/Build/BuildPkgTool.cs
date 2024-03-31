@@ -634,6 +634,7 @@ namespace F8Framework.Core.Editor
             // 序列化对象
             string json = Util.LitJson.ToJson(gameVersion);
             FileTools.SafeDeleteFile(gameVersionResourcesPath);
+            FileTools.SafeDeleteFile(gameVersionResourcesPath + ".meta");
             UnityEditor.AssetDatabase.Refresh();
             FileTools.CheckFileAndCreateDirWhenNeeded(gameVersionResourcesPath);
             FileTools.SafeWriteAllText(gameVersionResourcesPath, json);
