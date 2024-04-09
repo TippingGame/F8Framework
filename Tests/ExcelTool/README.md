@@ -127,7 +127,7 @@ I18N.Other.dll\
 I18N.Rare.dll\
 I18N.West.dll\
 [ICSharpCode.SharpZipLib.dll](https://github.com/icsharpcode/SharpZipLib)  
-[LitJson.dll](https://github.com/LitJSON/litjson)（已修改字典Key可以使用int类型）
+[LitJson.dll](https://github.com/LitJSON/litjson)（已修改字典Key可以使用int类型，增加UnityEngine基础类型）
 
 ## 注意
 
