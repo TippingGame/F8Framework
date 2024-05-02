@@ -48,11 +48,18 @@ namespace F8Framework.Core.Editor
             ABBuildTool.BuildAllAB();
         }
 
+        // 加载时初始化方法，统一管理调用顺序
         [InitializeOnLoadMethod]
-        private static void ProjectKeyDownSpace()
+        private static void InitializeOnLoadMethods()
         {
-            //在Project面板按空格键相当于Show In Explorer
+            // 在Project面板按空格键相当于Show In Explorer
             EditorApplication.projectWindowItemOnGUI += ProjectWindowItemOnGUI;
+            
+            ExcelUpdater.Init();
+
+            LocalizationEditorSettings.LoadEditorSettings();
+
+            TMPIntegrationSwitcher.EnsureIntegrationState();
         }
         
         private static void ProjectWindowItemOnGUI(string guid, Rect selectionRect)

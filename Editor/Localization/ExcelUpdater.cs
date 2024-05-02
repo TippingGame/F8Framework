@@ -16,8 +16,8 @@ namespace F8Framework.Core.Editor
 
         static string targetFileName = "本地化.xlsx"; // 设置你想要监听的特定文件名
         
-        [InitializeOnLoadMethod]
-        private static void Init()
+        // 监听Excel变动
+        public static void Init()
         {
             if (isInitialized) return;
             EditorApplication.update += OnUpdate;

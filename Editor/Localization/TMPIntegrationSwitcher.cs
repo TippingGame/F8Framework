@@ -6,8 +6,8 @@ namespace F8Framework.Core.Editor
 	{
 		const string Define = "LOCALIZER_TMP";
 
-		[InitializeOnLoadMethod]
-		static void EnsureIntegrationState()
+		// 确保集成状态
+		public static void EnsureIntegrationState()
 		{
 			if (Enabled && !LocalizationEditorSettings.current.enableTMP) Disable();
 			if (!Enabled && LocalizationEditorSettings.current.enableTMP) Enable();

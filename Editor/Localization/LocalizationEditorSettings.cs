@@ -21,7 +21,7 @@ namespace F8Framework.Core.Editor
 			current = new SettingsDefinition();
 		}
 
-		[InitializeOnLoadMethod]
+		// 初始化设置
 		public static void LoadEditorSettings()
 		{
 			var json = EditorPrefs.GetString(LocalizationConst.LocalizationSettingsKey, "");
