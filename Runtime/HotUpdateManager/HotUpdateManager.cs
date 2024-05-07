@@ -145,11 +145,18 @@ namespace F8Framework.Core
                 
                 if (assetMapping == null || resAssetMapping.Value.MD5 != assetMapping.MD5) // 新增资源，MD5不同则需更新
                 {
+                    string abPath = resAssetMapping.Value.Version + "/" + URLSetting.AssetBundlesName + "/" +
+                                              URLSetting.GetPlatformName() + "/" + resAssetMapping.Value.AbName;
+                    
+                    string persistentAbPath = Application.persistentDataPath + HotUpdateDirName + Separator + abPath;
+                    
+                    // 校验本地热更资源文件md5
+                    if (File.Exists(persistentAbPath) && FileTools.CreateMd5ForFile(persistentAbPath) == resAssetMapping.Value.MD5)
+                    {
+                        continue;
+                    }
                     allSize += long.Parse(resAssetMapping.Value.Size);
-                    hotUpdateAssetUrl.TryAdd(resAssetMapping.Key, resAssetMapping.Value.Version + "/" + URLSetting.AssetBundlesName
-                                          + "/" + URLSetting.GetPlatformName() + "/" + resAssetMapping.Value.AbName);
-                    hotUpdateAssetUrl.TryAdd(resAssetMapping.Key + ".manifest", resAssetMapping.Value.Version + "/" + URLSetting.AssetBundlesName
-                                                                               + "/" + URLSetting.GetPlatformName() + "/" + resAssetMapping.Value.AbName + ".manifest");
+                    hotUpdateAssetUrl.TryAdd(resAssetMapping.Key, abPath);
                 }
                 else if(GameConfig.CompareVersions(assetMapping.Version, resAssetMapping.Value.Version) < 0) // 版本修正
                 {
@@ -321,8 +328,16 @@ namespace F8Framework.Core
             // 添加下载清单
             foreach (var package in subPackages)
             {
+                string persistentPackagePath = Application.persistentDataPath + "/" + PackageSplit + package + ".zip";
+                long fileSizeInBytes = 0;
+                if (File.Exists(persistentPackagePath))
+                {
+                    FileInfo fileInfo = new FileInfo(persistentPackagePath);
+                    fileSizeInBytes = fileInfo.Length;
+                }
+                // 断点续传
                 packageDownloader.AddDownload(GameConfig.LocalGameVersion.AssetRemoteAddress + "/" + PackageSplit + package + ".zip",
-                    Application.persistentDataPath + "/" + PackageSplit + package + ".zip");
+                    persistentPackagePath, fileSizeInBytes, true);
             }
             
             packageDownloader.LaunchDownload();

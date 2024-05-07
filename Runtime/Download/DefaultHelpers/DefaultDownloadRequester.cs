@@ -49,16 +49,29 @@ namespace F8Framework.Core
             using (UnityWebRequest request = UnityWebRequest.Head(uri))
             {
                 yield return request.SendWebRequest();
-                string size = request.GetResponseHeader("Content-Length");
 #if UNITY_2020_1_OR_NEWER
                 if (request.result != UnityWebRequest.Result.ConnectionError &&
                     request.result != UnityWebRequest.Result.ProtocolError)
 #elif UNITY_2018_1_OR_NEWER
                 if (!request.isNetworkError && !request.isHttpError)
 #endif
-                    callback?.Invoke(Convert.ToInt64(size));
+                {
+                    string contentLengthHeader = request.GetResponseHeader("Content-Length");
+                    if (!string.IsNullOrEmpty(contentLengthHeader) && long.TryParse(contentLengthHeader, out long fileLength))
+                    {
+                        callback?.Invoke(fileLength);
+                    }
+                    else
+                    {
+                        LogF8.LogError("Content-Length 标头找不到或无效: " + request.error);
+                        callback?.Invoke(-1);
+                    }
+                }
                 else
+                {
+                    LogF8.LogError("检索文件大小时出错: " + request.error);
                     callback?.Invoke(-1);
+                }
             }
         }
     }

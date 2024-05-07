@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using F8Framework.Core;
 using UnityEngine;
 
@@ -33,7 +34,10 @@ namespace F8Framework.Tests
             foreach (var fileInfo in fileInfos)
             {
                 count += 1;
-                downloader.AddDownload(fileInfo, Application.persistentDataPath + "F8Download/download" + count + ".png");
+                // 获取文件大小，用于断点续传（可选）
+                FileInfo file = new FileInfo(Application.persistentDataPath + "F8Download/download" + count + ".png");
+                long fileSizeInBytes = file.Length;
+                downloader.AddDownload(fileInfo, Application.persistentDataPath + "F8Download/download" + count + ".png", fileSizeInBytes, true);
             }
             
             // 下载器开始下载
