@@ -60,6 +60,11 @@ namespace F8Framework.Core
             
             foreach (var item in tb.Values)
             {
+                if(item.TextID == null)
+                {
+                    continue;
+                }
+                
                 List<string> list = new List<string>();
             
                 Type type2 = item.GetType();
