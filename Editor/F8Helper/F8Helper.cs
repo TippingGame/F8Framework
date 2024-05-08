@@ -54,8 +54,6 @@ namespace F8Framework.Core.Editor
         {
             // 在Project面板按空格键相当于Show In Explorer
             EditorApplication.projectWindowItemOnGUI += ProjectWindowItemOnGUI;
-            
-            ExcelUpdater.Init();
 
             LocalizationEditorSettings.LoadEditorSettings();
 

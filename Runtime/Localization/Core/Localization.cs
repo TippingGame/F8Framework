@@ -40,7 +40,21 @@ namespace F8Framework.Core
             
             // 必须先加载本地化配置表
 #if UNITY_EDITOR
-            ReadExcel.Instance.LoadAllExcelData();
+            if (Application.isPlaying)
+            {
+                F8DataManager.Instance.LoadLocalizedStrings();
+            }
+            else
+            {
+                try
+                {
+                    F8DataManager.Instance.GetLocalizedStrings();
+                }
+                catch
+                {
+                    ReadExcel.Instance.LoadAllExcelData();
+                }
+            }
             LoadSuccess();
 #elif UNITY_WEBGL
             LogF8.LogConfig("由于WebGL异步加载完本地化表，请在创建本地化模块之前加上：yield return F8DataManager.Instance.LoadLocalizedStringsIEnumerator();");
@@ -55,7 +69,7 @@ namespace F8Framework.Core
         private void LoadSuccess()
         {
             Dictionary<int, LocalizedStringsItem> tb = F8DataManager.Instance.GetLocalizedStrings();
-           
+            
             LogF8.LogConfig("<color=green>获取本地化表格成功！</color>");
             
             foreach (var item in tb.Values)

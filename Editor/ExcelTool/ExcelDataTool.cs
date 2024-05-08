@@ -68,11 +68,7 @@ namespace F8Framework.Core.Editor
         {
             string INPUT_PATH = Application.dataPath + ExcelPath;
 
-            if (!Directory.Exists(INPUT_PATH))
-            {
-                EditorUtility.DisplayDialog("注意！！！", "\n请在游戏根目录下创建：" + ExcelPath + "目录，用于存放数据表。", "确定");
-                throw new Exception("暂无目录存放数据表！");
-            }
+            FileTools.CheckDirAndCreateWhenNeeded(INPUT_PATH);
 
             var files = Directory.GetFiles(INPUT_PATH, "*.*", SearchOption.AllDirectories)
                 .Where(s => s.EndsWith(".xls") || s.EndsWith(".xlsx")).ToArray();
