@@ -135,6 +135,8 @@ namespace F8Framework.Core
             {
                 SetAxis(InputAxisType.Horizontal, Input.GetAxis("Horizontal"));
                 SetAxis(InputAxisType.Vertical, Input.GetAxis("Vertical"));
+                SetAxis(InputAxisType.HorizontalRaw, Input.GetAxisRaw("Horizontal"));
+                SetAxis(InputAxisType.VerticalRaw, Input.GetAxisRaw("Vertical"));
 
                 if (Input.GetKey(KeyCode.Q)) _upperLowerValue -= Time.deltaTime;
                 else if (Input.GetKey(KeyCode.E)) _upperLowerValue += Time.deltaTime;

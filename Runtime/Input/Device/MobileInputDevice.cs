@@ -45,6 +45,8 @@ namespace F8Framework.Core
             SetAxis(InputAxisType.MouseScrollWheel, 0);
             SetAxis(InputAxisType.Horizontal, UnityEngine.Input.GetAxis("Horizontal"));
             SetAxis(InputAxisType.Vertical, UnityEngine.Input.GetAxis("Vertical"));
+            SetAxis(InputAxisType.HorizontalRaw, UnityEngine.Input.GetAxisRaw("Horizontal"));
+            SetAxis(InputAxisType.VerticalRaw, UnityEngine.Input.GetAxisRaw("Vertical"));
             if (UnityEngine.Input.touchCount == 1)
                 SetVirtualMousePosition(UnityEngine.Input.GetTouch(0).position);
             else

@@ -198,10 +198,12 @@ namespace F8Framework.Core
         /// 键盘水平输入
         /// </summary>
         public static string Horizontal = "Horizontal";
+        public static string HorizontalRaw = "HorizontalRaw";
         /// <summary>
         /// 键盘垂直输入
         /// </summary>
         public static string Vertical = "Vertical";
+        public static string VerticalRaw = "VerticalRaw";
         /// <summary>
         /// 键盘上下输入
         /// </summary>
