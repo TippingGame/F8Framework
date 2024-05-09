@@ -7,61 +7,101 @@ namespace F8Framework.Core
     [UpdateRefresh]
     public sealed class NetworkManager : ModuleSingleton<NetworkManager>, IModule
     {
-        ConcurrentDictionary<string, INetworkChannel> channelDict;
-        ConcurrentDictionary<string, INetworkChannel> addChannelDict;
-        ConcurrentDictionary<string, INetworkChannel> deleteChannelDict;
+        ConcurrentBag<INetworkChannel> channelDict;
         private Thread netRun;
         
         public int NetworkChannelCount => channelDict.Count;
 
-        public bool AddChannel(INetworkChannel channel)
+        public void AddChannel(INetworkChannel channel)
         {
-            var channelName = channel.ChannelName;
-            return addChannelDict.TryAdd(channelName, channel);
+            channelDict.Add(channel);
         }
 
-        public bool AddChannel(string channelName, INetworkChannel channel)
+        public void RemoveChannel(string channelName)
         {
-            return addChannelDict.TryAdd(channelName, channel);
+            INetworkChannel channel;
+            foreach (INetworkChannel item in channelDict)
+            {
+                if (item.ChannelName == channelName)
+                {
+                    channel = item;
+                    break;
+                }
+            }
+            
+            if (!channelDict.TryTake(out channel))
+            {
+                LogF8.LogError("不存在：" + channelName);
+            }
         }
-
+        
         public void RemoveChannel(INetworkChannel channel)
         {
-            var channelName = channel.ChannelName;
-            deleteChannelDict.TryAdd(channelName, channel);
-        }
-
-        public void RemoveChannel(string channelName, INetworkChannel channel)
-        {
-            deleteChannelDict.TryAdd(channelName, channel);
-        }
-
-        public bool CloseChannel(string channelName, out INetworkChannel channel)
-        {
-            if (channelDict.TryRemove(channelName, out channel))
+            if (!channelDict.TryTake(out channel))
             {
-                channel.Close();
-                return true;
+                LogF8.LogError("不存在：" + channel.ChannelName);
+            }
+        }
+        
+        public bool CloseChannel(string channelName)
+        {
+            foreach (INetworkChannel item in channelDict)
+            {
+                if (item.ChannelName == channelName)
+                {
+                    item.Close();
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        
+        public bool CloseChannel(INetworkChannel channel)
+        {
+            foreach (INetworkChannel item in channelDict)
+            {
+                if (item == channel)
+                {
+                    channel.Close();
+                    return true;
+                }
             }
 
             return false;
         }
 
-        public bool PeekChannel(string channelName, out INetworkChannel channel)
+        public INetworkChannel PeekChannel(string channelName)
         {
-            return channelDict.TryGetValue(channelName, out channel);
+            foreach (INetworkChannel item in channelDict)
+            {
+                if (item.ChannelName == channelName)
+                {
+                    return item;
+                }
+            }
+    
+            return null;
         }
         
         public bool HasChannel(string channelName)
         {
-            return channelDict.ContainsKey(channelName);
+            foreach (INetworkChannel item in channelDict)
+            {
+                if (item.ChannelName == channelName)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public List<INetworkChannel> GetAllChannels()
         {
             List<INetworkChannel> channelList = new List<INetworkChannel>();
     
-            foreach (INetworkChannel channel in channelDict.Values)
+            foreach (INetworkChannel channel in channelDict)
             {
                 channelList.Add(channel);
             }
@@ -71,9 +111,7 @@ namespace F8Framework.Core
 
         public void OnInit(object createParam)
         {
-            channelDict = new ConcurrentDictionary<string, INetworkChannel>();
-            addChannelDict = new ConcurrentDictionary<string, INetworkChannel>();
-            deleteChannelDict = new ConcurrentDictionary<string, INetworkChannel>();
+            channelDict = new ConcurrentBag<INetworkChannel>();
         }
 
         /// <summary>
@@ -116,23 +154,12 @@ namespace F8Framework.Core
 
         private void Update()
         {
-            // 首先处理待删除字典
-            foreach (var delete in deleteChannelDict)
+            if (channelDict.Count <= 0)
             {
-                delete.Value.Close();
-                channelDict.TryRemove(delete.Key, out _);
+                return;
             }
-            deleteChannelDict.Clear();
-    
-            // 然后处理待添加字典
-            foreach (var add in addChannelDict)
-            {
-                channelDict.TryAdd(add.Key, add.Value);
-            }
-            addChannelDict.Clear();
-    
             // 最后对所有通道进行刷新
-            foreach (var channel in channelDict.Values)
+            foreach (var channel in channelDict)
             {
                 channel.TickRefresh();
             }
@@ -152,7 +179,7 @@ namespace F8Framework.Core
         {
             foreach (var channel in channelDict)
             {
-                channel.Value.Close();
+                channel.Close();
             }
 
             channelDict.Clear();
