@@ -32,6 +32,7 @@ namespace F8Framework.Tests
             kcpClientChannel.OnDataReceived += KcpClient_OnDataReceived;
             kcpClientChannel.OnDisconnected += KcpClient_OnDisconnected;
 
+            // 可选
             // FF8.Network.StartThread();
             
             //channel的TickRefresh函数可自定义管理轮询，networkManager的作用是存放通道并调用TickRefresh。
@@ -47,13 +48,6 @@ namespace F8Framework.Tests
             btnKcpConnectC2S?.onClick.AddListener(KcpConnectC2S);
             btnKcpDisconnectC2S?.onClick.AddListener(KcpDisconnectC2S);
             btnKcpSendMessageC2S?.onClick.AddListener(KcpSendMessageC2S);
-        }
-
-        void Update()
-        {
-            //这里为了测试client，由update管理轮询
-            tcpClientChannel.TickRefresh();
-            kcpClientChannel.TickRefresh();
         }
 
         void OnDestroy()
