@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.10] - 2024-05-16
+1.AssetBundleMap.json中只保留一个AssetPath，改为从AssetBundle中GetAllAssetNames方法获取
+2.由于GetAllAssetNames只能获取小写的AssetPath，需修改GetLoadProgress和GetAssetObject方法
+
 ## [1.0.9] - 2024-05-12
 1.Network模块代码优化GC
 

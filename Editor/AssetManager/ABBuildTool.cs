@@ -185,7 +185,6 @@ namespace F8Framework.Core.Editor
                 string[] allPaths = filePaths.Concat(folderPaths).ToArray();
                 
                 List<string> tempNames = new List<string>();
-                Dictionary<string, List<string>> tempNamesDirectory = new Dictionary<string, List<string>>();
 
                 assetMapping = new Dictionary<string, AssetBundleMap.AssetMapping>();
 
@@ -221,29 +220,10 @@ namespace F8Framework.Core.Editor
                         }
                         tempNames.Add(fileNameWithoutExtension);
 
-                        // 修改同一AB名的assetPath
-                        List<string> assetPathsForAbName;
-                        if (!tempNamesDirectory.TryGetValue(abName.ToLower(), out assetPathsForAbName))
-                        {
-                            // 如果该 AssetBundle 名称还没有对应的资源路径列表，就创建一个新的列表
-                            assetPathsForAbName = new List<string>();
-                            tempNamesDirectory.Add(abName.ToLower(), assetPathsForAbName);
-                        }
+                        // 只留下一个assetPath
+                        List<string> assetPathsForAbName = new List<string>();
+                        assetPathsForAbName.Add(assetPath);
                         
-                        // 将当前资源路径添加到列表中，但是只添加一次，确保每个资源路径只出现一次
-                        if (!assetPathsForAbName.Contains(assetPath))
-                        {
-                            assetPathsForAbName.Add(assetPath);
-                        }
-                        
-                        // 同一ab名的直接覆盖assetPaths
-                        foreach (var value in assetMapping.Values)
-                        {
-                            if (value.AbName == abName.ToLower())
-                            {
-                                value.AssetPath = assetPathsForAbName.ToArray();
-                            }
-                        }
                         assetMapping.Add(fileNameWithoutExtension, new AssetBundleMap.AssetMapping(abName.ToLower(), assetPathsForAbName.ToArray(),
                             BuildPkgTool.ToVersion, FileTools.GetFileSize(AssetBundleHelper.GetAssetBundleFullName(abName.ToLower())).ToString(),
                             FileTools.CreateMd5ForFile(AssetBundleHelper.GetAssetBundleFullName(abName.ToLower())), GetPackage(filePath), ""));

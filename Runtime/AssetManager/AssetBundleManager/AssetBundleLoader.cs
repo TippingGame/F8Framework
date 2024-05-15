@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 namespace F8Framework.Core
@@ -83,7 +84,6 @@ namespace F8Framework.Core
             this.assetBundlePath = assetBundlePath;
             this.abName = GetSubPath(this.assetBundlePath).ToLower();
             this.hash128 = AssetBundleManager.Instance.GetAssetBundleHash(this.abName);
-            assetPaths = GetAssetPaths();
         }
 
         /// <summary>
@@ -108,17 +108,20 @@ namespace F8Framework.Core
                 LoadAsync(
                     (ab) => {
                         assetBundleContent = ab;
+                        GetAssetPaths();
                     }
                 );
 #else
                 DownloadRequest d = new DownloadRequest(assetBundlePath, hash128);
                 while (!d.IsFinished) ;
                 assetBundleContent = d.DownloadedAssetBundle;
+                GetAssetPaths();
 #endif
             }
             else
             {
                 assetBundleContent = AssetBundle.LoadFromFile(assetBundlePath);
+                GetAssetPaths();
             }
 
             assetBundleLoadState = LoaderState.FINISHED;
@@ -351,14 +354,14 @@ namespace F8Framework.Core
         /// <summary>
         /// 尝试获取资产对象。
         /// </summary>
-        /// <param name="assetPath">资产捆绑包的路径。</param>
+        /// <param name="abName">ab名。</param>
         /// <param name="obj">资产对象。</param>
         /// <returns></returns>
-        public bool TryGetAsset(string assetPath, out Object obj)
+        public bool TryGetAsset(string abName, out Object obj)
         {
-            if (assetObjects.ContainsKey(assetPath))
+            if (assetObjects.ContainsKey(abName))
             {
-                obj = assetObjects[assetPath];
+                obj = assetObjects[abName];
                 return true;
             }
             obj = null;
@@ -588,6 +591,7 @@ namespace F8Framework.Core
                                 else
                                 {
                                     assetBundleContent = assetBundleLoadRequest.assetBundle;
+                                    GetAssetPaths();
                                     assetBundleLoadState = LoaderState.FINISHED;
                                 }
                             }
@@ -607,6 +611,7 @@ namespace F8Framework.Core
                                 else
                                 {
                                     assetBundleContent = assetBundleDownloadRequest.DownloadedAssetBundle;
+                                    GetAssetPaths();
                                     assetBundleLoadState = LoaderState.FINISHED;
                                 }
                             }
@@ -837,23 +842,16 @@ namespace F8Framework.Core
         /// 获取资产路径列表。
         /// </summary>
         /// <returns>资产路径列表。</returns>
-        private List<string> GetAssetPaths()
+        private void GetAssetPaths()
         {
-            List<string> paths = new List<string>();
-            
-            foreach (var values in AssetBundleMap.Mappings.Values)
+            if (assetBundleContent)
             {
-                if (values.AbName == abName)
+                assetPaths.Clear();
+                foreach (var assetName in assetBundleContent.GetAllAssetNames()) // 获取得到是小写：assets/assetbundles/prefabs/cube.prefab
                 {
-                    foreach (var assetPath in values.AssetPath)
-                    {
-                        if (!paths.Contains(assetPath))
-                            paths.Add(assetPath);
-                    }
+                    assetPaths.Add(assetName);
                 }
             }
-            
-            return paths;
         }
         
         private string GetSubPath(string fullPath)
@@ -878,17 +876,21 @@ namespace F8Framework.Core
         /// <param name="obj">要设置的对象。</param>
         private void SetAssetObject(string assetPath, Object obj)
         {
-            if (assetPath == null ||
+            string abName = Path.ChangeExtension(assetPath, null).Replace(URLSetting.AssetBundlesPath.ToLower(), "");
+            
+            if (abName == null ||
                 obj == null)
-                return;
-
-            if (assetObjects.ContainsKey(assetPath))
             {
-                assetObjects[assetPath] = obj;
+                return;
+            }
+
+            if (assetObjects.ContainsKey(abName))
+            {
+                assetObjects[abName] = obj;
             }
             else
             {
-                assetObjects.Add(assetPath, obj);
+                assetObjects.Add(abName, obj);
             }
         }
 
