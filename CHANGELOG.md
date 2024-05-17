@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.0.11] - 2024-05-17
+1.编辑器模式下加载资源改为自动搜索AssetPath
+
 ## [1.0.10] - 2024-05-16
 1.AssetBundleMap.json中只保留一个AssetPath，改为从AssetBundle中GetAllAssetNames方法获取
 2.由于GetAllAssetNames只能获取小写的AssetPath，需修改GetLoadProgress和GetAssetObject方法
