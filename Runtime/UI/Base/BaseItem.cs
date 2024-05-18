@@ -2,20 +2,8 @@ using System;
 
 namespace F8Framework.Core
 {
-    public class BaseView : ComponentBind
+    public class BaseItem : ComponentBind
     {
-        public enum WindowState
-        {
-            Awake,
-            Animating,
-            Ready,
-            Closed
-        }
-        
-        public object[] Args;
-        public int UIid;
-        public WindowState windowState = WindowState.Closed;
-        
         // 消息事件
         private EventDispatcher _eventDispatcher = null;
                 
@@ -30,36 +18,23 @@ namespace F8Framework.Core
                 return _eventDispatcher;
             }
         }
-
+        
         private void Awake()
         {
-            windowState = WindowState.Awake;
             OnAwake();
+            OnViewTweenInit();
         }
 
         protected virtual void OnAwake()
         {
         }
-
-        public void Added(int uiId, object[] args = null)
-        {
-            this.Args = args;
-            this.UIid = uiId;
-            OnAdded(uiId, args);
-            windowState = WindowState.Animating;
-            OnViewTweenInit();
-            OnPlayViewTween();
-        }
-
-        protected virtual void OnAdded(int uiId, object[] args = null)
-        {
-        }
-
+        
         private void Start()
         {
             OnStart();
+            OnPlayViewTween();
         }
-
+        
         protected virtual void OnStart()
         {
         }
@@ -70,49 +45,10 @@ namespace F8Framework.Core
         
         protected virtual void OnPlayViewTween()
         {
-            windowState = WindowState.Ready;
             OnViewOpen();
         }
-
+        
         protected virtual void OnViewOpen()
-        {
-        }
-
-        public void AddEscBtn()
-        {
-
-        }
-
-        public void OnEscBtn()
-        {
-
-        }
-
-        public void Close(bool isDestroy = false)
-        {
-            windowState = WindowState.Closed;
-            UIManager.Instance.Close(UIid, isDestroy);
-        }
-
-        public void BeforeRemove()
-        {
-            if (_eventDispatcher != null) {
-                _eventDispatcher.Clear();
-                _eventDispatcher = null;
-            }
-            OnBeforeRemove();
-        }
-
-        protected virtual void OnBeforeRemove()
-        {
-        }
-
-        public void Removed()
-        {
-            OnRemoved();
-        }
-
-        protected virtual void OnRemoved()
         {
         }
         

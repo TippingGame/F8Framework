@@ -6,6 +6,8 @@ namespace F8Framework.Core
     public class EventDispatcher : IMessageManager
     {
         private Dictionary<int, HashSet<IEventDataBase>> events = new Dictionary<int, HashSet<IEventDataBase>>();
+        // 存储待删除的事件处理器列表
+        private List<IEventDataBase> delects = new List<IEventDataBase>();
         public void AddEventListener<T>(T eventName, Action listener, object handle = null) where T : Enum, IConvertible
         {
             int tempName = (int)(object)eventName;
@@ -59,14 +61,25 @@ namespace F8Framework.Core
                         return;
                     }
 
+                    delects.Clear();
+
                     foreach (var item in ebs)
                     {
-                        if (item is EventData eb)
+                        if (item is EventData eb && eb.Listener == listener && eb.Handle == handle)
                         {
                             MessageManager.Instance.RemoveEventListener(eventId, eb.Listener, eb.Handle);
+                            delects.Add(eb);
                         }
                     }
-                    events.Remove(eventId);
+                    
+                    foreach (var deletion in delects)
+                    {
+                        ebs.Remove(deletion);
+                    }
+
+                    delects.Clear();
+                    
+                    
                 }
             }
         }
@@ -85,21 +98,55 @@ namespace F8Framework.Core
                 {
                     HashSet<IEventDataBase> ebs = events[eventId];
                     if (ebs.Count < 0) {
+                        LogF8.Log("不可能为零");
                         return;
                     }
                     
+                    delects.Clear();
+
                     foreach (var item in ebs)
                     {
-                        if (item is EventData<object[]> eb)
+                        if (item is EventData<object[]> eb && eb.Listener == listener && eb.Handle == handle)
                         {
                             MessageManager.Instance.RemoveEventListener(eventId, eb.Listener, eb.Handle);
+                            delects.Add(eb);
                         }
                     }
-                    events.Remove(eventId);
+                    
+                    foreach (var deletion in delects)
+                    {
+                        ebs.Remove(deletion);
+                    }
+
+                    delects.Clear();
                 }
             }
         }
 
+        /// <summary>
+        /// 删除此事件所有监听（慎用）
+        /// </summary>
+        public void RemoveEventListener<T>(T eventName)
+        {
+            int tempName = (int)(object)eventName;
+            RemoveEventListener(tempName);
+        }
+        
+        /// <summary>
+        /// 删除此事件所有监听（慎用）
+        /// </summary>
+        public void RemoveEventListener(int eventId)
+        {
+            if (events.ContainsKey(eventId))
+            {
+                if (events[eventId].Count > 0)
+                {
+                    events.Remove(eventId);
+                    MessageManager.Instance.RemoveEventListener(eventId);
+                }
+            }
+        }
+        
         public void DispatchEvent<T>(T eventName) where T : Enum, IConvertible
         {
             MessageManager.Instance.DispatchEvent(eventName);
@@ -140,6 +187,7 @@ namespace F8Framework.Core
                 }
             }
             events.Clear();
+            delects.Clear();
         }
     }
 }

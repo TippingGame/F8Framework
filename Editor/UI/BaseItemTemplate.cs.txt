@@ -5,16 +5,22 @@ using UnityEngine.UI;
 using F8Framework.Core;
 
     #ROOTNAMESPACEBEGIN#
-public class #SCRIPTNAME# : BaseView
+public class #SCRIPTNAME# : BaseItem
 {
-    // Awake
-    protected override void OnAwake()
+    // 预留给刷新Item使用
+    public void Refresh()
     {
         #NOTRIM#
     }
     
-    // 参数传入
-    protected override void OnAdded(int uiId, object[] args = null)
+    // OnEnable
+    private void OnEnable()
+    {
+        #NOTRIM#
+    }
+    
+    // Awake
+    protected override void OnAwake()
     {
         #NOTRIM#
     }
@@ -42,14 +48,8 @@ public class #SCRIPTNAME# : BaseView
         #NOTRIM#
     }
     
-    // 删除之前
-    protected override void OnBeforeRemove()
-    {
-        #NOTRIM#
-    }
-    
-    // 删除
-    protected override void OnRemoved()
+    // OnDisable
+    private void OnDisable()
     {
         #NOTRIM#
     }

@@ -215,6 +215,24 @@ namespace F8Framework.Core
             delects.Clear();
         }
 
+        // 删除此事件所有监听
+        public void RemoveEventListener<T>(T eventName)
+        {
+            int tempName = (int)(object)eventName;
+            RemoveEventListener(tempName);
+        }
+        
+        public void RemoveEventListener(int eventId)
+        {
+            if (events.ContainsKey(eventId))
+            {
+                if (events[eventId].Count > 0)
+                {
+                    events.Remove(eventId);
+                }
+            }
+        }
+        
         // 触发事件（不带参数）
         public void DispatchEvent<T>(T eventName) where T : Enum, IConvertible
         {
