@@ -1,15 +1,19 @@
 # Changelog
 
+## [1.0.13] - 2024-05-19
+1.修复相同AB名下获取资产失败问题  
+2.明确AB资产地址(大小写不敏感)  
+
 ## [1.0.12] - 2024-05-18
-1.增加BaseItem组件
-2.事件系统增加移除事件所有监听的方法
+1.增加BaseItem组件  
+2.事件系统增加移除事件所有监听的方法  
 
 ## [1.0.11] - 2024-05-17
 1.编辑器模式下加载资源改为自动搜索AssetPath
 
 ## [1.0.10] - 2024-05-16
-1.AssetBundleMap.json中只保留一个AssetPath，改为从AssetBundle中GetAllAssetNames方法获取
-2.由于GetAllAssetNames只能获取小写的AssetPath，需修改GetLoadProgress和GetAssetObject方法
+1.AssetBundleMap.json中只保留一个AssetPath，改为从AssetBundle中GetAllAssetNames方法获取  
+2.由于GetAllAssetNames只能获取小写的AssetPath，需修改GetLoadProgress和GetAssetObject方法  
 
 ## [1.0.9] - 2024-05-12
 1.Network模块代码优化GC
@@ -27,8 +31,8 @@
 1.本地化表TextID可为空
 
 ## [1.0.4] - 2024-05-08
-1.热更新增加校验本地资源md5
-2.分包下载增加断点续传
+1.热更新增加校验本地资源md5  
+2.分包下载增加断点续传  
 
 ## [1.0.3] - 2024-05-02
 1.InitializeOnLoadMethod统一管理调用顺序

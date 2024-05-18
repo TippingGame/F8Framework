@@ -9,6 +9,7 @@ Unity F8 AssetManager资产加载组件。
 1. 编辑器下：点击F8自动生成资产索引/AB名称，自动区分不同平台，清理多余AB和文件夹，Editor模式下减少开发周期。  
 2. 运行时：同步/异步加载单个资产，展开文件夹或同一AB下所有资产，自动判断是 Resources / AssetBundle 资产，加载Remote远程资产，获取加载进度，同步打断异步加载。
 3. AssetBundle可以这样加载：1. 单个资产单个AB 2. 指定文件夹名称（文件夹第一层的AB） 3. 设置多个资产为同一AB名（指定任意资产名）
+4. 注意AB资产地址(大小写不敏感)，文件和目录名需要保证唯一。
 
 ## 导入插件（需要首先导入核心）
 注意！内置在->F8Framework核心：https://github.com/TippingGame/F8Framework.git  

@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 
 namespace F8Framework.Core
@@ -354,14 +353,14 @@ namespace F8Framework.Core
         /// <summary>
         /// 尝试获取资产对象。
         /// </summary>
-        /// <param name="abName">ab名。</param>
+        /// <param name="assetPath">assetPath名。（小写）</param>
         /// <param name="obj">资产对象。</param>
         /// <returns></returns>
-        public bool TryGetAsset(string abName, out Object obj)
+        public bool TryGetAsset(string assetPath, out Object obj)
         {
-            if (assetObjects.ContainsKey(abName))
+            if (assetObjects.ContainsKey(assetPath))
             {
-                obj = assetObjects[abName];
+                obj = assetObjects[assetPath];
                 return true;
             }
             obj = null;
@@ -876,21 +875,20 @@ namespace F8Framework.Core
         /// <param name="obj">要设置的对象。</param>
         private void SetAssetObject(string assetPath, Object obj)
         {
-            string abName = Path.ChangeExtension(assetPath, null).Replace(URLSetting.AssetBundlesPath.ToLower(), "");
-            
-            if (abName == null ||
+            // assetPath是小写
+            if (assetPath == null ||
                 obj == null)
             {
                 return;
             }
 
-            if (assetObjects.ContainsKey(abName))
+            if (assetObjects.ContainsKey(assetPath))
             {
-                assetObjects[abName] = obj;
+                assetObjects[assetPath] = obj;
             }
             else
             {
-                assetObjects.Add(abName, obj);
+                assetObjects.Add(assetPath, obj);
             }
         }
 

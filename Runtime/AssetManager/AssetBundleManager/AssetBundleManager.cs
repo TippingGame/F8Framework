@@ -426,9 +426,9 @@ namespace F8Framework.Core
         /// </summary>
         /// <typeparam name="T">资产对象的目标对象类型。</typeparam>
         /// <param name="assetBundlePath">assetBundle路径。</param>
-        /// <param name="abName">ab名。</param>
+        /// <param name="assetPath">assetPath名。（小写）</param>
         /// <returns>找到的资产对象。</returns>
-        public T GetAssetObject<T>(string assetBundlePath, string abName)
+        public T GetAssetObject<T>(string assetBundlePath, string assetPath)
             where T : Object
         {
             if (assetBundleLoaders.TryGetValue(assetBundlePath, out AssetBundleLoader loader))
@@ -437,7 +437,7 @@ namespace F8Framework.Core
                     loader.IsLoadFinished &&
                     loader.IsExpandFinished)
                 {
-                    bool success = loader.TryGetAsset(abName, out Object obj);
+                    bool success = loader.TryGetAsset(assetPath, out Object obj);
                     if (success)
                     {
                         if (obj is T t)
@@ -453,10 +453,10 @@ namespace F8Framework.Core
         /// 通过资产捆绑加载程序和对象名称获取资产对象。
         /// </summary>
         /// <param name="assetBundlePath">assetBundle路径。</param>
-        /// <param name="abName">ab名。</param>
+        /// <param name="assetPath">assetPath名。（小写）</param>
         /// <param name="assetType">资产对象的目标对象类型。</param>
         /// <returns>找到的资产对象。</returns>
-        public Object GetAssetObject(string assetBundlePath, string abName, System.Type assetType)
+        public Object GetAssetObject(string assetBundlePath, string assetPath, System.Type assetType)
         {
             if (assetBundleLoaders.TryGetValue(assetBundlePath, out AssetBundleLoader loader))
             {
@@ -464,7 +464,7 @@ namespace F8Framework.Core
                     loader.IsLoadFinished &&
                     loader.IsExpandFinished)
                 {
-                    bool success = loader.TryGetAsset(abName, out Object obj);
+                    bool success = loader.TryGetAsset(assetPath, out Object obj);
                     if (success)
                     {
                         if (assetType.IsAssignableFrom(obj.GetType()))
@@ -481,9 +481,9 @@ namespace F8Framework.Core
         /// 通过资产捆绑加载程序和对象名称获取资产对象。
         /// </summary>
         /// <param name="assetBundlePath">assetBundle路径。</param>
-        /// <param name="abName">ab名。</param>
+        /// <param name="assetPath">assetPath名。（小写）</param>
         /// <returns>找到的资产对象。</returns>
-        public Object GetAssetObject(string assetBundlePath, string abName)
+        public Object GetAssetObject(string assetBundlePath, string assetPath)
         {
             if (assetBundleLoaders.TryGetValue(assetBundlePath, out AssetBundleLoader loader))
             {
@@ -491,7 +491,7 @@ namespace F8Framework.Core
                     loader.IsLoadFinished &&
                     loader.IsExpandFinished)
                 {
-                    bool success = loader.TryGetAsset(abName, out Object obj);
+                    bool success = loader.TryGetAsset(assetPath, out Object obj);
                     if (success)
                         return obj;
                 }

@@ -212,13 +212,13 @@ namespace F8Framework.Core.Editor
                             continue;
                         }
                         
-                        if (tempNames.Contains(fileNameWithoutExtension))
+                        if (tempNames.Contains(fileNameWithoutExtension.ToLower()))
                         {
-                            LogF8.LogError("AssetName重复，请检查资源地址：" + filePath);
+                            LogF8.LogError("AssetName重复，请检查资源地址（大小写不敏感）：" + filePath);
                             string id = Guid.NewGuid().ToString(); // 生成一个唯一的ID
                             fileNameWithoutExtension += id;
                         }
-                        tempNames.Add(fileNameWithoutExtension);
+                        tempNames.Add(fileNameWithoutExtension.ToLower());
 
                         // 只留下一个assetPath
                         List<string> assetPathsForAbName = new List<string>();
@@ -247,7 +247,7 @@ namespace F8Framework.Core.Editor
                         
                         if (tempNames.Contains(fileNameWithoutExtension))
                         {
-                            LogF8.LogError("AssetName重复，请检查文件夹地址：" + filePath);
+                            LogF8.LogError("AssetName重复，请检查文件夹地址（大小写不敏感）：" + filePath);
                             string id = Guid.NewGuid().ToString(); // 生成一个唯一的ID
                             fileNameWithoutExtension += id;
                         }
