@@ -81,7 +81,7 @@ namespace F8Framework.Core
         {
             Clear(true);
             this.assetBundlePath = assetBundlePath;
-            this.abName = GetSubPath(this.assetBundlePath).ToLower();
+            this.abName = GetSubPath(this.assetBundlePath);
             this.hash128 = AssetBundleManager.Instance.GetAssetBundleHash(this.abName);
         }
 

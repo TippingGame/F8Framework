@@ -7,6 +7,7 @@ namespace F8Framework.Core
     {
             public const string AssetBundlesName = "AssetBundles";  // AB包名
             public const string AssetBundlesPath = "Assets/AssetBundles/"; // 打包AB包根路径
+            public const string AssetBundlesPathLower = "assets/assetbundles/"; // 打包AB包根路径小写
             public const string ResourcesPath = "Resources/"; // Resources根路径
             
             public static string GetAssetBundlesFolder()

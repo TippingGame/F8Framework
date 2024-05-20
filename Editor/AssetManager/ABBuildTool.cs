@@ -222,7 +222,7 @@ namespace F8Framework.Core.Editor
 
                         // 只留下一个assetPath
                         List<string> assetPathsForAbName = new List<string>();
-                        assetPathsForAbName.Add(assetPath);
+                        assetPathsForAbName.Add(assetPath.ToLower());
                         
                         assetMapping.Add(fileNameWithoutExtension, new AssetBundleMap.AssetMapping(abName.ToLower(), assetPathsForAbName.ToArray(),
                             BuildPkgTool.ToVersion, FileTools.GetFileSize(AssetBundleHelper.GetAssetBundleFullName(abName.ToLower())).ToString(),
@@ -242,7 +242,7 @@ namespace F8Framework.Core.Editor
                         
                         for (int i = 0; i < assetPaths.Length; i++)
                         {
-                            assetPaths[i] = GetAssetPath(assetPaths[i]);
+                            assetPaths[i] = GetAssetPath(assetPaths[i]).ToLower();
                         }
                         
                         if (tempNames.Contains(fileNameWithoutExtension))

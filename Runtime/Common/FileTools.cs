@@ -124,8 +124,7 @@ namespace F8Framework.Core
         
         public static bool IsLegalHTTPURI(string uri)
         {
-            uri = uri.ToLower();
-            return !string.IsNullOrEmpty(uri) && (uri.StartsWith("http://") || uri.StartsWith("https://"));
+            return !string.IsNullOrEmpty(uri) && (uri.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || uri.StartsWith("https://", StringComparison.OrdinalIgnoreCase));
         }
         
         public static string FormatToUnityPath(string path)
