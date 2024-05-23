@@ -48,10 +48,10 @@ Unity F8 SDKManager组件，与原生平台交互，接入多个平台或者渠�
 
 ## 安卓工程使用方法
 * 勾选两个选项 Project Settings -> Player -> Publishing Settings -> Build  
-![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20240324030616.png)  
+![image](ui_20240324030616.png)  
 ------------------------------
 * 勾选自动生成后替换这两个文件 [AndroidManifest.xml](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/AndroidManifest.xml) 和 [mainTemplate.gradle](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/mainTemplate.gradle)  
-![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20240324030626.png)
+![image](ui_20240324030626.png)
 ------------------------------
 * 注意：假如前面两步没完成，打包到Android后会出现两个icon
 ------------------------------
@@ -70,9 +70,9 @@ Unity F8 SDKManager组件，与原生平台交互，接入多个平台或者渠�
 * 导入[WebGL转微信小游戏](https://github.com/wechat-miniprogram/minigame-unity-webgl-transform)插件，下载[ unitypackage ](https://game.weixin.qq.com/cgi-bin/gamewxagwasmsplitwap/getunityplugininfo?download=1)并导入至游戏项目中  
 ---
 * 删除WX-WASM-SDK-V2插件里的LitJson.dll  
-![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20240524000853.png)  
+![image](ui_20240524000853.png)  
 * 分别给WX-WASM-SDK-V2目录下Editor和Runtime的两个.asmdef文件，添加F8框架的LitJson引用  
-![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20240524001621.png)  
+![image](ui_20240524001621.png)  
 ---
 * 修改两个变量为true。
 1. [AssetManager.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/AssetManager/AssetManager.cs)  
@@ -94,4 +94,4 @@ yield return AssetBundleManager.Instance.LoadAssetBundleManifest(); // WebGL专�
 yield return F8DataManager.Instance.LoadLocalizedStringsIEnumerator(); // WebGL专用
 ```
 * 构建设置。  
-![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20240329230924.png)  
+![image](ui_20240329230924.png)  

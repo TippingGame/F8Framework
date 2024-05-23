@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="Tests/Logo.png" width="256" height="256" alt="F8Framework" style="display: block; margin: 20px auto -90px;">
+    <img src="https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/Logo.png" width="256" height="256" alt="F8Framework" style="display: block; margin: 20px auto -90px;">
 </p>
 
 # F8 Framework
@@ -17,7 +17,7 @@ F8 Framework是一个**优雅，轻量，符合直觉的**基于Unity引擎的Ga
 
 ## 支持版本
 Unity 2021.3.15f1+  
-构建可支持：Win / Android / iOS / Mac / Linux / WebGL / 微信小游戏
+构建可支持：Win / Android / iOS / Mac / Linux / WebGL / 微信小游戏（[构建文档](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/README.md)）
 
 ## 文档快速预览 - 1分钟
 ### ----------可选功能----------
@@ -72,4 +72,56 @@ Unity 2021.3.15f1+
 
 * 视频教程：[【Unity框架】开源 F8Framework 游戏框架介绍](https://www.bilibili.com/video/BV16i42117nx/?share_source=copy_web&vd_source=2fde88c46cd96d06f86859724813e355)  
 * 游戏项目Demo：[https://github.com/TippingGame/F8FrameworkDemo](https://github.com/TippingGame/F8FrameworkDemo)  
+
+---
+
+## INTRODUCTION
+F8 Framework is an **elegant, lightweight, and intuitive** Game Framework based on the Unity engine. The components revolve around F8 one click startup, **without the need for cumbersome startup configurations**, with minimal mental burden. The overall framework follows the principle of developing games with **minimal usage costs**.  
+
+## SUPPORTED
+Unity 2021.3.15f1+  
+Support for building：Win / Android / iOS / Mac / Linux / WebGL / WeChat mini game（[Building Documents](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/README_EN.md)）
+
+## Quick preview of document - 1 minute
+### ----------Optional Features----------
+* [1. Hot update version manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/HotUpdateManager/README_EN.md) - Select packaging platform, output path, version number, remote asset loading address, enable hot update, full packaging, subcontracting, and empty packaging.
+* [2. High speed local cache (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/CacheStorage/README_EN.md) - High speed local caching, downloading and caching bytes Serializable assets such as JSON, text, and texture, set cache quantity, size, and lifetime, and clear cache.
+* [3. Code Hot Update (Import HybridCLR)](https://github.com/TippingGame/F8Framework/blob/main/Tests/HybridCLR/README_EN.md) - [HybridCLR](https://github.com/focus-creative-games/hybridclr) HybridCLR is a full-platform native c# hot update solution for Unity with complete features, zero cost, high performance, and low memory.
+### ----------Core Features----------
+* [1. Config table (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/ExcelTool/README_EN.md) - Using Excel as the configuration table, **balancing high performance and adaptability**, click F8 to load the manually generated Excel binary cache, and automatically read the latest Excel at runtime without the need for frequent table navigation.
+* [2. Asset Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/AssetManager/README_EN.md) - **At editor**: Click F8 to automatically generate asset index/AB name, automatically distinguish different platforms, and clean up excess AB and folders, Reduce development cycle in Editor mode. **At runtime**: load a single asset synchronously/asynchronously, expand a folder or all assets under the same AB, automatically determine whether it is a Resources/AssetBundle asset, load remote assets, obtain loading progress, and synchronously interrupt asynchronous loading. You can load AssetBundle in this way: **a single asset with a single AB, specify a folder name (AB on the first layer of the folder), set multiple assets to the same AB name (specify any asset name)**.
+* [3. Module Center (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Module/README_EN.md) - The module center can obtain instances of all modules, implement delayed loading strategies, and freely control the lifecycle.
+* [4. Log Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Log/README_EN.md) - Print logs, write files, and report errors.
+* [5. Sound Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Audio/README_EN.md) - Play/pause/stop/progress control of sound, volume control/save, global pause/resume. Audio is divided into three categories: **background music, vocals, and special effects sound**.
+* [6. Event Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Event/README_EN.md) - Send message events, monitor events, **prevent message loops**, and automatically release events.
+* [7. Time Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Timer/README_EN.md) - Provide Timer/FrameTimer has two types of timers, pause/resume, and automatically release the timer.
+* [8. Tween Animation (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Tween/README_EN.md) - Play/Stop animations, including rotation/displacement/scaling/gradient/fill animations, which can be shifted based on the **relative layout** of the UI.
+* [9. Reference Pool Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/ReferencePool/README_EN.md) - Reference Pool Manager, C # object, pooling/retrieving/recycling/emptying.
+* [10. GameObject Pool (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/GameObjectPool/README_EN.md) - GameObject Pool Manager, GameObject preload pooling, generation/destruction/delayed destruction, lifecycle event monitoring.
+* [11. Localization Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Localization/README_EN.md) - Localize components such as Text/TextMeshPro/Image/RawImage/SpriteRenderer/Renderer/Audio/Timeline, and use **Excel** as a multilingual translation table.
+* [12. Finite state machine (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/FSM/README_EN.md) - Customize finite state machine FSMState/FSMSwitch, create/switch states/poll/destroy.
+* [13. Download Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Download/README_EN.md) - Supports downloading of files from both local host and HTTP addresses, **allowing for local writing, monitoring of download progress, and recovery of downloads**. It also supports dynamic addition, removal, pause, and recovery of downloads.
+* [14. UI interface manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/UI/README_EN.md) - Handle interface loading, opening, closing, querying, hierarchical control, custom animation, and automatic retrieval of component indexes. UI interfaces are divided into three categories: **regular UI, modal pop ups, and non modal pop ups**.
+* [15. Input System Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Input/README_EN.md) - Using the same set of code, customize input devices, adapt to multiple platforms, hot switch input devices, or enable multiple sets of input devices simultaneously.
+* [16. Game Procedure Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Procedure/README_EN.md) - Customize the process node ProcedureNode to control the game process, add/run/poll/remove.
+* [17. Local data storage (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Storage/README_EN.md) - Local data storage/reading.
+* [18. SDK Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/README_EN.md) - Interacting with **native platforms**, accessing multiple platform or channel SDKs, logging in/out/switching/payment/video advertising/exiting games/native Toast.
+* [19. Network Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Network/README_EN.md) - Establish long connection channels using KCP/TCP/WebSocket network communication protocols, supporting both client and server ends.
+
+## IMPORT
+
+In the Unity Package Manager, add the F8Framework package using Git URL.
+
+1. Open Unity Editor
+
+2. Click on the **Window** item in the menu, then click on the **Package Manager** sub item
+
+3. Click on the **+** sign in the upper left corner and select **Add Package from git URL**
+
+4. Input <https://github.com/TippingGame/F8Framework.git>, Please confirm successful import
+
+## GUIDE
+
+* [GameLauncher：](https://github.com/TippingGame/F8Framework/blob/main/Runtime/Launcher/GameLauncher.cs)Game Launcher Example.[GameLauncher.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/Launcher/GameLauncher.cs)
+* [Module renaming：](https://github.com/TippingGame/F8Framework/blob/main/Runtime/Launcher/FF8.cs)Module customization renaming.[FF8.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/Launcher/FF8.cs)  
 

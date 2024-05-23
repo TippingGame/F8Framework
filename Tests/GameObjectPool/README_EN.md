@@ -155,4 +155,4 @@ Unity F8 GameObjectPool组件，对象池管理，预加载池化，生成/销�
 ```
 ## 拓展功能
 1. 使用预加载池
-![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/GameObjectPool/ui_20240302154233.png)
+![image](ui_20240302154233.png)

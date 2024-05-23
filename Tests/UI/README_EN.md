@@ -20,10 +20,10 @@ UI界面分为三大类：
 
 1. 制作UI预制体，放到AssetBundles或者Resources文件夹下任意目录  
 2. 右键资源文件夹，看到（F8UI界面管理功能），创建BaseView模板，挂载到UI根层级上  
-![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_20240302154254.png)
+![image](ui_20240302154254.png)
 --------------------------
 3. 自动生成UI组件的索引（默认自动）  
-![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_20240205223438.png)
+![image](ui_20240205223438.png)
 ### 代码使用方法
 ```C#
         private Dictionary<int, UIConfig> configs = new Dictionary<int, UIConfig>
@@ -107,19 +107,19 @@ UI界面分为三大类：
 * 2. 图集切割
 * 3. 图片尺寸设为4的倍数
 * 4. 收集UI所有的中文放入本地化表
-![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_20240315025120.png)
+![image](ui_20240315025120.png)
 ----------------------------------
 2. UI常用组件（https://github.com/nhn/gpm.unity.git）  
 * 嵌套布局  
-![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_20240302173446.png)
+![image](ui_20240302173446.png)
 ----------------------------------
 * 无限列表  
-![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_20240302173458.png)
+![image](ui_20240302173458.png)
 ----------------------------------
 * 拖拽  
-![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_20240302173503.png)
+![image](ui_20240302173503.png)
 ----------------------------------
 * Tab标签页  
-![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_20240302173507.png)
+![image](ui_20240302173507.png)
 ----------------------------------
 

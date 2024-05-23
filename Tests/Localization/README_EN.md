@@ -17,19 +17,19 @@ Unity F8 Localization本地化组件。
 ### 如何使用
 
 1. 在 StreamingAssets/config 目录创建一个名为：本地化.xlsx 的Excel（Sheet改名为LocalizedStrings） 作为本地化配置  
-![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/Localization/ui_20240219212643.png)  
+![image](ui_20240219212643.png)  
 ----------------------------
 2. 编辑器和运行时，支持42种系统语言实时切换。（快捷键F6）  
-![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/Localization/ui_20240219212707.png)  
+![image](ui_20240219212707.png)  
 ----------------------------
 3. Text / TextTextMeshPro 特有功能（实时显示ID索引）  
-![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/Localization/ui_20240219213728.png)  
-![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/Localization/ui_20240219213734.png)  
+![image](ui_20240219213728.png)  
+![image](ui_20240219213734.png)  
 ----------------------------
 4. 其他组件使用  
-![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/Localization/ui_20240219213738.png)  
-![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/Localization/ui_20240219213741.png)  
-![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/Localization/ui_20240219213745.png)  
+![image](ui_20240219213738.png)  
+![image](ui_20240219213741.png)  
+![image](ui_20240219213745.png)  
 
 ### 代码使用方法
 ```C#

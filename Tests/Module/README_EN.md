@@ -17,7 +17,7 @@ Unity F8 Module模块中心组件。提供三种模块可使用。
 ### 创建模板
 
 1. 右键资源文件夹，看到（F8模块中心功能），创建模板 Module / ModuleMono / StaticModule  
-![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/Module/ui_20240302154204.png)
+![image](ui_20240302154204.png)
 ### 代码使用方法
 ```C#
         /*----------------------------模块中心功能----------------------------*/
