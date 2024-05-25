@@ -142,11 +142,6 @@ namespace F8Framework.Core
             }
         }
 
-        public void OpenAsync(int uiId, object[] uiArgs = null, UICallbacks callbacks = null, Action openCallback = null)
-        {
-           
-        }
-
         public bool Has(int uiId)
         {
             if (!_configs.TryGetValue(uiId, out UIConfig config))

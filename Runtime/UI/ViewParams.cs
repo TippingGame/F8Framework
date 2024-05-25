@@ -9,12 +9,12 @@ namespace F8Framework.Core
         
         public OnAddedEventDelegate OnAdded;
         public OnAddedEventDelegate OnRemoved;
-        public Action<Action> OnBeforeRemove;
+        public Action OnBeforeRemove;
 
         public UICallbacks(
             OnAddedEventDelegate onAdded = null,
             OnAddedEventDelegate onRemoved = null,
-            Action<Action> onBeforeRemove = null)
+            Action onBeforeRemove = null)
         {
             OnAdded = onAdded;
             OnRemoved = onRemoved;

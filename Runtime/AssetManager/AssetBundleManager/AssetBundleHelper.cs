@@ -8,10 +8,49 @@ namespace F8Framework.Core
     /// </summary>
     public static class AssetBundleHelper
     {
-        private static string _streamingAssetsPath => Application.streamingAssetsPath + "/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
-        private static string _remoteAddress => GameConfig.LocalGameVersion.AssetRemoteAddress + "/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
-        private static string _hotUpdatePath => Application.persistentDataPath + HotUpdateManager.HotUpdateDirName + "/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
-        private static string _packagePath => Application.persistentDataPath + HotUpdateManager.PackageDirName + "/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
+        private static string _streamingAssetsPath;
+
+        private static string GetStreamingAssetsPath()
+        {
+            if (_streamingAssetsPath == null)
+            {
+                _streamingAssetsPath = Application.streamingAssetsPath + "/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
+            }
+            return _streamingAssetsPath;
+        }
+        
+        private static string _remoteAddress;
+        
+        private static string GetRemoteAddress()
+        {
+            if (_remoteAddress == null)
+            {
+                _remoteAddress = GameConfig.LocalGameVersion.AssetRemoteAddress + "/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
+            }
+            return _remoteAddress;
+        }
+
+        private static string _hotUpdatePath;
+        
+        private static string GetHotUpdatePath()
+        {
+            if (_hotUpdatePath == null)
+            {
+                _hotUpdatePath = Application.persistentDataPath + HotUpdateManager.HotUpdateDirName + "/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
+            }
+            return _hotUpdatePath;
+        }
+
+        private static string _packagePath;
+        
+        private static string GetPackagePath()
+        {
+            if (_packagePath == null)
+            {
+                _packagePath = Application.persistentDataPath + HotUpdateManager.PackageDirName + "/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
+            }
+            return _packagePath;
+        }
         
         /// <summary>
         /// 源类型的枚举。
@@ -36,20 +75,20 @@ namespace F8Framework.Core
             switch (type)
             {
                 case SourceType.STREAMING_ASSETS:
-                    assetBundlePath = _streamingAssetsPath;
+                    assetBundlePath = GetStreamingAssetsPath();
                     break;
                 case SourceType.HOT_UPDATE_PATH:
-                    assetBundlePath = _hotUpdatePath;
+                    assetBundlePath = GetHotUpdatePath();
                     break;
                 case SourceType.PACKAGE_PATH:
-                    assetBundlePath = _packagePath;
+                    assetBundlePath = GetPackagePath();
                     break;
                 case SourceType.REMOTE_ADDRESS:
                     if (string.IsNullOrEmpty(GameConfig.LocalGameVersion.AssetRemoteAddress))
                     {
                         LogF8.LogError("加载远程包需要配置远程地址：AssetRemoteAddress");
                     }
-                    assetBundlePath = _remoteAddress;
+                    assetBundlePath = GetRemoteAddress();
                     break;
                 default:
                     return null;

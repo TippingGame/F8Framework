@@ -28,7 +28,8 @@ namespace F8Framework.Core
                 // 通知外部对象窗口组件上移除之前的事件（关闭窗口前的关闭动画处理）
                 if (ViewParams.Callbacks != null && ViewParams.Callbacks.OnBeforeRemove != null)
                 {
-                    ViewParams.Callbacks.OnBeforeRemove(() => Removed(ViewParams, isDestroy));
+                    ViewParams.Callbacks.OnBeforeRemove();
+                    Removed(ViewParams, isDestroy);
                 }
                 else
                 {

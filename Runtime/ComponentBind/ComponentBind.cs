@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace F8Framework.Core
@@ -163,9 +164,16 @@ namespace F8Framework.Core
                 }
 
                 UnityEditor.AssetDatabase.Refresh();
-                
-                SetComponents();
-                
+
+                try
+                {
+                    SetComponents();
+                }
+                catch (Exception e)
+                {
+                    LogF8.LogView(e);
+                }
+
                 UnityEditor.EditorUtility.SetDirty(this);
             }
             else

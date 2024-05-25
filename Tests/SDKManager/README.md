@@ -95,3 +95,5 @@ yield return F8DataManager.Instance.LoadLocalizedStringsIEnumerator(); // WebGL�
 ```
 * 构建设置。  
 ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20240329230924.png)  
+
+### 如构建失败：请尝试使用Unity自带的Build一次后再尝试

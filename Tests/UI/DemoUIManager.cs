@@ -20,8 +20,17 @@ namespace F8Framework.Tests
             // 初始化
             FF8.UI.Initialize(configs);
             // 打开UI，可选参数：data，new UICallbacks()
-            FF8.UI.Open(1, data, new UICallbacks());
-            FF8.UI.OpenAsync(1);
+            FF8.UI.Open(1, data, new UICallbacks(
+                (parameters, id) => // onAdded
+                {
+                    
+                }, (parameters, id) => // OnRemoved
+                {
+                    
+                }, () => // OnBeforeRemove
+                {
+                    
+                }));
             // 打开提示类Notify
             FF8.UI.ShowNotify(1, "tip");
             // UI是否存在
