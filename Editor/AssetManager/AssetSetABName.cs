@@ -27,6 +27,7 @@ namespace F8Framework.Core.Editor
                     if (!string.IsNullOrEmpty(ai.assetBundleName))
                     {
                         ai.assetBundleName = null;
+                        EditorUtility.SetDirty(ai);
                     }
                     LogF8.Log("文件" + assetPath);
                 }
@@ -36,6 +37,7 @@ namespace F8Framework.Core.Editor
                     if (!string.IsNullOrEmpty(aiDir.assetBundleName))
                     {
                         aiDir.assetBundleName = null;
+                        EditorUtility.SetDirty(aiDir);
                     }
                     LogF8.Log("文件夹" + assetPath);
                     
@@ -47,6 +49,7 @@ namespace F8Framework.Core.Editor
                         if (!string.IsNullOrEmpty(ai.assetBundleName))
                         {
                             ai.assetBundleName = null;
+                            EditorUtility.SetDirty(ai);
                         }
                     }
                     // 获取所有文件
@@ -59,12 +62,13 @@ namespace F8Framework.Core.Editor
                         if (!string.IsNullOrEmpty(ai.assetBundleName))
                         {
                             ai.assetBundleName = null;
+                            EditorUtility.SetDirty(ai);
                         }
                         LogF8.Log("文件" + _assetPath);
                     }
                 }
             }
-        
+            AssetDatabase.Refresh();
             LogF8.LogAsset("已清空所有选中的资产AB名");
         }
         
@@ -96,6 +100,7 @@ namespace F8Framework.Core.Editor
                         {
                             ai.assetBundleName = FirstName;
                         }
+                        EditorUtility.SetDirty(ai);
                     }
                     LogF8.Log("文件" + assetPath);
                 }
@@ -122,12 +127,13 @@ namespace F8Framework.Core.Editor
                             {
                                 ai.assetBundleName = FirstName;
                             }
+                            EditorUtility.SetDirty(ai);
                         }
                         LogF8.Log("文件" + _assetPath);
                     }
                 }
             }
-        
+            AssetDatabase.Refresh();
             LogF8.LogAsset("设置所有AB名为：" + FirstName);
         }
     }

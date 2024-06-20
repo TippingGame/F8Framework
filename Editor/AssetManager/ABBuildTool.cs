@@ -24,18 +24,20 @@ namespace F8Framework.Core.Editor
             // 获取“StreamingAssets”文件夹路径（不一定这个文件夹，可自定义）            
             string strABOutPAthDir = URLSetting.GetAssetBundlesOutPath();
             
-            LogF8.LogAsset("生成AssetBundleMap.json，生成ResourceMap.json");
             GenerateAssetNames();
             GenerateResourceNames();
+            LogF8.LogAsset("自动设置AssetBundleName（AB名为空时）");
             AssetDatabase.Refresh();
             
             FileTools.CheckDirAndCreateWhenNeeded(strABOutPAthDir);
             AssetDatabase.Refresh();
+
+            Caching.ClearCache();
             
-            LogF8.LogAsset("打包AssetBundle：" + URLSetting.GetAssetBundlesOutPath() + "  当前打包平台：" + EditorUserBuildSettings.activeBuildTarget);
             // 打包生成AB包 (目标平台自动根据当前平台设置，WebGL不可使用BuildAssetBundleOptions.None压缩)
             BuildPipeline.BuildAssetBundles(strABOutPAthDir, BuildAssetBundleOptions.ChunkBasedCompression, EditorUserBuildSettings.activeBuildTarget);
-           
+            LogF8.LogAsset("打包AssetBundle：" + URLSetting.GetAssetBundlesOutPath() + "  当前打包平台：" + EditorUserBuildSettings.activeBuildTarget);
+            
             AssetDatabase.Refresh();
             
             // 清理多余文件夹和ab
@@ -44,6 +46,9 @@ namespace F8Framework.Core.Editor
             // 等待AB打包完成，再写入数据
             GenerateAssetNames(true);
             GenerateResourceNames(true);
+            LogF8.LogAsset("写入资产数据 生成：AssetBundleMap.json，生成：ResourceMap.json");
+            
+            AssetDatabase.Refresh();
             
             LogF8.LogAsset("资产打包成功!");
         }
@@ -165,9 +170,11 @@ namespace F8Framework.Core.Editor
             {
                 bundleName = Path.ChangeExtension(path, null).Replace(URLSetting.AssetBundlesPath, "");
             }
+            
             if (!ai.assetBundleName.Equals(bundleName) && ai.assetBundleName.IsNullOrEmpty())
             {
                 ai.assetBundleName = bundleName;
+                EditorUtility.SetDirty(ai);
             }
             return ai.assetBundleName;
         }
@@ -211,7 +218,7 @@ namespace F8Framework.Core.Editor
                         {
                             continue;
                         }
-                        
+
                         if (tempNames.Contains(fileNameWithoutExtension.ToLower()))
                         {
                             LogF8.LogError("AssetName重复，请检查资源地址（大小写不敏感）：" + filePath);

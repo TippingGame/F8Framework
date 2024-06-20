@@ -1,12 +1,8 @@
 {
-    "name": "F8Framework.Tests",
-    "rootNamespace": "",
+    "name": "F8Framework.F8ExcelDataClass",
     "references": [
         "F8Framework.Core",
-        "Unity.Timeline",
-        "SimpleWebTransport",
-        "F8Framework.F8ExcelDataClass",
-        "F8Framework.Launcher"
+        "LitJson"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -14,9 +10,7 @@
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": false,
-    "defineConstraints": [
-        "BUILD_F8FRAMEWORK_TEST"
-    ],
+    "defineConstraints": [],
     "versionDefines": [],
     "noEngineReferences": false
 }

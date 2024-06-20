@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using F8Framework.F8ExcelDataClass;
 using UnityEngine;
 
 namespace F8Framework.Core
@@ -20,8 +20,7 @@ namespace F8Framework.Core
         public string CurrentLanguageName { get; set; }
         // 当前语言索引
         public int CurrentLanguageIndex => GetLanguageIndex(CurrentLanguageName);
-
-        private LocalizedStrings p_LocalizedStrings;
+        
         public void OnInit(object createParam)
         {
             Load();
@@ -42,13 +41,13 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
             if (Application.isPlaying)
             {
-                F8DataManager.Instance.LoadLocalizedStrings();
+                Util.Assembly.InvokeMethod("F8DataManager", "LoadLocalizedStrings", new object[] { });
             }
             else
             {
                 try
                 {
-                    F8DataManager.Instance.GetLocalizedStrings();
+                    Util.Assembly.InvokeMethod("F8DataManager", "GetLocalizedStrings", new object[] { });
                 }
                 catch
                 {
@@ -60,7 +59,7 @@ namespace F8Framework.Core
             LogF8.LogConfig("由于WebGL异步加载完本地化表，请在创建本地化模块之前加上：yield return F8DataManager.Instance.LoadLocalizedStringsIEnumerator();");
             LoadSuccess();
 #else
-            F8DataManager.Instance.LoadLocalizedStrings();
+            Util.Assembly.InvokeMethod("F8DataManager", "LoadLocalizedStrings", new object[] { });
             LoadSuccess();
 #endif
             
@@ -68,22 +67,42 @@ namespace F8Framework.Core
 
         private void LoadSuccess()
         {
-            Dictionary<int, LocalizedStringsItem> tb = F8DataManager.Instance.GetLocalizedStrings();
+            var tb = Util.Assembly.InvokeMethod("F8DataManager", "GetLocalizedStrings", new object[] { }) as IDictionary;
             
             LogF8.LogConfig("<color=green>获取本地化表格成功！</color>");
             
             foreach (var item in tb.Values)
             {
-                if(item.TextID == null)
+                // 反射获取 TextID 属性的值
+                Type itemType = item.GetType();
+                FieldInfo textIDProperty = itemType.GetField("TextID");
+                if (textIDProperty == null)
+                {
+                    LogF8.LogError("无法获取 TextID 属性，请检查对象类型。");
+                    continue;
+                }
+
+                object textIDValue = textIDProperty.GetValue(item);
+                if (textIDValue == null)
                 {
                     continue;
                 }
+
+                string id = string.Empty;
+                FieldInfo idProperty = itemType.GetField("id");
+                object idValue = idProperty?.GetValue(item);
+                if (idProperty != null && idValue != null)
+                {
+                    id = idValue.ToString();
+                }
                 
+                string textID = textIDValue.ToString();
+
                 List<string> list = new List<string>();
-            
+
                 Type type2 = item.GetType();
                 FieldInfo[] fields = type2.GetFields();
-        
+
                 foreach (var field in fields)
                 {
                     // 排除 id 和 TextID 字段
@@ -93,6 +112,7 @@ namespace F8Framework.Core
                         {
                             LanguageList.Add(field.Name);
                         }
+
                         object value = field.GetValue(item); // 这里传递的是 item 对象
                         if (value != null)
                         {
@@ -102,20 +122,22 @@ namespace F8Framework.Core
                         {
                             // 如果字段的值为 null，你可以选择添加一个默认值，或者进行其他处理
                             list.Add("");
-                            LogF8.LogConfig($"本地化表字段：\"<b>{item.TextID}</b>\" 的值为空");
+                            LogF8.LogConfig($"本地化表id：\"<b>{id}</b>\"，字段：\"<b>{textID}</b>\" 的值为空");
                         }
                     }
                 }
-                if (LocalizedStrings.ContainsKey(item.TextID))
+
+                if (LocalizedStrings.ContainsKey(textID))
                 {
-                    LogF8.LogError($"本地化表 ID \"<b>{item.TextID}</b>\" 出现重复，请修改。");
+                    LogF8.LogError($"本地化表id：\"<b>{id}</b>\"，字段：\"<b>{textID}</b>\" 出现重复，请修改。");
                     continue;
                 }
-                LocalizedStrings.TryAdd(item.TextID, list);
-            }
 
-            LocalizationSettings.LoadLanguageSettings();
-            ChangeLanguage(CurrentLanguageName ?? "");
+                LocalizedStrings.TryAdd(textID, list);
+
+                LocalizationSettings.LoadLanguageSettings();
+                ChangeLanguage(CurrentLanguageName ?? "");
+            }
         }
         
         /// <summary>

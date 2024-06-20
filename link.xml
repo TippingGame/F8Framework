@@ -15,6 +15,7 @@
   <assembly fullname="kcp" preserve="all" />
   <assembly fullname="SimpleWebTransport" preserve="all" />
   <assembly fullname="Telepathy" preserve="all" />
-  <assembly fullname="F8Framework.F8ExcelDataClass" preserve="all" />
   <assembly fullname="F8Framework.Core" preserve="all" />
+  <assembly fullname="F8Framework.F8ExcelDataClass" preserve="all" />
+  <assembly fullname="F8Framework.Launcher" preserve="all" />
 </linker>

@@ -10,10 +10,8 @@ namespace F8Framework.Core.Editor
         public static void F8Run()
         {
             GenerateCopyHotUpdateDll();
+            EditorPrefs.SetBool("compilationFinishedBuildAB", true);
             LoadAllExcelData();
-            BuildAssetBundles();
-            
-            AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
         }
         
         [MenuItem("开发工具/生成并复制热更新Dll-F8")]
@@ -24,7 +22,8 @@ namespace F8Framework.Core.Editor
             // FileTools.CheckDirAndCreateWhenNeeded(Application.dataPath + "/AssetBundles/Code");
             // List<string> hotUpdateDll = new List<string>()
             // {
-            //     "HotUpdate", // 自行添加需要热更的程序集
+            //     "F8Framework.F8ExcelDataClass", // 自行添加需要热更的程序集
+            //     "F8Framework.Launcher"
             // };
             // foreach (var dll in hotUpdateDll)
             // {

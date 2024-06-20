@@ -4,6 +4,7 @@ using System.Text;
 using System;
 using UnityEngine;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 //脚本生成器
@@ -44,26 +45,25 @@ namespace F8Framework.Core.Editor
             classSource.Append("Don't Edit it*/\n");
             classSource.Append("\n");
             classSource.Append("using System;\n");
-            classSource.Append("using System.Reflection;\n");
-            classSource.Append("using System.Collections.Generic;\n");
+            classSource.Append("using System.Collections.Generic;\n\n");
             classSource.Append("namespace " + ExcelDataTool.CODE_NAMESPACE + "\n");
             classSource.Append("{\n");
-            classSource.Append("[Serializable]\n");
-            classSource.Append("public class " + ClassName + "Item\n"); //表里每一条数据的类型名为表类型名加Item
-            classSource.Append("{\n");
+            classSource.Append("\t[Serializable]\n");
+            classSource.Append("\tpublic class " + ClassName + "Item\n"); //表里每一条数据的类型名为表类型名加Item
+            classSource.Append("\t{\n");
             //设置成员
             for (int i = 0; i < fields.Length; ++i)
             {
                 classSource.Append(PropertyString(types[i], fields[i]));
             }
 
-            classSource.Append("}\n");
+            classSource.Append("\t}\n");
 
             //生成Container
-            classSource.Append("\n");
-            classSource.Append("[Serializable]\n");
-            classSource.Append("public class " + ClassName + "\n");
-            classSource.Append("{\n");
+            classSource.Append("\t\n");
+            classSource.Append("\t[Serializable]\n");
+            classSource.Append("\tpublic class " + ClassName + "\n");
+            classSource.Append("\t{\n");
             string idType = "";
             for (int i = 0; i < fields.Length; i++)
             {
@@ -74,9 +74,9 @@ namespace F8Framework.Core.Editor
                 }
             }
 
-            classSource.Append("\tpublic " + "Dictionary<" + idType + ", " + ClassName + "Item" + " > " + " Dict" +
+            classSource.Append("\t\tpublic " + "Dictionary<" + idType + ", " + ClassName + "Item" + "> " + "Dict" +
                                " = new Dictionary<" + idType + ", " + ClassName + "Item" + ">();\n");
-            classSource.Append("}\n");
+            classSource.Append("\t}\n");
             classSource.Append("}\n");
             return classSource.ToString();
             /*  //生成的条目数据类
@@ -179,11 +179,11 @@ namespace F8Framework.Core.Editor
         }
 
         //创建数据管理器脚本
-        public static void CreateDataManager(Assembly assembly)
+        public static void CreateDataManager(Dictionary<string, string> codeList)
         {
-            List<Type> list = new List<Type>();
-            list.AddRange(assembly.GetTypes());
-            IEnumerable types = list.FindAll(t => { return !t.Name.Contains("Item"); });
+            List<string> list = new List<string>();
+            list.AddRange(codeList.Keys);
+            IEnumerable types = list.FindAll(t => { return !t.Contains("Item"); });
 
             StringBuilder source = new StringBuilder();
             source.Append("/*\n");
@@ -199,47 +199,47 @@ namespace F8Framework.Core.Editor
             source.Append("using System.Runtime.Serialization;\n");
             source.Append("using System.Runtime.Serialization.Formatters.Binary;\n");
             source.Append("using System.IO;\n");
-            source.Append("using " + ExcelDataTool.CODE_NAMESPACE + ";\n");
-            source.Append("using LitJson;\n\n");
-            source.Append("namespace F8Framework.Core\n");
+            source.Append("using LitJson;\n");
+            source.Append("using F8Framework.Core;\n\n");
+            source.Append("namespace " + ExcelDataTool.CODE_NAMESPACE + "\n");
             source.Append("{\n");
             source.Append("\tpublic class F8DataManager : ModuleSingleton<F8DataManager>, IModule\n");
             source.Append("\t{\n");
 
             //定义变量
-            foreach (Type t in types)
+            foreach (string t in types)
             {
-                source.Append("\t\tprivate " + t.Name + " p_" + t.Name + ";\n");
+                source.Append("\t\tprivate " + t + " p_" + t + ";\n");
             }
 
             source.Append("\n");
 
             bool hasLocalizedStrings = false;
             //定义方法
-            foreach (Type t in types)
+            foreach (string t in types)
             {
-                string typeName = t.Name + "Item"; //类型名
-                string typeNameNotItem = t.Name; //类型名没item
-                string funcName = typeName.Remove(1).ToUpper() + typeName.Substring(1); //将类型名第一个字母大写
+                string typeName = t + "Item"; //类型名
+                string typeNameNotItem = t; //类型名没item
+                Type tempType = Util.Assembly.GetType(ExcelDataTool.CODE_NAMESPACE + "." + typeName);
                 List<FieldInfo> fields = new List<FieldInfo>();
-                fields.AddRange(list.Find(temp => temp.Name == typeName).GetFields()); //获取数据类的所有字段信息
+                fields = Util.Assembly.GetTypeAllFields(tempType).ToList(); //获取数据类的所有字段信息
                 string idType = fields.Find(f => f.Name == "id" || f.Name == "ID" || f.Name == "iD" || f.Name == "Id")
                     .FieldType.Name; //获取id的数据类型
                 source.Append("\t\tpublic " + typeName + " Get" + typeNameNotItem + "ByID" + "(" + idType + " id)\n");
                 source.Append("\t\t{\n");
                 source.Append("\t\t\t" + typeName + " t = null;\n");
-                source.Append("\t\t\tp_" + t.Name + ".Dict.TryGetValue(id, out t);\n");
+                source.Append("\t\t\tp_" + t + ".Dict.TryGetValue(id, out t);\n");
                 source.Append("\t\t\tif (t == null) LogF8.LogError(" + '"' + "找不到id： " + '"' + " + id " +
                               "+ " +
-                              '"' + " ，配置表： " + t.Name + '"' + ");\n");
+                              '"' + " ，配置表： " + t + '"' + ");\n");
                 source.Append("\t\t\treturn t;\n");
                 source.Append("\t\t}\n\n");
 
                 source.Append("\t\tpublic Dictionary<int, " + typeName + ">" + " Get" + typeNameNotItem + "()\n");
                 source.Append("\t\t{\n");
-                source.Append("\t\t\treturn p_" + t.Name + ".Dict;\n");
+                source.Append("\t\t\treturn p_" + t + ".Dict;\n");
                 source.Append("\t\t}\n\n");
-                if (t.Name == "LocalizedStrings")
+                if (t == "LocalizedStrings")
                 {
                     hasLocalizedStrings = true;
                 }
@@ -268,9 +268,9 @@ namespace F8Framework.Core.Editor
             //加载所有配置表
             source.Append("\t\tpublic void LoadAll()\n");
             source.Append("\t\t{\n");
-            foreach (Type t in types)
+            foreach (string t in types)
             {
-                source.Append("\t\t\tp_" + t.Name + " = Load<" + t.Name + ">(" + '"' + t.Name + '"' + ") as " + t.Name + ";\n");
+                source.Append("\t\t\tp_" + t + " = Load<" + t + ">(" + '"' + t + '"' + ") as " + t + ";\n");
             }
 
             source.Append("\t\t}\n\n");
@@ -278,9 +278,9 @@ namespace F8Framework.Core.Editor
             //运行时加载所有配置表
             source.Append("\t\tpublic void RuntimeLoadAll(Dictionary<String, System.Object> objs)\n");
             source.Append("\t\t{\n");
-            foreach (Type t in types)
+            foreach (string t in types)
             {
-                source.Append("\t\t\tp_" + t.Name + " = objs[" + '"' + t.Name + '"' + "] as " + t.Name + ";\n");
+                source.Append("\t\t\tp_" + t + " = objs[" + '"' + t + '"' + "] as " + t + ";\n");
             }
 
             source.Append("\t\t}\n\n");
@@ -288,9 +288,9 @@ namespace F8Framework.Core.Editor
             //异步加载所有配置表
             source.Append("\t\tpublic IEnumerable LoadAllAsync()\n");
             source.Append("\t\t{\n");
-            foreach (Type t in types)
+            foreach (string t in types)
             {
-                source.Append("\t\t\tyield return LoadAsync<" + t.Name + ">("+ '"' + t.Name + '"' + ", result => " +  "p_" + t.Name + " = result" + " as " + t.Name + ");\n");
+                source.Append("\t\t\tyield return LoadAsync<" + t + ">("+ '"' + t + '"' + ", result => " +  "p_" + t + " = result" + " as " + t + ");\n");
             }
 
             source.Append("\t\t}\n\n");
@@ -304,9 +304,9 @@ namespace F8Framework.Core.Editor
             //异步加载所有配置表
             source.Append("\t\tpublic IEnumerator LoadAllAsyncIEnumerator(Action onLoadComplete)\n");
             source.Append("\t\t{\n");
-            foreach (Type t in types)
+            foreach (string t in types)
             {
-                source.Append("\t\t\tyield return LoadAsync<" + t.Name + ">("+ '"' + t.Name + '"' + ", result => " +  "p_" + t.Name + " = result" + " as " + t.Name + ");\n");
+                source.Append("\t\t\tyield return LoadAsync<" + t + ">("+ '"' + t + '"' + ", result => " +  "p_" + t + " = result" + " as " + t + ");\n");
             }
             source.Append("\t\t\tonLoadComplete?.Invoke();\n");
             source.Append("\t\t}\n\n");
@@ -384,7 +384,7 @@ namespace F8Framework.Core.Editor
             sw.NewLine = "\n"; // 设置行尾符为 UNIX 风格
 
             sw.WriteLine(source.ToString());
-            LogF8.LogConfig("已生成 " + path + "/<color=#FFFF00>" + ExcelDataTool.DataManagerName + "</color>");
+            LogF8.LogConfig("已生成代码 " + path + "/<color=#FF9E59>" + ExcelDataTool.DataManagerName + "</color>");
             sw.Close();
 
             /*  //生成的数据管理类如下

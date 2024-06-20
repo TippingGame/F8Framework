@@ -87,7 +87,10 @@ namespace F8Framework.Core
                 Serialize(container, temp, each.Value);
                 objs.Add(each.Key, container);
             }
-            F8DataManager.Instance.RuntimeLoadAll(objs);
+            string _class = "F8DataManager";
+            string method= "RuntimeLoadAll";
+            object[] parameters = new object[] { objs };
+            Util.Assembly.InvokeMethod(_class, method, parameters);
             LogF8.LogConfig("<color=green>运行时导表成功！</color>");
         }
 

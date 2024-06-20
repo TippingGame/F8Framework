@@ -65,8 +65,8 @@ Unity 2021.3.15f1+
 
 ## 新手指南
 
-* [游戏启动器：](https://github.com/TippingGame/F8Framework/blob/main/Runtime/Launcher/GameLauncher.cs)游戏启动器示例。[GameLauncher.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/Launcher/GameLauncher.cs)  
-* [模块自定义改名：](https://github.com/TippingGame/F8Framework/blob/main/Runtime/Launcher/FF8.cs)模块自定义改名。[FF8.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/Launcher/FF8.cs)  
+* [游戏启动器：](https://github.com/TippingGame/F8Framework/blob/main/Launcher/GameLauncher.cs)游戏启动器示例。[GameLauncher.cs](https://github.com/TippingGame/F8Framework/blob/main/Launcher/GameLauncher.cs)  
+* [模块自定义改名：](https://github.com/TippingGame/F8Framework/blob/main/Launcher/FF8.cs)模块自定义改名。[FF8.cs](https://github.com/TippingGame/F8Framework/blob/main/Launcher/FF8.cs)  
 
 ## 视频教程
 
@@ -122,6 +122,6 @@ In the Unity Package Manager, add the F8Framework package using Git URL.
 
 ## GUIDE
 
-* [GameLauncher：](https://github.com/TippingGame/F8Framework/blob/main/Runtime/Launcher/GameLauncher.cs)Game Launcher Example.[GameLauncher.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/Launcher/GameLauncher.cs)
-* [Module renaming：](https://github.com/TippingGame/F8Framework/blob/main/Runtime/Launcher/FF8.cs)Module customization renaming.[FF8.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/Launcher/FF8.cs)  
+* [GameLauncher：](https://github.com/TippingGame/F8Framework/blob/main/Launcher/GameLauncher.cs)Game Launcher Example.[GameLauncher.cs](https://github.com/TippingGame/F8Framework/blob/main/Launcher/GameLauncher.cs)
+* [Module renaming：](https://github.com/TippingGame/F8Framework/blob/main/Launcher/FF8.cs)Module customization renaming.[FF8.cs](https://github.com/TippingGame/F8Framework/blob/main/Launcher/FF8.cs)  
 

@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.17] - 2024-06-21
+1.新增F8Framework.F8ExcelDataClass和F8Framework.Launcher程序集  
+2.配置表生成的F8Framework.F8ExcelDataClass可用于HybridCLR热更  
+3.增加导表后脚本编译完成，再打包AB步骤  
+4.重新加载C#域后，AssetDatabase.Refresh需要增加delayCall延迟执行  
+5.完善热更文档  
+6.F8Framework.Tests程序集增加宏定义不参与打包  
+
 ## [1.0.16] - 2024-05-26
 1.优化资产管理代码  
 2.优化UI界面传入参数  

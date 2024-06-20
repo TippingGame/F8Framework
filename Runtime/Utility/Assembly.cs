@@ -956,6 +956,40 @@ namespace F8Framework.Core
             }
 
             /// <summary>
+            /// 执行方法
+            /// </summary>
+            /// <param name="className">类名</param>
+            /// <param name="methodName">方法名</param>
+            /// <param name="parameters">方法参数</param>
+            /// <returns>返回值</returns>
+            public static object InvokeMethod(string className, string methodName, object[] parameters = null)
+            {
+                // 查找指定类名的类型
+                var type = domainAssemblies.SelectMany(assembly => assembly.GetTypes()).FirstOrDefault(t => t.Name == className);
+                if (type == null)
+                {
+                    throw new Exception($"需要检查是否有正确生成{className}类!");
+                }
+
+                // 获取单例的实例
+                var property = type.BaseType?.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static);
+                if (property == null)
+                {
+                    throw new Exception($"无法获取 {className} 的单例实例!");
+                }
+                var instance = property.GetValue(null, null);
+
+                // 获取方法并执行
+                var method = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic);
+                if (method == null)
+                {
+                    throw new Exception($"类中 : {type} 找不到此方法 : {methodName}!");
+                }
+
+                return method.Invoke(instance, parameters);
+            }
+            
+            /// <summary>
             /// 执行方法；
             /// </summary>
             /// <param name="obj">目标对象</param>
@@ -1184,7 +1218,7 @@ namespace F8Framework.Core
             /// <returns>名称数组</returns>
             public static string[] GetTypeAllFields<T>()
             {
-                return GetTypeAllFields(typeof(T));
+                return GetTypeAllString(typeof(T));
             }
 
             /// <summary>
@@ -1192,13 +1226,25 @@ namespace F8Framework.Core
             /// </summary>
             /// <param name="type">type类型</param>
             /// <returns>名称数组</returns>
-            public static string[] GetTypeAllFields(Type type)
+            public static string[] GetTypeAllString(Type type)
             {
                 var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic |
                                             BindingFlags.Static);
                 return fields.Select(f => f.Name).ToArray();
             }
 
+            /// <summary>
+            /// 获取类Type类型中的所有字段名；
+            /// </summary>
+            /// <param name="type">type类型</param>
+            /// <returns>名称数组</returns>
+            public static System.Reflection.FieldInfo[] GetTypeAllFields(Type type)
+            {
+                var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic |
+                                            BindingFlags.Static);
+                return fields.Select(f => f).ToArray();
+            }
+            
             /// <summary>
             /// 获取Type类型中所有属性字段名；
             /// </summary>

@@ -10,10 +10,10 @@ using UnityEngine;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
-using F8Framework.F8ExcelDataClass;
 using LitJson;
+using F8Framework.Core;
 
-namespace F8Framework.Core
+namespace F8Framework.F8ExcelDataClass
 {
 	public class F8DataManager : ModuleSingleton<F8DataManager>, IModule
 	{

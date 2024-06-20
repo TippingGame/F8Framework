@@ -1,11 +1,14 @@
-﻿using F8Framework.Core;
+﻿using System.Collections;
+using F8Framework.Core;
+using F8Framework.F8ExcelDataClass;
+using F8Framework.Launcher;
 using UnityEngine;
 
 namespace F8Framework.Tests
 {
 	public class LanguageCycler : MonoBehaviour
 	{
-		private void Start()
+		IEnumerator Start()
 		{
 			// 初始化模块中心
 			ModuleCenter.Initialize(this);
@@ -33,6 +36,7 @@ namespace F8Framework.Tests
 			FF8.SDK = ModuleCenter.CreateModule<SDKManager>();
 			FF8.Download = ModuleCenter.CreateModule<DownloadManager>();
 			FF8.LogWriter = ModuleCenter.CreateModule<F8LogWriter>();
+			yield break;
 		}
 
 		void Update()
