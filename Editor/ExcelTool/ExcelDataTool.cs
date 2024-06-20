@@ -69,7 +69,7 @@ namespace F8Framework.Core.Editor
     ""allowUnsafeCode"": false,
     ""overrideReferences"": false,
     ""precompiledReferences"": [],
-    ""autoReferenced"": false,
+    ""autoReferenced"": true,
     ""defineConstraints"": [],
     ""versionDefines"": [],
     ""noEngineReferences"": false
@@ -110,6 +110,7 @@ namespace F8Framework.Core.Editor
             FileTools.CheckDirAndCreateWhenNeeded(F8ExcelDataClassPath);
             string F8ExcelDataClassPathDLL = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/ConfigData/" + CODE_NAMESPACE + ".asmdef";
             FileTools.SafeDeleteFile(F8ExcelDataClassPathDLL);
+            FileTools.SafeDeleteFile(Application.dataPath + DataManagerFolder + "/F8DataManager.asmref");
             CreateAsmdefFile();
             AssetDatabase.Refresh();
             
