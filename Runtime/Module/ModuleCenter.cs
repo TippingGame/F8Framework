@@ -39,7 +39,10 @@ namespace F8Framework.Core
 			if (behaviour == null)
 				LogF8.LogError("MonoBehaviour 为空。");
 			if (_behaviour != null)
+			{
 				LogF8.LogError($"{nameof(ModuleCenter)} 已初始化。");
+				return;
+			}
 
 			UnityEngine.Object.DontDestroyOnLoad(behaviour.gameObject);
 			_behaviour = behaviour;
@@ -219,7 +222,7 @@ namespace F8Framework.Core
 			if (Contains(typeof(T)))
 			{
 				LogF8.LogError($"游戏模块 {typeof(T)} 已存在");
-				return null;
+				return GetModule<T>();
 			}
 			
 			// 如果没有设置优先级

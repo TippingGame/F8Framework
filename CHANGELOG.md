@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.18] - 2024-06-22
+1.修复打包热更包的资产后缀被错误删除  
+2.热更新计算Size大小时增加判空  
+3.CreateModule存在模块时增加返回  
+4.完善热更文档  
+
 ## [1.0.17] - 2024-06-21
 1.新增F8Framework.F8ExcelDataClass和F8Framework.Launcher程序集  
 2.配置表生成的F8Framework.F8ExcelDataClass可用于HybridCLR热更  

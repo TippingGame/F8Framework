@@ -199,7 +199,6 @@ namespace F8Framework.Core.Editor
             source.Append("using System.Runtime.Serialization;\n");
             source.Append("using System.Runtime.Serialization.Formatters.Binary;\n");
             source.Append("using System.IO;\n");
-            source.Append("using LitJson;\n");
             source.Append("using F8Framework.Core;\n\n");
             source.Append("namespace " + ExcelDataTool.CODE_NAMESPACE + "\n");
             source.Append("{\n");

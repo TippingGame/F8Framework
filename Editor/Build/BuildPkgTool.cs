@@ -58,6 +58,8 @@ namespace F8Framework.Core.Editor
         {
             string gameVersionPath = _buildPath + HotUpdateManager.RemoteDirName + "/" + nameof(GameVersion) + ".json";
             string assetBundleMapPath = _buildPath + HotUpdateManager.RemoteDirName + "/" + nameof(AssetBundleMap) + ".json";
+            string hotUpdateMapPath = _buildPath + HotUpdateManager.RemoteDirName + "/HotUpdate" +
+                                      HotUpdateManager.Separator + nameof(AssetBundleMap) + ".json";
             if (!File.Exists(gameVersionPath) || !File.Exists(assetBundleMapPath))
             {
                 LogF8.LogError("请先构建一个游戏版本，再构建热更新文件！~");
@@ -65,8 +67,12 @@ namespace F8Framework.Core.Editor
             }
 
             var resAssetBundleMappings = Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(Resources.Load<TextAsset>(nameof(AssetBundleMap)).ToString());
-            
+
             var assetBundleMappings = Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(FileTools.SafeReadAllText(assetBundleMapPath));
+            if (File.Exists(hotUpdateMapPath))
+            {
+                assetBundleMappings = Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(FileTools.SafeReadAllText(hotUpdateMapPath));
+            }
 
             Dictionary<string, AssetBundleMap.AssetMapping> generateAssetBundleMappings = new Dictionary<string, AssetBundleMap.AssetMapping>();
             foreach (var resAssetMapping in resAssetBundleMappings)
@@ -93,7 +99,7 @@ namespace F8Framework.Core.Editor
             FileTools.SafeWriteAllText(gameVersionPath, Util.LitJson.ToJson(remoteGameVersion));
             
             FileTools.SafeCopyFile(Application.dataPath + "/F8Framework/AssetMap/Resources/" + nameof(AssetBundleMap) + ".json",
-                _buildPath + HotUpdateManager.RemoteDirName + "/HotUpdate" + HotUpdateManager.Separator + nameof(AssetBundleMap) + ".json");
+                hotUpdateMapPath);
             
             LogF8.LogVersion("构建热更新包版本成功！版本：" + _toVersion);
             
@@ -528,7 +534,7 @@ namespace F8Framework.Core.Editor
                     {
                         string filePath = FileTools.FormatToUnityPath(file);
                         string filePathManifest = FileTools.FormatToUnityPath(file) + ".manifest";
-                        string abName = Path.ChangeExtension(filePath, null).Replace(assetBundlesOutPath + "/", "");
+                        string abName = filePath.Replace(assetBundlesOutPath + "/", "");
                         if (temp_mappings.TryGetValue(abName, out AssetBundleMap.AssetMapping assetMapping))
                         {
                             FileTools.SafeCopyFile(filePath,
@@ -576,7 +582,7 @@ namespace F8Framework.Core.Editor
                     {
                         string filePath = FileTools.FormatToUnityPath(file);
                         string filePathManifest = FileTools.FormatToUnityPath(file) + ".manifest";
-                        string abName = Path.ChangeExtension(filePath, null).Replace(assetBundlesOutPath + "/", "");
+                        string abName = filePath.Replace(assetBundlesOutPath + "/", "");
                         if (temp_mappings.TryGetValue(abName, out AssetBundleMap.AssetMapping assetMapping))
                         {
                             if (abName == assetMapping.AbName && package.Equals(assetMapping.Package))

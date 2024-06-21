@@ -155,7 +155,7 @@ namespace F8Framework.Core
                     {
                         continue;
                     }
-                    allSize += long.Parse(resAssetMapping.Value.Size);
+                    allSize += string.IsNullOrEmpty(resAssetMapping.Value.Size) ? 0 : long.Parse(resAssetMapping.Value.Size) ;
                     hotUpdateAssetUrl.TryAdd(resAssetMapping.Key, abPath);
                 }
                 else if(GameConfig.CompareVersions(assetMapping.Version, resAssetMapping.Value.Version) < 0) // 版本修正
@@ -178,11 +178,13 @@ namespace F8Framework.Core
         {
             if (!GameConfig.LocalGameVersion.EnableHotUpdate)
             {
+                completed?.Invoke();
                 return;
             }
             
             if (hotUpdateAssetUrl.Count <= 0)
             {
+                completed?.Invoke();
                 return;
             }
             
@@ -275,11 +277,13 @@ namespace F8Framework.Core
         {
             if (!GameConfig.LocalGameVersion.EnablePackage)
             {
+                completed?.Invoke();
                 return;
             }
 
             if (subPackages.Count <= 0)
             {
+                completed?.Invoke();
                 return;
             }
             

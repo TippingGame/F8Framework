@@ -10,7 +10,6 @@ using UnityEngine;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
-using LitJson;
 using F8Framework.Core;
 
 namespace F8Framework.F8ExcelDataClass
