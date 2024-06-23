@@ -58,8 +58,20 @@ namespace F8Framework.Core.Editor
             LocalizationEditorSettings.LoadEditorSettings();
 
             TMPIntegrationSwitcher.EnsureIntegrationState();
+            
+            // 注册编辑器退出事件
+            EditorApplication.quitting += OnEditorQuit;
         }
         
+        private static void OnEditorQuit()
+        {
+            EditorPrefs.SetBool("compilationFinished", false);
+            EditorPrefs.SetBool("compilationFinishedBuildAB", false);
+            EditorPrefs.SetBool("compilationFinishedBuildPkg", false);
+            EditorPrefs.SetBool("compilationFinishedBuildRun", false);
+            EditorPrefs.SetBool("compilationFinishedBuildUpdate", false);
+        }
+
         private static void ProjectWindowItemOnGUI(string guid, Rect selectionRect)
         {
             if (Event.current.type == EventType.KeyDown

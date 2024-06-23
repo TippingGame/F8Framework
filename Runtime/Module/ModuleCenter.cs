@@ -58,9 +58,13 @@ namespace F8Framework.Core
 			var wait = new WaitForSeconds(1f);
 			yield return wait;
 
-			// 说明：初始化之后，如果忘记更新ModuleCenter，这里会抛出异常
+			// 说明：初始化之后，如果忘记更新ModuleCenter
 			if (_frame == 0)
-				LogF8.LogError($"请调用更新方法：ModuleCenter.Update");
+			{
+				LogF8.LogError($"暂未调用轮询方法：ModuleCenter.Update");
+				LogF8.LogError($"暂未调用轮询方法：ModuleCenter.LateUpdate");
+				LogF8.LogError($"暂未调用轮询方法：ModuleCenter.FixedUpdate");
+			}
 		}
 
 		/// <summary>

@@ -151,15 +151,15 @@ namespace F8Framework.Core.Editor
             //编译代码,生成包含所有数据表内数据类型的dll
             GenerateCodeFiles(codeList);
             ScriptGenerator.CreateDataManager(codeList);
+            AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             // 等待脚本编译完成
-            EditorPrefs.SetBool("compilationFinished", false);
             CompilationPipeline.compilationFinished += (object s) =>
             {
                 EditorPrefs.SetBool("compilationFinished", true);
             };
         }
-
+        
         // 等待脚本编译完成
         [UnityEditor.Callbacks.DidReloadScripts]
         private static void AllScriptsReloaded()
@@ -208,6 +208,7 @@ namespace F8Framework.Core.Editor
                 //序列化数据
                 Serialize(container, temp, each.Value, BinDataPath);
             }
+            LogF8.LogConfig("<color=yellow>导表成功!</color>");
             
             // 如果 Unity 检测到任何脚本更改，则会重新加载 C# 域。这样做的原因是可能已创建新的脚本化导入器 (Scripted Importer)，
             // 它们的逻辑可能会影响“刷新”队列中的资源导入结果。此步骤会重新启动 Refresh() 以确保所有新的脚本化导入器生效。
@@ -220,7 +221,34 @@ namespace F8Framework.Core.Editor
                 }
                 EditorPrefs.SetBool("compilationFinishedBuildAB", false);
             };
-            LogF8.LogConfig("<color=yellow>导表成功!</color>");
+            
+            UnityEditor.EditorApplication.delayCall += () =>
+            {
+                if (EditorPrefs.GetBool("compilationFinishedBuildPkg", false) == true)
+                {
+                    BuildPkgTool.Build();
+                    BuildPkgTool.WriteAssetVersion();
+                }
+                EditorPrefs.SetBool("compilationFinishedBuildPkg", false);
+            };
+            
+            UnityEditor.EditorApplication.delayCall += () =>
+            {
+                if (EditorPrefs.GetBool("compilationFinishedBuildRun", false) == true)
+                {
+                    BuildPkgTool.RunExportedGame();
+                }
+                EditorPrefs.SetBool("compilationFinishedBuildRun", false);
+            };
+            
+            UnityEditor.EditorApplication.delayCall += () =>
+            {
+                if (EditorPrefs.GetBool("compilationFinishedBuildUpdate", false) == true)
+                {
+                    BuildPkgTool.BuildUpdate();
+                }
+                EditorPrefs.SetBool("compilationFinishedBuildUpdate", false);
+            };
         }
         
         [UnityEditor.MenuItem("开发工具/运行时读取Excel _F7", false, 101)]
@@ -396,7 +424,7 @@ namespace F8Framework.Core.Editor
             {
                 string filePath = $"{path}/{kvp.Key}.cs";
                 File.WriteAllText(filePath, kvp.Value);
-                LogF8.LogConfig($"已生成代码 " + path + "/<color=#FF9E59>" + kvp.Key + "</color>");
+                LogF8.LogConfig($"已生成代码 " + path + "/<color=#FF9E59>" + kvp.Key + ".cs</color>");
             }
         }
         

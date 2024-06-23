@@ -194,16 +194,16 @@ namespace F8Framework.Core
             // 设置热更下载器回调
             hotUpdateDownloader.OnDownloadSuccess += (eventArgs) =>
             {
-                LogF8.LogVersion($"获取热更资源完成：{eventArgs.DownloadInfo.DownloadUrl}");
+                LogF8.LogVersion($"获取热更资源完成！：{eventArgs.DownloadInfo.DownloadUrl}");
             };
             hotUpdateDownloader.OnDownloadFailure += (eventArgs) =>
             {
-                LogF8.LogError($"获取热更资源失败：{eventArgs.DownloadInfo.DownloadUrl}\n{eventArgs.ErrorMessage}");
+                LogF8.LogError($"获取热更资源失败。：{eventArgs.DownloadInfo.DownloadUrl}\n{eventArgs.ErrorMessage}");
                 failure?.Invoke();
             };
             hotUpdateDownloader.OnDownloadStart += (eventArgs) =>
             {
-                LogF8.LogVersion($"开始获取热更资源：{eventArgs.DownloadInfo.DownloadUrl}");
+                LogF8.LogVersion($"开始获取热更资源...：{eventArgs.DownloadInfo.DownloadUrl}");
             };
             hotUpdateDownloader.OnDownloadOverallProgress += (eventArgs) =>
             {
@@ -217,7 +217,7 @@ namespace F8Framework.Core
             };
             hotUpdateDownloader.OnAllDownloadTaskCompleted += (eventArgs) =>
             {
-                LogF8.LogVersion($"所有热更资源获取完成：{eventArgs.TimeSpan}");
+                LogF8.LogVersion($"所有热更资源获取完成！，用时：{eventArgs.TimeSpan}");
                 GameConfig.LocalGameVersion.Version = GameConfig.RemoteGameVersion.Version;
                 GameConfig.LocalGameVersion.HotUpdateVersion = new List<string>();
                 FileTools.SafeWriteAllText(Application.persistentDataPath + "/" + nameof(GameVersion) + ".json",
@@ -295,17 +295,17 @@ namespace F8Framework.Core
             // 设置分包下载器回调
             packageDownloader.OnDownloadSuccess += (eventArgs) =>
             {
-                LogF8.LogVersion($"获取分包资源完成：{eventArgs.DownloadInfo.DownloadUrl}");
+                LogF8.LogVersion($"获取分包资源完成！：{eventArgs.DownloadInfo.DownloadUrl}");
                 downloadPaths.Add(eventArgs.DownloadInfo.DownloadPath);
             };
             packageDownloader.OnDownloadFailure += (eventArgs) =>
             {
-                LogF8.LogError($"获取分包资源失败：{eventArgs.DownloadInfo.DownloadUrl}\n{eventArgs.ErrorMessage}");
+                LogF8.LogError($"获取分包资源失败。：{eventArgs.DownloadInfo.DownloadUrl}\n{eventArgs.ErrorMessage}");
                 failure?.Invoke();
             };
             packageDownloader.OnDownloadStart += (eventArgs) =>
             {
-                LogF8.LogVersion($"开始获取分包资源：{eventArgs.DownloadInfo.DownloadUrl}");
+                LogF8.LogVersion($"开始获取分包资源...：{eventArgs.DownloadInfo.DownloadUrl}");
             };
             packageDownloader.OnDownloadOverallProgress += (eventArgs) =>
             {
@@ -319,7 +319,7 @@ namespace F8Framework.Core
             };
             packageDownloader.OnAllDownloadTaskCompleted += (eventArgs) =>
             {
-                LogF8.LogVersion($"所有分包资源获取完成，用时：{eventArgs.TimeSpan}");
+                LogF8.LogVersion($"所有分包资源获取完成！，用时：{eventArgs.TimeSpan}");
 #if UNITY_WEBGL
                 // 使用协程
 				Util.Unity.StartCoroutine(UnZipPackagePathsCo(downloadPaths, completed));
