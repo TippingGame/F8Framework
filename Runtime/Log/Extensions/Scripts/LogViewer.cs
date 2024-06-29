@@ -8,7 +8,7 @@ namespace F8Framework.Core
         [Header("5指长按启用")] public bool gestureEnable = true;
 
         [Space(5)] [Header("发送邮件")]
-        // public MailData     mailSetting     = null;
+        public MailData mailSetting = null;
         private Viewer viewer = null;
 
         protected override void Init()
@@ -45,7 +45,7 @@ namespace F8Framework.Core
         {
             Function.Instance.Initialize();
 
-            // SetMailData();
+            SetMailData();
 
             if (viewer == null)
             {
@@ -68,7 +68,7 @@ namespace F8Framework.Core
 
         private void SetMailData()
         {
-            // Function.Instance.SetMailData(mailSetting);
+            Function.Instance.SetMailData(mailSetting);
         }
     }
 }

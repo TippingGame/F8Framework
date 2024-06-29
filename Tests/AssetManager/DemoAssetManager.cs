@@ -2,6 +2,7 @@ using System.Collections;
 using F8Framework.Core;
 using F8Framework.Launcher;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace F8Framework.Tests
 {
@@ -69,6 +70,10 @@ namespace F8Framework.Tests
 
             // 编辑器模式，无需打包AB
             FF8.Asset.IsEditorMode = true;
+            
+            // 加载场景，别忘了加载天空盒材质，不然会变紫色
+            FF8.Asset.Load("Scene");
+            SceneManager.LoadScene("Scene");
         }
     }
 }

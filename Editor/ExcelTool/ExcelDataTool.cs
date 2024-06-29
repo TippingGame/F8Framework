@@ -110,6 +110,7 @@ namespace F8Framework.Core.Editor
             FileTools.CheckDirAndCreateWhenNeeded(F8ExcelDataClassPath);
             string F8ExcelDataClassPathDLL = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/ConfigData/" + CODE_NAMESPACE + ".asmdef";
             FileTools.SafeDeleteFile(F8ExcelDataClassPathDLL);
+            FileTools.SafeDeleteFile(F8ExcelDataClassPathDLL + ".meta");
             FileTools.SafeDeleteFile(Application.dataPath + DataManagerFolder + "/F8DataManager.asmref");
             CreateAsmdefFile();
             AssetDatabase.Refresh();

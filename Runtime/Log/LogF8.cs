@@ -20,17 +20,20 @@ namespace F8Framework.Core
         private static StringBuilder sb = new StringBuilder();
         
         // 调色板
-        // private static Color color1 = new Color(.14f, .65f, 1.00f);
-        // private static Color color2 = new Color(.89f, .12f, .12f);
-        // private static Color color3 = new Color(.09f, .85f, .43f);
-        // private static Color color4 = new Color(.80f, .24f, 1.00f);
-        // private static Color color5 = new Color(1.00f, .79f, .0f);
-        // private static Color color6 = new Color(.09f, .80f, .85f);
-        // private static Color color7 = new Color(.66f, .85f, .09f);
-        // private static Color color8 = new Color(1.0f, 0.63f, 0.66f);
-        // private static Color color9 = new Color(1.0f, 0.62f, 0.35f);
-        // private static Color color10 = new Color(0.86f, 0.55f, 0.92f);
-        // private static Color color11 = new Color(1.0f, 0.90f, 0.40f);
+        private static readonly Color color1 = new Color(.14f, .65f, 1.00f);
+        private static readonly Color color2 = new Color(.89f, .12f, .12f);
+        private static readonly Color color3 = new Color(.09f, .85f, .43f);
+        private static readonly Color color4 = new Color(.80f, .24f, 1.00f);
+        private static readonly Color color5 = new Color(1.00f, .79f, .0f);
+        private static readonly Color color6 = new Color(.09f, .80f, .85f);
+        private static readonly Color color7 = new Color(.66f, .85f, .09f);
+        private static readonly Color color8 = new Color(1.0f, 0.63f, 0.66f);
+        private static readonly Color color9 = new Color(1.0f, 0.62f, 0.35f);
+        private static readonly Color color10 = new Color(0.86f, 0.55f, 0.92f);
+        private static readonly Color color11 = new Color(1.0f, 0.90f, 0.40f);
+        private static readonly Color color12 = new Color(1.0f, 0.9215f, 0.0156f);
+        private static readonly Color color13 = new Color(0.0f, 1.0f, 1.0f);
+        private static readonly Color color14 = new Color(0.0f, 1.0f, 0.0f);
         
         public static void EnabledLog()
         {
@@ -81,152 +84,152 @@ namespace F8Framework.Core
 
         public static void LogUtil(string s, Object context)
         {
-            LogColor("[工具日志]", new Color(0.86f, 0.55f, 0.92f), s, context);
+            LogColor("[工具日志]", color10, s, context);
         }
         
         public static void LogUtil(string s, params object[] p)
         {
-            LogColor("[工具日志]", new Color(0.86f, 0.55f, 0.92f), s, p);
+            LogColor("[工具日志]", color10, s, p);
         }
         
         public static void LogUtil(object o)
         {
-            LogColor("[工具日志]", new Color(0.86f, 0.55f, 0.92f), o);
+            LogColor("[工具日志]", color10, o);
         }
         
         public static void LogVersion(string s, Object context)
         {
-            LogColor("[版本日志]", new Color(1.0f, 0.62f, 0.35f), s, context);
+            LogColor("[版本日志]", color9, s, context);
         }
         
         public static void LogVersion(string s, params object[] p)
         {
-            LogColor("[版本日志]", new Color(1.0f, 0.62f, 0.35f), s, p);
+            LogColor("[版本日志]", color9, s, p);
         }
         
         public static void LogVersion(object o)
         {
-            LogColor("[版本日志]", new Color(1.0f, 0.62f, 0.35f), o);
+            LogColor("[版本日志]", color9, o);
         }
         
         public static void LogSDK(string s, Object context)
         {
-            LogColor("[SDK日志]", new Color(1.0f, 0.63f, 0.66f), s, context);
+            LogColor("[SDK日志]", color8, s, context);
         }
         
         public static void LogSDK(string s, params object[] p)
         {
-            LogColor("[SDK日志]", new Color(1.0f, 0.63f, 0.66f), s, p);
+            LogColor("[SDK日志]", color8, s, p);
         }
         
         public static void LogSDK(object o)
         {
-            LogColor("[SDK日志]", new Color(1.0f, 0.63f, 0.66f), o);
+            LogColor("[SDK日志]", color8, o);
         }
         
         public static void LogModule(string s, Object context)
         {
-            LogColor("[模块日志]", new Color(.14f, .65f, 1.00f), s, context);
+            LogColor("[模块日志]", color1, s, context);
         }
         
         public static void LogModule(string s, params object[] p)
         {
-            LogColor("[模块日志]", new Color(.14f, .65f, 1.00f), s, p);
+            LogColor("[模块日志]", color1, s, p);
         }
         
         public static void LogModule(object o)
         {
-            LogColor("[模块日志]", new Color(.14f, .65f, 1.00f), o);
+            LogColor("[模块日志]", color1, o);
         }
         
         public static void LogNet(string s, Object context)
         {
-            LogColor("[网络日志]", new Color(1.00f, .79f, .0f), s, context);
+            LogColor("[网络日志]", color5, s, context);
         }
         
         public static void LogNet(string s, params object[] p)
         {
-            LogColor("[网络日志]", new Color(1.00f, .79f, .0f), s, p);
+            LogColor("[网络日志]", color5, s, p);
         }
         
         public static void LogNet(object o)
         {
-            LogColor("[网络日志]", new Color(1.00f, .79f, .0f), o);
+            LogColor("[网络日志]", color5, o);
         }
         
         public static void LogConfig(string s, Object context)
         {
-            LogColor("[配置日志]", new Color(.66f, .85f, .09f), s, context);
+            LogColor("[配置日志]", color7, s, context);
         }
         
         public static void LogConfig(string s, params object[] p)
         {
-            LogColor("[配置日志]", new Color(.66f, .85f, .09f), s, p);
+            LogColor("[配置日志]", color7, s, p);
         }
         
         public static void LogConfig(object o)
         {
-            LogColor("[配置日志]", new Color(.66f, .85f, .09f), o);
+            LogColor("[配置日志]", color7, o);
         }
         
         public static void LogView(string s, Object context)
         {
-            LogColor("[视图日志]", Color.yellow, s, context);
+            LogColor("[视图日志]", color12, s, context);
         }
         
         public static void LogView(string s, params object[] p)
         {
-            LogColor("[视图日志]", Color.yellow, s, p);
+            LogColor("[视图日志]", color12, s, p);
         }
         
         public static void LogView(object o)
         {
-            LogColor("[视图日志]", Color.yellow, o);
+            LogColor("[视图日志]", color12, o);
         }
         
         public static void LogEvent(string s, Object context)
         {
-            LogColor("[事件日志]", Color.cyan, s, context);
+            LogColor("[事件日志]", color13, s, context);
         }
         
         public static void LogEvent(string s, params object[] p)
         {
-            LogColor("[事件日志]", Color.cyan, s, p);
+            LogColor("[事件日志]", color13, s, p);
         }
         
         public static void LogEvent(object o)
         {
-            LogColor("[事件日志]", Color.cyan, o);
+            LogColor("[事件日志]", color13, o);
         }
 
         public static void LogEntity(string s, Object context)
         {
-            LogColor("[实体日志]", new Color(.09f, .85f, .43f), s, context);
+            LogColor("[实体日志]", color3, s, context);
         }
         
         public static void LogEntity(string s, params object[] p)
         {
-            LogColor("[实体日志]", new Color(.09f, .85f, .43f), s, p);
+            LogColor("[实体日志]", color3, s, p);
         }
         
         public static void LogEntity(object o)
         {
-            LogColor("[实体日志]", new Color(.09f, .85f, .43f), o);
+            LogColor("[实体日志]", color3, o);
         }
         
         public static void LogAsset(string s, Object context)
         {
-            LogColor("[资产日志]", Color.green, s, context);
+            LogColor("[资产日志]", color14, s, context);
         }
         
         public static void LogAsset(string s, params object[] p)
         {
-            LogColor("[资产日志]", Color.green, s, p);
+            LogColor("[资产日志]", color14, s, p);
         }
         
         public static void LogAsset(object o)
         {
-            LogColor("[资产日志]", Color.green, o);
+            LogColor("[资产日志]", color14, o);
         }
         
         private static void LogColor(string logName, Color color, string s, Object context)
@@ -411,6 +414,10 @@ namespace F8Framework.Core
         private static void OnUploadStringCompleted(object sender, UploadStringCompletedEventArgs e)
         {
             m_canTakeError = true;
+            if (e.Error != null)
+            {
+                LogF8.LogError(e.Error.Message);
+            }
         }
 
         public static void Watch()

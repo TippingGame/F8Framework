@@ -90,32 +90,32 @@ namespace F8Framework.Core
 
         public void SendMail()
         {
-            // WaitUi.Instance.ShowUi(true);
-            // WaitUi.Instance.SetMessage(ConsoleViewConst.SEND_MAIL_SENDING);
-            //
-            // Log.Instance.SendFullLogToMail((object sender, AsyncCompletedEventArgs e) =>
-            // {
-            //     WaitUi.Instance.ShowUi(false);
-            //     
-            //     if (e.Cancelled == true)
-            //     {
-            //         Debug.Log(ConsoleViewConst.SEND_MAIL_CANCELED);
-            //         Popup.Instance.ShowPopup(ConsoleViewConst.SEND_MAIL_CANCELED);
-            //     }
-            //     else if (e.Error != null)
-            //     {
-            //         string message = string.Format(ConsoleViewConst.SEND_MAIL_FAILED, e.Error.Message);
-            //         Debug.LogError(message);
-            //         Popup.Instance.ShowPopup(message, Common.ERROR);
-            //     }
-            //     else
-            //     {
-            //         Debug.Log(ConsoleViewConst.SEND_MAIL_SUCCEEDED);
-            //         Popup.Instance.ShowPopup(ConsoleViewConst.SEND_MAIL_SUCCEEDED);
-            //     }
-            //     
-            //     logList.MoveToBottom();
-            // });
+            WaitUi.Instance.ShowUi(true);
+            WaitUi.Instance.SetMessage(ConsoleViewConst.SEND_MAIL_SENDING);
+            
+            Log.Instance.SendFullLogToMail((object sender, AsyncCompletedEventArgs e) =>
+            {
+                WaitUi.Instance.ShowUi(false);
+                
+                if (e.Cancelled == true)
+                {
+                    LogF8.Log(ConsoleViewConst.SEND_MAIL_CANCELED);
+                    Popup.Instance.ShowPopup(ConsoleViewConst.SEND_MAIL_CANCELED);
+                }
+                else if (e.Error != null)
+                {
+                    string message = string.Format(ConsoleViewConst.SEND_MAIL_FAILED, e.Error.Message);
+                    LogF8.LogError(message);
+                    Popup.Instance.ShowPopup(message, "ERROR");
+                }
+                else
+                {
+                    LogF8.Log(ConsoleViewConst.SEND_MAIL_SUCCEEDED);
+                    Popup.Instance.ShowPopup(ConsoleViewConst.SEND_MAIL_SUCCEEDED);
+                }
+                
+                logList.MoveToBottom();
+            });
         }
 
         public void SelectCategory()
