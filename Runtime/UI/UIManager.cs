@@ -96,14 +96,14 @@ namespace F8Framework.Core
             Destroy(gameObject);
         }
         
-        public void ShowNotify(int uiId, string content)
+        public void ShowNotify(int uiId, string content, UICallbacks callbacks = null)
         {
             if (!_configs.TryGetValue(uiId, out UIConfig config))
             {
                 LogF8.LogView($"打开 ID 为 {uiId} 的 UI 失败，未找到配置。");
                 return;
             }
-            _layerNotify.Show(uiId, config, content);
+            _layerNotify.Show(uiId, config, content, callbacks);
         }
 
         public List<string> GetCurrentUuids()

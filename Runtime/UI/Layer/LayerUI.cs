@@ -58,7 +58,7 @@ namespace F8Framework.Core
 
             viewParams.UIid = uiId;
             viewParams.Params = parameters;
-            viewParams.Callbacks = new UICallbacks();
+            viewParams.Callbacks = callbacks;
             viewParams.Valid = true;
 
             Load(viewParams);

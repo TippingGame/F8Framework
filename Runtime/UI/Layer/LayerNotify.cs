@@ -4,7 +4,7 @@ namespace F8Framework.Core
 {
     public class LayerNotify : LayerUI
     {
-        public void Show(int uiId, UIConfig config, string content)
+        public void Show(int uiId, UIConfig config, string content, UICallbacks callbacks = null)
         {
             var prefabPath = config.AssetName;
             ViewParams viewParams = new ViewParams
@@ -13,7 +13,7 @@ namespace F8Framework.Core
                 Uuid = prefabPath, // 暂时和prefabPath相同
                 PrefabPath = prefabPath,
                 Params = new object[] { content },
-                Callbacks = new UICallbacks(),
+                Callbacks = callbacks,
                 Valid = true
             };
 

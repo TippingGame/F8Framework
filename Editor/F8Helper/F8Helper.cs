@@ -9,7 +9,7 @@ namespace F8Framework.Core.Editor
         [MenuItem("开发工具/F8Run _F8")]
         public static void F8Run()
         {
-            GenerateCopyHotUpdateDll();
+            EditorPrefs.SetBool("compilationFinishedHotUpdateDll", true);
             EditorPrefs.SetBool("compilationFinishedBuildAB", true);
             LoadAllExcelData();
         }
@@ -17,6 +17,7 @@ namespace F8Framework.Core.Editor
         [MenuItem("开发工具/生成并复制热更新Dll-F8")]
         public static void GenerateCopyHotUpdateDll()
         {
+            // EditorPrefs.SetBool("compilationFinishedHotUpdateDll", false);
             // HybridCLR.Editor.Commands.PrebuildCommand.GenerateAll();
             // FileTools.SafeClearDir(Application.dataPath + "/AssetBundles/Code");
             // FileTools.CheckDirAndCreateWhenNeeded(Application.dataPath + "/AssetBundles/Code");
@@ -66,6 +67,7 @@ namespace F8Framework.Core.Editor
         private static void OnEditorQuit()
         {
             EditorPrefs.SetBool("compilationFinished", false);
+            EditorPrefs.SetBool("compilationFinishedHotUpdateDll", false);
             EditorPrefs.SetBool("compilationFinishedBuildAB", false);
             EditorPrefs.SetBool("compilationFinishedBuildPkg", false);
             EditorPrefs.SetBool("compilationFinishedBuildRun", false);

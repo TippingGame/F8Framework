@@ -13,6 +13,7 @@
     [MenuItem("开发工具/生成并复制热更新Dll-F8")]
     public static void GenerateCopyHotUpdateDll()
     {
+        // EditorPrefs.SetBool("compilationFinishedHotUpdateDll", false);
         // HybridCLR.Editor.Commands.PrebuildCommand.GenerateAll();
         // FileTools.SafeClearDir(Application.dataPath + "/AssetBundles/Code");
         // FileTools.CheckDirAndCreateWhenNeeded(Application.dataPath + "/AssetBundles/Code");

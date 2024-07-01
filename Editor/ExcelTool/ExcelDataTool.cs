@@ -216,6 +216,16 @@ namespace F8Framework.Core.Editor
             UnityEditor.EditorApplication.delayCall += () =>
             {
                 AssetDatabase.Refresh();
+                if (EditorPrefs.GetBool("compilationFinishedHotUpdateDll", false) == true)
+                {
+                    F8Helper.GenerateCopyHotUpdateDll();
+                }
+                EditorPrefs.SetBool("compilationFinishedHotUpdateDll", false);
+            };
+            
+            UnityEditor.EditorApplication.delayCall += () =>
+            {
+                AssetDatabase.Refresh();
                 if (EditorPrefs.GetBool("compilationFinishedBuildAB", false) == true)
                 {
                     ABBuildTool.BuildAllAB();
