@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.22] - 2024-07-03
+1.AudioEffect3D使用游戏对象池  
+2.游戏对象池模块添加轮询，默认DontDestroyOnLoad = true，默认CheckForPrefab = true  
+3.AudioMixer优化使侧链压缩/闪避效果更突出  
+
 ## [1.0.21] - 2024-07-01
 1.等待编译完成后生成复制热更新Dll  
 2.UI系统UICallbacks修正为使用传入的参数  

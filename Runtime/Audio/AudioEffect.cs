@@ -17,6 +17,13 @@ namespace F8Framework.Core
         private float maxVolume = 1.0f;
         private float minPitch = 0.8f;
         private float maxPitch = 1.2f;
+        private GameObject OneShotAudio;
+        
+        public AudioEffect()
+        {
+            OneShotAudio = new GameObject("AudioEffect3D", typeof (AudioSource));
+            Object.DontDestroyOnLoad(OneShotAudio);
+        }
         
         public void Load(string url, Vector3 position, float volume = 1f, Action callback = null, AudioMixerGroup audioEffectMixerGroup = null, bool isRandom = false)
         {
@@ -51,17 +58,18 @@ namespace F8Framework.Core
         /// <param name="isRandom"></param>
         public void PlayClipAtPoint(AudioClip clip, Vector3 position, [DefaultValue("1.0F")] float volume, AudioMixerGroup audioEffectMixerGroup = null, bool isRandom = false)
         {
-            GameObject gameObject = new GameObject("One shot audio");
+            GameObject gameObject = GameObjectPool.Instance.Spawn(OneShotAudio);
             gameObject.transform.position = position;
-            AudioSource audioSource = (AudioSource) gameObject.AddComponent(typeof (AudioSource));
+            AudioSource audioSource = gameObject.GetComponent<AudioSource>();
             audioSource.clip = clip;
             audioSource.spatialBlend = 1f;
             audioSource.volume = isRandom ? Random.Range(minVolume, maxVolume) : volume;
             audioSource.pitch = isRandom ? Random.Range(minPitch, maxPitch) : 1f;
+            audioSource.rolloffMode = AudioRolloffMode.Linear;
             if (audioEffectMixerGroup)
                 audioSource.outputAudioMixerGroup = audioEffectMixerGroup;
             audioSource.Play();
-            Object.Destroy((Object) gameObject, clip.length * ((double) Time.timeScale < 0.009999999776482582 ? 0.01f : Time.timeScale));
+            GameObjectPool.Instance.Despawn(gameObject, clip.length * ((double) Time.timeScale < 0.009999999776482582 ? 0.01f : Time.timeScale));
         }
         
         public void Release()

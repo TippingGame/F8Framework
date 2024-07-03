@@ -39,7 +39,7 @@ namespace F8Framework.Core
 
         [Header("Persistent")]
         [Tooltip("此池是否应该是持久的？")]
-        [SerializeField] internal bool _dontDestroyOnLoad;
+        [SerializeField] internal bool _dontDestroyOnLoad = true;
 
         [Header("Debug")]
         [Tooltip("此池是否应该查找问题并记录警告？")]

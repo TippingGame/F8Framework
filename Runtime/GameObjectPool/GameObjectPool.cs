@@ -21,7 +21,7 @@ namespace F8Framework.Core
         internal bool s_isApplicationQuitting = false;
         internal bool s_despawnPersistentClonesOnDestroy = true;
         internal bool s_checkClonesForNull = true;
-        internal bool s_checkForPrefab = true;
+        internal bool s_checkForPrefab = false;
         internal F8PoolGlobal s_instance = null;
 
         private readonly Dictionary<GameObject, F8GameObjectPool> AllPoolsMap =

@@ -7,6 +7,9 @@ namespace F8Framework.Core
     [DisallowMultipleComponent]
     [AddComponentMenu(Constants.F8PoolComponentPath + "F8 Pool Global")]
 #endif
+    [UpdateRefresh]
+    [FixedUpdateRefresh]
+    [LateUpdateRefresh]
     public sealed class F8PoolGlobal : ModuleSingletonMono<F8PoolGlobal>, IModule
     {
         [Header("Main")] 
@@ -34,7 +37,7 @@ namespace F8Framework.Core
         [SerializeField, Min(0)] internal int _capacity = 64;
         
         [Tooltip(Constants.Tooltips.Persistent)]
-        [SerializeField] internal bool _dontDestroyOnLoad;
+        [SerializeField] internal bool _dontDestroyOnLoad = true;
 
         [Tooltip(Constants.Tooltips.Warnings)]
         [SerializeField] internal bool _sendWarnings = true;
@@ -53,7 +56,7 @@ namespace F8Framework.Core
         [SerializeField] private bool _checkClonesForNull = true;
         
         [Tooltip(Constants.Tooltips.CheckForPrefab)]
-        [SerializeField] private bool _checkForPrefab = true;
+        [SerializeField] private bool _checkForPrefab = false;
         
         [Tooltip(Constants.Tooltips.ClearEventsOnDestroy)]
         [SerializeField] private bool _clearEventsOnDestroy;

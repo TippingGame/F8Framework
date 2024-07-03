@@ -28,7 +28,7 @@ namespace F8Framework.Launcher
         private static AssetManager _asset;
         // 读取配置表-->使用了资产模块
         private static F8DataManager _config;
-        // 音频管理-->使用了资产模块
+        // 音频管理-->使用了资产模块-->使用了游戏对象池模块
         private static AudioManager _audio;
         // 补间动画
         private static Tween _tween;

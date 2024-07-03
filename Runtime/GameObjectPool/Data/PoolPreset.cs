@@ -34,7 +34,7 @@ namespace F8Framework.Core
         [Tooltip(Constants.Tooltips.PreloadSize)]
         [SerializeField, Min(0)] private int _preloadSize;
         [Tooltip(Constants.Tooltips.Persistent)]
-        [SerializeField] private bool _dontDestroyOnLoad;
+        [SerializeField] private bool _dontDestroyOnLoad = true;
         [Tooltip(Constants.Tooltips.Warnings)]
         [SerializeField] private bool _warnings = true;
 
