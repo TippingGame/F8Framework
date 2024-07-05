@@ -138,7 +138,7 @@ namespace F8Framework.Core.Editor
             int index = Array.FindIndex((BuildTarget[])enumValues, target => 
                 target.ToString() == EditorPrefs.GetString(_exportPlatformKey, ""));
 
-            BuildTarget buildTarget = _options[index];
+            BuildTarget buildTarget = EditorPrefs.GetBool(_exportCurrentPlatformKey, true) ? EditorUserBuildSettings.activeBuildTarget : _options[index];
             
             string toVersion = EditorPrefs.GetString(_toVersionKey, "");
             

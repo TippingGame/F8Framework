@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.0.23] - 2024-07-05
+1.修正构建时根据当前平台导出的表现  
+
 ## [1.0.22] - 2024-07-03
 1.AudioEffect3D使用游戏对象池  
 2.游戏对象池模块添加轮询，默认DontDestroyOnLoad = true，默认CheckForPrefab = true  
