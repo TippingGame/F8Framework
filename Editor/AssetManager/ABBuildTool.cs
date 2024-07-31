@@ -13,6 +13,8 @@ namespace F8Framework.Core.Editor
     {
         private static Dictionary<string, AssetBundleMap.AssetMapping> assetMapping;
         private static Dictionary<string, string> resourceMapping;
+        // AssetBundle名与资产文件名不同时查找
+        private static Dictionary<string, string> DiscrepantAssetPathMapping;
 
         // 打包后AB名加上MD5（微信小游戏使用）
         private static bool appendHashToAssetBundleName = false;
@@ -49,7 +51,7 @@ namespace F8Framework.Core.Editor
             LogF8.LogAsset("写入资产数据 生成：AssetBundleMap.json，生成：ResourceMap.json");
             
             AssetDatabase.Refresh();
-            
+
             LogF8.LogAsset("资产打包成功!");
         }
 
@@ -70,7 +72,7 @@ namespace F8Framework.Core.Editor
             
             foreach (string ab in abPaths)
             {
-                if (!assetPaths.Contains(ab))
+                if (!assetPaths.Contains(ab) && !AssetPathsContainsDiscrepantAssetBundle(assetPaths, ab)) 
                 {
                     string abpath = URLSetting.GetAssetBundlesOutPath() + ab;
                     if (File.Exists(abpath))
@@ -155,6 +157,7 @@ namespace F8Framework.Core.Editor
                 }
             }
         }
+
         
         //设置资源AB名字
         public static string SetAssetBundleName(string path)
@@ -171,16 +174,35 @@ namespace F8Framework.Core.Editor
                 bundleName = Path.ChangeExtension(path, null).Replace(URLSetting.AssetBundlesPath, "");
             }
             
-            if (!ai.assetBundleName.Equals(bundleName) && ai.assetBundleName.IsNullOrEmpty())
+            if (!ai.assetBundleName.Equals(bundleName))
             {
-                ai.assetBundleName = bundleName;
-                EditorUtility.SetDirty(ai);
+                if (ai.assetBundleName.IsNullOrEmpty())
+                {
+                    ai.assetBundleName = bundleName;
+                    EditorUtility.SetDirty(ai);
+                }
+                else if (DiscrepantAssetPathMapping != null) 
+                {
+                    // 资产名和ab包名不相等
+                    DiscrepantAssetPathMapping["/" + ai.assetBundleName] = "/" + bundleName.ToLower();
+                }
+
             }
             return ai.assetBundleName;
         }
         
+        private static bool AssetPathsContainsDiscrepantAssetBundle(List<string> assetPaths, string ab)
+        {
+            if (DiscrepantAssetPathMapping.TryGetValue(ab, out string disPath))
+                return assetPaths.Contains(disPath);
+            return false;
+        }
+
         public static void GenerateAssetNames(bool isWrite = false)
         {
+            if (isWrite) DiscrepantAssetPathMapping = null;
+            else DiscrepantAssetPathMapping = new Dictionary<string, string>();
+
             FileTools.CheckDirAndCreateWhenNeeded(URLSetting.GetAssetBundlesFolder());
             if (Directory.Exists(URLSetting.GetAssetBundlesFolder()))
             {
