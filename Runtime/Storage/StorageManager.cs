@@ -66,9 +66,10 @@ namespace F8Framework.Core
         /// <returns>读取的对象。</returns>
          public T GetObject<T>(string key, bool user = false)
          {
-             if (PlayerPrefs.HasKey(key))
+             string keywords = GetKeywords(key, user);
+             if (PlayerPrefs.HasKey(keywords))
              {
-                 string jsonString = PlayerPrefs.GetString(GetKeywords(key, user));
+                 string jsonString = PlayerPrefs.GetString(keywords);
                  return Util.LitJson.ToObject<T>(jsonString);
              }
 

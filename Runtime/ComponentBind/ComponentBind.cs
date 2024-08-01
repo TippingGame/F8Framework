@@ -21,18 +21,19 @@ namespace F8Framework.Core
             GenerateAutoBindComponentsCode();
         }
         
-        protected void Reset()
-        {
-            Bind();
-        }
-
-        protected void OnValidate()
-        {
-            if (!Application.isPlaying)
-            {
-                Bind();
-            }
-        }
+        // 屏蔽自动获取组件
+        // protected void Reset()
+        // {
+        //     Bind();
+        // }
+        //
+        // protected void OnValidate()
+        // {
+        //     if (!Application.isPlaying)
+        //     {
+        //         Bind();
+        //     }
+        // }
         
         private void GenerateAutoBindComponentsCode()
         {
