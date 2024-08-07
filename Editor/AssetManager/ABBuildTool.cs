@@ -263,16 +263,12 @@ namespace F8Framework.Core.Editor
                         {
                             continue;
                         }
-                        string abName = assetPath.Replace(URLSetting.AssetBundlesPath, "");
                        
-                        string[] assetPaths = Directory.GetFiles(filePath, "*", SearchOption.TopDirectoryOnly)
+                        // 文件夹资产信息，使用资产名名代替
+                        string[] assetNameDir = Directory.GetFiles(filePath, "*", SearchOption.TopDirectoryOnly)
                             .Where(path => !path.EndsWith(".meta", StringComparison.OrdinalIgnoreCase) && !path.EndsWith(".DS_Store", StringComparison.OrdinalIgnoreCase))
+                            .Select(path => Path.GetFileNameWithoutExtension(path))
                             .ToArray();
-                        
-                        for (int i = 0; i < assetPaths.Length; i++)
-                        {
-                            assetPaths[i] = GetAssetPath(assetPaths[i]).ToLower();
-                        }
                         
                         if (tempNames.Contains(fileNameWithoutExtension))
                         {
@@ -282,7 +278,7 @@ namespace F8Framework.Core.Editor
                         }
                         tempNames.Add(fileNameWithoutExtension);
                         
-                        assetMapping.Add(fileNameWithoutExtension, new AssetBundleMap.AssetMapping(abName.ToLower(), assetPaths,
+                        assetMapping.Add(fileNameWithoutExtension, new AssetBundleMap.AssetMapping("", assetNameDir,
                             BuildPkgTool.ToVersion, "", "", "", ""));
                     }
                 }

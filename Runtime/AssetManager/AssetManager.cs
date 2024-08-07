@@ -380,20 +380,17 @@ namespace F8Framework.Core
                         return;
                     }
 #endif
-                    foreach (var assetPath in info.AssetPath)
+                    foreach (var subAssetName in info.AssetPath)
                     {
-                        if (string.IsNullOrEmpty(assetPath))
+                        if (string.IsNullOrEmpty(subAssetName))
                         {
                             continue;
                         }
-                        string subAssetName = Path.ChangeExtension(assetPath, null).Replace(URLSetting.AssetBundlesPathLower, "");
-                        string abName = subAssetName;
-                        AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(AssetBundleManager.GetAssetBundlePathWithoutAb(subAssetName) + abName);
+                        AssetInfo subInfo = GetAssetInfo(subAssetName, mode);
+                        AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(subInfo.AssetBundlePath);
                         if (ab == null || ab.AssetBundleContent == null)
                         {
-                            AssetInfo assetInfo = new AssetInfo(info.AssetType, new []{assetPath}, AssetBundleManager.GetAssetBundlePathWithoutAb(subAssetName), abName);
-                            AssetBundleManager.Instance.Load(Path.GetFileNameWithoutExtension(assetPath), 
-                                ref assetInfo);
+                            AssetBundleManager.Instance.Load(subAssetName, ref subInfo);
                         }
                     }
                 }
@@ -665,19 +662,18 @@ namespace F8Framework.Core
                     }
 #endif
                     int assetCount = 0;
-                    foreach (var assetPath in info.AssetPath)
+                    foreach (var subAssetName in info.AssetPath)
                     {
-                        if (string.IsNullOrEmpty(assetPath))
+                        if (string.IsNullOrEmpty(subAssetName))
                         {
                             continue;
                         }
-                        string subAssetName = Path.ChangeExtension(assetPath, null).Replace(URLSetting.AssetBundlesPathLower, "");
-                        string abName = subAssetName;
-                        AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(AssetBundleManager.GetAssetBundlePathWithoutAb(subAssetName) + abName);
+                        AssetInfo subInfo = GetAssetInfo(subAssetName, mode);
+                        AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(subInfo.AssetBundlePath);
                         if (ab == null || ab.AssetBundleContent == null || ab.GetDependentNamesLoadFinished() < ab.AddDependentNames())
                         {
-                            AssetBundleManager.Instance.LoadAsync(Path.GetFileNameWithoutExtension(assetPath), 
-                                new AssetInfo(info.AssetType, new []{assetPath}, AssetBundleManager.GetAssetBundlePathWithoutAb(subAssetName), abName), (b) =>
+                            AssetBundleManager.Instance.LoadAsync(subAssetName, 
+                                subInfo, (b) =>
                                 {
                                     if (++assetCount >= info.AssetPath.Length)
                                     {
@@ -687,7 +683,7 @@ namespace F8Framework.Core
                         }
                         else
                         {
-                            Object o = AssetBundleManager.Instance.GetAssetObject(AssetBundleManager.GetAssetBundlePathWithoutAb(subAssetName), assetPath);
+                            Object o = AssetBundleManager.Instance.GetAssetObject(subInfo.AssetBundlePath, subInfo.AssetPath[0]);
                             if (o != null)
                             {
                                 if (++assetCount >= info.AssetPath.Length)
@@ -739,19 +735,17 @@ namespace F8Framework.Core
                     }
 #endif
                     int assetCount = 0;
-                    foreach (var assetPath in info.AssetPath)
+                    foreach (var subAssetName in info.AssetPath)
                     {
-                        if (string.IsNullOrEmpty(assetPath))
+                        if (string.IsNullOrEmpty(subAssetName))
                         {
                             continue;
                         }
-                        string subAssetName = Path.ChangeExtension(assetPath, null).Replace(URLSetting.AssetBundlesPathLower, "");
-                        string abName = subAssetName;
-                        AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(AssetBundleManager.GetAssetBundlePathWithoutAb(subAssetName) + abName);
+                        AssetInfo subInfo = GetAssetInfo(subAssetName, mode);
+                        AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(subInfo.AssetBundlePath);
                         if (ab == null || ab.AssetBundleContent == null || ab.GetDependentNamesLoadFinished() < ab.AddDependentNames())
                         {
-                            yield return AssetBundleManager.Instance.LoadAsyncCoroutine(Path.GetFileNameWithoutExtension(assetPath),
-                                new AssetInfo(info.AssetType, new[] { assetPath }, AssetBundleManager.GetAssetBundlePathWithoutAb(subAssetName), abName));
+                            yield return AssetBundleManager.Instance.LoadAsyncCoroutine(subAssetName, subInfo);
                             if (++assetCount >= info.AssetPath.Length)
                             {
                                 yield break;
@@ -759,7 +753,7 @@ namespace F8Framework.Core
                         }
                         else
                         {
-                            Object o = AssetBundleManager.Instance.GetAssetObject(AssetBundleManager.GetAssetBundlePathWithoutAb(subAssetName), assetPath);
+                            Object o = AssetBundleManager.Instance.GetAssetObject(subInfo.AssetBundlePath, subInfo.AssetPath[0]);
                             if (o != null)
                             {
                                 if (++assetCount >= info.AssetPath.Length)
