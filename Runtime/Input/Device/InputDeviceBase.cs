@@ -84,6 +84,15 @@ namespace F8Framework.Core
         }
         
         /// <summary>
+        /// 开始按按钮
+        /// </summary>
+        /// <param name="name">按钮名称</param>
+        protected void SetButtonStart(string name)
+        {
+            InputManager.Instance.SetButtonStart(name);
+        }
+        
+        /// <summary>
         /// 设置按钮按下
         /// </summary>
         /// <param name="name">按钮名称</param>

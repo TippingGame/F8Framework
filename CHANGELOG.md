@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.0.26] - 2024-08-07
+1.输入系统增加按钮Started、Performed、Canceled回调，Axis增加ValueChanged回调  
+
 ## [1.0.25] - 2024-08-07
 1.修复资产的文件名和ab名不一致时，加载文件夹内资产失败问题  
 

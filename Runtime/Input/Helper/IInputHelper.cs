@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace F8Framework.Core
 {
@@ -77,6 +78,12 @@ namespace F8Framework.Core
         void SetVirtualMousePosition(Vector3 value);
         
         /// <summary>
+        /// 开始按按钮
+        /// </summary>
+        /// <param name="name">按钮名称</param>
+        void SetButtonStart(string name);
+        
+        /// <summary>
         /// 设置按钮按下
         /// </summary>
         /// <param name="name">按钮名称</param>
@@ -113,6 +120,67 @@ namespace F8Framework.Core
         /// <param name="value">轴线值</param>
         void SetAxis(string name, float value);
 
+        /// <summary>
+        /// 开始按按钮Action
+        /// </summary>
+        /// <param name="name">按钮名称</param>
+        /// <param name="started">回调</param>
+        void SetButtonStarted(string name, Action<string> started);
+        
+        /// <summary>
+        /// 按下按钮Action
+        /// </summary>
+        /// <param name="name">按钮名称</param>
+        /// <param name="performed">回调</param>
+        void SetButtonPerformed(string name, Action<string> performed);
+        
+        /// <summary>
+        /// 结束按钮Action
+        /// </summary>
+        /// <param name="name">按钮名称</param>
+        /// <param name="canceled">回调</param>
+        void SetButtonCanceled(string name, Action<string> canceled);
+
+        /// <summary>
+        /// Axis值改变Action
+        /// </summary>
+        /// <param name="name">按钮名称</param>
+        /// <param name="valueChanged">回调</param>
+        void SetAxisValueChanged(string name, Action<float> valueChanged);
+        
+        /// <summary>
+        /// 移除开始按按钮Action
+        /// </summary>
+        /// <param name="name">按钮名称</param>
+        /// <param name="started">回调</param>
+        void RemoveButtonStarted(string name, Action<string> started);
+        
+        /// <summary>
+        /// 移除按下按钮Action
+        /// </summary>
+        /// <param name="name">按钮名称</param>
+        /// <param name="performed">回调</param>
+        void RemoveButtonPerformed(string name, Action<string> performed);
+        
+        /// <summary>
+        /// 移除结束按钮Action
+        /// </summary>
+        /// <param name="name">按钮名称</param>
+        /// <param name="canceled">回调</param>
+        void RemoveButtonCanceled(string name, Action<string> canceled);
+        
+        /// <summary>
+        /// 移除Axis值改变Action
+        /// </summary>
+        /// <param name="name">按钮名称</param>
+        /// <param name="valueChanged">回调</param>
+        void RemoveAxisValueChanged(string name, Action<float> valueChanged);
+
+        /// <summary>
+        /// 清除所有输入事件
+        /// </summary>
+        void ClearAllAction();
+        
         /// <summary>
         /// 按钮按住
         /// </summary>

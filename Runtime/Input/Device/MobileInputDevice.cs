@@ -25,21 +25,38 @@ namespace F8Framework.Core
         public override void OnRun()
         {
             if (UnityEngine.Input.touchCount == 1 && UnityEngine.Input.GetTouch(0).phase == TouchPhase.Began)
+            {
+                SetButtonStart(InputButtonType.MouseLeft);
                 SetButtonDown(InputButtonType.MouseLeft);
+            }
             else if (UnityEngine.Input.touchCount == 1 && UnityEngine.Input.GetTouch(0).phase == TouchPhase.Ended)
+            {
                 SetButtonUp(InputButtonType.MouseLeft);
-            
-            if (UnityEngine.Input.touchCount == 2 && UnityEngine.Input.GetTouch(0).phase == TouchPhase.Began && UnityEngine.Input.GetTouch(1).phase == TouchPhase.Began)
+            }
+
+            if (UnityEngine.Input.touchCount == 2 && UnityEngine.Input.GetTouch(0).phase == TouchPhase.Began &&
+                UnityEngine.Input.GetTouch(1).phase == TouchPhase.Began)
+            {
+                SetButtonStart(InputButtonType.MouseRight);
                 SetButtonDown(InputButtonType.MouseRight);
+            }
             else
+            {
                 SetButtonUp(InputButtonType.MouseRight);
-            
-            if (UnityEngine.Input.touchCount == 3 && UnityEngine.Input.GetTouch(0).phase == TouchPhase.Began && UnityEngine.Input.GetTouch(1).phase == TouchPhase.Began && UnityEngine.Input.GetTouch(2).phase == TouchPhase.Began)
+            }
+
+            if (UnityEngine.Input.touchCount == 3 && UnityEngine.Input.GetTouch(0).phase == TouchPhase.Began &&
+                UnityEngine.Input.GetTouch(1).phase == TouchPhase.Began &&
+                UnityEngine.Input.GetTouch(2).phase == TouchPhase.Began)
+            {
+                SetButtonStart(InputButtonType.MouseMiddle);
                 SetButtonDown(InputButtonType.MouseMiddle);
+            }
             else
+            {
                 SetButtonUp(InputButtonType.MouseMiddle);
-            
-            
+            }
+
             SetAxis(InputAxisType.MouseX, UnityEngine.Input.GetAxis("Horizontal"));
             SetAxis(InputAxisType.MouseY, UnityEngine.Input.GetAxis("Vertical"));
             SetAxis(InputAxisType.MouseScrollWheel, 0);
@@ -48,9 +65,13 @@ namespace F8Framework.Core
             SetAxis(InputAxisType.HorizontalRaw, UnityEngine.Input.GetAxisRaw("Horizontal"));
             SetAxis(InputAxisType.VerticalRaw, UnityEngine.Input.GetAxisRaw("Vertical"));
             if (UnityEngine.Input.touchCount == 1)
+            {
                 SetVirtualMousePosition(UnityEngine.Input.GetTouch(0).position);
+            }
             else
+            {
                 SetVirtualMousePosition(Vector3.zero);
+            }
         }
 
         public override void OnShutdown()

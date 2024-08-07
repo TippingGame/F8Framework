@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace F8Framework.Core
 {
@@ -135,6 +136,15 @@ namespace F8Framework.Core
         }
         
         /// <summary>
+        /// 开始按按钮
+        /// </summary>
+        /// <param name="name">按钮名称</param>
+        internal void SetButtonStart(string name)
+        {
+            _helper.SetButtonStart(name);
+        }
+        
+        /// <summary>
         /// 设置按钮按下
         /// </summary>
         /// <param name="name">按钮名称</param>
@@ -189,6 +199,94 @@ namespace F8Framework.Core
             _helper.SetAxis(name, value);
         }
 
+        /// <summary>
+        /// 开始按按钮Action
+        /// </summary>
+        /// <param name="name">按钮名称</param>
+        /// <param name="started">回调</param>
+        public void SetButtonStarted(string name, Action<string> started)
+        {
+            _helper.SetButtonStarted(name, started);
+        }
+
+        /// <summary>
+        /// 按下按钮Action
+        /// </summary>
+        /// <param name="name">按钮名称</param>
+        /// <param name="performed">回调</param>
+        public void SetButtonPerformed(string name, Action<string> performed)
+        {
+            _helper.SetButtonPerformed(name, performed);
+        }
+        
+        /// <summary>
+        /// 开始按按钮
+        /// </summary>
+        /// <param name="name">按钮名称</param>
+        /// <param name="canceled">回调</param>
+        public void SetButtonCanceled(string name, Action<string> canceled)
+        {
+            _helper.SetButtonCanceled(name, canceled);
+        }
+        
+        /// <summary>
+        /// Axis值改变Action
+        /// </summary>
+        /// <param name="name">按钮名称</param>
+        /// <param name="valueChanged">回调</param>
+        public void SetAxisValueChanged(string name, Action<float> valueChanged)
+        {
+            _helper.SetAxisValueChanged(name, valueChanged);
+        }
+        
+        /// <summary>
+        /// 移除开始按按钮Action
+        /// </summary>
+        /// <param name="name">按钮名称</param>
+        /// <param name="started">回调</param>
+        public void RemoveButtonStarted(string name, Action<string> started)
+        {
+            _helper.RemoveButtonStarted(name, started);
+        }
+
+        /// <summary>
+        /// 移除按下按钮Action
+        /// </summary>
+        /// <param name="name">按钮名称</param>
+        /// <param name="performed">回调</param>
+        public void RemoveButtonPerformed(string name, Action<string> performed)
+        {
+            _helper.RemoveButtonPerformed(name, performed);
+        }
+        
+        /// <summary>
+        /// 移除开始按按钮
+        /// </summary>
+        /// <param name="name">按钮名称</param>
+        /// <param name="canceled">回调</param>
+        public void RemoveButtonCanceled(string name, Action<string> canceled)
+        {
+            _helper.RemoveButtonCanceled(name, canceled);
+        }
+        
+        /// <summary>
+        /// 移除Axis值改变Action
+        /// </summary>
+        /// <param name="name">按钮名称</param>
+        /// <param name="valueChanged">回调</param>
+        public void RemoveAxisValueChanged(string name, Action<float> valueChanged)
+        {
+            _helper.RemoveAxisValueChanged(name, valueChanged);
+        }
+        
+        /// <summary>
+        /// 清除所有输入事件
+        /// </summary>
+        public void ClearAllAction()
+        {
+            _helper.ClearAllAction();
+        }
+        
         /// <summary>
         /// 按钮按住
         /// </summary>
@@ -346,8 +444,8 @@ namespace F8Framework.Core
                 _helper.LoadDevice(new StandardInputDevice());
                 _helper.OnInit();
 
-                MessageManager.Instance.AddEventListener(MessageEvent.ApplicationFocus, _helper.ResetAll, this);
-                MessageManager.Instance.AddEventListener(MessageEvent.NotApplicationFocus, _helper.ResetAll, this);
+                MessageManager.Instance.AddEventListener(MessageEvent.ApplicationFocus, ResetAll, this);
+                MessageManager.Instance.AddEventListener(MessageEvent.NotApplicationFocus, ResetAll, this);
             }
             else
             {
@@ -360,11 +458,16 @@ namespace F8Framework.Core
         /// </summary>
         public void SwitchDevice(InputDeviceBase deviceType)
         {
-            _helper.OnTerminate();
+            _helper.ResetAll();
             _helper.LoadDevice(deviceType);
             _helper.OnInit();
         }
-
+        
+        public void ResetAll()
+        {
+            _helper?.ResetAll();
+        }
+        
         public void OnUpdate()
         {
             _helper.OnUpdate();
@@ -382,8 +485,8 @@ namespace F8Framework.Core
 
         public void OnTermination()
         {
-            MessageManager.Instance.RemoveEventListener(MessageEvent.ApplicationFocus, _helper.ResetAll, this);
-            MessageManager.Instance.RemoveEventListener(MessageEvent.NotApplicationFocus, _helper.ResetAll, this);
+            MessageManager.Instance.RemoveEventListener(MessageEvent.ApplicationFocus, ResetAll, this);
+            MessageManager.Instance.RemoveEventListener(MessageEvent.NotApplicationFocus, ResetAll, this);
             _helper.OnTerminate();
             base.Destroy();
         }

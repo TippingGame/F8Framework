@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace F8Framework.Core
@@ -137,14 +138,7 @@ namespace F8Framework.Core
         /// <param name="name">轴线名称</param>
         public void RegisterVirtualAxis(string name)
         {
-            if (_virtualAxes.ContainsKey(name))
-            {
-                LogF8.LogError($"注册虚拟轴线失败：已经存在名为 {name} 的虚拟轴线！");
-            }
-            else
-            {
-                _virtualAxes.Add(name, new VirtualAxis(name));
-            }
+            _virtualAxes.TryAdd(name, new VirtualAxis(name));
         }
         
         /// <summary>
@@ -153,14 +147,7 @@ namespace F8Framework.Core
         /// <param name="name">按钮名称</param>
         public void RegisterVirtualButton(string name)
         {
-            if (_virtualButtons.ContainsKey(name))
-            {
-                LogF8.LogError($"注册虚拟按钮失败：已经存在名为 {name} 的虚拟按钮！");
-            }
-            else
-            {
-                _virtualButtons.Add(name, new VirtualButton(name));
-            }
+            _virtualButtons.TryAdd(name, new VirtualButton(name));
         }
         
         /// <summary>
@@ -195,7 +182,20 @@ namespace F8Framework.Core
         {
             MousePosition = value;
         }
-        
+
+        /// <summary>
+        /// 开始按钮按
+        /// </summary>
+        /// <param name="name">按钮名称</param>
+        public void SetButtonStart(string name)
+        {
+            if (!IsExistVirtualButton(name))
+            {
+                RegisterVirtualButton(name);
+            }
+            _virtualButtons[name].Began();
+        }
+
         /// <summary>
         /// 设置按钮按下
         /// </summary>
@@ -275,6 +275,74 @@ namespace F8Framework.Core
             _virtualAxes[name].Update(value);
         }
 
+        public void SetButtonStarted(string name, Action<string> started)
+        {
+            if (!IsExistVirtualButton(name))
+            {
+                RegisterVirtualButton(name);
+            }
+            _virtualButtons[name].Started += started;
+        }
+
+        public void SetButtonPerformed(string name, Action<string> performed)
+        {
+            if (!IsExistVirtualButton(name))
+            {
+                RegisterVirtualButton(name);
+            }
+            _virtualButtons[name].Performed += performed;
+        }
+
+        public void SetButtonCanceled(string name, Action<string> canceled)
+        {
+            if (!IsExistVirtualButton(name))
+            {
+                RegisterVirtualButton(name);
+            }
+            _virtualButtons[name].Canceled += canceled;
+        }
+        
+        public void SetAxisValueChanged(string name, Action<float> valueChanged)
+        {
+            if (!IsExistVirtualAxis(name))
+            {
+                RegisterVirtualAxis(name);
+            }
+            _virtualAxes[name].ValueChanged += valueChanged;
+        }
+        
+        public void RemoveButtonStarted(string name, Action<string> started)
+        {
+            if (IsExistVirtualButton(name))
+            {
+                _virtualButtons[name].Started -= started;
+            }
+        }
+
+        public void RemoveButtonPerformed(string name, Action<string> performed)
+        {
+            if (IsExistVirtualButton(name))
+            {
+                _virtualButtons[name].Performed -= performed;
+            }
+        }
+
+        public void RemoveButtonCanceled(string name, Action<string> canceled)
+        {
+            if (IsExistVirtualButton(name))
+            {
+                _virtualButtons[name].Canceled -= canceled;
+            }
+        }
+
+        public void RemoveAxisValueChanged(string name, Action<float> valueChanged)
+        {
+            if (IsExistVirtualAxis(name))
+            {
+                _virtualAxes[name].ValueChanged -= valueChanged;
+            }
+        }
+        
         /// <summary>
         /// 按钮按住
         /// </summary>
@@ -484,6 +552,21 @@ namespace F8Framework.Core
         }
 
         /// <summary>
+        /// 清除所有输入事件
+        /// </summary>
+        public void ClearAllAction()
+        {
+            foreach (var item in _virtualAxes)
+            {
+                item.Value.ClearAction();
+            }
+            foreach (var item in _virtualButtons)
+            {
+                item.Value.ClearAction();
+            }
+        }
+        
+        /// <summary>
         /// 虚拟按钮
         /// </summary>
         private sealed class VirtualButton
@@ -494,9 +577,21 @@ namespace F8Framework.Core
             private int _releasedFrame = -5;
             private bool _pressed = false;
 
+            public event Action<string> Started;
+            public event Action<string> Performed;
+            public event Action<string> Canceled;
+            
             public VirtualButton(string name)
             {
                 Name = name;
+            }
+            
+            public void Began()
+            {
+                _pressedFrame = -5;
+                _releasedFrame = -5;
+                _pressed = false;
+                Started?.Invoke(Name);
             }
             
             public void Pressed()
@@ -506,6 +601,7 @@ namespace F8Framework.Core
 
                 _pressed = true;
                 _pressedFrame = Time.frameCount;
+                Performed?.Invoke(Name);
             }
             
             public void Released()
@@ -515,6 +611,7 @@ namespace F8Framework.Core
 
                 _pressed = false;
                 _releasedFrame = Time.frameCount;
+                Canceled?.Invoke(Name);
             }
 
             public bool GetButton
@@ -540,6 +637,13 @@ namespace F8Framework.Core
                     return _releasedFrame == Time.frameCount;
                 }
             }
+            
+            public void ClearAction()
+            {
+                Started = null;
+                Performed = null;
+                Canceled = null;
+            }
         }
         
         /// <summary>
@@ -550,7 +654,9 @@ namespace F8Framework.Core
             public string Name { get; private set; }
 
             private float _value;
-
+            
+            public event Action<float> ValueChanged;
+            
             public VirtualAxis(string name)
             {
                 Name = name;
@@ -558,7 +664,12 @@ namespace F8Framework.Core
 
             public void Update(float value)
             {
-                _value = value;
+                // unity的比较浮点数，比较两个浮点数是否“足够接近”
+                if (!Mathf.Approximately(_value, value))
+                {
+                    _value = value;
+                    ValueChanged?.Invoke(_value);
+                }
             }
 
             public float GetValue
@@ -577,6 +688,11 @@ namespace F8Framework.Core
                     else if (_value > 0) return 1;
                     else return 0;
                 }
+            }
+            
+            public void ClearAction()
+            {
+                ValueChanged = null;
             }
         }
     }

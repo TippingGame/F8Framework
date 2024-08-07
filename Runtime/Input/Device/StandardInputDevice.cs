@@ -94,20 +94,45 @@ namespace F8Framework.Core
         public override void OnRun()
         {
             //标准PC平台：鼠标和键盘做为输入设备
-            if (Input.GetMouseButtonDown(0)) SetButtonDown(InputButtonType.MouseLeft);
-            if (Input.GetMouseButtonUp(0)) SetButtonUp(InputButtonType.MouseLeft);
+            if (Input.GetMouseButtonDown(0))
+            {
+                SetButtonStart(InputButtonType.MouseLeft);
+                SetButtonDown(InputButtonType.MouseLeft);
+            }
 
-            if (Input.GetMouseButtonDown(1)) SetButtonDown(InputButtonType.MouseRight);
-            if (Input.GetMouseButtonUp(1)) SetButtonUp(InputButtonType.MouseRight);
+            if (Input.GetMouseButtonUp(0))
+            {
+                SetButtonUp(InputButtonType.MouseLeft);
+            }
 
-            if (Input.GetMouseButtonDown(2)) SetButtonDown(InputButtonType.MouseMiddle);
-            if (Input.GetMouseButtonUp(2)) SetButtonUp(InputButtonType.MouseMiddle);
+            if (Input.GetMouseButtonDown(1))
+            {
+                SetButtonStart(InputButtonType.MouseRight);
+                SetButtonDown(InputButtonType.MouseRight);
+            }
+
+            if (Input.GetMouseButtonUp(1))
+            {
+                SetButtonUp(InputButtonType.MouseRight);
+            }
+
+            if (Input.GetMouseButtonDown(2))
+            {
+                SetButtonStart(InputButtonType.MouseMiddle);
+                SetButtonDown(InputButtonType.MouseMiddle);
+            }
+
+            if (Input.GetMouseButtonUp(2))
+            {
+                SetButtonUp(InputButtonType.MouseMiddle);
+            }
 
             if (Input.GetMouseButtonDown(0))
             {
                 if (_mouseLeftClickTimer <= 0)
                 {
                     _mouseLeftClickTimer = _mouseLeftDoubleClickInterval;
+                    SetButtonStart(InputButtonType.MouseLeftDoubleClick);
                 }
                 else
                 {

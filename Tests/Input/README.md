@@ -17,11 +17,41 @@ Unity F8 Input输入管理组件。
 ```C#
 /*------------------------------输入管理方法------------------------------*/
 
-        // 切换输入设备
+        // 切换输入设备（不会清理回调，方便热切换输入设备）
         FF8.Input.SwitchDevice(new StandardInputDevice());
-        
+
         // 启用或暂停输入
         FF8.Input.IsEnableInputDevice = false;
+        
+        // 设置按钮回调，Started开始按按钮，Performed按下按钮，Canceled结束按钮
+        FF8.Input.SetButtonStarted(InputButtonType.MouseLeft, MouseLeft);
+        FF8.Input.SetButtonPerformed(InputButtonType.MouseLeft, MouseLeft);
+        FF8.Input.SetButtonCanceled(InputButtonType.MouseLeft, MouseLeft);
+        
+        FF8.Input.SetAxisValueChanged(InputAxisType.MouseX, MouseX);
+        
+        // 移除按钮回调
+        FF8.Input.RemoveButtonStarted(InputButtonType.MouseLeft, MouseLeft);
+        FF8.Input.RemoveButtonPerformed(InputButtonType.MouseLeft, MouseLeft);
+        FF8.Input.RemoveButtonCanceled(InputButtonType.MouseLeft, MouseLeft);
+
+        FF8.Input.RemoveAxisValueChanged(InputAxisType.MouseX, MouseX);
+        
+        // 移除所有输入回调
+        FF8.Input.ClearAllAction();
+        
+        // 移除所有输入状态
+        FF8.Input.ResetAll();
+        
+        void MouseLeft(string name)
+        {
+            
+        }
+        
+        void MouseX(float value)
+        {
+        
+        }
 
 /*------------------------------按键监听使用------------------------------*/
         
