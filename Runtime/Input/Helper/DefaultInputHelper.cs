@@ -275,7 +275,7 @@ namespace F8Framework.Core
             _virtualAxes[name].Update(value);
         }
 
-        public void SetButtonStarted(string name, Action<string> started)
+        public void AddButtonStarted(string name, Action<string> started)
         {
             if (!IsExistVirtualButton(name))
             {
@@ -284,7 +284,7 @@ namespace F8Framework.Core
             _virtualButtons[name].Started += started;
         }
 
-        public void SetButtonPerformed(string name, Action<string> performed)
+        public void AddButtonPerformed(string name, Action<string> performed)
         {
             if (!IsExistVirtualButton(name))
             {
@@ -293,7 +293,7 @@ namespace F8Framework.Core
             _virtualButtons[name].Performed += performed;
         }
 
-        public void SetButtonCanceled(string name, Action<string> canceled)
+        public void AddButtonCanceled(string name, Action<string> canceled)
         {
             if (!IsExistVirtualButton(name))
             {
@@ -302,7 +302,7 @@ namespace F8Framework.Core
             _virtualButtons[name].Canceled += canceled;
         }
         
-        public void SetAxisValueChanged(string name, Action<float> valueChanged)
+        public void AddAxisValueChanged(string name, Action<float> valueChanged)
         {
             if (!IsExistVirtualAxis(name))
             {

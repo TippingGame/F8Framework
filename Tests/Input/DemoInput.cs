@@ -16,11 +16,11 @@ namespace F8Framework.Tests
             FF8.Input.IsEnableInputDevice = false;
             
             // 设置按钮回调，Started开始按按钮，Performed按下按钮，Canceled结束按钮
-            FF8.Input.SetButtonStarted(InputButtonType.MouseLeft, MouseLeft);
-            FF8.Input.SetButtonPerformed(InputButtonType.MouseLeft, MouseLeft);
-            FF8.Input.SetButtonCanceled(InputButtonType.MouseLeft, MouseLeft);
+            FF8.Input.AddButtonStarted(InputButtonType.MouseLeft, MouseLeft);
+            FF8.Input.AddButtonPerformed(InputButtonType.MouseLeft, MouseLeft);
+            FF8.Input.AddButtonCanceled(InputButtonType.MouseLeft, MouseLeft);
             
-            FF8.Input.SetAxisValueChanged(InputAxisType.MouseX, MouseX);
+            FF8.Input.AddAxisValueChanged(InputAxisType.MouseX, MouseX);
             
             // 移除按钮回调
             FF8.Input.RemoveButtonStarted(InputButtonType.MouseLeft, MouseLeft);

@@ -204,9 +204,9 @@ namespace F8Framework.Core
         /// </summary>
         /// <param name="name">按钮名称</param>
         /// <param name="started">回调</param>
-        public void SetButtonStarted(string name, Action<string> started)
+        public void AddButtonStarted(string name, Action<string> started)
         {
-            _helper.SetButtonStarted(name, started);
+            _helper.AddButtonStarted(name, started);
         }
 
         /// <summary>
@@ -214,9 +214,9 @@ namespace F8Framework.Core
         /// </summary>
         /// <param name="name">按钮名称</param>
         /// <param name="performed">回调</param>
-        public void SetButtonPerformed(string name, Action<string> performed)
+        public void AddButtonPerformed(string name, Action<string> performed)
         {
-            _helper.SetButtonPerformed(name, performed);
+            _helper.AddButtonPerformed(name, performed);
         }
         
         /// <summary>
@@ -224,9 +224,9 @@ namespace F8Framework.Core
         /// </summary>
         /// <param name="name">按钮名称</param>
         /// <param name="canceled">回调</param>
-        public void SetButtonCanceled(string name, Action<string> canceled)
+        public void AddButtonCanceled(string name, Action<string> canceled)
         {
-            _helper.SetButtonCanceled(name, canceled);
+            _helper.AddButtonCanceled(name, canceled);
         }
         
         /// <summary>
@@ -234,9 +234,9 @@ namespace F8Framework.Core
         /// </summary>
         /// <param name="name">按钮名称</param>
         /// <param name="valueChanged">回调</param>
-        public void SetAxisValueChanged(string name, Action<float> valueChanged)
+        public void AddAxisValueChanged(string name, Action<float> valueChanged)
         {
-            _helper.SetAxisValueChanged(name, valueChanged);
+            _helper.AddAxisValueChanged(name, valueChanged);
         }
         
         /// <summary>
