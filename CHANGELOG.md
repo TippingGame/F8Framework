@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.27] - 2024-08-11
+1.优化UI系统Guid标识，Dialog和Notify类型界面正确使用缓存  
+2.增加收集UI所有的中文编辑器功能  
+
 ## [1.0.26] - 2024-08-07
 1.输入系统增加按钮Started、Performed、Canceled回调，Axis增加ValueChanged回调  
 

@@ -12,9 +12,10 @@ namespace F8Framework.Core
             Closed
         }
         
-        public object[] Args;
-        public int UIid;
-        public WindowState windowState = WindowState.Closed;
+        private int UIid;
+        private string Guid;
+        private object[] Args;
+        private WindowState windowState = WindowState.Closed;
         
         // 消息事件
         private EventDispatcher _eventDispatcher = null;
@@ -41,10 +42,11 @@ namespace F8Framework.Core
         {
         }
 
-        public void Added(int uiId, object[] args = null)
+        public void Added(int uiId, string guid, object[] args = null)
         {
             this.Args = args;
             this.UIid = uiId;
+            this.Guid = guid;
             OnAdded(uiId, args);
             windowState = WindowState.Animating;
             OnViewTweenInit();
@@ -91,7 +93,7 @@ namespace F8Framework.Core
         public void Close(bool isDestroy = false)
         {
             windowState = WindowState.Closed;
-            UIManager.Instance.Close(UIid, isDestroy);
+            UIManager.Instance.Close(this.UIid, isDestroy, this.Guid);
         }
 
         public void BeforeRemove()

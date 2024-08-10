@@ -1,52 +1,60 @@
-using UnityEngine;
+using System;
 
 namespace F8Framework.Core
 {
     public class LayerNotify : LayerUI
     {
-        public void Show(int uiId, UIConfig config, string content, UICallbacks callbacks = null)
+        public string Show(int uiId, UIConfig config, string content, UICallbacks callbacks = null)
         {
             var prefabPath = config.AssetName;
-            ViewParams viewParams = new ViewParams
-            {
-                UIid = uiId,
-                Uuid = prefabPath, // 暂时和prefabPath相同
-                PrefabPath = prefabPath,
-                Params = new object[] { content },
-                Callbacks = callbacks,
-                Valid = true
-            };
-
-            uiViews[viewParams.Uuid] = viewParams;
-            Load(viewParams);
-        }
-
-        protected new void Load(ViewParams viewParams)
-        {
-            AssetManager.Instance.LoadAsync<GameObject>(viewParams.PrefabPath, (res) =>
-            {
-                AssetManager.Instance.Unload(viewParams.PrefabPath, false);
-                
-                GameObject childObject = Instantiate(res);
-                viewParams.Go = childObject;
+            ViewParams viewParams;
+            string guid = Guid.NewGuid().ToString(); // 生成一个唯一的ID
             
-                DelegateComponent comp = childObject.AddComponent<DelegateComponent>();
-                viewParams.DelegateComponent = comp;
-                viewParams.BaseView = childObject.GetComponent<BaseView>();
-                comp.ViewParams = viewParams;
-            
-                CreateNode(viewParams);
-            });
-        }
+            if (!uiViews.TryGetValue(prefabPath, out viewParams))
+            {
+                if (!uiCache.TryGetValue(prefabPath, out viewParams))
+                {
+                    viewParams = new ViewParams();
+                    viewParams.Guid = guid;
+                    viewParams.PrefabPath = prefabPath;
+                    uiViews.Add(viewParams.Guid, viewParams);
+                }
+                else
+                {
+                    viewParams.Guid = guid;
+                    viewParams.PrefabPath = prefabPath;
+                    uiViews.Add(viewParams.Guid, viewParams);
+                }
+            }
 
-        protected new void CreateNode(ViewParams viewParams)
-        {
+            viewParams.UIid = uiId;
+            viewParams.Params = new object[] { content };
+            viewParams.Callbacks = callbacks;
             viewParams.Valid = true;
+            
+            Load(viewParams);
+            return guid;
+        }
+        
+        public int CloseByGuid(string guid, bool isDestroy)
+        {
+            if (uiViews.TryGetValue(guid, out var viewParams))
+            {
+                if (isDestroy)
+                {
+                    RemoveCache(viewParams.PrefabPath);
+                }
+                else
+                {
+                    uiCache[viewParams.PrefabPath] = viewParams;
+                }
+                var comp = viewParams.DelegateComponent;
+                comp.Remove(isDestroy);
+                viewParams.Valid = false;
+                return viewParams.UIid;
+            }
 
-            var comp = viewParams.DelegateComponent;
-            comp.Add();
-            viewParams.Go.transform.SetParent(gameObject.transform, false);
-            viewParams.Go.transform.localPosition = Vector3.zero;
+            return default;
         }
     }
 }

@@ -28,7 +28,7 @@ namespace F8Framework.Core
     public class ViewParams
     {
         public int UIid;
-        public string Uuid;
+        public string Guid;
         public string PrefabPath;
         public object[] Params;
         public UICallbacks Callbacks;

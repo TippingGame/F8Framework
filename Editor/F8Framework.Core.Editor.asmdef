@@ -2,6 +2,7 @@
     "name": "F8Framework.Core.Editor",
     "rootNamespace": "",
     "references": [
+        "Unity.TextMeshPro",
         "F8Framework.Core",
         "ICSharpCode.SharpZipLib",
         "Excel",

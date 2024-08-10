@@ -36,7 +36,7 @@ namespace F8Framework.Core
         private LayerGuide _layerGuide;
 
         private Dictionary<int, UIConfig> _configs = new Dictionary<int, UIConfig>();
-        private List<string> _currentUuids = new List<string>();
+        private List<int> _currentUIids = new List<int>();
         
         public void Initialize(Dictionary<int, UIConfig> configs)
         {
@@ -96,50 +96,47 @@ namespace F8Framework.Core
             Destroy(gameObject);
         }
         
-        public void ShowNotify(int uiId, string content, UICallbacks callbacks = null)
+        public string ShowNotify(int uiId, string content, UICallbacks callbacks = null)
         {
             if (!_configs.TryGetValue(uiId, out UIConfig config))
             {
                 LogF8.LogView($"打开 ID 为 {uiId} 的 UI 失败，未找到配置。");
-                return;
+                return default;
             }
-            _layerNotify.Show(uiId, config, content, callbacks);
+            return _layerNotify.Show(uiId, config, content, callbacks);
         }
 
-        public List<string> GetCurrentUuids()
+        public List<int> GetCurrentUIids()
         {
-            return _currentUuids;
+            return _currentUIids;
         }
 
-        public void Open(int uiId, object[] uiArgs = null, UICallbacks callbacks = null)
+        public string Open(int uiId, object[] uiArgs = null, UICallbacks callbacks = null)
         {
             if (!_configs.TryGetValue(uiId, out UIConfig config))
             {
                 LogF8.LogView($"打开 ID 为 {uiId} 的 UI 失败，未找到配置。");
-                return;
+                return default;
             }
             
             switch (config.Layer)
             {
                 case LayerType.Game:
-                    _layerGame.Add(uiId, config, uiArgs, callbacks);
-                    break;
+                    return _layerGame.Add(uiId, config, uiArgs, callbacks);
                 case LayerType.UI:
-                    _layerUI.Add(uiId, config, uiArgs, callbacks);
-                    break;
+                    return _layerUI.Add(uiId, config, uiArgs, callbacks);
                 case LayerType.PopUp:
-                    _layerPopUp.Add(uiId, config, uiArgs, callbacks);
-                    break;
+                    return _layerPopUp.Add(uiId, config, uiArgs, callbacks);
                 case LayerType.Dialog:
-                    _layerDialog.Add(uiId, config, uiArgs, callbacks);
-                    break;
+                    return _layerDialog.Add(uiId, config, uiArgs, callbacks);
                 case LayerType.Notify:
                     LogF8.LogView($"请使用ShowNotify 打开 ID 为 {uiId} 的 UI");
-                    break;
+                    return default;
                 case LayerType.Guide:
-                    _layerGuide.Add(uiId, config, uiArgs, callbacks);
-                    break;
+                    return _layerGuide.Add(uiId, config, uiArgs, callbacks);
             }
+
+            return default;
         }
 
         public bool Has(int uiId)
@@ -177,7 +174,58 @@ namespace F8Framework.Core
             return result;
         }
 
-        public void Close(int uiId, bool isDestroy = false)
+        public GameObject GetByGuid(string guid)
+        {
+            GameObject result = _layerGame.GetByGuid(guid);
+            if (result != null) return result;
+
+            result = _layerUI.GetByGuid(guid);
+            if (result != null) return result;
+
+            result = _layerPopUp.GetByGuid(guid);
+            if (result != null) return result;
+
+            result = _layerDialog.GetByGuid(guid);
+            if (result != null) return result;
+
+            result = _layerNotify.GetByGuid(guid);
+            if (result != null) return result;
+
+            result = _layerGuide.GetByGuid(guid);
+            if (result != null) return result;
+
+            // 如果所有层都没有找到匹配的 GameObject，返回 null
+            return null;
+        }
+        
+        public List<GameObject> GetByUIid(int uiId)
+        {
+            if (!_configs.TryGetValue(uiId, out UIConfig config))
+            {
+                LogF8.LogView($"查找 ID 为 {uiId} 的 UI 失败，未找到配置。");
+                return null;
+            }
+            
+            switch (config.Layer)
+            {
+                case LayerType.Game:
+                    return _layerGame.GetByUIid(uiId);
+                case LayerType.UI:
+                    return _layerUI.GetByUIid(uiId);
+                case LayerType.PopUp:
+                    return _layerPopUp.GetByUIid(uiId);
+                case LayerType.Dialog:
+                    return _layerDialog.GetByUIid(uiId);
+                case LayerType.Notify:
+                    return _layerNotify.GetByUIid(uiId);
+                case LayerType.Guide:
+                    return _layerGuide.GetByUIid(uiId);
+            }
+
+            return null;
+        }
+        
+        public void Close(int uiId = default, bool isDestroy = false, string guid = default)
         {
             if (!_configs.TryGetValue(uiId, out UIConfig config))
             {
@@ -197,25 +245,31 @@ namespace F8Framework.Core
                     _layerPopUp.Close(config.AssetName, isDestroy);
                     break;
                 case LayerType.Dialog:
-                    _layerDialog.Close(uiId, config.AssetName, isDestroy);
+                    _layerDialog.Close(config.AssetName, isDestroy);
                     break;
                 case LayerType.Notify:
-                    LogF8.LogView($"Notify 不能移除 ID 为 {uiId} 的 UI");
+                    _layerNotify.CloseByGuid(guid, isDestroy);
                     break;
                 case LayerType.Guide:
                     _layerGuide.Close(config.AssetName, isDestroy);
                     break;
             }
-            for (int i = _currentUuids.Count - 1; i >= 0; i--)
+
+            RemoveAtUIid(uiId);
+        }
+
+        private void RemoveAtUIid(int uiId)
+        {
+            for (int i = _currentUIids.Count - 1; i >= 0; i--)
             {
-                if (_currentUuids[i] == config.AssetName)
+                if (_currentUIids[i] == uiId)
                 {
-                    _currentUuids.RemoveAt(i);
+                    _currentUIids.RemoveAt(i);
                     break; // 退出循环
                 }
             }
         }
-
+        
         public void Clear(bool isDestroy = true)
         {
             _layerGame.Clear(isDestroy);
@@ -223,7 +277,7 @@ namespace F8Framework.Core
             _layerPopUp.Clear(isDestroy);
             _layerDialog.Clear(isDestroy);
             _layerGuide.Clear(isDestroy);
-            _currentUuids.Clear();
+            _currentUIids.Clear();
         }
     }
 }

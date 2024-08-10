@@ -9,7 +9,7 @@ namespace F8Framework.Core
         public void Add()
         {
             // 触发窗口组件上添加到父节点后的事件
-            ViewParams.BaseView.Added(ViewParams.UIid, ViewParams.Params);
+            ViewParams.BaseView?.Added(ViewParams.UIid, ViewParams.Guid, ViewParams.Params);
             
             if (ViewParams.Callbacks != null && ViewParams.Callbacks.OnAdded != null)
             {
@@ -23,7 +23,7 @@ namespace F8Framework.Core
             if (ViewParams.Valid)
             {
                 // 触发窗口组件上移除之前的事件
-                ViewParams.BaseView.BeforeRemove();
+                ViewParams.BaseView?.BeforeRemove();
 
                 // 通知外部对象窗口组件上移除之前的事件（关闭窗口前的关闭动画处理）
                 if (ViewParams.Callbacks != null && ViewParams.Callbacks.OnBeforeRemove != null)
@@ -65,7 +65,7 @@ namespace F8Framework.Core
         private void OnDestroy()
         {
             // 触发窗口组件上窗口移除之后的事件
-            ViewParams.BaseView.Removed();
+            ViewParams.BaseView?.Removed();
 
             ViewParams = null;
         }

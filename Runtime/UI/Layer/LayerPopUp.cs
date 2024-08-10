@@ -11,18 +11,6 @@ namespace F8Framework.Core
         public new void Close(string prefabPath, bool isDestroy)
         {
             base.Close(prefabPath, isDestroy);
-            SetBlackDisable();
-        }
-
-        protected new void RemoveByUuid(string prefabPath, bool isDestroy)
-        {
-            base.RemoveByUuid(prefabPath, isDestroy);
-            SetBlackDisable();
-        }
-
-        private void SetBlackDisable()
-        {
-           
         }
     }
 }

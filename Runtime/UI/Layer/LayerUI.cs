@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -32,27 +33,27 @@ namespace F8Framework.Core
         public string Add(int uiId, UIConfig config, object[] parameters = null, UICallbacks callbacks = null)
         {
             var prefabPath = config.AssetName;
-            var uuid = prefabPath; // 暂时和prefabPath相同
-            if (uiViews.TryGetValue(uuid, out var viewParams) && viewParams.Valid)
+            var guid = Guid.NewGuid().ToString(); // 生成一个唯一的ID
+            if (uiViews.TryGetValue(prefabPath, out var viewParams) && viewParams.Valid)
             {
                 LogF8.LogView($"UI重复加载：{prefabPath}");
                 return string.Empty;
             }
 
-            if (!uiViews.TryGetValue(uuid, out viewParams))
+            if (!uiViews.TryGetValue(prefabPath, out viewParams))
             {
                 if (!uiCache.TryGetValue(prefabPath, out viewParams))
                 {
                     viewParams = new ViewParams();
-                    viewParams.Uuid = uuid;
+                    viewParams.Guid = guid;
                     viewParams.PrefabPath = prefabPath;
-                    uiViews.Add(viewParams.Uuid, viewParams);
+                    uiViews.Add(viewParams.PrefabPath, viewParams);
                 }
                 else
                 {
-                    viewParams.Uuid = uuid;
+                    viewParams.Guid = guid;
                     viewParams.PrefabPath = prefabPath;
-                    uiViews.Add(viewParams.Uuid, viewParams);
+                    uiViews.Add(viewParams.PrefabPath, viewParams);
                 }
             }
 
@@ -63,7 +64,7 @@ namespace F8Framework.Core
 
             Load(viewParams);
 
-            return uuid;
+            return guid;
         }
 
         protected void Load(ViewParams viewParams)
@@ -80,7 +81,7 @@ namespace F8Framework.Core
                     AssetManager.Instance.Unload(viewParams.PrefabPath, false);
                     
                     GameObject childNode = Instantiate(res);
-                    childNode.name = viewParams.Uuid;
+                    childNode.name = viewParams.PrefabPath;
                     viewParams.Go = childNode;
                 
                     DelegateComponent comp = childNode.AddComponent<DelegateComponent>();
@@ -95,18 +96,14 @@ namespace F8Framework.Core
 
         public void CreateNode(ViewParams viewParams)
         {
-            if (viewParams.Uuid != null)
-            {
-                UIManager.Instance.GetCurrentUuids().Add(viewParams.Uuid);
-            }
+            UIManager.Instance.GetCurrentUIids().Add(viewParams.UIid);
             
             viewParams.Valid = true;
 
             var comp = viewParams.DelegateComponent;
             comp.Add();
             viewParams.Go.transform.SetParent(gameObject.transform, false);
-            viewParams.Go.transform.localPosition = Vector3.zero;
-            viewParams.Go.transform.localRotation = Quaternion.identity;
+            viewParams.Go.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
             if (viewParams.Go.activeSelf == false)
             {
                 viewParams.Go.SetActive(true);
@@ -126,7 +123,7 @@ namespace F8Framework.Core
                 var viewParams = comp.ViewParams;
                 if (viewParams.PrefabPath == prefabPath)
                 {
-                    uiViews.Remove(viewParams.Uuid);
+                    uiViews.Remove(viewParams.PrefabPath);
                     if (!isDestroy)
                     {
                         uiCache[viewParams.PrefabPath] = viewParams;
@@ -137,37 +134,23 @@ namespace F8Framework.Core
             }
         }
 
-        protected void RemoveByUuid(string uuid, bool isDestroy)
-        {
-            if (uiViews.TryGetValue(uuid, out var viewParams))
-            {
-                if (isDestroy)
-                {
-                    uiViews.Remove(viewParams.Uuid);
-                }
-                
-                var comp = viewParams.DelegateComponent;
-                comp.Remove(isDestroy);
-            }
-        }
-
         protected void RemoveCache(string prefabPath)
         {
             if (uiCache.TryGetValue(prefabPath, out var viewParams))
             {
-                uiViews.Remove(viewParams.Uuid);
+                uiViews.Remove(viewParams.PrefabPath);
                 uiCache.Remove(prefabPath);
                 var childNode = viewParams.Go;
                 Destroy(childNode);
             }
         }
 
-        public GameObject GetByUuid(string uuid)
+        public GameObject GetByGuid(string guid)
         {
             var children = GetChildrens();
             foreach (var comp in children)
             {
-                if (comp.ViewParams != null && comp.ViewParams.Uuid == uuid)
+                if (comp.ViewParams != null && comp.ViewParams.Guid == guid)
                 {
                     return comp.gameObject;
                 }
@@ -176,14 +159,19 @@ namespace F8Framework.Core
             return null;
         }
 
-        public List<GameObject> Get(string prefabPath)
+        public List<GameObject> GetByUIid(int uiid)
         {
-            var nodeList = new List<GameObject>();
+            List<GameObject> nodeList = null;
             var children = GetChildrens();
+    
             foreach (var comp in children)
             {
-                if (comp.ViewParams.PrefabPath == prefabPath)
+                if (comp.ViewParams != null && comp.ViewParams.UIid == uiid)
                 {
+                    if (nodeList == null)
+                    {
+                        nodeList = new List<GameObject>();
+                    }
                     nodeList.Add(comp.gameObject);
                 }
             }
@@ -191,12 +179,12 @@ namespace F8Framework.Core
             return nodeList;
         }
 
-        public bool Has(string prefabPathOrUuid)
+        public bool Has(string prefabPathOrGuid)
         {
             var children = GetChildrens();
             foreach (var comp in children)
             {
-                if (comp.ViewParams.Uuid == prefabPathOrUuid || comp.ViewParams.PrefabPath == prefabPathOrUuid)
+                if (comp.ViewParams.Guid == prefabPathOrGuid || comp.ViewParams.PrefabPath == prefabPathOrGuid)
                 {
                     return true;
                 }
