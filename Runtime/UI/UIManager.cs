@@ -130,8 +130,7 @@ namespace F8Framework.Core
                 case LayerType.Dialog:
                     return _layerDialog.Add(uiId, config, uiArgs, callbacks);
                 case LayerType.Notify:
-                    LogF8.LogView($"请使用ShowNotify 打开 ID 为 {uiId} 的 UI");
-                    return default;
+                    return _layerNotify.Add(uiId, config, uiArgs, callbacks);
                 case LayerType.Guide:
                     return _layerGuide.Add(uiId, config, uiArgs, callbacks);
             }
