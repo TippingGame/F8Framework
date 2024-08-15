@@ -36,10 +36,10 @@ namespace F8Framework.Core
             public readonly string AbName;
             
             public AssetInfo(
-                AssetTypeEnum assetType,
-                string[] assetPath,
-                string assetBundlePathWithoutAb,
-                string abName)
+                AssetTypeEnum assetType = default,
+                string[] assetPath = default,
+                string assetBundlePathWithoutAb = default,
+                string abName = default)
             {
                 AssetType = assetType;
                 AssetPath = assetPath;
@@ -125,11 +125,15 @@ namespace F8Framework.Core
                 
                 if (accessMode.HasFlag(AssetAccessMode.RESOURCE))
                 {
-                    return GetAssetInfoFromResource(assetName, showTip: true);
+                    bool showTip = !_isEditorMode;
+                    
+                    return GetAssetInfoFromResource(assetName, showTip);
                 }
                 else if (accessMode.HasFlag(AssetAccessMode.ASSET_BUNDLE))
                 {
-                    return GetAssetInfoFromAssetBundle(assetName, showTip: true);
+                    bool showTip = !_isEditorMode;
+                    
+                    return GetAssetInfoFromAssetBundle(assetName, showTip);
                 }
                 else if (accessMode.HasFlag(AssetAccessMode.UNKNOWN))
                 {
@@ -182,7 +186,14 @@ namespace F8Framework.Core
 
                 if (info.AssetType == AssetTypeEnum.RESOURCE)
                 {
-                    T o = ResourcesManager.Instance.GetResouceObject<T>(info.AssetPath[0]);
+                    string assetPath = info.AssetPath?[0];
+#if UNITY_EDITOR
+                    if (_isEditorMode)
+                    {
+                        assetPath = info.AssetPath == null ? SearchAsset(assetName, typeof(T), AssetAccessMode.RESOURCE) : info.AssetPath[0];
+                    }
+#endif
+                    T o = ResourcesManager.Instance.GetResouceObject<T>(assetPath);
                     return o;
                 }
                 else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
@@ -190,7 +201,7 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                     if (_isEditorMode)
                     {
-                        return UnityEditor.AssetDatabase.LoadAssetAtPath<T>(info.AssetPath == null ? SearchEditorAsset(assetName) : info.AssetPath[0]);
+                        return UnityEditor.AssetDatabase.LoadAssetAtPath<T>(info.AssetPath == null ? SearchAsset(assetName, typeof(T)) : info.AssetPath[0]);
                     }
 #endif
                     T o = AssetBundleManager.Instance.GetAssetObject<T>(info.AssetBundlePath, info.AssetPath[0]);
@@ -227,7 +238,14 @@ namespace F8Framework.Core
                 
                 if (info.AssetType == AssetTypeEnum.RESOURCE)
                 {
-                    Object o = ResourcesManager.Instance.GetResouceObject(info.AssetPath[0], assetType);
+                    string assetPath = info.AssetPath?[0];
+#if UNITY_EDITOR
+                    if (_isEditorMode)
+                    {
+                        assetPath = info.AssetPath == null ? SearchAsset(assetName, default, AssetAccessMode.RESOURCE) : info.AssetPath[0];
+                    }
+#endif
+                    Object o = ResourcesManager.Instance.GetResouceObject(assetPath, assetType);
                     return o;
                 }
                 else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
@@ -235,7 +253,7 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                     if (_isEditorMode)
                     {
-                        return UnityEditor.AssetDatabase.LoadAssetAtPath(info.AssetPath == null ? SearchEditorAsset(assetName) : info.AssetPath[0], assetType);
+                        return UnityEditor.AssetDatabase.LoadAssetAtPath(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], assetType);
                     }
 #endif
                     Object o = AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], assetType);
@@ -270,7 +288,14 @@ namespace F8Framework.Core
                 
                 if (info.AssetType == AssetTypeEnum.RESOURCE)
                 {
-                    Object o = ResourcesManager.Instance.GetResouceObject(info.AssetPath[0]);
+                    string assetPath = info.AssetPath?[0];
+#if UNITY_EDITOR
+                    if (_isEditorMode)
+                    {
+                        assetPath = info.AssetPath == null ? SearchAsset(assetName, default, AssetAccessMode.RESOURCE) : info.AssetPath[0];
+                    }
+#endif
+                    Object o = ResourcesManager.Instance.GetResouceObject(assetPath);
                     return o;
                 }
                 else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
@@ -278,7 +303,7 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                     if (_isEditorMode)
                     {
-                        return UnityEditor.AssetDatabase.LoadAssetAtPath<Object>(info.AssetPath == null ? SearchEditorAsset(assetName) : info.AssetPath[0]);
+                        return UnityEditor.AssetDatabase.LoadAssetAtPath<Object>(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0]);
                     }
 #endif
                     Object o = AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0]);
@@ -318,20 +343,27 @@ namespace F8Framework.Core
                 
                 if (info.AssetType == AssetTypeEnum.RESOURCE)
                 {
-                    T o = ResourcesManager.Instance.GetResouceObject<T>(info.AssetPath[0]);
+                    string assetPath = info.AssetPath?[0];
+#if UNITY_EDITOR
+                    if (_isEditorMode)
+                    {
+                        assetPath = info.AssetPath == null ? SearchAsset(assetName, typeof(T), AssetAccessMode.RESOURCE) : info.AssetPath[0];
+                    }
+#endif
+                    T o = ResourcesManager.Instance.GetResouceObject<T>(assetPath);
                     if (o != null)
                     {
                         return o;
                     }
                       
-                    return ResourcesManager.Instance.Load<T>(info.AssetPath[0]);
+                    return ResourcesManager.Instance.Load<T>(assetPath);
                 }
                 else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
                 {
 #if UNITY_EDITOR
                     if (_isEditorMode)
                     {
-                        return UnityEditor.AssetDatabase.LoadAssetAtPath<T>(info.AssetPath == null ? SearchEditorAsset(assetName) : info.AssetPath[0]);
+                        return UnityEditor.AssetDatabase.LoadAssetAtPath<T>(info.AssetPath == null ? SearchAsset(assetName, typeof(T)) : info.AssetPath[0]);
                     }
 #endif
                     AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePath);
@@ -414,20 +446,27 @@ namespace F8Framework.Core
 
                 if (info.AssetType == AssetTypeEnum.RESOURCE)
                 {
-                    Object o = ResourcesManager.Instance.GetResouceObject(info.AssetPath[0], assetType);
+                    string assetPath = info.AssetPath?[0];
+#if UNITY_EDITOR
+                    if (_isEditorMode)
+                    {
+                        assetPath = info.AssetPath == null ? SearchAsset(assetName, default, AssetAccessMode.RESOURCE) : info.AssetPath[0];
+                    }
+#endif
+                    Object o = ResourcesManager.Instance.GetResouceObject(assetPath, assetType);
                     if (o != null)
                     {
                         return o;
                     }
 
-                    return ResourcesManager.Instance.Load(info.AssetPath[0], assetType);
+                    return ResourcesManager.Instance.Load(assetPath, assetType);
                 }
                 else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
                 {
 #if UNITY_EDITOR
                     if (_isEditorMode)
                     {
-                        return UnityEditor.AssetDatabase.LoadAssetAtPath(info.AssetPath == null ? SearchEditorAsset(assetName) : info.AssetPath[0], assetType);
+                        return UnityEditor.AssetDatabase.LoadAssetAtPath(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], assetType);
                     }
 #endif
                     AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePath);
@@ -467,20 +506,27 @@ namespace F8Framework.Core
 
                 if (info.AssetType == AssetTypeEnum.RESOURCE)
                 {
-                    Object o = ResourcesManager.Instance.GetResouceObject(info.AssetPath[0]);
+                    string assetPath = info.AssetPath?[0];
+#if UNITY_EDITOR
+                    if (_isEditorMode)
+                    {
+                        assetPath = info.AssetPath == null ? SearchAsset(assetName, default, AssetAccessMode.RESOURCE) : info.AssetPath[0];
+                    }
+#endif
+                    Object o = ResourcesManager.Instance.GetResouceObject(assetPath);
                     if (o != null)
                     {
                         return o;
                     }
 
-                    return ResourcesManager.Instance.Load(info.AssetPath[0]);
+                    return ResourcesManager.Instance.Load(assetPath);
                 }
                 else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
                 {
 #if UNITY_EDITOR
                     if (_isEditorMode)
                     {
-                        return UnityEditor.AssetDatabase.LoadAssetAtPath<Object>(info.AssetPath == null ? SearchEditorAsset(assetName) : info.AssetPath[0]);
+                        return UnityEditor.AssetDatabase.LoadAssetAtPath<Object>(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0]);
                     }
 #endif
                     AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePath);
@@ -525,20 +571,27 @@ namespace F8Framework.Core
 
                 if (info.AssetType == AssetTypeEnum.RESOURCE)
                 {
-                    T o = ResourcesManager.Instance.GetResouceObject<T>(info.AssetPath[0]);
+                    string assetPath = info.AssetPath?[0];
+#if UNITY_EDITOR
+                    if (_isEditorMode)
+                    {
+                        assetPath = info.AssetPath == null ? SearchAsset(assetName, typeof(T), AssetAccessMode.RESOURCE) : info.AssetPath[0];
+                    }
+#endif
+                    T o = ResourcesManager.Instance.GetResouceObject<T>(assetPath);
                     if (o != null)
                     {
                         End(o);
                         return;
                     }
-                    ResourcesManager.Instance.LoadAsync<T>(info.AssetPath[0], callback);
+                    ResourcesManager.Instance.LoadAsync<T>(assetPath, callback);
                 }
                 else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
                 {
 #if UNITY_EDITOR
                     if (_isEditorMode)
                     {
-                        T o = UnityEditor.AssetDatabase.LoadAssetAtPath<T>(info.AssetPath == null ? SearchEditorAsset(assetName) : info.AssetPath[0]);
+                        T o = UnityEditor.AssetDatabase.LoadAssetAtPath<T>(info.AssetPath == null ? SearchAsset(assetName, typeof(T)) : info.AssetPath[0]);
                         End(o);
                         return;
                     }
@@ -587,14 +640,21 @@ namespace F8Framework.Core
 
                 if (info.AssetType == AssetTypeEnum.RESOURCE)
                 {
-                    T o = ResourcesManager.Instance.GetResouceObject<T>(info.AssetPath[0]);
+                    string assetPath = info.AssetPath?[0];
+#if UNITY_EDITOR
+                    if (_isEditorMode)
+                    {
+                        assetPath = info.AssetPath == null ? SearchAsset(assetName, typeof(T), AssetAccessMode.RESOURCE) : info.AssetPath[0];
+                    }
+#endif
+                    T o = ResourcesManager.Instance.GetResouceObject<T>(assetPath);
                     if (o != null)
                     {
                         yield return o;
                     }
                     else
                     {
-                        yield return ResourcesManager.Instance.LoadAsyncCoroutine<T>(info.AssetPath[0]);
+                        yield return ResourcesManager.Instance.LoadAsyncCoroutine<T>(assetPath);
                     }
                 }
                 else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
@@ -602,7 +662,7 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                     if (_isEditorMode)
                     {
-                        T o = UnityEditor.AssetDatabase.LoadAssetAtPath<T>(info.AssetPath == null ? SearchEditorAsset(assetName) : info.AssetPath[0]);
+                        T o = UnityEditor.AssetDatabase.LoadAssetAtPath<T>(info.AssetPath == null ? SearchAsset(assetName, typeof(T)) : info.AssetPath[0]);
                         yield return o;
                         yield break;
                     }
@@ -795,20 +855,27 @@ namespace F8Framework.Core
 
                 if (info.AssetType == AssetTypeEnum.RESOURCE)
                 {
-                    Object o = ResourcesManager.Instance.GetResouceObject(info.AssetPath[0], assetType);
+                    string assetPath = info.AssetPath?[0];
+#if UNITY_EDITOR
+                    if (_isEditorMode)
+                    {
+                        assetPath = info.AssetPath == null ? SearchAsset(assetName, default, AssetAccessMode.RESOURCE) : info.AssetPath[0];
+                    }
+#endif
+                    Object o = ResourcesManager.Instance.GetResouceObject(assetPath, assetType);
                     if (o != null)
                     {
                         End(o);
                         return;
                     }
-                    ResourcesManager.Instance.LoadAsync(info.AssetPath[0], assetType, callback);
+                    ResourcesManager.Instance.LoadAsync(assetPath, assetType, callback);
                 }
                 else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
                 {
 #if UNITY_EDITOR
                     if (_isEditorMode)
                     {
-                        Object o = UnityEditor.AssetDatabase.LoadAssetAtPath(info.AssetPath == null ? SearchEditorAsset(assetName) : info.AssetPath[0], assetType);
+                        Object o = UnityEditor.AssetDatabase.LoadAssetAtPath(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], assetType);
                         End(o);
                         return;
                     }
@@ -862,20 +929,27 @@ namespace F8Framework.Core
 
                 if (info.AssetType == AssetTypeEnum.RESOURCE)
                 {
-                    Object o = ResourcesManager.Instance.GetResouceObject(info.AssetPath[0]);
+                    string assetPath = info.AssetPath?[0];
+#if UNITY_EDITOR
+                    if (_isEditorMode)
+                    {
+                        assetPath = info.AssetPath == null ? SearchAsset(assetName, default, AssetAccessMode.RESOURCE) : info.AssetPath[0];
+                    }
+#endif
+                    Object o = ResourcesManager.Instance.GetResouceObject(assetPath);
                     if (o != null)
                     {
                         End(o);
                         return;
                     }
-                    ResourcesManager.Instance.LoadAsync(info.AssetPath[0], callback);
+                    ResourcesManager.Instance.LoadAsync(assetPath, callback);
                 }
                 else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
                 {
 #if UNITY_EDITOR
                     if (_isEditorMode)
                     {
-                        Object o = UnityEditor.AssetDatabase.LoadAssetAtPath<Object>(info.AssetPath == null ? SearchEditorAsset(assetName) : info.AssetPath[0]);
+                        Object o = UnityEditor.AssetDatabase.LoadAssetAtPath<Object>(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0]);
                         End(o);
                         return;
                     }
@@ -919,9 +993,9 @@ namespace F8Framework.Core
 
                 if (showTip)
                 {
-                    LogF8.LogError("Resource都找不到指定资源可用的索引：" + assetName);
+                    LogF8.LogError("Resource找不到指定资源可用的索引：" + assetName);
                 }
-                return new AssetInfo();
+                return new AssetInfo(AssetTypeEnum.RESOURCE);
             }
             
             private AssetInfo GetAssetInfoFromAssetBundle(string assetName, bool remote = false, bool showTip = false)
@@ -940,9 +1014,9 @@ namespace F8Framework.Core
 
                 if (showTip)
                 {
-                    LogF8.LogError("AssetBundle都找不到指定资源可用的索引：" + assetName);
+                    LogF8.LogError("AssetBundle找不到指定资源可用的索引：" + assetName);
                 }
-                return new AssetInfo();
+                return new AssetInfo(AssetTypeEnum.ASSET_BUNDLE);
             }
             
             /// <summary>
@@ -1100,24 +1174,58 @@ namespace F8Framework.Core
             }
             
 #if UNITY_EDITOR
-            private string SearchEditorAsset(string assetName)
+            private string SearchAsset(string assetName, System.Object type = default, AssetAccessMode mode = AssetAccessMode.UNKNOWN)
             {
-                // 获取 AssetBundles 文件夹下所有资源
-                string[] uiDirs = { System.IO.Path.Combine(URLSetting.AssetBundlesPath) };
-                string[] guids = UnityEditor.AssetDatabase.FindAssets(assetName, uiDirs);
+                // 获取项目中的所有文件夹路径
+                string[] allFolders = UnityEditor.AssetDatabase.GetAllAssetPaths();
+                List<string> searchDirs = new List<string>();
+                
+                // 根据 searchOption 参数决定要搜索的文件夹路径
+                switch (mode)
+                {
+                    case AssetAccessMode.RESOURCE:
+                        foreach (string folderPath in allFolders)
+                        {
+                            if (System.IO.Directory.Exists(folderPath) && folderPath.Contains("/Resources"))
+                            {
+                                searchDirs.Add(folderPath);
+                            }
+                        }
+                        break;
+                    case AssetAccessMode.ASSET_BUNDLE:
+                        searchDirs.Add(System.IO.Path.Combine(URLSetting.AssetBundlesPath));
+                        break;
+                    case AssetAccessMode.UNKNOWN:
+                        foreach (string folderPath in allFolders)
+                        {
+                            if (System.IO.Directory.Exists(folderPath) && folderPath.Contains("/Resources"))
+                            {
+                                searchDirs.Add(folderPath);
+                            }
+                        }
+                        searchDirs.Add(System.IO.Path.Combine(URLSetting.AssetBundlesPath));
+                        break;
+                }
+                
+                // 查找指定资源
+                string[] guids = UnityEditor.AssetDatabase.FindAssets(assetName, searchDirs.ToArray());
                 foreach (string guid in guids)
                 {
                     // 将 GUID 转换为路径
                     string assetPath = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
-                    if (Path.GetFileNameWithoutExtension(assetPath) == assetName)
+    
+                    if (type == default || ReferenceEquals(UnityEditor.AssetDatabase.GetMainAssetTypeAtPath(assetPath), type))
                     {
-                        return assetPath;
+                        if (Path.GetFileNameWithoutExtension(assetPath) == assetName)
+                        {
+                            return assetPath;
+                        }
                     }
                 }
                 return null;
             }
 #endif
-        
+            
             public void OnInit(object createParam)
             {
                 _assetBundleManager = ModuleCenter.CreateModule<AssetBundleManager>();
