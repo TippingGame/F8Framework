@@ -102,7 +102,6 @@ namespace F8Framework.Core
 
             var comp = viewParams.DelegateComponent;
             viewParams.Go.transform.SetParent(gameObject.transform, false);
-            viewParams.Go.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
             if (viewParams.Go.activeSelf == false)
             {
                 viewParams.Go.SetActive(true);
