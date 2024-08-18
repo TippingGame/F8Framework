@@ -101,13 +101,14 @@ namespace F8Framework.Core
             viewParams.Valid = true;
 
             var comp = viewParams.DelegateComponent;
-            comp.Add();
             viewParams.Go.transform.SetParent(gameObject.transform, false);
             viewParams.Go.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
             if (viewParams.Go.activeSelf == false)
             {
                 viewParams.Go.SetActive(true);
             }
+            
+            comp.Add();
         }
 
         public void Close(string prefabPath, bool isDestroy)
