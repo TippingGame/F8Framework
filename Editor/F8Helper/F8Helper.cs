@@ -6,6 +6,18 @@ namespace F8Framework.Core.Editor
 {
     public class F8Helper
     {
+        [MenuItem("开发工具/设置Excel存放目录")]
+        public static void SetExcelPath()
+        {
+            string lastExcelPath = EditorPrefs.GetString("ExcelPath", default);
+            string tempExcelPath = EditorUtility.OpenFolderPanel("设置Excel存放目录", lastExcelPath ?? Application.dataPath, "");
+            if (!tempExcelPath.IsNullOrEmpty())
+            {
+                EditorPrefs.SetString("ExcelPath", tempExcelPath);
+            }
+            LogF8.LogConfig("设置Excel存放目录：" + tempExcelPath);
+        }
+        
         [MenuItem("开发工具/F8Run _F8")]
         public static void F8Run()
         {

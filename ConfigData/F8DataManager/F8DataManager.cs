@@ -20,7 +20,7 @@ namespace F8Framework.F8ExcelDataClass
 		private Sheet2 p_Sheet2;
 		private LocalizedStrings p_LocalizedStrings;
 
-		public Sheet1Item GetSheet1ByID(Int32 id)
+		public Sheet1Item GetSheet1ByID(int id)
 		{
 			Sheet1Item t = null;
 			p_Sheet1.Dict.TryGetValue(id, out t);
@@ -33,7 +33,7 @@ namespace F8Framework.F8ExcelDataClass
 			return p_Sheet1.Dict;
 		}
 
-		public Sheet2Item GetSheet2ByID(Int32 id)
+		public Sheet2Item GetSheet2ByID(int id)
 		{
 			Sheet2Item t = null;
 			p_Sheet2.Dict.TryGetValue(id, out t);
@@ -46,7 +46,7 @@ namespace F8Framework.F8ExcelDataClass
 			return p_Sheet2.Dict;
 		}
 
-		public LocalizedStringsItem GetLocalizedStringsByID(Int32 id)
+		public LocalizedStringsItem GetLocalizedStringsByID(int id)
 		{
 			LocalizedStringsItem t = null;
 			p_LocalizedStrings.Dict.TryGetValue(id, out t);

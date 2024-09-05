@@ -31,7 +31,7 @@ namespace F8Framework.Core.Editor
         public const string ExcelPath = "/StreamingAssets/config"; //需要导表的目录
         public const string DLLFolder = "/F8Framework/ConfigData"; //存放dll目录
         public const string FileIndexFile = "config/fileindex.txt"; //fileindex文件目录
-        private static Dictionary<string, string> codeList; //存放所有生成的类的代码
+        private static Dictionary<string, ScriptGenerator> codeList; //存放所有生成的类的代码
 
         private static Dictionary<string, List<ConfigData[]>> dataDict; //存放所有数据表内的数据，key：类名  value：数据
 
@@ -81,10 +81,25 @@ namespace F8Framework.Core.Editor
         
         public static void LoadAllExcelData()
         {
-            string INPUT_PATH = Application.dataPath + ExcelPath;
+            if (EditorPrefs.GetString("ExcelPath", default).IsNullOrEmpty())
+            {
+                FileTools.CheckDirAndCreateWhenNeeded(Application.dataPath + ExcelPath);
+                string tempExcelPath = EditorUtility.OpenFolderPanel("设置Excel存放目录", Application.dataPath + ExcelPath, "");
+                if (tempExcelPath.IsNullOrEmpty())
+                {
+                    tempExcelPath = Application.dataPath + ExcelPath;
+                }
+                EditorPrefs.SetString("ExcelPath", tempExcelPath);
+                LogF8.LogConfig("首次启动，设置Excel存放目录：" + tempExcelPath + " （如要更改请到----上方菜单栏->开发工具->设置Excel存放目录）");
+                LoadAllExcelData();
+                return;
+            }
+            string lastExcelPath = EditorPrefs.GetString("ExcelPath", default) ?? Application.dataPath + ExcelPath;
+            
+            string INPUT_PATH = lastExcelPath;
 
             FileTools.CheckDirAndCreateWhenNeeded(INPUT_PATH);
-
+            
             var files = Directory.GetFiles(INPUT_PATH, "*.*", SearchOption.AllDirectories)
                 .Where(s => s.EndsWith(".xls") || s.EndsWith(".xlsx")).ToArray();
             if (files == null || files.Length == 0)
@@ -92,14 +107,14 @@ namespace F8Framework.Core.Editor
                 FileTools.SafeCopyFile(
                     FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) +
                     "/Tests/ExcelTool/StreamingAssets_config/Demo工作表.xlsx",
-                    Application.streamingAssetsPath + "/config/Demo工作表.xlsx");
+                    lastExcelPath + "/Demo工作表.xlsx");
                 FileTools.SafeCopyFile(
                     FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) +
                     "/Tests/Localization/StreamingAssets_config/本地化.xlsx",
-                    Application.streamingAssetsPath + "/config/本地化.xlsx");
+                    lastExcelPath + "/本地化.xlsx");
                 files = Directory.GetFiles(INPUT_PATH, "*.*", SearchOption.AllDirectories)
                     .Where(s => s.EndsWith(".xls") || s.EndsWith(".xlsx")).ToArray();
-                LogF8.LogError("暂无可以导入的数据表！自动为你创建：【Demo工作表.xlsx / 本地化.xlsx】两个表格！" + ExcelPath + " 目录");
+                LogF8.LogError("暂无可以导入的数据表！自动为你创建：【Demo工作表.xlsx / 本地化.xlsx】两个表格！" + lastExcelPath + " 目录");
             }
             
             string F8DataManagerPath = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/ConfigData/F8DataManager";
@@ -117,7 +132,7 @@ namespace F8Framework.Core.Editor
             
             if (codeList == null)
             {
-                codeList = new Dictionary<string, string>();
+                codeList = new Dictionary<string, ScriptGenerator>();
             }
             else
             {
@@ -177,12 +192,14 @@ namespace F8Framework.Core.Editor
             if (Directory.Exists(BinDataPath)) Directory.Delete(BinDataPath, true); //删除旧的数据文件
             Directory.CreateDirectory(BinDataPath);
             
-            string INPUT_PATH = Application.dataPath + ExcelPath;
+            string lastExcelPath = EditorPrefs.GetString("ExcelPath", default) ?? Application.dataPath + ExcelPath;
+            
+            string INPUT_PATH = lastExcelPath;
             var files = Directory.GetFiles(INPUT_PATH, "*.*", SearchOption.AllDirectories)
                 .Where(s => s.EndsWith(".xls") || s.EndsWith(".xlsx")).ToArray();
             if (codeList == null)
             {
-                codeList = new Dictionary<string, string>();
+                codeList = new Dictionary<string, ScriptGenerator>();
             }
             else
             {
@@ -379,7 +396,7 @@ namespace F8Framework.Core.Editor
                         {
                             throw new Exception("类名重复: " + className + " ,路径:  " + inputPath);
                         }
-                        codeList.Add(className, generator.Generate());
+                        codeList.Add(className, generator);
                         if (dataDict.ContainsKey(className))
                         {
                             throw new Exception("类名重复: " + className + " ,路径:  " + inputPath);
@@ -425,7 +442,7 @@ namespace F8Framework.Core.Editor
         }
 
         // 生成代码文件
-        public static void GenerateCodeFiles(Dictionary<string, string> codeList)
+        public static void GenerateCodeFiles(Dictionary<string, ScriptGenerator> codeList)
         {
             string path = Application.dataPath + DLLFolder + "/F8ExcelDataClass";
             FileTools.SafeClearDir(path);// 删除旧文件
@@ -434,7 +451,7 @@ namespace F8Framework.Core.Editor
             foreach (var kvp in codeList)
             {
                 string filePath = $"{path}/{kvp.Key}.cs";
-                File.WriteAllText(filePath, kvp.Value);
+                File.WriteAllText(filePath, kvp.Value.Generate());
                 LogF8.LogConfig($"已生成代码 " + path + "/<color=#FF9E59>" + kvp.Key + ".cs</color>");
             }
         }
@@ -464,7 +481,17 @@ namespace F8Framework.Core.Editor
                 }
 
                 // FieldInfo.GetValue 获取对象内指定名称的字段的值
-                object id = temp.GetField("id").GetValue(t); //获取id
+
+                FieldInfo fieldInfoId = null;
+                foreach (var field in temp.GetFields())
+                {
+                    if (string.Equals(field.Name, "id", StringComparison.OrdinalIgnoreCase))
+                    {
+                        fieldInfoId = field;
+                        break;
+                    }  
+                }
+                object id = fieldInfoId.GetValue(t); //获取id
                 FieldInfo dictInfo = container.GetType().GetField("Dict");
                 object dict = dictInfo.GetValue(container);
 

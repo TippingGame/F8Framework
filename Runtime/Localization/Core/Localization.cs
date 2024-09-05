@@ -89,7 +89,16 @@ namespace F8Framework.Core
                 }
 
                 string id = string.Empty;
-                FieldInfo idProperty = itemType.GetField("id");
+                FieldInfo fieldInfoId = null;
+                foreach (var field in itemType.GetFields())
+                {
+                    if (string.Equals(field.Name, "id", StringComparison.OrdinalIgnoreCase))
+                    {
+                        fieldInfoId = field;
+                        break;
+                    }  
+                }
+                FieldInfo idProperty = fieldInfoId;
                 object idValue = idProperty?.GetValue(item);
                 if (idProperty != null && idValue != null)
                 {
@@ -106,7 +115,7 @@ namespace F8Framework.Core
                 foreach (var field in fields)
                 {
                     // 排除 id 和 TextID 字段
-                    if (field.Name != "id" && field.Name != "TextID")
+                    if (!field.Name.Equals("id", StringComparison.OrdinalIgnoreCase) && field.Name != "TextID")
                     {
                         if (!LanguageList.Contains(field.Name))
                         {

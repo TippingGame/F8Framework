@@ -16,25 +16,46 @@ namespace F8Framework.Core
         public const string FLOAT = "float";
         public const string DOUBLE = "double";
         public const string STRING = "str";
-        public const string ARRAY_OBJ = "obj[]";
+        public const string STRINGFULL = "string";
+        public const string OBJ = "obj";
+        public const string OBJFULL = "object";
+       
         public const string ARRAY_INT = "int[]";
+        public const string ARRAY_LONG = "long[]";
         public const string ARRAY_FLOAT = "float[]";
+        public const string ARRAY_DOUBLE = "double[]";
         public const string ARRAY_STRING = "str[]";
+        public const string ARRAY_STRINGFULL = "string[]";
+        public const string ARRAY_OBJ = "obj[]";
+        public const string ARRAY_OBJFULL = "object[]";
+        
         public const string ARRAY_ARRAY_INT = "int[][]";
+        public const string ARRAY_ARRAY_LONG = "long[][]";
         public const string ARRAY_ARRAY_FLOAT = "float[][]";
+        public const string ARRAY_ARRAY_DOUBLE = "double[][]";
         public const string ARRAY_ARRAY_STRING = "str[][]";
+        public const string ARRAY_ARRAY_STRINGFULL = "string[][]";
         public const string ARRAY_ARRAY_OBJ = "obj[][]";
+        public const string ARRAY_ARRAY_OBJFULL = "object[][]";
     }
 
     public class ReadExcel : Singleton<ReadExcel>
     {
         private const string CODE_NAMESPACE = "F8Framework.F8ExcelDataClass"; //由表生成的数据类型均在此命名空间内
-        private const string ExcelPath = "config"; //需要导表的目录
+        private string ExcelPath = "config"; //需要导表的目录
         private Dictionary<string, List<ConfigData[]>> dataDict; //存放所有数据表内的数据，key：类名  value：数据
 
+        // 设置实时读取Excel路径，只限在StreamingAssets目录下
+        public void SetRunTimeExcelPath(string path)
+        {
+            ExcelPath = path;
+        }
+        
         public void LoadAllExcelData()
         {
-#if UNITY_EDITOR || UNITY_STANDALONE
+#if UNITY_EDITOR
+        string INPUT_PATH = UnityEditor.EditorPrefs.GetString("ExcelPath", default);
+#elif UNITY_STANDALONE
         string INPUT_PATH = URLSetting.CS_STREAMINGASSETS_URL + ExcelPath;
 #elif UNITY_ANDROID
         string INPUT_PATH = UnityEngine.Application.persistentDataPath + "/" + ExcelPath;
@@ -225,7 +246,16 @@ namespace F8Framework.Core
                 }
 
                 // FieldInfo.GetValue 获取对象内指定名称的字段的值
-                object id = temp.GetField("id").GetValue(t); //获取id
+                FieldInfo fieldInfoId = null;
+                foreach (var field in temp.GetFields())
+                {
+                    if (string.Equals(field.Name, "id", StringComparison.OrdinalIgnoreCase))
+                    {
+                        fieldInfoId = field;
+                        break;
+                    }  
+                }
+                object id = fieldInfoId.GetValue(t); //获取id
                 FieldInfo dictInfo = container.GetType().GetField("Dict");
                 object dict = dictInfo.GetValue(container);
 
@@ -291,10 +321,13 @@ namespace F8Framework.Core
 
                         o = DOUBLE_double;
                         break;
-                    case SupportType.STRING:
+                    case SupportType.STRING or SupportType.STRINGFULL:
                         o = data;
                         break;
-                    case SupportType.ARRAY_OBJ:
+                    case SupportType.OBJ or SupportType.OBJFULL:
+                        o = data as System.Object;
+                        break;
+                    case SupportType.ARRAY_OBJ or SupportType.ARRAY_OBJFULL:
                         data = data.Substring(1, data.Length - 2); //移除 '['   ']'
                         var ts = Regex.Matches(data, "(?:\"(?:[^\"]|\"\")*\"|[^,]+)") //逗号分隔
                             .Cast<Match>()
@@ -337,6 +370,21 @@ namespace F8Framework.Core
 
                         o = array;
                         break;
+                    case SupportType.ARRAY_LONG:
+                        data = data.Substring(1, data.Length - 2); //移除 '['   ']'
+                        var longs = Regex.Matches(data, "(?:\"(?:[^\"]|\"\")*\"|[^,]+)") //逗号分隔
+                            .Cast<Match>()
+                            .Select(m => m.Value)
+                            .ToArray();
+                        int longsLength = longs.Length;
+                        long[] list = new long[longsLength];
+                        for (int i = 0; i < longsLength; i++)
+                        {
+                            list[i] = (long)ParseValue(SupportType.LONG, longs[i], classname);
+                        }
+
+                        o = list;
+                        break;
                     case SupportType.ARRAY_FLOAT:
                         data = data.Substring(1, data.Length - 2); //移除 '['   ']'
                         var floats = Regex.Matches(data, "(?:\"(?:[^\"]|\"\")*\"|[^,]+)") //逗号分隔
@@ -352,7 +400,22 @@ namespace F8Framework.Core
 
                         o = list2;
                         break;
-                    case SupportType.ARRAY_STRING:
+                    case SupportType.ARRAY_DOUBLE:
+                        data = data.Substring(1, data.Length - 2); //移除 '['   ']'
+                        var dounbles = Regex.Matches(data, "(?:\"(?:[^\"]|\"\")*\"|[^,]+)") //逗号分隔
+                            .Cast<Match>()
+                            .Select(m => m.Value)
+                            .ToArray();
+                        int dounbles9Length = dounbles.Length;
+                        double[] list9 = new double[dounbles9Length];
+                        for (int i = 0; i < dounbles9Length; i++)
+                        {
+                            list9[i] = (double)ParseValue(SupportType.DOUBLE, dounbles[i], classname);
+                        }
+
+                        o = list9;
+                        break;
+                    case SupportType.ARRAY_STRING or SupportType.ARRAY_STRINGFULL:
                         data = data.Substring(1, data.Length - 2); //移除 '['   ']'
                         var strs = Regex.Matches(data, "(?:\"(?:[^\"]|\"\")*\"|[^,]+)") //逗号分隔
                             .Cast<Match>()
@@ -375,13 +438,29 @@ namespace F8Framework.Core
                             .Select(m => m.Value)
                             .ToArray();
                         int arr4Length = arr4.Length;
-                        int[][] aa = new int[arr4Length][];
+                        int[][] list4 = new int[arr4Length][];
                         for (int i = 0; i < arr4Length; i++)
                         {
-                            aa[i] = (int[])ParseValue(SupportType.ARRAY_INT, arr4[i], classname);
+                            list4[i] = (int[])ParseValue(SupportType.ARRAY_INT, arr4[i], classname);
                         }
 
-                        o = aa;
+                        o = list4;
+                        break;
+                    case SupportType.ARRAY_ARRAY_LONG:
+                        data = data.Substring(1, data.Length - 2); //移除 '['   ']'
+                        //匹配[]内的内容，并忽略""内的[]，考虑了逗号出现在引号内的情况。它会匹配不在引号内的内容，并且会忽略引号内部的逗号
+                        var arr8 = Regex.Matches(data, @"\[[^\[\]\""]*(?:(?:""[^""]*""|'[^']*')[^\[\]\""]*)*\]")
+                            .Cast<Match>()
+                            .Select(m => m.Value)
+                            .ToArray();
+                        int arr8Length = arr8.Length;
+                        long[][] list8 = new long[arr8Length][];
+                        for (int i = 0; i < arr8Length; i++)
+                        {
+                            list8[i] = (long[])ParseValue(SupportType.ARRAY_LONG, arr8[i], classname);
+                        }
+
+                        o = list8;
                         break;
                     case SupportType.ARRAY_ARRAY_FLOAT:
                         data = data.Substring(1, data.Length - 2); //移除 '['   ']'
@@ -399,7 +478,23 @@ namespace F8Framework.Core
 
                         o = list5;
                         break;
-                    case SupportType.ARRAY_ARRAY_STRING:
+                    case SupportType.ARRAY_ARRAY_DOUBLE:
+                        data = data.Substring(1, data.Length - 2); //移除 '['   ']'
+                        //匹配[]内的内容，并忽略""内的[]，考虑了逗号出现在引号内的情况。它会匹配不在引号内的内容，并且会忽略引号内部的逗号
+                        var arr9 = Regex.Matches(data, @"\[[^\[\]\""]*(?:(?:""[^""]*""|'[^']*')[^\[\]\""]*)*\]")
+                            .Cast<Match>()
+                            .Select(m => m.Value)
+                            .ToArray();
+                        int arr10Length = arr9.Length;
+                        double[][] list10 = new double[arr10Length][];
+                        for (int i = 0; i < arr10Length; i++)
+                        {
+                            list10[i] = (double[])ParseValue(SupportType.ARRAY_DOUBLE, arr9[i], classname);
+                        }
+
+                        o = list10;
+                        break;
+                    case SupportType.ARRAY_ARRAY_STRING or SupportType.ARRAY_ARRAY_STRINGFULL:
                         data = data.Substring(1, data.Length - 2); //移除 '['   ']'
                         //匹配[]内的内容，并忽略""内的[]，考虑了逗号出现在引号内的情况。它会匹配不在引号内的内容，并且会忽略引号内部的逗号
                         var arr6 = Regex.Matches(data, @"\[[^\[\]\""]*(?:(?:""[^""]*""|'[^']*')[^\[\]\""]*)*\]")
@@ -415,7 +510,7 @@ namespace F8Framework.Core
 
                         o = list6;
                         break;
-                    case SupportType.ARRAY_ARRAY_OBJ:
+                    case SupportType.ARRAY_ARRAY_OBJ or SupportType.ARRAY_ARRAY_OBJFULL:
                         data = data.Substring(1, data.Length - 2); //移除 '['   ']'
                         //匹配[]内的内容，并忽略""内的[]，考虑了逗号出现在引号内的情况。它会匹配不在引号内的内容，并且会忽略引号内部的逗号
                         var arr7 = Regex.Matches(data, @"\[[^\[\]\""]*(?:(?:""[^""]*""|'[^']*')[^\[\]\""]*)*\]")
