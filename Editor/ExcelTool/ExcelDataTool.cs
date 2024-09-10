@@ -119,12 +119,15 @@ namespace F8Framework.Core.Editor
             
             string F8DataManagerPath = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/ConfigData/F8DataManager";
             FileTools.SafeClearDir(F8DataManagerPath);
+            LogF8.LogConfig("清空目录：" + F8DataManagerPath);
             FileTools.CheckDirAndCreateWhenNeeded(F8DataManagerPath);
             string F8ExcelDataClassPath = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/ConfigData/F8ExcelDataClass";
             FileTools.SafeClearDir(F8ExcelDataClassPath);
+            LogF8.LogConfig("清空目录：" + F8ExcelDataClassPath);
             FileTools.CheckDirAndCreateWhenNeeded(F8ExcelDataClassPath);
             string F8ExcelDataClassPathDLL = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/ConfigData/" + CODE_NAMESPACE + ".asmdef";
             FileTools.SafeDeleteFile(F8ExcelDataClassPathDLL);
+            LogF8.LogConfig("删除文件：" + F8ExcelDataClassPathDLL);
             FileTools.SafeDeleteFile(F8ExcelDataClassPathDLL + ".meta");
             FileTools.SafeDeleteFile(Application.dataPath + DataManagerFolder + "/F8DataManager.asmref");
             CreateAsmdefFile();

@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 
 namespace F8Framework.Core.Editor
 {
-    public class F8Helper
+    public class F8Helper : ScriptableObject
     {
         [MenuItem("开发工具/设置Excel存放目录")]
         public static void SetExcelPath()
@@ -21,9 +22,32 @@ namespace F8Framework.Core.Editor
         [MenuItem("开发工具/F8Run _F8")]
         public static void F8Run()
         {
+            CopyAndroidManifest();
             EditorPrefs.SetBool("compilationFinishedHotUpdateDll", true);
             EditorPrefs.SetBool("compilationFinishedBuildAB", true);
             LoadAllExcelData();
+        }
+
+        public static void CopyAndroidManifest()
+        {
+            if (!File.Exists(Application.dataPath + "/Plugins/Android/AndroidManifest.xml"))
+            {
+                FileTools.SafeCopyFile(
+                    FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) +
+                    "/Tests/SDKManager/AndroidManifest.xml",
+                    Application.dataPath + "/Plugins/Android/AndroidManifest.xml");
+                LogF8.Log("复制 AndroidManifest.xml 至 " + Application.dataPath + "/Plugins/Android");
+                AssetDatabase.Refresh();
+            }
+            if (!File.Exists(Application.dataPath + "/Plugins/Android/mainTemplate.gradle"))
+            {
+                FileTools.SafeCopyFile(
+                    FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) +
+                    "/Tests/SDKManager/mainTemplate.gradle",
+                    Application.dataPath + "/Plugins/Android/mainTemplate.gradle");
+                LogF8.Log("复制 mainTemplate.gradle 至 " + Application.dataPath + "/Plugins/Android");
+                AssetDatabase.Refresh();
+            }
         }
         
         [MenuItem("开发工具/生成并复制热更新Dll-F8")]
@@ -103,6 +127,19 @@ namespace F8Framework.Core.Editor
                 }
                 Event.current.Use();
             }
+        }
+        
+        private static string GetScriptPath()
+        {
+            MonoScript monoScript = MonoScript.FromScriptableObject(CreateInstance<F8Helper>());
+
+            // 获取脚本在 Assets 中的相对路径
+            string scriptRelativePath = AssetDatabase.GetAssetPath(monoScript);
+
+            // 获取绝对路径并规范化
+            string scriptPath = Path.GetFullPath(Path.Combine(Application.dataPath, "..", scriptRelativePath));
+
+            return scriptPath;
         }
     }
 }

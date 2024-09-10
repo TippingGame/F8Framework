@@ -24,10 +24,48 @@ namespace F8Framework.Core
             _graphicRaycaster = gameObject.AddComponent<GraphicRaycaster>();
         }
 
-        public void Init(int sortOrder, RenderMode renderMode = RenderMode.ScreenSpaceOverlay)
+        public void Init(int sortOrder = 0, string sortingLayerName = "Default", RenderMode renderMode = RenderMode.ScreenSpaceOverlay, bool pixelPerfect = false, UnityEngine.Camera camera = null)
         {
             _canvas.sortingOrder = sortOrder;
-            _canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            _canvas.sortingLayerName = sortingLayerName;
+            _canvas.renderMode = renderMode;
+            _canvas.pixelPerfect = pixelPerfect;
+            _canvas.worldCamera = camera;
+        }
+        
+        public void SetCanvasScaler(CanvasScaler.ScaleMode scaleMode = CanvasScaler.ScaleMode.ConstantPixelSize,
+            float scaleFactor = 1f,
+            float referencePixelsPerUnit = 100f)
+        {
+            _canvasScaler.uiScaleMode = scaleMode;
+            _canvasScaler.scaleFactor = scaleFactor;
+            _canvasScaler.referencePixelsPerUnit = referencePixelsPerUnit;
+        }
+        
+        public void SetCanvasScaler(CanvasScaler.ScaleMode scaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize,
+            Vector2? referenceResolution = null,
+            CanvasScaler.ScreenMatchMode screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight,
+            float matchWidthOrHeight = 0f,
+            float referencePixelsPerUnit = 100f)
+        {
+            _canvasScaler.uiScaleMode = scaleMode;
+            _canvasScaler.referenceResolution = referenceResolution ?? new Vector2(800, 600);;
+            _canvasScaler.screenMatchMode = screenMatchMode;
+            _canvasScaler.matchWidthOrHeight = matchWidthOrHeight;
+            _canvasScaler.referencePixelsPerUnit = referencePixelsPerUnit;
+        }
+        
+        public void SetCanvasScaler(CanvasScaler.ScaleMode scaleMode = CanvasScaler.ScaleMode.ConstantPhysicalSize,
+            CanvasScaler.Unit physicalUnit = CanvasScaler.Unit.Points,
+            float fallbackScreenDPI = 96f,
+            float defaultSpriteDPI = 96f,
+            float referencePixelsPerUnit = 100f)
+        {
+            _canvasScaler.uiScaleMode = scaleMode;
+            _canvasScaler.physicalUnit = physicalUnit;
+            _canvasScaler.fallbackScreenDPI = fallbackScreenDPI;
+            _canvasScaler.defaultSpriteDPI = defaultSpriteDPI;
+            _canvasScaler.referencePixelsPerUnit = referencePixelsPerUnit;
         }
         
         public string Add(int uiId, UIConfig config, object[] parameters = null, UICallbacks callbacks = null)

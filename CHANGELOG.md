@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.33] - 2024-09-11
+1.新增自动复制AndroidManifest和mainTemplate  
+2.新增UI模块设置Canvas和CanvasScaler属性的方法  
+
 ## [1.0.32] - 2024-09-06
 1.修复配置表sheet名不能使用Item关键字的问题  
 2.新增可以更改配置表路径  

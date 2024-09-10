@@ -37,6 +37,12 @@ UI界面分为三大类：
         
         // 初始化
         FF8.UI.Initialize(configs);
+        // 设置UI Canvas属性
+        FF8.UI.SetCanvas(null, 1, "Default", RenderMode.ScreenSpaceCamera, false, Camera.main);
+        // 设置UI CanvasScaler属性
+        FF8.UI.SetCanvasScaler(null, CanvasScaler.ScaleMode.ConstantPixelSize, 1f, 100f);
+        FF8.UI.SetCanvasScaler(LayerType.UI, CanvasScaler.ScaleMode.ScaleWithScreenSize, new Vector2(1920, 1080), CanvasScaler.ScreenMatchMode.MatchWidthOrHeight, 0f, 100f);
+        FF8.UI.SetCanvasScaler(LayerType.UI, CanvasScaler.ScaleMode.ConstantPhysicalSize, CanvasScaler.Unit.Points, 96f, 100f, 100f);
         // 打开UI，可选参数：data，new UICallbacks()
         FF8.UI.Open(1, data, new UICallbacks());
         FF8.UI.OpenAsync(1);
