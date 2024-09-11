@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace F8Framework.Core
@@ -164,7 +165,10 @@ namespace F8Framework.Core
         
         public void OnInit(object createParam)
         {
-            
+            if (EventSystem.current == null)
+            {
+                LogF8.LogError("场景中缺少：EventSystem 组件");
+            }
         }
 
         public void OnUpdate()

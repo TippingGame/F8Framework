@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.0.34] - 2024-09-11
+1.新增缺少EventSystem提示  
+
 ## [1.0.33] - 2024-09-11
 1.新增自动复制AndroidManifest和mainTemplate  
 2.新增UI模块设置Canvas和CanvasScaler属性的方法  
