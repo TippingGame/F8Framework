@@ -19,7 +19,7 @@ namespace F8Framework.Core.Editor
 		{
 			// base.OnInspectorGUI();
 
-			Localization.Instance.Load();
+			Localization.Instance.LoadInEditor();
 			serializedObject.Update();
 
 			EditorGUILayout.PropertyField(playFromSamePositionWhenInject, new GUIContent("从同一位置播放"));

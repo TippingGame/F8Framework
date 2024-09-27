@@ -103,10 +103,6 @@ namespace F8Framework.Core
         /// <returns>正确的路径。</returns>
         public static string GetAssetBundleManifestPath(SourceType type = SourceType.STREAMING_ASSETS)
         {
-            if (AssetManager.ForceRemoteAssetBundle)
-            {
-                type = SourceType.REMOTE_ADDRESS;
-            }
             string platformAssetBundlePath = GetAssetBundlePath(type);
             if (platformAssetBundlePath == null)
                 return null;

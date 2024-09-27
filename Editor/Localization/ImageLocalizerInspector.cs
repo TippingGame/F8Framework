@@ -20,7 +20,7 @@ namespace F8Framework.Core.Editor
 		{
 			// base.OnInspectorGUI();
 
-			Localization.Instance.Load();
+			Localization.Instance.LoadInEditor();
 			serializedObject.Update();
 
 			var langCount = Localization.Instance.LanguageList.Count;

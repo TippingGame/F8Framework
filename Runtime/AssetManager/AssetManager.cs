@@ -156,7 +156,11 @@ namespace F8Framework.Core
                 else if (accessMode.HasFlag(AssetAccessMode.REMOTE_ASSET_BUNDLE))
                 {
                     AssetInfo r = GetAssetInfoFromAssetBundle(assetName, true);
-
+                    if (!IsLegal(ref r))
+                    {
+                        r = GetAssetInfoFromResource(assetName);
+                    }
+                    
                     if (IsLegal(ref r))
                     {
                         return r;

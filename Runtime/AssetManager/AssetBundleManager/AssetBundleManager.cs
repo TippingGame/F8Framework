@@ -938,12 +938,9 @@ namespace F8Framework.Core
             string manifestPath = AssetBundleHelper.GetAssetBundleManifestPath();
             if (manifestPath == null)
                 yield break;
-            if (!AssetManager.ForceRemoteAssetBundle)
-            {
 #if UNITY_EDITOR
                 manifestPath = "file://" + manifestPath;
 #endif
-            }
             DownloadRequest assetBundleDownloadRequest = new DownloadRequest(manifestPath, default);
             yield return assetBundleDownloadRequest.SendAssetBundleDownloadRequestCoroutine(manifestPath);
             manifest = assetBundleDownloadRequest.DownloadedAssetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
@@ -954,7 +951,7 @@ namespace F8Framework.Core
         public void OnInit(object createParam)
         {
 #if UNITY_WEBGL
-            LogF8.LogAsset("由于WebGL异步加载AssetBundleManifest，请在创建资产模块之后加上：yield return AssetBundleManager.Instance.LoadAssetBundleManifest();");
+            LogF8.LogAsset("（提示）由于WebGL异步加载AssetBundleManifest，请在创建资产模块之后加上：yield return AssetBundleManager.Instance.LoadAssetBundleManifest();");
 #else
             string manifestPath = AssetBundleHelper.GetAssetBundleManifestPath(AssetBundleHelper.SourceType.STREAMING_ASSETS);
             if (manifestPath == null)

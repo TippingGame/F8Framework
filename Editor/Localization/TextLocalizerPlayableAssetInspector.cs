@@ -20,7 +20,7 @@ namespace F8Framework.Core.Editor
 			base.OnInspectorGUI();
 
 			GUI.skin.GetStyle("HelpBox").richText = true;
-			Localization.Instance.Load();
+			Localization.Instance.LoadInEditor();
 			var keys = Localization.Instance.GetAllIds();
 
 			if (keys.Count == 0)

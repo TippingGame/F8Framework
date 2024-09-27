@@ -25,20 +25,16 @@ namespace F8Framework.Core
         {
             Load();
         }
-        
-        /// <summary>
-        /// 加载本地化字符串到内存。
-        /// </summary>
-        public void Load(bool force = false)
+
+        public void LoadInEditor(bool force = false)
         {
+#if UNITY_EDITOR
             if (LocalizedStrings.Count > 0 && force == false)
             {
                 return;
             }
             LocalizedStrings.Clear();
             
-            // 必须先加载本地化配置表
-#if UNITY_EDITOR
             if (Application.isPlaying)
             {
                 Util.Assembly.InvokeMethod("F8DataManager", "LoadLocalizedStrings", new object[] { });
@@ -55,14 +51,28 @@ namespace F8Framework.Core
                 }
             }
             LoadSuccess();
-#elif UNITY_WEBGL
-            LogF8.LogConfig("由于WebGL异步加载完本地化表，请在创建本地化模块之前加上：yield return F8DataManager.Instance.LoadLocalizedStringsIEnumerator();");
+#endif
+        }
+        
+        /// <summary>
+        /// 加载本地化字符串到内存。
+        /// </summary>
+        public void Load(bool force = false)
+        {
+            if (LocalizedStrings.Count > 0 && force == false)
+            {
+                return;
+            }
+            LocalizedStrings.Clear();
+            
+            // 必须先加载本地化配置表
+#if UNITY_WEBGL
+            LogF8.LogConfig("（提示）由于WebGL异步加载完本地化表，请在创建本地化模块之前加上：yield return F8DataManager.Instance.LoadLocalizedStringsIEnumerator();");
             LoadSuccess();
 #else
             Util.Assembly.InvokeMethod("F8DataManager", "LoadLocalizedStrings", new object[] { });
             LoadSuccess();
 #endif
-            
         }
 
         private void LoadSuccess()
