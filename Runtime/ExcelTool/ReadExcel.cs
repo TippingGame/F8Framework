@@ -54,7 +54,7 @@ namespace F8Framework.Core
         public void LoadAllExcelData()
         {
 #if UNITY_EDITOR
-        string INPUT_PATH = UnityEditor.EditorPrefs.GetString("ExcelPath", default);
+        string INPUT_PATH = UnityEditor.EditorPrefs.GetString(UnityEngine.Application.dataPath.GetHashCode() + "ExcelPath", default);
 #elif UNITY_STANDALONE
         string INPUT_PATH = URLSetting.CS_STREAMINGASSETS_URL + ExcelPath;
 #elif UNITY_ANDROID
