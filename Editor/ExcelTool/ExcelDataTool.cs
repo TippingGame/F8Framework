@@ -81,7 +81,7 @@ namespace F8Framework.Core.Editor
         
         public static void LoadAllExcelData()
         {
-            if (EditorPrefs.GetString("ExcelPath", default).IsNullOrEmpty())
+            if (F8EditorPrefs.GetString("ExcelPath", default).IsNullOrEmpty())
             {
                 FileTools.CheckDirAndCreateWhenNeeded(Application.dataPath + ExcelPath);
                 string tempExcelPath = EditorUtility.OpenFolderPanel("设置Excel存放目录", Application.dataPath + ExcelPath, "");
@@ -89,12 +89,12 @@ namespace F8Framework.Core.Editor
                 {
                     tempExcelPath = Application.dataPath + ExcelPath;
                 }
-                EditorPrefs.SetString("ExcelPath", tempExcelPath);
+                F8EditorPrefs.SetString("ExcelPath", tempExcelPath);
                 LogF8.LogConfig("首次启动，设置Excel存放目录：" + tempExcelPath + " （如要更改请到----上方菜单栏->开发工具->设置Excel存放目录）");
                 LoadAllExcelData();
                 return;
             }
-            string lastExcelPath = EditorPrefs.GetString("ExcelPath", default) ?? Application.dataPath + ExcelPath;
+            string lastExcelPath = F8EditorPrefs.GetString("ExcelPath", default) ?? Application.dataPath + ExcelPath;
             
             string INPUT_PATH = lastExcelPath;
 
@@ -175,7 +175,7 @@ namespace F8Framework.Core.Editor
             // 等待脚本编译完成
             CompilationPipeline.compilationFinished += (object s) =>
             {
-                EditorPrefs.SetBool("compilationFinished", true);
+                F8EditorPrefs.SetBool("compilationFinished", true);
             };
         }
         
@@ -183,11 +183,11 @@ namespace F8Framework.Core.Editor
         [UnityEditor.Callbacks.DidReloadScripts]
         private static void AllScriptsReloaded()
         {
-            if (EditorPrefs.GetBool("compilationFinished", false) == false)
+            if (F8EditorPrefs.GetBool("compilationFinished", false) == false)
             {
                 return;
             }
-            EditorPrefs.SetBool("compilationFinished", false);
+            F8EditorPrefs.SetBool("compilationFinished", false);
             LogF8.LogConfig("<color=#FF9E59>导表后脚本编译完成!</color>");
             Assembly assembly = Util.Assembly.GetAssembly(CODE_NAMESPACE);
             //准备序列化数据
@@ -195,7 +195,7 @@ namespace F8Framework.Core.Editor
             if (Directory.Exists(BinDataPath)) Directory.Delete(BinDataPath, true); //删除旧的数据文件
             Directory.CreateDirectory(BinDataPath);
             
-            string lastExcelPath = EditorPrefs.GetString("ExcelPath", default) ?? Application.dataPath + ExcelPath;
+            string lastExcelPath = F8EditorPrefs.GetString("ExcelPath", default) ?? Application.dataPath + ExcelPath;
             
             string INPUT_PATH = lastExcelPath;
             var files = Directory.GetFiles(INPUT_PATH, "*.*", SearchOption.AllDirectories)
@@ -236,49 +236,49 @@ namespace F8Framework.Core.Editor
             UnityEditor.EditorApplication.delayCall += () =>
             {
                 AssetDatabase.Refresh();
-                if (EditorPrefs.GetBool("compilationFinishedHotUpdateDll", false) == true)
+                if (F8EditorPrefs.GetBool("compilationFinishedHotUpdateDll", false) == true)
                 {
                     F8Helper.GenerateCopyHotUpdateDll();
                 }
-                EditorPrefs.SetBool("compilationFinishedHotUpdateDll", false);
+                F8EditorPrefs.SetBool("compilationFinishedHotUpdateDll", false);
             };
             
             UnityEditor.EditorApplication.delayCall += () =>
             {
                 AssetDatabase.Refresh();
-                if (EditorPrefs.GetBool("compilationFinishedBuildAB", false) == true)
+                if (F8EditorPrefs.GetBool("compilationFinishedBuildAB", false) == true)
                 {
                     ABBuildTool.BuildAllAB();
                 }
-                EditorPrefs.SetBool("compilationFinishedBuildAB", false);
+                F8EditorPrefs.SetBool("compilationFinishedBuildAB", false);
             };
             
             UnityEditor.EditorApplication.delayCall += () =>
             {
-                if (EditorPrefs.GetBool("compilationFinishedBuildPkg", false) == true)
+                if (F8EditorPrefs.GetBool("compilationFinishedBuildPkg", false) == true)
                 {
                     BuildPkgTool.Build();
                     BuildPkgTool.WriteAssetVersion();
                 }
-                EditorPrefs.SetBool("compilationFinishedBuildPkg", false);
+                F8EditorPrefs.SetBool("compilationFinishedBuildPkg", false);
             };
             
             UnityEditor.EditorApplication.delayCall += () =>
             {
-                if (EditorPrefs.GetBool("compilationFinishedBuildRun", false) == true)
+                if (F8EditorPrefs.GetBool("compilationFinishedBuildRun", false) == true)
                 {
                     BuildPkgTool.RunExportedGame();
                 }
-                EditorPrefs.SetBool("compilationFinishedBuildRun", false);
+                F8EditorPrefs.SetBool("compilationFinishedBuildRun", false);
             };
             
             UnityEditor.EditorApplication.delayCall += () =>
             {
-                if (EditorPrefs.GetBool("compilationFinishedBuildUpdate", false) == true)
+                if (F8EditorPrefs.GetBool("compilationFinishedBuildUpdate", false) == true)
                 {
                     BuildPkgTool.BuildUpdate();
                 }
-                EditorPrefs.SetBool("compilationFinishedBuildUpdate", false);
+                F8EditorPrefs.SetBool("compilationFinishedBuildUpdate", false);
             };
         }
         

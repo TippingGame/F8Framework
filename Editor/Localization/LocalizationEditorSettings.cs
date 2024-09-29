@@ -24,7 +24,7 @@ namespace F8Framework.Core.Editor
 		// 初始化设置
 		public static void LoadEditorSettings()
 		{
-			var json = EditorPrefs.GetString(LocalizationConst.LocalizationSettingsKey, "");
+			var json = F8EditorPrefs.GetString(LocalizationConst.LocalizationSettingsKey, "");
 			if (json == "")
 			{
 				current = new SettingsDefinition();
@@ -39,7 +39,7 @@ namespace F8Framework.Core.Editor
 		{
 			var definition = current;
 			var json = JsonUtility.ToJson(definition);
-			EditorPrefs.SetString(LocalizationConst.LocalizationSettingsKey, json);
+			F8EditorPrefs.SetString(LocalizationConst.LocalizationSettingsKey, json);
 		}
 	}
 }

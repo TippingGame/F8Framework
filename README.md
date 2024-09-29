@@ -4,6 +4,8 @@
 
 # F8 Framework
 
+[![license](https://img.shields.io/github/stars/TippingGame/F8Framework.svg)](https://github.com/TippingGame/F8Framework/stargazers) 
+[![license](https://img.shields.io/github/forks/TippingGame/F8Framework?color=eb6ea5)](https://github.com/TippingGame/F8Framework/fork) 
 [![license](http://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT) 
 [![Unity Version](https://img.shields.io/badge/unity-2021.3.15f1-blue)](https://unity.com) 
 [![Platform](https://img.shields.io/badge/platform-Win%20%7C%20Android%20%7C%20iOS%20%7C%20Mac%20%7C%20Linux%20%7C%20WebGL-orange)]() 
@@ -72,6 +74,9 @@ Unity 2021.3.15f1+
 
 * 视频教程：[【Unity框架】开源 F8Framework 游戏框架介绍](https://www.bilibili.com/video/BV16i42117nx/?share_source=copy_web&vd_source=2fde88c46cd96d06f86859724813e355)  
 * 游戏项目Demo：[https://github.com/TippingGame/F8FrameworkDemo](https://github.com/TippingGame/F8FrameworkDemo)  
+
+## 社区
+* qq开发交流群：722647431
 
 ---
 

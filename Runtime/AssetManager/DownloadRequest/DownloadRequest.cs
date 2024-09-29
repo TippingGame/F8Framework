@@ -12,7 +12,7 @@ namespace F8Framework.Core
     public class DownloadRequest
     {
         /// <summary>
-        /// 禁用Unity缓存系统在WebGL平台
+        /// 禁用Unity缓存系统在WebGL平台（微信小游戏使用）
         /// </summary>
         public static bool DisableUnityCacheOnWebGL = false;
         

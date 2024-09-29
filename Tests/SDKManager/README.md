@@ -74,7 +74,7 @@ Unity F8 SDKManager组件，与原生平台交互，接入多个平台或者渠�
 * 分别给WX-WASM-SDK-V2目录下Editor和Runtime的两个.asmdef文件，添加F8框架的LitJson引用  
 ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20240524001621.png)  
 ---
-* 修改两个变量为true。
+* 修改三个变量为true。
 1. [AssetManager.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/AssetManager/AssetManager.cs)  
 ```C#
 //强制更改资产加载模式为远程（微信小游戏使用）
@@ -84,6 +84,11 @@ public static bool ForceRemoteAssetBundle = false;
 ```C#
 // 打包后AB名加上MD5（微信小游戏使用）
 private static bool appendHashToAssetBundleName = false;
+```
+3. [DownloadRequest.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/AssetManager/DownloadRequest/DownloadRequest.cs)
+```C#
+// 禁用Unity缓存系统在WebGL平台（微信小游戏使用）
+public static bool DisableUnityCacheOnWebGL = false;
 ```
 ---
 * 解除两个注释。

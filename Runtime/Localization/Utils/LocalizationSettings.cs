@@ -1,5 +1,4 @@
-﻿using UnityEditor;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace F8Framework.Core
 {
@@ -13,7 +12,7 @@ namespace F8Framework.Core
 		public static string LoadLanguageSettings()
 		{
 #if UNITY_EDITOR
-			var json = EditorPrefs.GetString(LocalizationConst.CurrentLanguageKey, "");
+			var json = UnityEditor.EditorPrefs.GetString(Application.dataPath.GetHashCode() + LocalizationConst.CurrentLanguageKey, "");
 			if (json == "")
 			{
 				// 根据系统语言设置
@@ -45,7 +44,7 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
 			var definition = new Definition { currentLanguageName = Localization.Instance.CurrentLanguageName };
 			var json = JsonUtility.ToJson(definition);
-			EditorPrefs.SetString(LocalizationConst.CurrentLanguageKey, json);
+			UnityEditor.EditorPrefs.SetString(Application.dataPath.GetHashCode() + LocalizationConst.CurrentLanguageKey, json);
 #else
 			var definition = new Definition { currentLanguageName = Localization.Instance.CurrentLanguageName };
 			StorageManager.Instance.SetObject<Definition>(LocalizationConst.CurrentLanguageKey, definition, true);

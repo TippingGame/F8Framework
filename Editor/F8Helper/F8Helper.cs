@@ -10,11 +10,11 @@ namespace F8Framework.Core.Editor
         [MenuItem("开发工具/设置Excel存放目录")]
         public static void SetExcelPath()
         {
-            string lastExcelPath = EditorPrefs.GetString("ExcelPath", default);
+            string lastExcelPath = F8EditorPrefs.GetString("ExcelPath", default);
             string tempExcelPath = EditorUtility.OpenFolderPanel("设置Excel存放目录", lastExcelPath ?? Application.dataPath, "");
             if (!tempExcelPath.IsNullOrEmpty())
             {
-                EditorPrefs.SetString("ExcelPath", tempExcelPath);
+                F8EditorPrefs.SetString("ExcelPath", tempExcelPath);
             }
             LogF8.LogConfig("设置Excel存放目录：" + tempExcelPath);
         }
@@ -23,8 +23,8 @@ namespace F8Framework.Core.Editor
         public static void F8Run()
         {
             CopyAndroidManifest();
-            EditorPrefs.SetBool("compilationFinishedHotUpdateDll", true);
-            EditorPrefs.SetBool("compilationFinishedBuildAB", true);
+            F8EditorPrefs.SetBool("compilationFinishedHotUpdateDll", true);
+            F8EditorPrefs.SetBool("compilationFinishedBuildAB", true);
             LoadAllExcelData();
         }
 
@@ -53,7 +53,7 @@ namespace F8Framework.Core.Editor
         [MenuItem("开发工具/生成并复制热更新Dll-F8")]
         public static void GenerateCopyHotUpdateDll()
         {
-            // EditorPrefs.SetBool("compilationFinishedHotUpdateDll", false);
+            // F8EditorPrefs.SetBool("compilationFinishedHotUpdateDll", false);
             // HybridCLR.Editor.Commands.PrebuildCommand.GenerateAll();
             // FileTools.SafeClearDir(Application.dataPath + "/AssetBundles/Code");
             // FileTools.CheckDirAndCreateWhenNeeded(Application.dataPath + "/AssetBundles/Code");
@@ -81,7 +81,7 @@ namespace F8Framework.Core.Editor
         [MenuItem("开发工具/打包AssetBundles目录资源-F8")]
         public static void BuildAssetBundles()
         {
-            EditorPrefs.SetBool("compilationFinishedBuildAB", false);
+            F8EditorPrefs.SetBool("compilationFinishedBuildAB", false);
             ABBuildTool.BuildAllAB();
         }
 
@@ -102,12 +102,12 @@ namespace F8Framework.Core.Editor
         
         private static void OnEditorQuit()
         {
-            EditorPrefs.SetBool("compilationFinished", false);
-            EditorPrefs.SetBool("compilationFinishedHotUpdateDll", false);
-            EditorPrefs.SetBool("compilationFinishedBuildAB", false);
-            EditorPrefs.SetBool("compilationFinishedBuildPkg", false);
-            EditorPrefs.SetBool("compilationFinishedBuildRun", false);
-            EditorPrefs.SetBool("compilationFinishedBuildUpdate", false);
+            F8EditorPrefs.SetBool("compilationFinished", false);
+            F8EditorPrefs.SetBool("compilationFinishedHotUpdateDll", false);
+            F8EditorPrefs.SetBool("compilationFinishedBuildAB", false);
+            F8EditorPrefs.SetBool("compilationFinishedBuildPkg", false);
+            F8EditorPrefs.SetBool("compilationFinishedBuildRun", false);
+            F8EditorPrefs.SetBool("compilationFinishedBuildUpdate", false);
         }
 
         private static void ProjectWindowItemOnGUI(string guid, Rect selectionRect)

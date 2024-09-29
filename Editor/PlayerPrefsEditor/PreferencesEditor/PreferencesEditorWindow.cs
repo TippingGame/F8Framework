@@ -106,11 +106,11 @@ namespace F8Framework.Core.Editor
 #endif
             entryAccessor.PrefEntryChangedDelegate = () => { updateView = true; };
 
-            monitoring = EditorPrefs.GetBool("F8Framework.Core.Editor.WatchingForChanges", true);
+            monitoring = F8EditorPrefs.GetBool("F8Framework.Core.Editor.WatchingForChanges", true);
             if(monitoring)
                 entryAccessor.StartMonitoring();
 
-            sortOrder = (PreferencesEntrySortOrder) EditorPrefs.GetInt("F8Framework.Core.Editor.SortOrder", 0);
+            sortOrder = (PreferencesEntrySortOrder) F8EditorPrefs.GetInt("F8Framework.Core.Editor.SortOrder", 0);
             searchfield = new MySearchField();
             searchfield.DropdownSelectionDelegate = () => { PrepareData(); };
 
@@ -169,7 +169,7 @@ namespace F8Framework.Core.Editor
             userDefList = new ReorderableList(serializedObject, serializedObject.FindProperty("userDefList"), false, true, true, true);
             unityDefList = new ReorderableList(serializedObject, serializedObject.FindProperty("unityDefList"), false, true, false, false);
 
-            relSpliterPos = EditorPrefs.GetFloat("F8Framework.Core.Editor.RelativeSpliterPosition", 100 / position.width);
+            relSpliterPos = F8EditorPrefs.GetFloat("F8Framework.Core.Editor.RelativeSpliterPosition", 100 / position.width);
 
             userDefList.drawHeaderCallback = (Rect rect) =>
             {
@@ -377,7 +377,7 @@ namespace F8Framework.Core.Editor
             if (Event.current.type == EventType.MouseUp)
             {
                 moveSplitterPos = false;
-                EditorPrefs.SetFloat("F8Framework.Core.Editor.RelativeSpliterPosition", relSpliterPos);
+                F8EditorPrefs.SetFloat("F8Framework.Core.Editor.RelativeSpliterPosition", relSpliterPos);
             }
         }
 
@@ -435,7 +435,7 @@ namespace F8Framework.Core.Editor
                     {
                         sortOrder = 0;
                     }
-                    EditorPrefs.SetInt("F8Framework.Core.Editor.SortOrder", (int) sortOrder);
+                    F8EditorPrefs.SetInt("F8Framework.Core.Editor.SortOrder", (int) sortOrder);
                     PrepareData(false);
                 }
 
@@ -444,7 +444,7 @@ namespace F8Framework.Core.Editor
                 {
                     monitoring = !monitoring;
 
-                    EditorPrefs.SetBool("F8Framework.Core.Editor.WatchingForChanges", monitoring);
+                    F8EditorPrefs.SetBool("F8Framework.Core.Editor.WatchingForChanges", monitoring);
 
                     if (monitoring)
                         entryAccessor.StartMonitoring();
