@@ -155,6 +155,23 @@ namespace F8Framework.Core
             loader.LoadAsync(resourceType, callback);
         }
 
+        public IEnumerator LoadAsyncCoroutine(string resourcePath, System.Type resourceType = default)
+        {
+            ResourcesLoader loader;
+            if (resourceLoaders.ContainsKey(resourcePath))
+            {
+                loader = resourceLoaders[resourcePath];
+            }
+            else
+            {
+                loader = new ResourcesLoader();
+                loader.Init(resourcePath);
+                resourceLoaders.Add(resourcePath, loader);
+            }
+
+            yield return loader.LoadAsyncCoroutine(resourceType);
+        }
+        
         /// <summary>
         /// 通过相对资源名称异步加载。
         /// 如果资源重复加载，将直接从资源池提供。
@@ -327,7 +344,7 @@ namespace F8Framework.Core
         /// <param name="resourcePath">资源文件夹的相对路径。</param>
         /// <param name="resourceType">Asset对象的目标对象类型。</param>
         /// <returns>加载的资源对象。</returns>
-        public Object GetResouceObject(string resourcePath, System.Type resourceType)
+        public Object GetResouceObject(string resourcePath, System.Type resourceType = default)
         {
             if (IsLoadFinished(resourcePath))
             {
@@ -335,34 +352,21 @@ namespace F8Framework.Core
                     resourcePath,
                     out ResourcesLoader loader))
                 {
-                    if (resourceType.IsAssignableFrom(loader.ResouceObject.GetType()))
+                    if (resourceType == default)
                     {
                         return loader.ResouceObject;
                     }
                     else
                     {
-                        return null;
+                        if (resourceType.IsAssignableFrom(loader.ResouceObject.GetType()))
+                        {
+                            return loader.ResouceObject;
+                        }
+                        else
+                        {
+                            return null;
+                        }
                     }
-                }
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// 通过相对资源名称获取资源对象列表。
-        /// </summary>
-        /// <param name="resourcePath">资源文件夹的相对路径。</param>
-        /// <returns>加载的资源对象。</returns>
-        public Object GetResouceObject(string resourcePath)
-        {
-            if (IsLoadFinished(resourcePath))
-            {
-                if (resourceLoaders.TryGetValue(
-                    resourcePath,
-                    out ResourcesLoader loader))
-                {
-                    return loader.ResouceObject;
                 }
             }
 

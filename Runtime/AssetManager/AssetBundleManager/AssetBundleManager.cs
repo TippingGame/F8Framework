@@ -456,7 +456,7 @@ namespace F8Framework.Core
         /// <param name="assetPath">assetPath名。（小写）</param>
         /// <param name="assetType">资产对象的目标对象类型。</param>
         /// <returns>找到的资产对象。</returns>
-        public Object GetAssetObject(string assetBundlePath, string assetPath, System.Type assetType)
+        public Object GetAssetObject(string assetBundlePath, string assetPath, System.Type assetType = default)
         {
             if (assetBundleLoaders.TryGetValue(assetBundlePath, out AssetBundleLoader loader))
             {
@@ -467,33 +467,17 @@ namespace F8Framework.Core
                     bool success = loader.TryGetAsset(assetPath, out Object obj);
                     if (success)
                     {
-                        if (assetType.IsAssignableFrom(obj.GetType()))
+                        if (assetType == default)
+                        {
                             return obj;
-                        return null;
+                        }
+                        else
+                        {
+                            if (assetType.IsAssignableFrom(obj.GetType()))
+                                return obj;
+                            return null;
+                        }
                     }
-                }
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// 通过资产捆绑加载程序和对象名称获取资产对象。
-        /// </summary>
-        /// <param name="assetBundlePath">assetBundle路径。</param>
-        /// <param name="assetPath">assetPath名。（小写）</param>
-        /// <returns>找到的资产对象。</returns>
-        public Object GetAssetObject(string assetBundlePath, string assetPath)
-        {
-            if (assetBundleLoaders.TryGetValue(assetBundlePath, out AssetBundleLoader loader))
-            {
-                if (loader != null &&
-                    loader.IsLoadFinished &&
-                    loader.IsExpandFinished)
-                {
-                    bool success = loader.TryGetAsset(assetPath, out Object obj);
-                    if (success)
-                        return obj;
                 }
             }
 

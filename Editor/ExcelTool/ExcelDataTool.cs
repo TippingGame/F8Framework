@@ -84,15 +84,9 @@ namespace F8Framework.Core.Editor
             if (F8EditorPrefs.GetString("ExcelPath", default).IsNullOrEmpty())
             {
                 FileTools.CheckDirAndCreateWhenNeeded(Application.dataPath + ExcelPath);
-                string tempExcelPath = EditorUtility.OpenFolderPanel("设置Excel存放目录", Application.dataPath + ExcelPath, "");
-                if (tempExcelPath.IsNullOrEmpty())
-                {
-                    tempExcelPath = Application.dataPath + ExcelPath;
-                }
+                string tempExcelPath = Application.dataPath + ExcelPath;
                 F8EditorPrefs.SetString("ExcelPath", tempExcelPath);
                 LogF8.LogConfig("首次启动，设置Excel存放目录：" + tempExcelPath + " （如要更改请到----上方菜单栏->开发工具->设置Excel存放目录）");
-                LoadAllExcelData();
-                return;
             }
             string lastExcelPath = F8EditorPrefs.GetString("ExcelPath", default) ?? Application.dataPath + ExcelPath;
             

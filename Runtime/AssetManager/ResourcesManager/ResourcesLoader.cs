@@ -200,6 +200,27 @@ namespace F8Framework.Core
             }
         }
 
+        public virtual IEnumerator LoadAsyncCoroutine(System.Type resourceType = default)
+        {
+            if (resourceLoadState == LoaderState.NONE)
+            {
+                loadType = LoaderType.ASYNC;
+                resourceLoadState = LoaderState.WORKING;
+                resourceLoadRequest = resourceType == default ?
+                    Resources.LoadAsync(resourcePath):
+                    Resources.LoadAsync(resourcePath, resourceType);
+
+                // Wait until the resource is loaded
+                yield return resourceLoadRequest;
+
+                resouceObject = resourceLoadRequest.asset;
+                resourceLoadState = LoaderState.FINISHED;
+                
+                // 返回加载完成的资源对象
+                yield return resouceObject;
+            }
+        }
+        
         /// <summary>
         /// 异步加载资源。
         /// </summary>

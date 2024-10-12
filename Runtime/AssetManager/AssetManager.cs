@@ -694,6 +694,74 @@ namespace F8Framework.Core
             }
             
             /// <summary>
+            /// 协程加载资产对象。
+            /// </summary>
+            /// <param name="assetName">资产路径字符串。</param>
+            /// <param name="assetType">目标资产类型。</param>
+            /// <param name="mode">访问模式。</param>
+            public IEnumerator LoadAsyncCoroutine(string assetName, System.Type assetType = default, AssetAccessMode mode = AssetAccessMode.UNKNOWN)
+            {
+                AssetInfo info = GetAssetInfo(assetName, mode);
+                if (!IsLegal(ref info))
+                {
+                    yield break;
+                }
+
+                if (info.AssetType == AssetTypeEnum.RESOURCE)
+                {
+                    string assetPath = info.AssetPath?[0];
+#if UNITY_EDITOR
+                    if (_isEditorMode)
+                    {
+                        assetPath = info.AssetPath == null ? SearchAsset(assetName, assetType, AssetAccessMode.RESOURCE) : info.AssetPath[0];
+                    }
+#endif
+                    Object o = ResourcesManager.Instance.GetResouceObject(assetPath, assetType);
+                    
+                    if (o != null)
+                    {
+                        yield return o;
+                    }
+                    else
+                    {
+                        yield return ResourcesManager.Instance.LoadAsyncCoroutine(assetPath, assetType);
+                    }
+                }
+                else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
+                {
+#if UNITY_EDITOR
+                    if (_isEditorMode)
+                    {
+                        var o = assetType == default ?
+                            UnityEditor.AssetDatabase.LoadAssetAtPath<Object>(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0]) :
+                            UnityEditor.AssetDatabase.LoadAssetAtPath(info.AssetPath == null ? SearchAsset(assetName, assetType) : info.AssetPath[0], assetType);
+                        yield return o;
+                        yield break;
+                    }
+#endif
+                    AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePath);
+                    if (ab == null || ab.AssetBundleContent == null || ab.GetDependentNamesLoadFinished() < ab.AddDependentNames())
+                    {
+                        yield return AssetBundleManager.Instance.LoadAsyncCoroutine(assetName, info);
+                        yield return AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], assetType);
+                    }
+                    else
+                    {
+                        Object o = AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], assetType);
+                        if (o != null)
+                        {
+                            yield return o;
+                        }
+                        else
+                        {
+                            ab.Expand();
+                            yield return AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], assetType);
+                        }
+                    }
+                }
+            }
+             
+            /// <summary>
             /// 异步加载资产文件夹。
             /// </summary>
             /// <param name="assetName">资产路径字符串。</param>
