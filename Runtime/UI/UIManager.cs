@@ -206,6 +206,14 @@ namespace F8Framework.Core
             return _currentUIids;
         }
 
+        // 异步加载，使用枚举作为参数
+        public string Open<T>(T eventName, object[] uiArgs = null, UICallbacks callbacks = null) where T : Enum, IConvertible
+        {
+            int tempName = (int)(object)eventName;
+            return Open(tempName, uiArgs, callbacks);
+        }
+        
+        // 异步加载，使用id作为参数
         public string Open(int uiId, object[] uiArgs = null, UICallbacks callbacks = null)
         {
             if (!_configs.TryGetValue(uiId, out UIConfig config))

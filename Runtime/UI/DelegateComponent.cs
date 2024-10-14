@@ -64,9 +64,11 @@ namespace F8Framework.Core
 
         private void OnDestroy()
         {
-            // 触发窗口组件上窗口移除之后的事件
-            ViewParams.BaseView?.Removed();
-
+            if (Application.isPlaying)
+            {
+                // 触发窗口组件上窗口移除之后的事件
+                ViewParams.BaseView?.Removed();
+            }
             ViewParams = null;
         }
     }
