@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace JamesFrowen.SimpleWeb
+namespace Mirror.SimpleWeb
 {
     /// <summary>
     /// Constant values that should never change
@@ -58,7 +58,6 @@ namespace JamesFrowen.SimpleWeb
         /// if payload length is 127 when next 8 bytes will be the length
         /// </summary>
         public const int UlongPayloadLength = 127;
-
 
         /// <summary>
         /// Guid used for WebSocket Protocol

@@ -6,15 +6,14 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
-namespace JamesFrowen.SimpleWeb
+namespace Mirror.SimpleWeb
 {
     internal sealed class Connection : IDisposable
     {
+        readonly object disposedLock = new object();
+
         public const int IdNotSet = -1;
-        private readonly object disposedLock = new object();
-
         public TcpClient client;
-
         public int connId = IdNotSet;
 
         /// <summary>
@@ -36,7 +35,7 @@ namespace JamesFrowen.SimpleWeb
         public ConcurrentQueue<ArrayBuffer> sendQueue = new ConcurrentQueue<ArrayBuffer>();
 
         public Action<Connection> onDispose;
-        private volatile bool hasDisposed;
+        volatile bool hasDisposed;
 
         public Connection(TcpClient client, Action<Connection> onDispose)
         {
@@ -49,12 +48,12 @@ namespace JamesFrowen.SimpleWeb
         /// </summary>
         public void Dispose()
         {
-            Log.Verbose($"Dispose {ToString()}");
+            Log.Verbose("[SWT-Connection]: Dispose {0}", ToString());
 
             // check hasDisposed first to stop ThreadInterruptedException on lock
             if (hasDisposed) return;
 
-            Log.Info($"Connection Close: {ToString()}");
+            Log.Verbose("[SWT-Connection]: Connection Close: {0}", ToString());
 
             lock (disposedLock)
             {
@@ -92,12 +91,15 @@ namespace JamesFrowen.SimpleWeb
 
         public override string ToString()
         {
+            // remoteAddress isn't set until after handshake
             if (hasDisposed)
                 return $"[Conn:{connId}, Disposed]";
+            else if (!string.IsNullOrWhiteSpace(remoteAddress))
+                return $"[Conn:{connId}, endPoint:{remoteAddress}]";
             else
                 try
                 {
-                    System.Net.EndPoint endpoint = client?.Client?.RemoteEndPoint;
+                    EndPoint endpoint = client?.Client?.RemoteEndPoint;
                     return $"[Conn:{connId}, endPoint:{endpoint}]";
                 }
                 catch (SocketException)

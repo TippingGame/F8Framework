@@ -8,7 +8,7 @@
         "Excel",
         "LitJson",
         "MessagePack",
-        "kcp",
+        "kcp2k",
         "Telepathy",
         "SimpleWebTransport",
         "HybridCLR.Runtime"

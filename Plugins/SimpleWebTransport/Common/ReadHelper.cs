@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Runtime.Serialization;
 
-namespace JamesFrowen.SimpleWeb
+namespace Mirror.SimpleWeb
 {
     public static class ReadHelper
     {
@@ -20,9 +20,8 @@ namespace JamesFrowen.SimpleWeb
                 {
                     int read = stream.Read(outBuffer, outOffset + received, length - received);
                     if (read == 0)
-                    {
-                        throw new ReadHelperException("returned 0");
-                    }
+                        throw new ReadHelperException("[SWT-ReadHelper]: Read returned 0");
+
                     received += read;
                 }
             }
@@ -36,9 +35,7 @@ namespace JamesFrowen.SimpleWeb
             }
 
             if (received != length)
-            {
-                throw new ReadHelperException("returned not equal to length");
-            }
+                throw new ReadHelperException("[SWT-ReadHelper]: received not equal to length");
 
             return outOffset + received;
         }
@@ -83,7 +80,7 @@ namespace JamesFrowen.SimpleWeb
 
                     if (read >= maxLength)
                     {
-                        Log.Error("SafeReadTillMatch exceeded maxLength");
+                        Log.Error("[SWT-ReadHelper]: SafeReadTillMatch exceeded maxLength");
                         return null;
                     }
 
@@ -96,15 +93,11 @@ namespace JamesFrowen.SimpleWeb
                         endIndex++;
                         // when all is match return with read length
                         if (endIndex >= endLength)
-                        {
                             return read;
-                        }
                     }
                     // if n not match reset to 0
                     else
-                    {
                         endIndex = 0;
-                    }
                 }
             }
             catch (IOException e)
@@ -125,8 +118,6 @@ namespace JamesFrowen.SimpleWeb
     {
         public ReadHelperException(string message) : base(message) { }
 
-        protected ReadHelperException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
+        protected ReadHelperException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

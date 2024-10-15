@@ -3,7 +3,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace JamesFrowen.SimpleWeb
+namespace Mirror.SimpleWeb
 {
     /// <summary>
     /// Handles Handshakes from new clients on the server
@@ -13,12 +13,16 @@ namespace JamesFrowen.SimpleWeb
     {
         const int GetSize = 3;
         const int ResponseLength = 129;
-        internal const int KeyLength = 24;
+        const int KeyLength = 24;
         const int MergedKeyLength = 60;
         const string KeyHeaderString = "\r\nSec-WebSocket-Key: ";
         // this isn't an official max, just a reasonable size for a websocket handshake
         readonly int maxHttpHeaderSize = 3000;
 
+        // SHA-1 is the websocket standard:
+        // https://www.rfc-editor.org/rfc/rfc6455
+        // we should follow the standard, even though SHA1 is considered weak:
+        // https://stackoverflow.com/questions/38038841/why-is-sha-1-considered-insecure
         readonly SHA1 sha1 = SHA1.Create();
         readonly BufferPool bufferPool;
 
@@ -46,7 +50,7 @@ namespace JamesFrowen.SimpleWeb
 
                 if (!IsGet(getHeader.array))
                 {
-                    Log.Warn($"First bytes from client was not 'GET' for handshake, instead was {Log.BufferToString(getHeader.array, 0, GetSize)}");
+                    Log.Warn("[SWT-ServerHandshake]: First bytes from client was not 'GET' for handshake, instead was {0}", Log.BufferToString(getHeader.array, 0, GetSize));
                     return false;
                 }
             }
@@ -62,6 +66,7 @@ namespace JamesFrowen.SimpleWeb
 
                 conn.request = new Request(msg);
                 conn.remoteAddress = conn.CalculateAddress();
+                Log.Info($"[SWT-ServerHandshake]: A client connected from {0}", conn);
 
                 return true;
             }
@@ -83,7 +88,9 @@ namespace JamesFrowen.SimpleWeb
                 int readCount = readCountOrFail.Value;
 
                 string msg = Encoding.ASCII.GetString(readBuffer.array, 0, readCount);
-                Log.Verbose(msg);
+                // GET isn't in the bytes we read here, so we need to add it back
+                msg = $"GET{msg}";
+                Log.Verbose("[SWT-ServerHandshake]: Client Handshake Message:\r\n{0}", msg);
 
                 return msg;
             }
@@ -99,9 +106,8 @@ namespace JamesFrowen.SimpleWeb
 
         void AcceptHandshake(Stream stream, string msg)
         {
-            using (
-                ArrayBuffer keyBuffer = bufferPool.Take(KeyLength + Constants.HandshakeGUIDLength),
-                            responseBuffer = bufferPool.Take(ResponseLength))
+            using (ArrayBuffer keyBuffer = bufferPool.Take(KeyLength + Constants.HandshakeGUIDLength),
+                               responseBuffer = bufferPool.Take(ResponseLength))
             {
                 GetKey(msg, keyBuffer.array);
                 AppendGuid(keyBuffer.array);
@@ -112,11 +118,11 @@ namespace JamesFrowen.SimpleWeb
             }
         }
 
-        internal static void GetKey(string msg, byte[] keyBuffer)
+        static void GetKey(string msg, byte[] keyBuffer)
         {
             int start = msg.IndexOf(KeyHeaderString, StringComparison.InvariantCultureIgnoreCase) + KeyHeaderString.Length;
 
-            Log.Verbose($"Handshake Key: {msg.Substring(start, KeyLength)}");
+            Log.Verbose("[SWT-ServerHandshake]: Handshake Key: {0}", msg.Substring(start, KeyLength));
             Encoding.ASCII.GetBytes(msg, start, KeyLength, keyBuffer, 0);
         }
 
@@ -127,7 +133,7 @@ namespace JamesFrowen.SimpleWeb
 
         byte[] CreateHash(byte[] keyBuffer)
         {
-            Log.Verbose($"Handshake Hashing {Encoding.ASCII.GetString(keyBuffer, 0, MergedKeyLength)}");
+            Log.Verbose("[SWT-ServerHandshake]: Handshake Hashing {0}", Encoding.ASCII.GetString(keyBuffer, 0, MergedKeyLength));
             return sha1.ComputeHash(keyBuffer, 0, MergedKeyLength);
         }
 
@@ -143,7 +149,7 @@ namespace JamesFrowen.SimpleWeb
                 "Sec-WebSocket-Accept: {0}\r\n\r\n",
                 keyHashString);
 
-            Log.Verbose($"Handshake Response length {message.Length}, IsExpected {message.Length == ResponseLength}");
+            Log.Verbose("[SWT-ServerHandshake]: Handshake Response length {0}, IsExpected {1}", message.Length, message.Length == ResponseLength);
             Encoding.ASCII.GetBytes(message, 0, ResponseLength, responseBuffer, 0);
         }
     }

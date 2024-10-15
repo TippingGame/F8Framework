@@ -2,7 +2,7 @@ using System;
 using System.Net.Sockets;
 using System.Threading;
 
-namespace JamesFrowen.SimpleWeb
+namespace Mirror.SimpleWeb
 {
     public class WebSocketClientStandAlone : SimpleWebClient
     {
@@ -27,13 +27,13 @@ namespace JamesFrowen.SimpleWeb
             state = ClientState.Connecting;
 
             // create connection here before thread so that send queue exist before connected
-            var client = new TcpClient();
+            TcpClient client = new TcpClient();
             tcpConfig.ApplyTo(client);
 
             // create connection object here so dispose correctly disconnects on failed connect
             conn = new Connection(client, AfterConnectionDisposed);
 
-            var receiveThread = new Thread(() => ConnectAndReceiveLoop(serverAddress));
+            Thread receiveThread = new Thread(() => ConnectAndReceiveLoop(serverAddress));
             receiveThread.IsBackground = true;
             receiveThread.Start();
         }
@@ -60,7 +60,7 @@ namespace JamesFrowen.SimpleWeb
                 bool success = sslHelper.TryCreateStream(conn, serverAddress);
                 if (!success)
                 {
-                    Log.Warn("Failed to create Stream");
+                    Log.Warn("[SWT-WebSocketClientStandAlone]: Failed to create Stream with {0}", serverAddress);
                     conn.Dispose();
                     return;
                 }
@@ -68,20 +68,20 @@ namespace JamesFrowen.SimpleWeb
                 success = handshake.TryHandshake(conn, serverAddress);
                 if (!success)
                 {
-                    Log.Warn("Failed Handshake");
+                    Log.Warn("[SWT-WebSocketClientStandAlone]: Failed Handshake with {0}", serverAddress);
                     conn.Dispose();
                     return;
                 }
 
-                Log.Info("HandShake Successful");
+                Log.Info("[SWT-WebSocketClientStandAlone]: HandShake Successful with {0}", serverAddress);
 
                 state = ClientState.Connected;
 
                 receiveQueue.Enqueue(new Message(EventType.Connected));
 
-                var sendThread = new Thread(() =>
+                Thread sendThread = new Thread(() =>
                 {
-                    var sendConfig = new SendLoop.Config(
+                    SendLoop.Config sendConfig = new SendLoop.Config(
                         conn,
                         bufferSize: Constants.HeaderSize + Constants.MaskSize + maxMessageSize,
                         setMask: true);
@@ -93,7 +93,7 @@ namespace JamesFrowen.SimpleWeb
                 sendThread.IsBackground = true;
                 sendThread.Start();
 
-                var config = new ReceiveLoop.Config(conn,
+                ReceiveLoop.Config config = new ReceiveLoop.Config(conn,
                     maxMessageSize,
                     false,
                     receiveQueue,
@@ -101,7 +101,7 @@ namespace JamesFrowen.SimpleWeb
                 ReceiveLoop.Loop(config);
             }
             catch (ThreadInterruptedException e) { Log.InfoException(e); }
-            catch (ThreadAbortException e) { Log.InfoException(e); }
+            catch (ThreadAbortException) { Log.Error("[SWT-WebSocketClientStandAlone]: Thread Abort Exception"); }
             catch (Exception e) { Log.Exception(e); }
             finally
             {
@@ -120,15 +120,12 @@ namespace JamesFrowen.SimpleWeb
         public override void Disconnect()
         {
             state = ClientState.Disconnecting;
-            Log.Info("Disconnect Called");
+            Log.Verbose("[SWT-WebSocketClientStandAlone]: Disconnect Called");
+
             if (conn == null)
-            {
                 state = ClientState.NotConnected;
-            }
             else
-            {
                 conn?.Dispose();
-            }
         }
 
         public override void Send(ArraySegment<byte> segment)

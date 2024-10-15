@@ -3,7 +3,7 @@ using System;
 using System.Runtime.InteropServices;
 #endif
 
-namespace JamesFrowen.SimpleWeb
+namespace Mirror.SimpleWeb
 {
     internal static class SimpleWebJSLib
     {

@@ -5,7 +5,7 @@ using System.Net.Sockets;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 
-namespace JamesFrowen.SimpleWeb
+namespace Mirror.SimpleWeb
 {
     public struct SslConfig
     {
@@ -31,7 +31,10 @@ namespace JamesFrowen.SimpleWeb
         {
             config = sslConfig;
             if (config.enabled)
+            {
                 certificate = new X509Certificate2(config.certPath, config.certPassword);
+                Log.Info($"[SWT-ServerSslHelper]: SSL Certificate {0} loaded with expiration of {1}", certificate.Subject, certificate.GetExpirationDateString());
+            }
         }
 
         internal bool TryCreateStream(Connection conn)
@@ -46,7 +49,7 @@ namespace JamesFrowen.SimpleWeb
                 }
                 catch (Exception e)
                 {
-                    Log.Error($"Create SSLStream Failed: {e}", false);
+                    Log.Error("[SWT-ServerSslHelper]: Create SSLStream Failed: {0}", e.Message);
                     return false;
                 }
             }
@@ -59,16 +62,13 @@ namespace JamesFrowen.SimpleWeb
 
         Stream CreateStream(NetworkStream stream)
         {
-            var sslStream = new SslStream(stream, true, acceptClient);
+            SslStream sslStream = new SslStream(stream, true, acceptClient);
             sslStream.AuthenticateAsServer(certificate, false, config.sslProtocols, false);
 
             return sslStream;
         }
 
-        bool acceptClient(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
-        {
-            // always accept client
-            return true;
-        }
+        // always accept client
+        bool acceptClient(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) => true;
     }
 }

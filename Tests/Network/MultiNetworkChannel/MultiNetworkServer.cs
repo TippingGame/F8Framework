@@ -57,9 +57,9 @@ namespace F8Framework.Tests
             tcpServerChannel.Close();
         }
 
-        void TcpServer_OnConnected(int conv)
+        void TcpServer_OnConnected(int conv, string ip)
         {
-            LogF8.LogNet($"TCP_SERVER conv: {conv} Connected");
+            LogF8.LogNet($"TCP_SERVER conv: {conv} Connected, ip: {ip}");
         }
 
         void TcpServer_OnDataReceived(int conv, byte[] data)
@@ -86,9 +86,9 @@ namespace F8Framework.Tests
             kcpServerChannel.Close();
         }
 
-        void KcpServer_OnConnected(int conv)
+        void KcpServer_OnConnected(int conv, string ip)
         {
-            LogF8.LogNet($"KCP_SERVER conv: {conv} Connected");
+            LogF8.LogNet($"KCP_SERVER conv: {conv} Connected, ip: {ip}");
         }
 
         void KcpServer_OnDataReceived(int conv, byte[] data)

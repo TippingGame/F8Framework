@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Runtime.CompilerServices;
 
-namespace JamesFrowen.SimpleWeb
+namespace Mirror.SimpleWeb
 {
     public static class MessageProcessor
     {
@@ -13,29 +13,21 @@ namespace JamesFrowen.SimpleWeb
         public static bool NeedToReadShortLength(byte[] buffer)
         {
             byte lenByte = FirstLengthByte(buffer);
-
             return lenByte == Constants.UshortPayloadLength;
         }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool NeedToReadLongLength(byte[] buffer)
         {
             byte lenByte = FirstLengthByte(buffer);
-
             return lenByte == Constants.UlongPayloadLength;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int GetOpcode(byte[] buffer)
-        {
-            return buffer[0] & 0b0000_1111;
-        }
+        public static int GetOpcode(byte[] buffer) => buffer[0] & 0b0000_1111;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int GetPayloadLength(byte[] buffer)
-        {
-            byte lenByte = FirstLengthByte(buffer);
-            return GetMessageLength(buffer, 0, lenByte);
-        }
+        public static int GetPayloadLength(byte[] buffer) => GetMessageLength(buffer, 0, FirstLengthByte(buffer));
 
         /// <summary>
         /// Has full message been sent
@@ -43,10 +35,7 @@ namespace JamesFrowen.SimpleWeb
         /// <param name="buffer"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Finished(byte[] buffer)
-        {
-            return (buffer[0] & 0b1000_0000) != 0;
-        }
+        public static bool Finished(byte[] buffer) => (buffer[0] & 0b1000_0000) != 0;
 
         public static void ValidateHeader(byte[] buffer, int maxLength, bool expectMask, bool opCodeContinuation = false)
         {
@@ -114,9 +103,8 @@ namespace JamesFrowen.SimpleWeb
                 value |= ((ulong)buffer[offset + 9] << 0);
 
                 if (value > int.MaxValue)
-                {
                     throw new NotSupportedException($"Can't receive payloads larger that int.max: {int.MaxValue}");
-                }
+
                 return (int)value;
             }
             else // is less than 126
@@ -130,9 +118,7 @@ namespace JamesFrowen.SimpleWeb
         static void ThrowIfMaskNotExpected(bool hasMask, bool expectMask)
         {
             if (hasMask != expectMask)
-            {
                 throw new InvalidDataException($"Message expected mask to be {expectMask} but was {hasMask}");
-            }
         }
 
         /// <exception cref="InvalidDataException"></exception>
@@ -166,7 +152,7 @@ namespace JamesFrowen.SimpleWeb
                 if (opcode == 2 || opcode == 8)
                     return;
 
-                throw new InvalidDataException($"Unexpected opcode {opcode}");
+                throw new InvalidDataException("Expected opcode to be binary or close");
             }
         }
 
@@ -174,21 +160,16 @@ namespace JamesFrowen.SimpleWeb
         static void ThrowIfLengthZero(int msglen)
         {
             if (msglen == 0)
-            {
                 throw new InvalidDataException("Message length was zero");
-            }
         }
 
         /// <summary>
         /// need to check this so that data from previous buffer isn't used
         /// </summary>
-        /// <exception cref="InvalidDataException"></exception>
         public static void ThrowIfMsgLengthTooLong(int msglen, int maxLength)
         {
             if (msglen > maxLength)
-            {
                 throw new InvalidDataException("Message length is greater than max length");
-            }
         }
     }
 }

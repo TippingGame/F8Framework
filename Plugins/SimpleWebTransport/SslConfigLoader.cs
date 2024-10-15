@@ -2,7 +2,7 @@ using System.IO;
 using System.Security.Authentication;
 using UnityEngine;
 
-namespace JamesFrowen.SimpleWeb
+namespace Mirror.SimpleWeb
 {
 
     public class SslConfigLoader
@@ -14,7 +14,7 @@ namespace JamesFrowen.SimpleWeb
         }
         public static SslConfig Load(bool sslEnabled, string sslCertJson, SslProtocols sslProtocols)
         {
-            // dont need to load anything if ssl is not enabled
+            // don't need to load anything if ssl is not enabled
             if (!sslEnabled)
                 return default;
 
@@ -36,15 +36,12 @@ namespace JamesFrowen.SimpleWeb
             Cert cert = JsonUtility.FromJson<Cert>(json);
 
             if (string.IsNullOrWhiteSpace(cert.path))
-            {
                 throw new InvalidDataException("Cert Json didn't not contain \"path\"");
-            }
-            // dont use IsNullOrWhiteSpace here because whitespace could be a valid password for a cert
+
+            // don't use IsNullOrWhiteSpace here because whitespace could be a valid password for a cert
+            // password can also be empty
             if (string.IsNullOrEmpty(cert.password))
-            {
-                // password can be empty
                 cert.password = string.Empty;
-            }
 
             return cert;
         }

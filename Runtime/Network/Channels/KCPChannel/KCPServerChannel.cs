@@ -24,11 +24,11 @@ namespace F8Framework.Core
     {
         KcpServerEndPoint server;
 
-        Action<int> onConnected;
+        Action<int, string> onConnected;
         Action<int> onDisconnected;
         Action<int, byte[]> onDataReceived;
         Action<int, string> onError;
-        public event Action<int> OnConnected
+        public event Action<int, string> OnConnected
         {
             add { onConnected += value; }
             remove { onConnected -= value; }
@@ -90,7 +90,7 @@ namespace F8Framework.Core
             Telepathy.Log.Error = (s) => LogF8.LogError(s);
             this.Port = port;
             server = new KcpServerEndPoint(
-                (connectionId) => onConnected?.Invoke(connectionId),
+                (connectionId, ipEndPoint) => onConnected?.Invoke(connectionId, ipEndPoint.ToString()),
                 OnReceiveDataHandler,
                 (connectionId) => onDisconnected?.Invoke(connectionId),
                 OnErrorHandler,

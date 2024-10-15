@@ -1,4 +1,5 @@
 ﻿using System;
+
 namespace F8Framework.Core
 {
     public interface INetworkServerChannel: INetworkChannel
@@ -6,7 +7,7 @@ namespace F8Framework.Core
         /// <summary>
         /// 建立连接回调；
         /// </summary>
-        event Action<int> OnConnected;
+        event Action<int, string> OnConnected;
         /// <summary>
         /// 断开连接回调；
         /// </summary>

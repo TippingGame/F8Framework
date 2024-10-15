@@ -115,7 +115,7 @@ UI界面分为三大类：
 * 4. 收集UI所有的中文放入本地化表
 ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_20240315025120.png)
 ----------------------------------
-2. UI常用组件（https://github.com/nhn/gpm.unity.git）  
+2. UI常用组件：[https://github.com/nhn/gpm.unity.git](https://github.com/nhn/gpm.unity.git)（已内置，参考目录：F8Framework/Tests/UI/Example）  
 * 嵌套布局  
 ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_20240302173446.png)
 ----------------------------------

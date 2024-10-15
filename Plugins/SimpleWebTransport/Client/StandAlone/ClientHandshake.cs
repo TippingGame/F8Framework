@@ -3,7 +3,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace JamesFrowen.SimpleWeb
+namespace Mirror.SimpleWeb
 {
     /// <summary>
     /// Handles Handshake to the server when it first connects
@@ -18,16 +18,18 @@ namespace JamesFrowen.SimpleWeb
                 Stream stream = conn.stream;
 
                 byte[] keyBuffer = new byte[16];
-                using (var rng = new RNGCryptoServiceProvider())
-                {
+                using (RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider())
                     rng.GetBytes(keyBuffer);
-                }
 
                 string key = Convert.ToBase64String(keyBuffer);
                 string keySum = key + Constants.HandshakeGUID;
                 byte[] keySumBytes = Encoding.ASCII.GetBytes(keySum);
-                Log.Verbose($"Handshake Hashing {Encoding.ASCII.GetString(keySumBytes)}");
+                Log.Verbose("[SWT-ClientHandshake]: Handshake Hashing {0}", Encoding.ASCII.GetString(keySumBytes));
 
+                // SHA-1 is the websocket standard:
+                // https://www.rfc-editor.org/rfc/rfc6455
+                // we should follow the standard, even though SHA1 is considered weak:
+                // https://stackoverflow.com/questions/38038841/why-is-sha-1-considered-insecure
                 byte[] keySumHash = SHA1.Create().ComputeHash(keySumBytes);
 
                 string expectedResponse = Convert.ToBase64String(keySumHash);
@@ -48,20 +50,29 @@ namespace JamesFrowen.SimpleWeb
 
                 if (!lengthOrNull.HasValue)
                 {
-                    Log.Error("Connected closed before handshake");
+                    Log.Error("[SWT-ClientHandshake]: Connection closed before handshake");
                     return false;
                 }
 
                 string responseString = Encoding.ASCII.GetString(responseBuffer, 0, lengthOrNull.Value);
+                Log.Verbose("[SWT-ClientHandshake]: Handshake Response {0}", responseString);
 
                 string acceptHeader = "Sec-WebSocket-Accept: ";
-                int startIndex = responseString.IndexOf(acceptHeader, StringComparison.InvariantCultureIgnoreCase) + acceptHeader.Length;
+                int startIndex = responseString.IndexOf(acceptHeader, StringComparison.InvariantCultureIgnoreCase);
+
+                if (startIndex < 0)
+                {
+                    Log.Error("[SWT-ClientHandshake]: Unexpected Handshake Response {0}", responseString);
+                    return false;
+                }
+
+                startIndex += acceptHeader.Length;
                 int endIndex = responseString.IndexOf("\r\n", startIndex);
                 string responseKey = responseString.Substring(startIndex, endIndex - startIndex);
 
                 if (responseKey != expectedResponse)
                 {
-                    Log.Error($"Response key incorrect, Response:{responseKey} Expected:{expectedResponse}");
+                    Log.Error("[SWT-ClientHandshake]: Response key incorrect\nExpected:{0}\nResponse:{1}\nThis can happen if Websocket Protocol is not installed in Windows Server Roles.", expectedResponse, responseKey);
                     return false;
                 }
 

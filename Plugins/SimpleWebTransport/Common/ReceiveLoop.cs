@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 using UnityEngine.Profiling;
 
-namespace JamesFrowen.SimpleWeb
+namespace Mirror.SimpleWeb
 {
     internal static class ReceiveLoop
     {
@@ -60,11 +60,9 @@ namespace JamesFrowen.SimpleWeb
                     TcpClient client = conn.client;
 
                     while (client.Connected)
-                    {
                         ReadOneMessage(config, readBuffer);
-                    }
 
-                    Log.Info($"{conn} Not Connected");
+                    Log.Verbose("[SWT-ReceiveLoop]: {0} Not Connected", conn);
                 }
                 catch (Exception)
                 {
@@ -74,27 +72,24 @@ namespace JamesFrowen.SimpleWeb
                 }
             }
             catch (ThreadInterruptedException e) { Log.InfoException(e); }
-            catch (ThreadAbortException e) { Log.InfoException(e); }
+            catch (ThreadAbortException) { Log.Error("[SWT-ReceiveLoop]: Thread Abort Exception"); }
             catch (ObjectDisposedException e) { Log.InfoException(e); }
-            catch (ReadHelperException e)
-            {
-                Log.InfoException(e);
-            }
+            catch (ReadHelperException e) { Log.InfoException(e); }
             catch (SocketException e)
             {
                 // this could happen if wss client closes stream
-                Log.Warn($"ReceiveLoop SocketException\n{e.Message}", false);
+                Log.Warn("[SWT-ReceiveLoop]: ReceiveLoop SocketException\n{0}", e.Message);
                 queue.Enqueue(new Message(conn.connId, e));
             }
             catch (IOException e)
             {
                 // this could happen if client disconnects
-                Log.Warn($"ReceiveLoop IOException\n{e.Message}", false);
+                Log.Warn("[SWT-ReceiveLoop]: ReceiveLoop IOException\n{0}", e.Message);
                 queue.Enqueue(new Message(conn.connId, e));
             }
             catch (InvalidDataException e)
             {
-                Log.Error($"Invalid data from {conn}: {e.Message}");
+                Log.Error("[SWT-ReceiveLoop]: Invalid data from {0}\n{1}\n{2}\n\n", conn, e.Message, e.StackTrace);
                 queue.Enqueue(new Message(conn.connId, e));
             }
             catch (Exception e)
@@ -105,7 +100,6 @@ namespace JamesFrowen.SimpleWeb
             finally
             {
                 Profiler.EndThreadProfiling();
-
                 conn.Dispose();
             }
         }
@@ -135,7 +129,7 @@ namespace JamesFrowen.SimpleWeb
             else
             {
                 // todo cache this to avoid allocations
-                var fragments = new Queue<ArrayBuffer>();
+                Queue<ArrayBuffer> fragments = new Queue<ArrayBuffer>();
                 fragments.Enqueue(CopyMessageToBuffer(bufferPool, expectMask, buffer, msgOffset, header.payloadLength));
                 int totalSize = header.payloadLength;
 
@@ -151,7 +145,6 @@ namespace JamesFrowen.SimpleWeb
                     MessageProcessor.ThrowIfMsgLengthTooLong(totalSize, maxMessageSize);
                 }
 
-
                 ArrayBuffer msg = bufferPool.Take(totalSize);
                 msg.count = 0;
                 while (fragments.Count > 0)
@@ -165,7 +158,7 @@ namespace JamesFrowen.SimpleWeb
                 }
 
                 // dump after mask off
-                Log.DumpBuffer($"Message", msg);
+                Log.DumpBuffer($"[SWT-ReceiveLoop]: Message", msg);
 
                 queue.Enqueue(new Message(conn.connId, msg));
             }
@@ -175,36 +168,30 @@ namespace JamesFrowen.SimpleWeb
         {
             (Connection conn, int maxMessageSize, bool expectMask, ConcurrentQueue<Message> queue, BufferPool bufferPool) = config;
             Stream stream = conn.stream;
-            var header = new Header();
+            Header header = new Header();
 
             // read 2
             header.offset = ReadHelper.Read(stream, buffer, header.offset, Constants.HeaderMinSize);
             // log after first blocking call
-            Log.Verbose($"Message From {conn}");
+            Log.Flood($"[SWT-ReceiveLoop]: Message From {conn}");
 
             if (MessageProcessor.NeedToReadShortLength(buffer))
-            {
                 header.offset = ReadHelper.Read(stream, buffer, header.offset, Constants.ShortLength);
-            }
             if (MessageProcessor.NeedToReadLongLength(buffer))
-            {
                 header.offset = ReadHelper.Read(stream, buffer, header.offset, Constants.LongLength);
-            }
 
-            Log.DumpBuffer($"Raw Header", buffer, 0, header.offset);
+            Log.DumpBuffer($"[SWT-ReceiveLoop]: Raw Header", buffer, 0, header.offset);
 
             MessageProcessor.ValidateHeader(buffer, maxMessageSize, expectMask, opCodeContinuation);
 
             if (expectMask)
-            {
                 header.offset = ReadHelper.Read(stream, buffer, header.offset, Constants.MaskSize);
-            }
 
             header.opcode = MessageProcessor.GetOpcode(buffer);
             header.payloadLength = MessageProcessor.GetPayloadLength(buffer);
             header.finished = MessageProcessor.Finished(buffer);
 
-            Log.Verbose($"Header ln:{header.payloadLength} op:{header.opcode} mask:{expectMask}");
+            Log.Flood($"[SWT-ReceiveLoop]: Header ln:{header.payloadLength} op:{header.opcode} mask:{expectMask}");
 
             return header;
         }
@@ -216,7 +203,7 @@ namespace JamesFrowen.SimpleWeb
             ArrayBuffer arrayBuffer = CopyMessageToBuffer(bufferPool, expectMask, buffer, msgOffset, payloadLength);
 
             // dump after mask off
-            Log.DumpBuffer($"Message", arrayBuffer);
+            Log.DumpBuffer($"[SWT-ReceiveLoop]: Message", arrayBuffer);
 
             queue.Enqueue(new Message(conn.connId, arrayBuffer));
         }
@@ -232,9 +219,7 @@ namespace JamesFrowen.SimpleWeb
                 MessageProcessor.ToggleMask(buffer, msgOffset, arrayBuffer, payloadLength, buffer, maskOffset);
             }
             else
-            {
                 arrayBuffer.CopyFrom(buffer, msgOffset, payloadLength);
-            }
 
             return arrayBuffer;
         }
@@ -250,21 +235,16 @@ namespace JamesFrowen.SimpleWeb
             }
 
             // dump after mask off
-            Log.DumpBuffer($"Message", buffer, msgOffset, payloadLength);
-
-            Log.Info($"Close: {GetCloseCode(buffer, msgOffset)} message:{GetCloseMessage(buffer, msgOffset, payloadLength)}");
+            Log.DumpBuffer($"[SWT-ReceiveLoop]: Message", buffer, msgOffset, payloadLength);
+            Log.Verbose("[SWT-ReceiveLoop]: Close: {0} message:{1}", GetCloseCode(buffer, msgOffset), GetCloseMessage(buffer, msgOffset, payloadLength));
 
             conn.Dispose();
         }
 
         static string GetCloseMessage(byte[] buffer, int msgOffset, int payloadLength)
-        {
-            return Encoding.UTF8.GetString(buffer, msgOffset + 2, payloadLength - 2);
-        }
+            => Encoding.UTF8.GetString(buffer, msgOffset + 2, payloadLength - 2);
 
         static int GetCloseCode(byte[] buffer, int msgOffset)
-        {
-            return buffer[msgOffset + 0] << 8 | buffer[msgOffset + 1];
-        }
+            => buffer[msgOffset + 0] << 8 | buffer[msgOffset + 1];
     }
 }

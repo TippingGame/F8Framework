@@ -1,8 +1,7 @@
 {
-    "name": "kcp",
+    "name": "kcp2k",
     "rootNamespace": "",
-    "references": [
-    ],
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": true,

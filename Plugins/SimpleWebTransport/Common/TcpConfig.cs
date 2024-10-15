@@ -1,6 +1,6 @@
 using System.Net.Sockets;
 
-namespace JamesFrowen.SimpleWeb
+namespace Mirror.SimpleWeb
 {
     [System.Serializable]
     public struct TcpConfig

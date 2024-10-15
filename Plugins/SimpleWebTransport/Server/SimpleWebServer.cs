@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace JamesFrowen.SimpleWeb
+namespace Mirror.SimpleWeb
 {
     public class SimpleWebServer
     {
-        public event Action<int> onConnect;
+        public event Action<int, string> onConnect;
         public event Action<int> onDisconnect;
         public event Action<int, ArraySegment<byte>> onData;
         public event Action<int, Exception> onError;
@@ -91,7 +91,7 @@ namespace JamesFrowen.SimpleWeb
                 switch (next.type)
                 {
                     case EventType.Connected:
-                        onConnect?.Invoke(next.connId);
+                        onConnect?.Invoke(next.connId, GetClientAddress(next.connId));
                         break;
                     case EventType.Data:
                         onData?.Invoke(next.connId, next.data.ToSegment());
@@ -108,7 +108,7 @@ namespace JamesFrowen.SimpleWeb
 
             if (server.receiveQueue.Count > 0)
             {
-                Log.Warn($"SimpleWebServer ProcessMessageQueue has {server.receiveQueue.Count} remaining.");
+                Log.Warn("[SWT-SimpleWebServer]: ProcessMessageQueue has {0} remaining.", server.receiveQueue.Count);
             }
         }
     }

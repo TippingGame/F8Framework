@@ -1,5 +1,6 @@
 ﻿using System;
 using Telepathy;
+
 namespace F8Framework.Core
 {
     public class TcpServerChannel : INetworkServerChannel
@@ -13,7 +14,7 @@ namespace F8Framework.Core
             add { onAbort += value; }
             remove { onAbort -= value; }
         }
-        public event Action<int> OnConnected
+        public event Action<int, string> OnConnected
         {
             add { server.OnConnected += value; }
             remove { server.OnConnected -= value; }

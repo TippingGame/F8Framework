@@ -2,15 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace JamesFrowen.SimpleWeb
+namespace Mirror.SimpleWeb
 {
     /// <summary>
     /// Represents a client's request to the Websockets server, which is the first message from the client.
     /// </summary>
     public class Request
     {
-        private static readonly char[] lineSplitChars = new char[] { '\r', '\n' };
-        private static readonly char[] headerSplitChars = new char[] { ':' };
+        static readonly char[] lineSplitChars = new char[] { '\r', '\n' };
+        static readonly char[] headerSplitChars = new char[] { ':' };
         public string RequestLine;
         public Dictionary<string, string> Headers = new Dictionary<string, string>();
 

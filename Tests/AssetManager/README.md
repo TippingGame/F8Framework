@@ -27,7 +27,7 @@ Unity F8 AssetManager资产加载组件。
 2. 生成AssetBundles目录，自动赋予资产AB名称（已有AB名不会覆盖），打包 AssetBundle，目录 StreamingAssets / AssetBundles / Windows（不同平台例如 Windows / iOS ）  
 ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_20240205225815.png)
 ---------------------------------
-3. 假如没有报错，就可以愉快地使用了  
+3. 假如没有报错，就可以愉快地使用了（注意：编辑器下加载不同平台的AB，Shader会变紫色，Scene也会加载失败（解决方案：FF8.Asset.IsEditorMode = true））  
 
 ### 代码使用方法
 ```C#

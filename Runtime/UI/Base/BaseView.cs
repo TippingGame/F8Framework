@@ -4,18 +4,9 @@ namespace F8Framework.Core
 {
     public class BaseView : ComponentBind
     {
-        public enum WindowState
-        {
-            Awake,
-            Animating,
-            Ready,
-            Closed
-        }
-        
-        private int UIid;
-        private string Guid;
-        private object[] Args;
-        private WindowState windowState = WindowState.Closed;
+        public int UIid;
+        public string Guid;
+        public object[] Args;
         
         // 消息事件
         private EventDispatcher _eventDispatcher = null;
@@ -34,7 +25,6 @@ namespace F8Framework.Core
 
         private void Awake()
         {
-            windowState = WindowState.Awake;
             OnAwake();
         }
 
@@ -48,7 +38,6 @@ namespace F8Framework.Core
             this.UIid = uiId;
             this.Guid = guid;
             OnAdded(uiId, args);
-            windowState = WindowState.Animating;
             OnViewTweenInit();
             OnPlayViewTween();
         }
@@ -72,7 +61,6 @@ namespace F8Framework.Core
         
         protected virtual void OnPlayViewTween()
         {
-            windowState = WindowState.Ready;
             OnViewOpen();
         }
 
@@ -92,7 +80,6 @@ namespace F8Framework.Core
 
         public void Close(bool isDestroy = false)
         {
-            windowState = WindowState.Closed;
             UIManager.Instance.Close(this.UIid, isDestroy, this.Guid);
         }
 

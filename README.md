@@ -46,10 +46,23 @@ Unity 2021.3.15f1+
 * [17. 本地数据存储（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Storage/README.md) - 本地数据存储/读取。
 * [18. SDK接入管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/README.md) - 与**原生平台交互**，接入多个平台或者渠道SDK，登录/退出/切换/支付/视频广告/退出游戏/原生Toast。
 * [19. 网络连接与通信（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Network/README.md) - 使用 KCP / TCP / WebSocket 网络通讯协议建立长连接通道，支持Client端和Server端。
+### ----------第三方库（注意冲突）----------
+* Excel.dll：读/写 Excel（已修改缓存地址为Application.persistentDataPath）
+* I18N.CJK.dll，I18N.dll，I18N.MidEast.dll，I18N.Other.dll，I18N.Rare.dll，I18N.West.dll：只为读/写 Excel
+* [ICSharpCode.SharpZipLib](https://github.com/icsharpcode/SharpZipLib)：压缩/解压缩
+* [Mirror(内置):KCP](https://github.com/MirrorNetworking/kcp2k)：Reliable UDP
+* [Mirror(内置):Telepathy](https://github.com/MirrorNetworking/Telepathy)：TCP
+* [Mirror(内置):Websockets](https://github.com/MirrorNetworking/SimpleWebTransport)：Websockets
+* [LitJson](https://github.com/LitJSON/litjson)：序列化/反序列化 JSON（已修改字典Key可以使用int类型，增加Unity常用类型：Type，Vector2，Vector3，Vector4，Quaternion，GameObject，Transform，Color，Color32，Bounds，Rect，RectOffset，LayerMask，Vector2Int，Vector3Int，RangeInt，BoundsInt）
+* [MessagePack-CSharp](https://github.com/MessagePack-CSharp/MessagePack-CSharp)：序列化/反序列化数据
 
 ## 使用步骤
 
-### 导入
+### 推荐导入方式（可修改源码）
+
+直接[下载完整包](https://codeload.github.com/TippingGame/F8Framework/zip/refs/heads/main)，放入工程里。
+
+### 也可以
 
 在 Unity 包管理器中，使用 Git URL 添加 F8 核心包。
 
@@ -60,10 +73,6 @@ Unity 2021.3.15f1+
 3. 点击左上角 **+** 号，选择 **Add Package from git URL**
 
 4. 输入 <https://github.com/TippingGame/F8Framework.git>，请确认导入成功
-
-#### 网络问题
-
-若您的网络不佳，也可以下载核心包文件，直接放入工程里，或者修改 package.json 并放入 Packages 文件夹。
 
 ## 新手指南
 
@@ -112,8 +121,21 @@ Support for building：Win / Android / iOS / Mac / Linux / WebGL / WeChat mini g
 * [17. Local data storage (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Storage/README_EN.md) - Local data storage/reading.
 * [18. SDK Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/README_EN.md) - Interacting with **native platforms**, accessing multiple platform or channel SDKs, logging in/out/switching/payment/video advertising/exiting games/native Toast.
 * [19. Network Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Network/README_EN.md) - Establish long connection channels using KCP/TCP/WebSocket network communication protocols, supporting both client and server ends.
+### ----------Third Party Libraries (note conflicts)----------
+* Excel.dll：Read/Write Excel (cache address has been changed to Application. persistentDataPath)
+* I18N.CJK.dll，I18N.dll，I18N.MidEast.dll，I18N.Other.dll，I18N.Rare.dll，I18N.West.dll：Only for Read/Write Excel
+* [ICSharpCode.SharpZipLib](https://github.com/icsharpcode/SharpZipLib)：Compression/Decompression
+* [Mirror(内置):KCP](https://github.com/MirrorNetworking/kcp2k)：Reliable UDP
+* [Mirror(内置):Telepathy](https://github.com/MirrorNetworking/Telepathy)：TCP
+* [Mirror(内置):Websockets](https://github.com/MirrorNetworking/SimpleWebTransport)：Websockets
+* [LitJson](https://github.com/LitJSON/litjson)：Serialize/Deserialize JSON (modified dictionary key can use int type, added Unity common types: Type，Vector2，Vector3，Vector4，Quaternion，GameObject，Transform，Color，Color32，Bounds，Rect，RectOffset，LayerMask，Vector2Int，Vector3Int，RangeInt，BoundsInt)
+* [MessagePack-CSharp](https://github.com/MessagePack-CSharp/MessagePack-CSharp)：Serialize/Deserialize data
 
-## IMPORT
+## IMPORT(Recommend)
+
+[download the complete package](https://codeload.github.com/TippingGame/F8Framework/zip/refs/heads/main), Put it into the project。
+
+### also
 
 In the Unity Package Manager, add the F8Framework package using Git URL.
 

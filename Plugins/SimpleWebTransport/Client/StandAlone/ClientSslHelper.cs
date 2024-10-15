@@ -4,14 +4,14 @@ using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 
-namespace JamesFrowen.SimpleWeb
+namespace Mirror.SimpleWeb
 {
     internal class ClientSslHelper
     {
         internal bool TryCreateStream(Connection conn, Uri uri)
         {
             NetworkStream stream = conn.client.GetStream();
-            if (uri.Scheme != "wss")
+            if (uri.Scheme != "wss" && uri.Scheme != "https")
             {
                 conn.stream = stream;
                 return true;
@@ -24,14 +24,14 @@ namespace JamesFrowen.SimpleWeb
             }
             catch (Exception e)
             {
-                Log.Error($"Create SSLStream Failed: {e}", false);
+                Log.Error("[SWT-ClientSslHelper]: Create SSLStream Failed: {0}\n{1}\n\n", e.Message, e.StackTrace);
                 return false;
             }
         }
 
         Stream CreateStream(NetworkStream stream, Uri uri)
         {
-            var sslStream = new SslStream(stream, true, ValidateServerCertificate);
+            SslStream sslStream = new SslStream(stream, true, ValidateServerCertificate);
             sslStream.AuthenticateAsClient(uri.Host);
             return sslStream;
         }

@@ -1,6 +1,6 @@
 using System.Threading;
 
-namespace JamesFrowen.SimpleWeb
+namespace Mirror.SimpleWeb
 {
     internal static class Utils
     {
