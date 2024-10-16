@@ -96,7 +96,7 @@ namespace F8Framework.Core
                             continue;
                         componentNames.Add(componentType);
 
-                        if (!child.GetComponent(componentType))
+                        if (componentType != nameof(GameObject) && !child.GetComponent(componentType))
                             continue;
                             
                         string normalizeName = RemoveSpecialCharacters(child.gameObject.name);

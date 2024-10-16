@@ -100,11 +100,11 @@ namespace F8Framework.Core.Editor
             {
                 FileTools.SafeCopyFile(
                     FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) +
-                    "/Tests/ExcelTool/StreamingAssets_config/Demo工作表.xlsx",
+                    "/Runtime/ExcelTool/StreamingAssets_config/Demo工作表.xlsx",
                     lastExcelPath + "/Demo工作表.xlsx");
                 FileTools.SafeCopyFile(
                     FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) +
-                    "/Tests/Localization/StreamingAssets_config/本地化.xlsx",
+                    "/Runtime/Localization/StreamingAssets_config/本地化.xlsx",
                     lastExcelPath + "/本地化.xlsx");
                 files = Directory.GetFiles(INPUT_PATH, "*.*", SearchOption.AllDirectories)
                     .Where(s => s.EndsWith(".xls") || s.EndsWith(".xlsx")).ToArray();

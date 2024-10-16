@@ -125,9 +125,9 @@ Support for building：Win / Android / iOS / Mac / Linux / WebGL / WeChat mini g
 * Excel.dll：Read/Write Excel (cache address has been changed to Application. persistentDataPath)
 * I18N.CJK.dll，I18N.dll，I18N.MidEast.dll，I18N.Other.dll，I18N.Rare.dll，I18N.West.dll：Only for Read/Write Excel
 * [ICSharpCode.SharpZipLib](https://github.com/icsharpcode/SharpZipLib)：Compression/Decompression
-* [Mirror(内置):KCP](https://github.com/MirrorNetworking/kcp2k)：Reliable UDP
-* [Mirror(内置):Telepathy](https://github.com/MirrorNetworking/Telepathy)：TCP
-* [Mirror(内置):Websockets](https://github.com/MirrorNetworking/SimpleWebTransport)：Websockets
+* [Mirror(built in):KCP](https://github.com/MirrorNetworking/kcp2k)：Reliable UDP
+* [Mirror(built in):Telepathy](https://github.com/MirrorNetworking/Telepathy)：TCP
+* [Mirror(built in):Websockets](https://github.com/MirrorNetworking/SimpleWebTransport)：Websockets
 * [LitJson](https://github.com/LitJSON/litjson)：Serialize/Deserialize JSON (modified dictionary key can use int type, added Unity common types: Type，Vector2，Vector3，Vector4，Quaternion，GameObject，Transform，Color，Color32，Bounds，Rect，RectOffset，LayerMask，Vector2Int，Vector3Int，RangeInt，BoundsInt)
 * [MessagePack-CSharp](https://github.com/MessagePack-CSharp/MessagePack-CSharp)：Serialize/Deserialize data
 

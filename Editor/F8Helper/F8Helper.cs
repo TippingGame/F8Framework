@@ -34,7 +34,7 @@ namespace F8Framework.Core.Editor
             {
                 FileTools.SafeCopyFile(
                     FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) +
-                    "/Tests/SDKManager/AndroidManifest.xml",
+                    "/Runtime/SDKManager/Plugins_Android/AndroidManifest.xml",
                     Application.dataPath + "/Plugins/Android/AndroidManifest.xml");
                 LogF8.Log("复制 AndroidManifest.xml 至 " + Application.dataPath + "/Plugins/Android");
                 AssetDatabase.Refresh();
@@ -43,7 +43,7 @@ namespace F8Framework.Core.Editor
             {
                 FileTools.SafeCopyFile(
                     FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) +
-                    "/Tests/SDKManager/mainTemplate.gradle",
+                    "/Runtime/SDKManager/Plugins_Android/mainTemplate.gradle",
                     Application.dataPath + "/Plugins/Android/mainTemplate.gradle");
                 LogF8.Log("复制 mainTemplate.gradle 至 " + Application.dataPath + "/Plugins/Android");
                 AssetDatabase.Refresh();
