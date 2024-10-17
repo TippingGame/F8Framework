@@ -12,7 +12,7 @@
   <assembly fullname="Excel" preserve="all" />
   <assembly fullname="LitJson" preserve="all" />
   <assembly fullname="MessagePack" preserve="all" />
-  <assembly fullname="kcp" preserve="all" />
+  <assembly fullname="kcp2k" preserve="all" />
   <assembly fullname="SimpleWebTransport" preserve="all" />
   <assembly fullname="Telepathy" preserve="all" />
   <assembly fullname="F8Framework.Core" preserve="all" />
