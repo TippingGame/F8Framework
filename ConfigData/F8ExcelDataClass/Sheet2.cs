@@ -3,19 +3,27 @@ Don't Edit it*/
 
 using System;
 using System.Collections.Generic;
+using UnityEngine.Scripting;
 
 namespace F8Framework.F8ExcelDataClass
 {
 	[Serializable]
 	public class Sheet2Item
 	{
-	public int id;
-	public string name;
-	public float[] price;
-	public int fddfd;
-	public float aaasd;
-	public int[] dfdfd;
-	public string[] gggaa;
+		[Preserve]
+		public int id;
+		[Preserve]
+		public string name;
+		[Preserve]
+		public float[] price;
+		[Preserve]
+		public int fddfd;
+		[Preserve]
+		public float aaasd;
+		[Preserve]
+		public int[] dfdfd;
+		[Preserve]
+		public string[] gggaa;
 	}
 	
 	[Serializable]

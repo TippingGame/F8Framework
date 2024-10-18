@@ -11,6 +11,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using F8Framework.Core;
+using UnityEngine.Scripting;
 
 namespace F8Framework.F8ExcelDataClass
 {
@@ -20,6 +21,7 @@ namespace F8Framework.F8ExcelDataClass
 		private Sheet2 p_Sheet2;
 		private LocalizedStrings p_LocalizedStrings;
 
+		[Preserve]
 		public Sheet1Item GetSheet1ByID(int id)
 		{
 			Sheet1Item t = null;
@@ -28,11 +30,13 @@ namespace F8Framework.F8ExcelDataClass
 			return t;
 		}
 
+		[Preserve]
 		public Dictionary<int, Sheet1Item> GetSheet1()
 		{
 			return p_Sheet1.Dict;
 		}
 
+		[Preserve]
 		public Sheet2Item GetSheet2ByID(int id)
 		{
 			Sheet2Item t = null;
@@ -41,11 +45,13 @@ namespace F8Framework.F8ExcelDataClass
 			return t;
 		}
 
+		[Preserve]
 		public Dictionary<int, Sheet2Item> GetSheet2()
 		{
 			return p_Sheet2.Dict;
 		}
 
+		[Preserve]
 		public LocalizedStringsItem GetLocalizedStringsByID(int id)
 		{
 			LocalizedStringsItem t = null;
@@ -54,27 +60,32 @@ namespace F8Framework.F8ExcelDataClass
 			return t;
 		}
 
+		[Preserve]
 		public Dictionary<int, LocalizedStringsItem> GetLocalizedStrings()
 		{
 			return p_LocalizedStrings.Dict;
 		}
 
+		[Preserve]
 		public void LoadLocalizedStrings()
 		{
 			p_LocalizedStrings = Load<LocalizedStrings>("LocalizedStrings") as LocalizedStrings;
 		}
 
+		[Preserve]
 		public void LoadLocalizedStringsCallback(Action onLoadComplete)
 		{
 			Util.Unity.StartCoroutine(LoadLocalizedStringsIEnumerator(onLoadComplete));
 		}
 
+		[Preserve]
 		public IEnumerator LoadLocalizedStringsIEnumerator(Action onLoadComplete = null)
 		{
 			yield return LoadAsync<LocalizedStrings>("LocalizedStrings", result => p_LocalizedStrings = result as LocalizedStrings);
 			onLoadComplete?.Invoke();
 		}
 
+		[Preserve]
 		public void LoadAll()
 		{
 			p_Sheet1 = Load<Sheet1>("Sheet1") as Sheet1;
@@ -82,6 +93,7 @@ namespace F8Framework.F8ExcelDataClass
 			p_LocalizedStrings = Load<LocalizedStrings>("LocalizedStrings") as LocalizedStrings;
 		}
 
+		[Preserve]
 		public void RuntimeLoadAll(Dictionary<String, System.Object> objs)
 		{
 			p_Sheet1 = objs["Sheet1"] as Sheet1;
@@ -89,6 +101,7 @@ namespace F8Framework.F8ExcelDataClass
 			p_LocalizedStrings = objs["LocalizedStrings"] as LocalizedStrings;
 		}
 
+		[Preserve]
 		public IEnumerable LoadAllAsync()
 		{
 			yield return LoadAsync<Sheet1>("Sheet1", result => p_Sheet1 = result as Sheet1);
@@ -96,11 +109,13 @@ namespace F8Framework.F8ExcelDataClass
 			yield return LoadAsync<LocalizedStrings>("LocalizedStrings", result => p_LocalizedStrings = result as LocalizedStrings);
 		}
 
+		[Preserve]
 		public void LoadAllAsyncCallback(Action onLoadComplete)
 		{
 			Util.Unity.StartCoroutine(LoadAllAsyncIEnumerator(onLoadComplete));
 		}
 
+		[Preserve]
 		public IEnumerator LoadAllAsyncIEnumerator(Action onLoadComplete)
 		{
 			yield return LoadAsync<Sheet1>("Sheet1", result => p_Sheet1 = result as Sheet1);
@@ -109,6 +124,7 @@ namespace F8Framework.F8ExcelDataClass
 			onLoadComplete?.Invoke();
 		}
 
+		[Preserve]
 		public T Load<T>(string name)
 		{
 			IFormatter f = new BinaryFormatter();
@@ -129,6 +145,7 @@ namespace F8Framework.F8ExcelDataClass
 #endif
 		}
 
+		[Preserve]
 		public IEnumerator LoadAsync<T>(string name, Action<T> callback)
 		{
 			IFormatter f = new BinaryFormatter();

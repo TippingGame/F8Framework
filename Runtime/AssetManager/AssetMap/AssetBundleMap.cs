@@ -1,11 +1,13 @@
 // code generation.
 
 using System.Collections.Generic;
+using UnityEngine.Scripting;
 
 namespace F8Framework.Core
 {
    public static class AssetBundleMap
    {
+       [Preserve]
        public class AssetMapping
        {
            public string AbName;

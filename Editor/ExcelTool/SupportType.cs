@@ -69,7 +69,8 @@ namespace F8Framework.Core.Editor
             classSource.Append("Don't Edit it*/\n");
             classSource.Append("\n");
             classSource.Append("using System;\n");
-            classSource.Append("using System.Collections.Generic;\n\n");
+            classSource.Append("using System.Collections.Generic;\n");
+            classSource.Append("using UnityEngine.Scripting;\n\n");
             classSource.Append("namespace " + ExcelDataTool.CODE_NAMESPACE + "\n");
             classSource.Append("{\n");
             classSource.Append("\t[Serializable]\n");
@@ -78,6 +79,7 @@ namespace F8Framework.Core.Editor
             //设置成员
             for (int i = 0; i < fields.Length; ++i)
             {
+                classSource.Append("\t\t[Preserve]\n");
                 classSource.Append(PropertyString(types[i], fields[i]));
             }
 
@@ -137,11 +139,11 @@ namespace F8Framework.Core.Editor
                 StringBuilder sbProperty = new StringBuilder();
                 if (type.EndsWith("[]"))
                 {
-                    sbProperty.Append("\tpublic " + type + " " + propertyName + ";\n");
+                    sbProperty.Append("\t\tpublic " + type + " " + propertyName + ";\n");
                 }
                 else
                 {
-                    sbProperty.Append("\tpublic " + type + " " + propertyName + ";\n");
+                    sbProperty.Append("\t\tpublic " + type + " " + propertyName + ";\n");
                 }
 
                 return sbProperty.ToString();
@@ -238,7 +240,8 @@ namespace F8Framework.Core.Editor
             source.Append("using System.Runtime.Serialization;\n");
             source.Append("using System.Runtime.Serialization.Formatters.Binary;\n");
             source.Append("using System.IO;\n");
-            source.Append("using F8Framework.Core;\n\n");
+            source.Append("using F8Framework.Core;\n");
+            source.Append("using UnityEngine.Scripting;\n\n");
             source.Append("namespace " + ExcelDataTool.CODE_NAMESPACE + "\n");
             source.Append("{\n");
             source.Append("\tpublic class F8DataManager : ModuleSingleton<F8DataManager>, IModule\n");
@@ -260,6 +263,7 @@ namespace F8Framework.Core.Editor
                 ScriptGenerator sg = dict.Value;
                 string typeName = t + "Item"; //类型名
                 string typeNameNotItem = t; //类型名没item
+                source.Append("\t\t[Preserve]\n");
                 source.Append("\t\tpublic " + typeName + " Get" + typeNameNotItem + "ByID" + "(" + sg.GetIdType() + " id)\n");
                 source.Append("\t\t{\n");
                 source.Append("\t\t\t" + typeName + " t = null;\n");
@@ -269,7 +273,7 @@ namespace F8Framework.Core.Editor
                               '"' + " ，配置表： " + t + '"' + ");\n");
                 source.Append("\t\t\treturn t;\n");
                 source.Append("\t\t}\n\n");
-
+                source.Append("\t\t[Preserve]\n");
                 source.Append("\t\tpublic Dictionary<" + sg.GetIdType() + ", " + typeName + ">" + " Get" + typeNameNotItem + "()\n");
                 source.Append("\t\t{\n");
                 source.Append("\t\t\treturn p_" + t + ".Dict;\n");
@@ -283,16 +287,19 @@ namespace F8Framework.Core.Editor
             if (hasLocalizedStrings)
             {
                 //只加载本地化表
+                source.Append("\t\t[Preserve]\n");
                 source.Append("\t\tpublic void LoadLocalizedStrings()\n");
                 source.Append("\t\t{\n");
                 source.Append("\t\t\tp_LocalizedStrings = Load<LocalizedStrings>(\"LocalizedStrings\") as LocalizedStrings;\n");
                 source.Append("\t\t}\n\n");
             
+                source.Append("\t\t[Preserve]\n");
                 source.Append("\t\tpublic void LoadLocalizedStringsCallback(Action onLoadComplete)\n");
                 source.Append("\t\t{\n");
                 source.Append("\t\t\tUtil.Unity.StartCoroutine(LoadLocalizedStringsIEnumerator(onLoadComplete));\n");
                 source.Append("\t\t}\n\n");
             
+                source.Append("\t\t[Preserve]\n");
                 source.Append("\t\tpublic IEnumerator LoadLocalizedStringsIEnumerator(Action onLoadComplete = null)\n");
                 source.Append("\t\t{\n");
                 source.Append("\t\t\tyield return LoadAsync<LocalizedStrings>(\"LocalizedStrings\", result => p_LocalizedStrings = result as LocalizedStrings);\n");
@@ -301,6 +308,7 @@ namespace F8Framework.Core.Editor
             }
 
             //加载所有配置表
+            source.Append("\t\t[Preserve]\n");
             source.Append("\t\tpublic void LoadAll()\n");
             source.Append("\t\t{\n");
             foreach (string t in types)
@@ -311,6 +319,7 @@ namespace F8Framework.Core.Editor
             source.Append("\t\t}\n\n");
 
             //运行时加载所有配置表
+            source.Append("\t\t[Preserve]\n");
             source.Append("\t\tpublic void RuntimeLoadAll(Dictionary<String, System.Object> objs)\n");
             source.Append("\t\t{\n");
             foreach (string t in types)
@@ -321,6 +330,7 @@ namespace F8Framework.Core.Editor
             source.Append("\t\t}\n\n");
 
             //异步加载所有配置表
+            source.Append("\t\t[Preserve]\n");
             source.Append("\t\tpublic IEnumerable LoadAllAsync()\n");
             source.Append("\t\t{\n");
             foreach (string t in types)
@@ -331,12 +341,14 @@ namespace F8Framework.Core.Editor
             source.Append("\t\t}\n\n");
             
             //异步加载所有配置表
+            source.Append("\t\t[Preserve]\n");
             source.Append("\t\tpublic void LoadAllAsyncCallback(Action onLoadComplete)\n");
             source.Append("\t\t{\n");
             source.Append("\t\t\tUtil.Unity.StartCoroutine(LoadAllAsyncIEnumerator(onLoadComplete));\n");
             source.Append("\t\t}\n\n");
             
             //异步加载所有配置表
+            source.Append("\t\t[Preserve]\n");
             source.Append("\t\tpublic IEnumerator LoadAllAsyncIEnumerator(Action onLoadComplete)\n");
             source.Append("\t\t{\n");
             foreach (string t in types)
@@ -347,6 +359,7 @@ namespace F8Framework.Core.Editor
             source.Append("\t\t}\n\n");
             
             //反序列化
+            source.Append("\t\t[Preserve]\n");
             source.Append("\t\tpublic T Load<T>(string name)\n");
             source.Append("\t\t{\n");
             source.Append("\t\t\tIFormatter f = new BinaryFormatter();\n");
@@ -367,6 +380,7 @@ namespace F8Framework.Core.Editor
             source.Append("#endif\n");
             source.Append("\t\t}\n\n");
             
+            source.Append("\t\t[Preserve]\n");
             source.Append("\t\tpublic IEnumerator LoadAsync<T>(string name, Action<T> callback)\n");
             source.Append("\t\t{\n");
             source.Append("\t\t\tIFormatter f = new BinaryFormatter();\n");

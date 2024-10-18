@@ -3,16 +3,21 @@ Don't Edit it*/
 
 using System;
 using System.Collections.Generic;
+using UnityEngine.Scripting;
 
 namespace F8Framework.F8ExcelDataClass
 {
 	[Serializable]
 	public class LocalizedStringsItem
 	{
-	public int id;
-	public string TextID;
-	public string ChineseSimplified;
-	public string English;
+		[Preserve]
+		public int id;
+		[Preserve]
+		public string TextID;
+		[Preserve]
+		public string ChineseSimplified;
+		[Preserve]
+		public string English;
 	}
 	
 	[Serializable]
