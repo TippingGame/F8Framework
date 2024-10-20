@@ -58,9 +58,12 @@ Unity 2021.3.15f1+
 
 ## 使用步骤
 
-### 推荐导入方式（可修改源码）
-
-直接[下载完整包](https://codeload.github.com/TippingGame/F8Framework/zip/refs/heads/main)，放入工程里。
+### 推荐导入方式（可修改源码或更新）
+[安装git](https://git-scm.com/)，使用git命令拉取：
+```text
+git clone https://github.com/TippingGame/F8Framework.git
+```
+或者直接[下载完整包](https://codeload.github.com/TippingGame/F8Framework/zip/refs/heads/main)，放入工程里。
 
 ### 也可以
 
@@ -131,9 +134,13 @@ Support for building：Win / Android / iOS / Mac / Linux / WebGL / WeChat mini g
 * [LitJson](https://github.com/LitJSON/litjson)：Serialize/Deserialize JSON (modified dictionary key can use int type, added Unity common types: Type，Vector2，Vector3，Vector4，Quaternion，GameObject，Transform，Color，Color32，Bounds，Rect，RectOffset，LayerMask，Vector2Int，Vector3Int，RangeInt，BoundsInt)
 * [MessagePack-CSharp](https://github.com/MessagePack-CSharp/MessagePack-CSharp)：Serialize/Deserialize data
 
-## IMPORT(Recommend)
-
-[download the complete package](https://codeload.github.com/TippingGame/F8Framework/zip/refs/heads/main), Put it into the project。
+## IMPORT
+### Recommend (source code can be modified or updated)
+[Install Git](https://git-scm.com/) use git command to pull：
+```text
+git clone https://github.com/TippingGame/F8Framework.git
+```
+Or [download the complete package](https://codeload.github.com/TippingGame/F8Framework/zip/refs/heads/main), Put it into the project。
 
 ### also
 
