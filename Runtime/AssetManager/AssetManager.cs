@@ -1095,9 +1095,7 @@ namespace F8Framework.Core
             /// 通过资源名称同步卸载。
             /// </summary>
             /// <param name="assetName">资源名称。</param>
-            /// <param name="unloadAllLoadedObjects">
-            /// 完全卸载。
-            /// </param>
+            /// <param name="unloadAllLoadedObjects">完全卸载。</param>
             public void Unload(string assetName, bool unloadAllLoadedObjects = false)
             {
 #if UNITY_EDITOR
@@ -1119,7 +1117,7 @@ namespace F8Framework.Core
                 AssetInfo res = GetAssetInfoFromResource(assetName);
                 if (IsLegal(ref res))
                 {
-                    ResourcesManager.Instance.Unload(res.AssetPath[0]);
+                    ResourcesManager.Instance.Unload(res.AssetPath[0], unloadAllLoadedObjects);
                 }
             }
             

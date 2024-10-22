@@ -201,8 +201,13 @@ namespace F8Framework.Core
         /// 通过相对资源名称同步卸载。
         /// </summary>
         /// <param name="resourcePath">资源文件夹的相对路径。</param>
-        public void Unload(string resourcePath)
+        /// <param name="unloadAllLoadedObjects">完全卸载。</param>
+        public void Unload(string resourcePath, bool unloadAllLoadedObjects = true)
         {
+            if (unloadAllLoadedObjects == false)
+            {
+                return;
+            }
             if (resourceLoaders.TryGetValue(
                     resourcePath,
                     out ResourcesLoader loader)
@@ -217,10 +222,16 @@ namespace F8Framework.Core
         /// 通过已存在的资源加载器同步卸载。
         /// </summary>
         /// <param name="loader">要卸载的资源加载器。</param>
-        public void Unload(ResourcesLoader loader)
+        /// <param name="unloadAllLoadedObjects">完全卸载。</param>
+        public void Unload(ResourcesLoader loader, bool unloadAllLoadedObjects = true)
         {
             if (loader == null)
                 return;
+            
+            if (unloadAllLoadedObjects == false)
+            {
+                return;
+            }
 
             if (resourceLoaders.ContainsValue(loader))
             {
@@ -235,7 +246,7 @@ namespace F8Framework.Core
 
                 foreach (string key in keys)
                 {
-                    Unload(key);
+                    Unload(key, unloadAllLoadedObjects);
                 }
             }
             else
@@ -248,11 +259,17 @@ namespace F8Framework.Core
         /// 通过已加载的资源对象同步卸载。
         /// </summary>
         /// <param name="obj">已加载的资源对象。</param>
-        public void Unload(Object obj)
+        /// <param name="unloadAllLoadedObjects">完全卸载。</param>
+        public void Unload(Object obj, bool unloadAllLoadedObjects = true)
         {
             if (obj == null)
                 return;
 
+            if (unloadAllLoadedObjects == false)
+            {
+                return;
+            }
+            
             List<string> keys = new List<string>();
             foreach (var kv in resourceLoaders)
             {
@@ -264,7 +281,7 @@ namespace F8Framework.Core
 
             foreach (string key in keys)
             {
-                Unload(key);
+                Unload(key, unloadAllLoadedObjects);
             }
 
             if (keys.Count <= 0 && obj != null)
