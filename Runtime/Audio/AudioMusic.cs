@@ -35,8 +35,6 @@ namespace F8Framework.Core
         {
             AssetManager.Instance.LoadAsync<AudioClip>(url, (audioClip) =>
             {
-                AssetManager.Instance.Unload(url, false);
-                
                 if (MusicSource.isPlaying)
                 {
                     _isPlay = false;

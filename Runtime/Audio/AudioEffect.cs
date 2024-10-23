@@ -36,8 +36,6 @@ namespace F8Framework.Core
             {
                 AssetManager.Instance.LoadAsync<AudioClip>(url, (audioClip) =>
                 {
-                    AssetManager.Instance.Unload(url, false);
-                    
                     if (_effects != null && !_effects.ContainsKey(url))
                     {
                         _effects.Add(url, audioClip);
