@@ -13,7 +13,7 @@ namespace F8Framework.Core
         // 用于检测死循环调用的调用栈
         private HashSet<IEventDataBase> callStack = new HashSet<IEventDataBase>();
         // 存储待触发的事件处理器列表
-        private Queue<IEventDataBase> dispatchInvokes = new Queue<IEventDataBase>();
+        private Dictionary<int, Queue<IEventDataBase>> dispatchInvokes = new Dictionary<int, Queue<IEventDataBase>>();
 
         // 输出消息死循环的函数
         private void MessageLoop(string debugInfo)
@@ -259,7 +259,11 @@ namespace F8Framework.Core
 
                 if (obj.EventDataShouldBeInvoked())
                 {
-                    dispatchInvokes.Enqueue(obj);
+                    if (!dispatchInvokes.ContainsKey(eventId))
+                    {
+                        dispatchInvokes[eventId] = new Queue<IEventDataBase>();
+                    }
+                    dispatchInvokes[eventId].Enqueue(obj);
                     callStack.Add(obj);
                 }
                 else
@@ -268,10 +272,10 @@ namespace F8Framework.Core
                     continue;
                 }
             }
-
-            while (dispatchInvokes.Count > 0)
+            
+            while (dispatchInvokes.ContainsKey(eventId) && dispatchInvokes[eventId].Count > 0)
             {
-                var obj = dispatchInvokes.Dequeue();
+                var obj = dispatchInvokes[eventId].Dequeue();
                 if (obj is EventData eventData)
                 {
                     eventData.Listener.Invoke();
@@ -311,7 +315,11 @@ namespace F8Framework.Core
                 
                 if (obj.EventDataShouldBeInvoked())
                 {
-                    dispatchInvokes.Enqueue(obj);
+                    if (!dispatchInvokes.ContainsKey(eventId))
+                    {
+                        dispatchInvokes[eventId] = new Queue<IEventDataBase>();
+                    }
+                    dispatchInvokes[eventId].Enqueue(obj);
                     callStack.Add(obj);
                 }
                 else
@@ -320,10 +328,10 @@ namespace F8Framework.Core
                     continue;
                 }
             }
-
-            while (dispatchInvokes.Count > 0)
+            
+            while (dispatchInvokes.ContainsKey(eventId) && dispatchInvokes[eventId].Count > 0)
             {
-                var obj = dispatchInvokes.Dequeue();
+                var obj = dispatchInvokes[eventId].Dequeue();
                 if (obj is EventData<object[]> eventData1)
                 {
                     eventData1.Listener.Invoke(arg1);
