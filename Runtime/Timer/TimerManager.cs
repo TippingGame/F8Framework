@@ -117,10 +117,10 @@ namespace F8Framework.Core
         }
 
         // 注册一个以帧为单位的计时器并返回其ID
-        public int AddTimerFrame(object handle, float step = 1f, float delay = 0f, int field = 0, Action onSecond = null, Action onComplete = null)
+        public int AddTimerFrame(object handle, float stepFrame = 1f, float delayFrame = 0f, int field = 0, Action onFrame = null, Action onComplete = null)
         {
             int id = Guid.NewGuid().GetHashCode(); // 生成一个唯一的ID
-            Timer timer = new Timer(handle, id, step, delay, field, onSecond, onComplete, true); // 创建一个以帧为单位的计时器对象
+            Timer timer = new Timer(handle, id, stepFrame, delayFrame, field, onFrame, onComplete, true); // 创建一个以帧为单位的计时器对象
             addTimes.Add(id, timer);
             return id;
         }

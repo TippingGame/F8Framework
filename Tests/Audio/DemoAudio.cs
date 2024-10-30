@@ -10,16 +10,29 @@ namespace F8Framework.Tests
         void Start()
         {
             /*----------背景音乐----------*/
-            FF8.Audio.PlayMusic("assetName", CallBack, loop: true, priority: 1); // 背景音乐
+            //assetName资产名
+            //callback播放完成回调
+            //loop是否循环
+            //priority优先级，高的覆盖低的
+            //fadeDuration淡入持续时间
+            FF8.Audio.PlayMusic("assetName", CallBack, loop: true, priority: 1, fadeDuration: 3f); // 背景音乐
             /*----------人声----------*/
-            FF8.Audio.PlayVoice("assetName", CallBack, loop: true, priority: 1); // 角色语音
+            FF8.Audio.PlayVoice("assetName", CallBack, true, 1, 3f); // 角色语音
             /*----------特效声----------*/
-            FF8.Audio.PlayUISound("assetName", CallBack, loop: true, priority: 1); // ui音效
-            FF8.Audio.PlayBtnClick("assetName", CallBack, loop: false, priority: 2); // 按钮音效
-            FF8.Audio.PlayAudioEffect("assetName", CallBack, loop: false, priority: 2); // 音效特效
-            // 3D音效，随机音量音高，位置，音量，播放回调
-            FF8.Audio.PlayAudioEffect3D("assetName", isRandom: true, transform.position, volume: 1f, CallBack);
-
+            FF8.Audio.PlayUISound("assetName", CallBack, true, 1, 3f); // ui音效
+            FF8.Audio.PlayBtnClick("assetName", CallBack, false, 2, 3f); // 按钮音效
+            FF8.Audio.PlayAudioEffect("assetName", CallBack, false, 2, 3f); // 音效特效
+            
+            /*----------一次性3D音效----------*/
+            //assetName资产名
+            //isRandom是否随机音量音高
+            //audioPosition音频播放位置
+            //volume音量
+            //spatialBlend2d到3d的比例
+            //maxNum最大同时播放个数
+            //callback播放完成回调
+            FF8.Audio.PlayAudioEffect3D("assetName", isRandom: true, transform.position, volume: 1f, spatialBlend: 1f, maxNum: 5, CallBack);
+            
             /*----------其他功能----------*/
             
             //可选，设置混音组F8AudioMixer，需手动放到可加载目录

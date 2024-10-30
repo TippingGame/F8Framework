@@ -23,8 +23,10 @@ namespace F8Framework.Core
         private AudioMusic _audioMusicUISound;
         
         private AudioMusic _audioMusicAudioEffect;
-        
+
+        /*----------一次性特效声----------*/
         private AudioEffect _audioMusicAudioEffect3D;
+        
         private AudioMixerGroup _audioEffectMixerGroup;
         
         private float _volumeAudioEffect = 1f;
@@ -125,6 +127,12 @@ namespace F8Framework.Core
 
         public void OnTermination()
         {
+            StopAll();
+            Tween.Instance.CancelTween(_audioMusic.AudioTween);
+            Tween.Instance.CancelTween(_audioMusicVoice.AudioTween);
+            Tween.Instance.CancelTween(_audioMusicBtnClick.AudioTween);
+            Tween.Instance.CancelTween(_audioMusicUISound.AudioTween);
+            Tween.Instance.CancelTween(_audioMusicAudioEffect.AudioTween);
             Destroy(gameObject);
         }
         
@@ -135,9 +143,16 @@ namespace F8Framework.Core
         {
             _audioMusic.OnComplete = callback;
         }
-
-        // 播放背景音乐
-        public void PlayMusic(string assetName, Action callback = null, bool loop = false, int priority = 0)
+        
+        /// <summary>
+        /// 播放背景音乐。
+        /// </summary>
+        /// <param name="assetName">资产名。</param>
+        /// <param name="callback">播放完成回调。</param>
+        /// <param name="loop">是否循环。</param>
+        /// <param name="priority">优先级，高的覆盖低的。</param>
+        /// <param name="fadeDuration">淡入持续时间。</param>
+        public void PlayMusic(string assetName, Action callback = null, bool loop = false, int priority = 0, float fadeDuration = 0f)
         {
             if (!_switchMusic)
             {
@@ -147,9 +162,7 @@ namespace F8Framework.Core
             {
                 return;
             }
-            _audioMusic.Load(assetName, callback);
-            _audioMusic.MusicSource.loop = loop;
-            _audioMusic.Priority = priority;
+            _audioMusic.Load(assetName, callback, loop, priority, fadeDuration);
         }
         
         // 设置背景乐播放进度
@@ -203,7 +216,7 @@ namespace F8Framework.Core
         }
 
         // 播放人声
-        public void PlayVoice(string assetName, Action callback = null, bool loop = false, int priority = 0)
+        public void PlayVoice(string assetName, Action callback = null, bool loop = false, int priority = 0, float fadeDuration = 0f)
         {
             if (!_switchVoice)
             {
@@ -213,9 +226,7 @@ namespace F8Framework.Core
             {
                 return;
             }
-            _audioMusicVoice.Load(assetName, callback);
-            _audioMusicVoice.MusicSource.loop = loop;
-            _audioMusicVoice.Priority = priority;
+            _audioMusicVoice.Load(assetName, callback, loop, priority, fadeDuration);
         }
         
         // 设置人声播放进度
@@ -308,7 +319,7 @@ namespace F8Framework.Core
         }
 
         // 播放按钮音效
-        public void PlayBtnClick(string assetName, Action callback = null, bool loop = false, int priority = 0)
+        public void PlayBtnClick(string assetName, Action callback = null, bool loop = false, int priority = 0, float fadeDuration = 0f)
         {
             if (!_switchAudioEffect)
             {
@@ -318,9 +329,7 @@ namespace F8Framework.Core
             {
                 return;
             }
-            _audioMusicBtnClick.Load(assetName, callback);
-            _audioMusicBtnClick.MusicSource.loop = loop;
-            _audioMusicBtnClick.Priority = priority;
+            _audioMusicBtnClick.Load(assetName, callback, loop, priority, fadeDuration);
         }
         
         /*----------UI音效特效----------*/
@@ -332,7 +341,7 @@ namespace F8Framework.Core
         }
 
         // 播放UI音效
-        public void PlayUISound(string assetName, Action callback = null, bool loop = false, int priority = 0)
+        public void PlayUISound(string assetName, Action callback = null, bool loop = false, int priority = 0, float fadeDuration = 0f)
         {
             if (!_switchAudioEffect)
             {
@@ -342,9 +351,7 @@ namespace F8Framework.Core
             {
                 return;
             }
-            _audioMusicUISound.Load(assetName, callback);
-            _audioMusicUISound.MusicSource.loop = loop;
-            _audioMusicUISound.Priority = priority;
+            _audioMusicUISound.Load(assetName, callback, loop, priority, fadeDuration);
         }
                 
         /*----------音效特效----------*/
@@ -356,7 +363,7 @@ namespace F8Framework.Core
         }
 
         // 播放音效特效
-        public void PlayAudioEffect(string assetName, Action callback = null, bool loop = false, int priority = 0)
+        public void PlayAudioEffect(string assetName, Action callback = null, bool loop = false, int priority = 0, float fadeDuration = 0f)
         {
             if (!_switchAudioEffect)
             {
@@ -366,21 +373,30 @@ namespace F8Framework.Core
             {
                 return;
             }
-            _audioMusicAudioEffect.Load(assetName, callback);
-            _audioMusicAudioEffect.MusicSource.loop = loop;
-            _audioMusicAudioEffect.Priority = priority;
+            _audioMusicAudioEffect.Load(assetName, callback, loop, priority, fadeDuration);
         }
         
-        /*----------3D音效特效----------*/
-        public void PlayAudioEffect3D(string assetName, bool isRandom = false, Vector3? audioListenerPosition = null, float volume = 1f, Action callback = null)
+        /*----------一次性3D音效特效----------*/
+        /// <summary>
+        /// 播放一次性3D音效特效。
+        /// </summary>
+        /// <param name="assetName">资产名。</param>
+        /// <param name="isRandom">是否随机音量音高。</param>
+        /// <param name="audioPosition">音频播放位置。</param>
+        /// <param name="volume">音量。</param>
+        /// <param name="spatialBlend">2d到3d的比例。</param>
+        /// <param name="maxNum">最大同时播放个数。</param>
+        /// <param name="callback">播放完成回调。</param>
+        public void PlayAudioEffect3D(string assetName, bool isRandom = false, Vector3? audioPosition = null, float volume = 1f, float spatialBlend = 1f,
+            int maxNum = 5, Action callback = null)
         {
             if (!_switchAudioEffect)
             {
                 return ;
             }
-            Vector3 actualPosition = audioListenerPosition.GetValueOrDefault(_transform.position);
+            Vector3 actualPosition = audioPosition.GetValueOrDefault(_transform.position);
             float actualVolume = volume * _volumeAudioEffect;
-            _audioMusicAudioEffect3D.Load(assetName, actualPosition, actualVolume, callback, _audioEffectMixerGroup, isRandom);
+            _audioMusicAudioEffect3D.Load(assetName, actualPosition, actualVolume, spatialBlend, maxNum, callback, _audioEffectMixerGroup, isRandom);
         }
         
         /*----------全局控制----------*/

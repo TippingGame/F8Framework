@@ -41,6 +41,23 @@ namespace F8Framework.Tests
             // (0.0 , 0.0)|______________________|(1.0 , 0.0)
             transform.GetComponent<RectTransform>().MoveUI(new Vector2(1f, 1f), canvasRect, 1f)
                 .SetEase(Ease.EaseOutBounce);
+            
+            // 你也可以这样使用
+            // 数字缓动变化
+            BaseTween valueTween = FF8.Tween.ValueTween(0f, 100f, 3f).SetOnUpdateFloat((float v) =>
+            {
+                LogF8.Log(v);
+            });
+            
+            FF8.Tween.CancelTween(valueTween);
+            
+            // 物体移动
+            BaseTween gameObjectTween = FF8.Tween.Move(gameObject, Vector3.one, 3f).SetOnUpdateVector3((Vector3 v) =>
+            {
+                LogF8.Log(v);
+            });
+            
+            FF8.Tween.CancelTween(gameObjectTween.ID);
         }
     }
 }

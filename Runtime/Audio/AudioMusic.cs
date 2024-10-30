@@ -11,6 +11,7 @@ namespace F8Framework.Core
         private bool _isPlay = false;
         public int Priority;
         public AudioSource MusicSource;
+        public BaseTween AudioTween;
 
         // 获取音乐播放进度
         public float Progress
@@ -31,8 +32,10 @@ namespace F8Framework.Core
         }
 
         // 加载音乐并播放
-        public void Load(string url, System.Action callback = null)
+        public void Load(string url, System.Action callback = null, bool loop = false, int priority = 0, float fadeDuration = 0f)
         {
+            MusicSource.loop = loop;
+            Priority = priority;
             AssetManager.Instance.LoadAsync<AudioClip>(url, (audioClip) =>
             {
                 if (MusicSource.isPlaying)
@@ -49,6 +52,16 @@ namespace F8Framework.Core
                 MusicSource.Play();
             
                 _url = url;
+                
+                if (fadeDuration > 0f)
+                {
+                    float tempVolume = MusicSource.volume;
+                    MusicSource.volume = 0f;
+                    AudioTween = Tween.Instance.ValueTween(0f, tempVolume, fadeDuration).SetOnUpdateFloat((float v) =>
+                    {
+                        MusicSource.volume = v;
+                    });
+                }
             });
         }
 
