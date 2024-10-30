@@ -100,15 +100,15 @@ namespace F8Framework.Core.Editor
             {
                 FileTools.SafeCopyFile(
                     FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) +
-                    "/Runtime/ExcelTool/StreamingAssets_config/Demo工作表.xlsx",
-                    lastExcelPath + "/Demo工作表.xlsx");
+                    "/Runtime/ExcelTool/StreamingAssets_config/DemoWorkSheet.xlsx",
+                    lastExcelPath + "/DemoWorkSheet.xlsx");
                 FileTools.SafeCopyFile(
                     FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) +
-                    "/Runtime/Localization/StreamingAssets_config/本地化.xlsx",
-                    lastExcelPath + "/本地化.xlsx");
+                    "/Runtime/Localization/StreamingAssets_config/Localization.xlsx",
+                    lastExcelPath + "/Localization.xlsx");
                 files = Directory.GetFiles(INPUT_PATH, "*.*", SearchOption.AllDirectories)
                     .Where(s => s.EndsWith(".xls") || s.EndsWith(".xlsx")).ToArray();
-                LogF8.LogError("暂无可以导入的数据表！自动为你创建：【Demo工作表.xlsx / 本地化.xlsx】两个表格！" + lastExcelPath + " 目录");
+                LogF8.LogError("暂无可以导入的数据表！自动为你创建：【DemoWorkSheet.xlsx / Localization.xlsx】两个表格！" + lastExcelPath + " 目录");
             }
             
             string F8DataManagerPath = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/ConfigData/F8DataManager";

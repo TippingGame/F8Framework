@@ -139,7 +139,15 @@ namespace F8Framework.Core
                         End(t);
                     };
             }
-
+            else if (resourceLoadState == LoaderState.WORKING)
+            {
+                resourceLoadRequest.completed +=
+                    ao => {
+                        T t = resourceLoadRequest.asset as T;
+                        End(t);
+                    };
+            }
+            
             void End(T o = null)
             {
                 if (callback != null)
@@ -162,6 +170,11 @@ namespace F8Framework.Core
                 resourceLoadState = LoaderState.FINISHED;
                 
                 // 返回加载完成的资源对象
+                yield return resouceObject;
+            }
+            else if (resourceLoadState == LoaderState.WORKING)
+            {
+                yield return resourceLoadState == LoaderState.FINISHED;
                 yield return resouceObject;
             }
         }

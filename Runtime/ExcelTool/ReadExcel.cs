@@ -77,7 +77,7 @@ namespace F8Framework.Core
                 .Where(s => s.EndsWith(".xls") || s.EndsWith(".xlsx")).ToArray();
             if (files == null || files.Length == 0)
             {
-                throw new Exception("暂无可以导入的数据表！首次F8请手动导入，【Demo工作表.xlsx / 本地化.xlsx】两个表格！" + INPUT_PATH + " 目录");
+                throw new Exception("暂无可以导入的数据表！首次F8请手动导入，【DemoWorkSheet.xlsx / Localization.xlsx】两个表格！" + INPUT_PATH + " 目录");
             }
 
             if (dataDict == null)

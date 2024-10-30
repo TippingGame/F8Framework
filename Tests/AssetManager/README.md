@@ -99,6 +99,9 @@ Unity F8 AssetManager资产加载组件。
         // 加载场景，别忘了加载天空盒材质，不然会变紫色
         FF8.Asset.Load("Scene");
         SceneManager.LoadScene("Scene");
+        
+        // 使用图集首先需要，加载图集
+        FF8.Asset.Load("SpriteAtlas");
     }
 ```
 

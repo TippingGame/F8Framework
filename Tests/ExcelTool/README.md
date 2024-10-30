@@ -27,7 +27,7 @@ Unity 读取 Excel 的工具
 
 ## 初始化
 
-1. 在 Assets 下，创建 StreamingAssets/config 目录，按照下面 "Excel 示例" 创建你的 Excel[（Excel例子）](https://github.com/TippingGame/F8Framework/blob/main/Runtime/ExcelTool/StreamingAssets_config/Demo工作表.xlsx)
+1. 在 Assets 下，创建 StreamingAssets/config 目录，按照下面 "Excel 示例" 创建你的 Excel[（Excel例子）](https://github.com/TippingGame/F8Framework/blob/main/Runtime/ExcelTool/StreamingAssets_config/DemoWorkSheet.xlsx)
 
 
 2. 点击菜单的**开发工具**项 -> **导入配置表**\_F8（快捷键），在 Assets/AssetBundles/Config/BinConfigData 下生成 **bytes** 文件（WebGL下生成 **Json** 文件）
@@ -36,7 +36,10 @@ Unity 读取 Excel 的工具
 3. 如无意外，根目录下会生成 **Assets/F8Framework/ConfigData/** 目录和相关文件  
 
 
-4. （可选项）通过 Editor，可在运行时读取 Excel 数据：点击菜单的**开发工具**项 -> **运行时读取 Excel**\_F7（快捷键）
+4. （可选项）更改Excel存放目录，**开发工具**项 -> **设置Excel存放目录**  
+
+
+5. （可选项）通过 Editor，可在运行时读取 Excel 数据：点击菜单的**开发工具**项 -> **运行时读取 Excel**\_F7（快捷键）
 
 
 ## Excel 示例

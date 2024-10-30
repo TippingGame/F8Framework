@@ -54,7 +54,7 @@ namespace F8Framework.Core
 
         public void Tick()
         {
-            if (MusicSource.time > 0)
+            if (MusicSource.clip && MusicSource.time > 0)
             {
                 _isPlay = true;
             }
