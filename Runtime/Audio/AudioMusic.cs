@@ -44,9 +44,11 @@ namespace F8Framework.Core
             }
             else
             {
-                AssetManager.Instance.LoadAsync<AudioClip>(url, (audioClip) =>
+                AssetManager.Instance.LoadAsync<AudioClip>(url, (asset) =>
                 {
-                    PlayClip(audioClip, callback, fadeDuration);
+                    _audios[url] = asset;
+                    
+                    PlayClip(_audios[url], callback, fadeDuration);
                 });
             }
         }

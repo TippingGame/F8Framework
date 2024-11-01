@@ -44,13 +44,11 @@ namespace F8Framework.Core
             }
             else
             {
-                AssetManager.Instance.LoadAsync<AudioClip>(url, (audioClip) =>
+                AssetManager.Instance.LoadAsync<AudioClip>(url, (asset) =>
                 {
-                    if (_effects != null && !_effects.ContainsKey(url))
-                    {
-                        _effects.Add(url, audioClip);
-                        PlayClipAtPoint(url, audioClip, position, volume, spatialBlend, callback, audioEffectMixerGroup, isRandom);
-                    }
+                    _effects[url] = asset;
+                    
+                    PlayClipAtPoint(url, _effects[url], position, volume, spatialBlend, callback, audioEffectMixerGroup, isRandom);
                 });
             }
         }
