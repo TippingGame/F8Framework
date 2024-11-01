@@ -133,6 +133,7 @@ namespace F8Framework.Core
             Tween.Instance.CancelTween(_audioMusicBtnClick.AudioTween);
             Tween.Instance.CancelTween(_audioMusicUISound.AudioTween);
             Tween.Instance.CancelTween(_audioMusicAudioEffect.AudioTween);
+            
             Destroy(gameObject);
         }
         
@@ -406,6 +407,7 @@ namespace F8Framework.Core
             _audioMusicVoice.MusicSource.Play();
             _audioMusicBtnClick.MusicSource.Play();
             _audioMusicUISound.MusicSource.Play();
+            _audioMusicAudioEffect.MusicSource.Play();
         }
         
         public void PauseAll() {
@@ -413,6 +415,7 @@ namespace F8Framework.Core
             _audioMusicVoice.MusicSource.Pause();
             _audioMusicBtnClick.MusicSource.Pause();
             _audioMusicUISound.MusicSource.Pause();
+            _audioMusicAudioEffect.MusicSource.Pause();
         }
         
         public void StopAll()
@@ -421,6 +424,17 @@ namespace F8Framework.Core
             _audioMusicVoice.MusicSource.Stop();
             _audioMusicBtnClick.MusicSource.Stop();
             _audioMusicUISound.MusicSource.Stop();
+            _audioMusicAudioEffect.MusicSource.Stop();
+        }
+        
+        public void UnloadAll(bool unloadAllLoadedObjects = true)
+        {
+            _audioMusic.UnloadAll(unloadAllLoadedObjects);
+            _audioMusicVoice.UnloadAll(unloadAllLoadedObjects);
+            _audioMusicBtnClick.UnloadAll(unloadAllLoadedObjects);
+            _audioMusicUISound.UnloadAll(unloadAllLoadedObjects);
+            _audioMusicAudioEffect.UnloadAll(unloadAllLoadedObjects);
+            _audioMusicAudioEffect3D.UnloadAll(unloadAllLoadedObjects);
         }
         
         private float Remap01ToDB(float linearVolume)

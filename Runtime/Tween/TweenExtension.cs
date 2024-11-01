@@ -257,7 +257,12 @@ public static class TweenExtension
     {
         return Tween.Instance.FadeInAtSpeed(sprite , speed);
     }
-
+    
+    public static BaseTween ColorTween(this Material material, Color to, float t)
+    {
+        return Tween.Instance.ColorTween(material , to , t);
+    }
+    
     public static BaseTween ColorTween(this SpriteRenderer sprite, Color to, float t)
     {
         return Tween.Instance.ColorTween(sprite , to , t);

@@ -49,6 +49,8 @@ namespace F8Framework.Tests
             FF8.Audio.ResumeAll(); // 恢复所有，不包括AudioEffect
             FF8.Audio.StopAll(); // 停止所有，不包括AudioEffect
 
+            FF8.Audio.UnloadAll(true); // 卸载所有音频和音效。（true:完全卸载，包括正在使用的）
+
             void CallBack()
             {
 

@@ -540,6 +540,22 @@ namespace F8Framework.Core
             return Vector3.Distance(ColorToVector3(a), ColorToVector3(b));
         }
 
+        public BaseTween ColorTween(Material material, Color to, float t)
+        {
+            ColorTween tween = TweenPool.GetColorTween(material.color, to, t);
+            tween.SetOnUpdateColor(delegate (Color c)
+            {
+                if (material == null)
+                {
+                    TweenPool.FinishTween(tween);
+                    return;
+                }
+
+                material.color = c;
+            });
+            return ProcessTween(tween);
+        }
+        
         public BaseTween ColorTween(SpriteRenderer sprite, Color to, float t)
         {
             ColorTween tween = TweenPool.GetColorTween(sprite.color, to, t);

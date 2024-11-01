@@ -38,9 +38,9 @@ namespace F8Framework.Core
             }
             _effectsNum[url] = count + 1;
             
-            if (_effects != null && _effects.ContainsKey(url))
+            if (_effects != null && _effects.TryGetValue(url, out AudioClip audioClip) && audioClip)
             {
-                PlayClipAtPoint(url, _effects[url], position, volume, spatialBlend, callback, audioEffectMixerGroup, isRandom);
+                PlayClipAtPoint(url, audioClip, position, volume, spatialBlend, callback, audioEffectMixerGroup, isRandom);
             }
             else
             {
@@ -93,13 +93,15 @@ namespace F8Framework.Core
             });
         }
         
-        public void Release()
+        // 释放所有音效资源
+        public void UnloadAll(bool unloadAllLoadedObjects = true)
         {
             foreach (var item in _effects)
             {
-                AssetManager.Instance.Unload(item.Key, true);
+                AssetManager.Instance.Unload(item.Key, unloadAllLoadedObjects);
             }
             _effects.Clear();
+            _effectsNum.Clear();
         }
     }
 }
