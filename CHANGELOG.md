@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.0.53] - 2024-11-03
+1.游戏对象池模块增加Spawn By PrefabName方法  
+
 ## [1.0.52] - 2024-11-03
 1.游戏对象池模块增加GetPoolByPrefabName方法  
 
