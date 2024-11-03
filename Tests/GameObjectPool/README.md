@@ -25,7 +25,8 @@ Unity F8 GameObjectPool组件，对象池管理，预加载池化，生成/销�
     {
         /*------------------------------使用GameObjectPool对象池------------------------------*/
         
-        // 使用GameObject或者Component创建对象
+        // 使用名称或GameObject或者Component创建对象
+        GameObject spawnedClone = FF8.GameObjectPool.Spawn("name");
         GameObject spawnedClone = FF8.GameObjectPool.Spawn(_gameObjectPrefab);
         DemoGameObjectPool component = FF8.GameObjectPool.Spawn(_componentPrefab, Vector3.zero, Quaternion.identity, this.transform);
         
