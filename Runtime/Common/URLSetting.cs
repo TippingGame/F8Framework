@@ -29,7 +29,7 @@ namespace F8Framework.Core
                 string strReturenPlatformName = "macOS";
 #elif UNITY_STANDALONE_LINUX
                 string strReturenPlatformName = "Linux";
-#elif UNITY_IPHONE
+#elif UNITY_IPHONE || UNITY_IOS
                 string strReturenPlatformName = "iOS";
 #elif UNITY_ANDROID
                 string strReturenPlatformName = "Android";

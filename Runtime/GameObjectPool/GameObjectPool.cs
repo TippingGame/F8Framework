@@ -432,6 +432,26 @@ namespace F8Framework.Core
         }
 
         /// <summary>
+        /// Returns the pool by prefab name.
+        /// </summary>
+        /// <param name="name">GameObject's prefab name.</param>
+        /// <returns>Found pool.</returns>
+        public F8GameObjectPool GetPoolByPrefabName(string name)
+        {
+            foreach (var poolKey in AllPoolsMap.Keys)
+            {
+                if (poolKey.name == name)
+                {
+                    return AllPoolsMap[poolKey];
+                }
+            }
+#if DEBUG
+            LogF8.LogError($"未通过预制体名称 '{name}' 找到池!", name);
+#endif
+            return null;
+        }
+        
+        /// <summary>
         /// Is the component a clone (spawned using F8Pool)?
         /// </summary>
         /// <param name="clone">Component to check.</param>

@@ -5,7 +5,6 @@ namespace F8Framework.Core
 {
 #if UNITY_EDITOR
     [DisallowMultipleComponent]
-    [AddComponentMenu(Constants.F8PoolComponentPath + "F8 Pool Global")]
 #endif
     [UpdateRefresh]
     [FixedUpdateRefresh]

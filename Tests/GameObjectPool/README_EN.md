@@ -39,6 +39,7 @@ Unity F8 GameObjectPool组件，对象池管理，预加载池化，生成/销�
         
         // 如何获取对象池
         F8GameObjectPool _pool = FF8.GameObjectPool.GetPoolByPrefab(_gameObjectPrefab);
+        F8GameObjectPool _pool = FF8.GameObjectPool.GetPoolByPrefabName(_gameObjectPrefab.name);
         
         // 对每个池执行操作。
         FF8.GameObjectPool.ForEachPool(LogF8.Log);

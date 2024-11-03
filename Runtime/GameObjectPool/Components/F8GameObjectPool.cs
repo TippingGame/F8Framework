@@ -13,7 +13,6 @@ namespace F8Framework.Core
     /// </summary>
 #if UNITY_EDITOR
     [DisallowMultipleComponent]
-    [AddComponentMenu(Constants.F8PoolComponentPath + "F8 Game Object Pool")]
 #endif
     public sealed class F8GameObjectPool : MonoBehaviour
     {

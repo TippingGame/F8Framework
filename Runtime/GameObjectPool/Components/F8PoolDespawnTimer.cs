@@ -2,9 +2,6 @@
 
 namespace F8Framework.Core
 {
-#if UNITY_EDITOR
-    [AddComponentMenu(Constants.F8PoolComponentPath + "F8 Pool Despawn Timer")]
-#endif
     public sealed class F8PoolDespawnTimer : MonoBehaviour, ISpawnable
     {
         [SerializeField] private UpdateType _updateType = UpdateType.Update;

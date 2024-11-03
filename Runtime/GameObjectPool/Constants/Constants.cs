@@ -13,7 +13,6 @@ namespace F8Framework.Core
         internal const CallbacksType DefaultCallbacksType = CallbacksType.Interfaces;
         internal const ReactionOnRepeatedDelayedDespawn DefaultDelayedDespawnHandleType = ReactionOnRepeatedDelayedDespawn.ResetDelay;
         internal const F8PoolMode DefaultF8PoolMode = F8PoolMode.Performance;
-        internal const string F8PoolComponentPath = Author + "/F8 Pool/";
         internal const string OnSpawnMessageName = "OnSpawn";
         internal const string OnDespawnMessageName = "OnDespawn";
         internal const int DefaultPoolsMapCapacity = 64;
@@ -25,9 +24,7 @@ namespace F8Framework.Core
         internal const int DefaultPoolablesListCapacity = 32;
         internal const bool DefaultSendWarningsStatus = true;
         internal const bool DefaultPoolPersistenceStatus = true;
-        internal const int F8PoolExecutionOrder = -10999;
         internal const int NewPoolPreloadSize = 0;
-        private const string Author = "F8 GameObjectPools Code";
 
         internal static readonly Vector3 Vector3One = Vector3.one;
         internal static readonly Vector3 DefaultPosition = Vector3.zero;
