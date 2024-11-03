@@ -297,7 +297,7 @@ namespace F8Framework.Core
 #endif
                     return;
                 }
-                
+                _preloadSize = Mathf.Clamp(count, 0, _capacity);
                 AddPoolableToList(_despawnedPoolables, InstantiateAndSetupPoolable(true), 
                     ref _despawnedClonesCount);
             }
