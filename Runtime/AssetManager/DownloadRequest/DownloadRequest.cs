@@ -40,7 +40,7 @@ namespace F8Framework.Core
         /// 创建一个AssetBundle下载请求。
         /// </summary>
         /// <param name="uri">请求的URI。</param>
-        /// <param name="version">
+        /// <param name="hash">
         /// 一个整数版本号，将与AssetBundle的缓存版本进行比较以确定是否下载。
         /// 将此数字递增以强制Unity重新下载缓存的AssetBundle。
         /// 如果为零，则忽略版本分配。
@@ -58,7 +58,7 @@ namespace F8Framework.Core
             type = DownloadType.ASSET_BUNDLE;
             SendAssetBundleDownloadRequest(uri, hash, crc);
         }
-
+        
         /// <summary>
         /// 终止正在进行的下载。
         /// </summary>

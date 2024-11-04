@@ -141,6 +141,7 @@ namespace F8Framework.Core
             }
             else if (resourceLoadState == LoaderState.WORKING)
             {
+                loadType = LoaderType.ASYNC;
                 resourceLoadRequest.completed +=
                     ao => {
                         T t = resourceLoadRequest.asset as T;
@@ -174,7 +175,8 @@ namespace F8Framework.Core
             }
             else if (resourceLoadState == LoaderState.WORKING)
             {
-                yield return resourceLoadState == LoaderState.FINISHED;
+                loadType = LoaderType.ASYNC;
+                yield return new WaitUntil(() => IsLoadFinished);
                 yield return resouceObject;
             }
         }
@@ -205,6 +207,14 @@ namespace F8Framework.Core
                         }
                     };
             }
+            else if (resourceLoadState == LoaderState.WORKING)
+            {
+                loadType = LoaderType.ASYNC;
+                resourceLoadRequest.completed +=
+                    ao => {
+                        End(resourceLoadRequest.asset);
+                    };
+            }
 
             void End(Object o = null)
             {
@@ -232,6 +242,12 @@ namespace F8Framework.Core
                 // 返回加载完成的资源对象
                 yield return resouceObject;
             }
+            else if (resourceLoadState == LoaderState.WORKING)
+            {
+                loadType = LoaderType.ASYNC;
+                yield return new WaitUntil(() => IsLoadFinished);
+                yield return resouceObject;
+            }
         }
         
         /// <summary>
@@ -252,7 +268,15 @@ namespace F8Framework.Core
                         End(resouceObject);
                     };
             }
-
+            else if (resourceLoadState == LoaderState.WORKING)
+            {
+                loadType = LoaderType.ASYNC;
+                resourceLoadRequest.completed +=
+                    ao => {
+                        End(resourceLoadRequest.asset);
+                    };
+            }
+            
             void End(Object o = null)
             {
                 if (callback != null)

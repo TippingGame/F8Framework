@@ -177,42 +177,49 @@ namespace F8Framework.Core
         public IEnumerator LoadAsyncCoroutine()
         {
             ClearUnloadData();
+
+            // 重置状态
             if (assetBundleLoadState == LoaderState.FINISHED && assetBundleContent == null)
                 assetBundleLoadState = LoaderState.NONE;
 
+            // 检查是否需要加载
             if (assetBundleLoadState == LoaderState.NONE)
             {
                 assetBundleLoadState = LoaderState.WORKING;
-                if (FileTools.IsLegalHTTPURI(assetBundlePath))
+
+                // 判断加载类型（远程或本地）
+                bool isRemote = FileTools.IsLegalHTTPURI(assetBundlePath);
+                loadType = isRemote ? LoaderType.REMOTE_ASYNC : LoaderType.LOCAL_ASYNC;
+
+                // 根据加载类型初始化请求
+                if (isRemote)
                 {
-                    loadType = LoaderType.REMOTE_ASYNC;
                     assetBundleDownloadRequest = new DownloadRequest(assetBundlePath, hash128);
                     if (assetBundleDownloadRequest == null)
                     {
                         assetBundleLoadState = LoaderState.FINISHED;
-                        string errMsg = string.Format("找不到远程资产捆绑包 {0} ，请检查", assetBundlePath);
-                        LogF8.LogError(errMsg);
-                    }
-                    else
-                    {
-                        yield return assetBundleDownloadRequest.SendAssetBundleDownloadRequestCoroutine(assetBundlePath, hash128);
+                        LogF8.LogError($"找不到远程资产捆绑包 {assetBundlePath} ，请检查");
+                        yield break;
                     }
                 }
                 else
                 {
-                    loadType = LoaderType.LOCAL_ASYNC;
                     assetBundleLoadRequest = AssetBundle.LoadFromFileAsync(assetBundlePath);
                     if (assetBundleLoadRequest == null)
                     {
                         assetBundleLoadState = LoaderState.FINISHED;
-                        string errMsg = string.Format("找不到本地资产捆绑包 {0} ，请检查", assetBundlePath);
-                        LogF8.LogError(errMsg);
-                    }
-                    else
-                    {
-                        yield return assetBundleLoadRequest;
+                        LogF8.LogError($"找不到本地资产捆绑包 {assetBundlePath} ，请检查");
+                        yield break;
                     }
                 }
+
+                // 等待加载完成
+                yield return new WaitUntil(() => IsLoadFinished);
+            }
+            else if (assetBundleLoadState == LoaderState.WORKING)
+            {
+                // 重用现有请求等待加载完成
+                yield return new WaitUntil(() => IsLoadFinished);
             }
         }
         
