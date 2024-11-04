@@ -1244,37 +1244,28 @@ namespace F8Framework.Core
             }
             
 #if UNITY_EDITOR
+            private List<string> searchDirs = new List<string>();
+            private Dictionary<string, string> findAssetPaths = new Dictionary<string, string>();
             private string SearchAsset(string assetName, System.Object type = default, AssetAccessMode mode = AssetAccessMode.UNKNOWN)
             {
-                // 获取项目中的所有文件夹路径
-                string[] allFolders = UnityEditor.AssetDatabase.GetAllAssetPaths();
-                List<string> searchDirs = new List<string>();
-                
-                // 根据 searchOption 参数决定要搜索的文件夹路径
-                switch (mode)
+                // 缓存路径
+                if (findAssetPaths.TryGetValue(assetName, out string value))
                 {
-                    case AssetAccessMode.RESOURCE:
-                        foreach (string folderPath in allFolders)
+                    return value;
+                }
+                
+                if (searchDirs.Count <= 0)
+                {
+                    // 获取项目中的所有文件夹路径
+                    string[] allFolders = UnityEditor.AssetDatabase.GetAllAssetPaths();
+                    foreach (string folderPath in allFolders)
+                    {
+                        if (System.IO.Directory.Exists(folderPath) && folderPath.Contains("/Resources"))
                         {
-                            if (System.IO.Directory.Exists(folderPath) && folderPath.Contains("/Resources"))
-                            {
-                                searchDirs.Add(folderPath);
-                            }
+                            searchDirs.Add(folderPath);
                         }
-                        break;
-                    case AssetAccessMode.ASSET_BUNDLE:
-                        searchDirs.Add(System.IO.Path.Combine(URLSetting.AssetBundlesPath));
-                        break;
-                    case AssetAccessMode.UNKNOWN:
-                        foreach (string folderPath in allFolders)
-                        {
-                            if (System.IO.Directory.Exists(folderPath) && folderPath.Contains("/Resources"))
-                            {
-                                searchDirs.Add(folderPath);
-                            }
-                        }
-                        searchDirs.Add(System.IO.Path.Combine(URLSetting.AssetBundlesPath));
-                        break;
+                    }
+                    searchDirs.Add(System.IO.Path.Combine(URLSetting.AssetBundlesPath));
                 }
                 
                 // 查找指定资源
@@ -1288,6 +1279,7 @@ namespace F8Framework.Core
                     {
                         if (Path.GetFileNameWithoutExtension(assetPath) == assetName)
                         {
+                            findAssetPaths[assetName] = assetPath;
                             return assetPath;
                         }
                     }
