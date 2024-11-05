@@ -5,11 +5,13 @@ namespace F8Framework.Core
 {
 	public class RawImageInjector : IInjector
 	{
+		readonly string localizedTextID;
 		readonly RawImage rawImage;
 		readonly Texture[] textures;
 
-		public RawImageInjector(RawImage rawImage, Texture[] textures)
+		public RawImageInjector(RawImage rawImage, string localizedTextID, Texture[] textures)
 		{
+			this.localizedTextID = localizedTextID;
 			this.rawImage = rawImage;
 			this.textures = textures;
 		}
@@ -18,7 +20,25 @@ namespace F8Framework.Core
 		{
 			if (localizedData is int index)
 			{
-				rawImage.texture = textures[index];
+				if (localizedTextID.IsNullOrEmpty())
+				{
+					rawImage.texture = textures[index];
+				}
+				else
+				{
+					string textIDValue = Localization.Instance.GetTextFromId(localizedTextID);
+					AssetManager.Instance.LoadAsync(textIDValue, (asset) =>
+					{
+						if (asset is Sprite sprite)
+						{
+							Texture texture = sprite.texture;
+							rawImage.texture = texture;
+							LogF8.LogAsset("本地化图片类型错误，已自动转换：" + asset);
+							return;
+						}
+						rawImage.texture = asset as Texture;
+					});
+				}
 			}
 		}
 	}

@@ -214,7 +214,7 @@ namespace F8Framework.Core
                         return o;
                     }
                     AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePath);
-                    ab.Expand();
+                    ab.Expand(typeof(T));
                     o = AssetBundleManager.Instance.GetAssetObject<T>(info.AssetBundlePath, info.AssetPath[0]);
                     if (o != null)
                     {
@@ -266,7 +266,7 @@ namespace F8Framework.Core
                         return o;
                     }
                     AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePath);
-                    ab.Expand();
+                    ab.Expand(assetType);
                     o = AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], assetType);
                     if (o != null)
                     {
@@ -316,7 +316,7 @@ namespace F8Framework.Core
                         return o;
                     }
                     AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePath);
-                    ab.Expand();
+                    ab.Expand(default);
                     o = AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0]);
                     if (o != null)
                     {
@@ -374,7 +374,7 @@ namespace F8Framework.Core
                     if (ab == null ||
                         ab.AssetBundleContent == null)
                     {
-                        AssetBundleManager.Instance.Load(assetName, ref info);
+                        AssetBundleManager.Instance.Load(assetName, typeof(T), ref info);
                         ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePath);
                     }
                 
@@ -384,7 +384,7 @@ namespace F8Framework.Core
                         return o;
                     }
                     
-                    ab.Expand();
+                    ab.Expand(typeof(T));
                     return AssetBundleManager.Instance.GetAssetObject<T>(info.AssetBundlePath, info.AssetPath[0]);
                 }
 
@@ -426,7 +426,7 @@ namespace F8Framework.Core
                         AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(subInfo.AssetBundlePath);
                         if (ab == null || ab.AssetBundleContent == null)
                         {
-                            AssetBundleManager.Instance.Load(subAssetName, ref subInfo);
+                            AssetBundleManager.Instance.Load(subAssetName, default, ref subInfo);
                         }
                     }
                 }
@@ -477,7 +477,7 @@ namespace F8Framework.Core
                     if (ab == null ||
                         ab.AssetBundleContent == null)
                     {
-                        AssetBundleManager.Instance.Load(assetName, ref info);
+                        AssetBundleManager.Instance.Load(assetName, assetType, ref info);
                         ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePath);
                     }
             
@@ -487,7 +487,7 @@ namespace F8Framework.Core
                         return o;
                     }
                 
-                    ab.Expand();
+                    ab.Expand(assetType);
                     return AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], assetType);
                 }
 
@@ -537,7 +537,7 @@ namespace F8Framework.Core
                     if (ab == null ||
                         ab.AssetBundleContent == null)
                     {
-                        AssetBundleManager.Instance.Load(assetName, ref info);
+                        AssetBundleManager.Instance.Load(assetName, default, ref info);
                         ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePath);
                     }
             
@@ -546,7 +546,7 @@ namespace F8Framework.Core
                     {
                         return o;
                     }
-                    ab.Expand();
+                    ab.Expand(default);
                     return AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0]);
                 }
 
@@ -603,7 +603,7 @@ namespace F8Framework.Core
                     AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePath);
                     if (ab == null || ab.AssetBundleContent == null || ab.GetDependentNamesLoadFinished() < ab.AddDependentNames())
                     {
-                        AssetBundleManager.Instance.LoadAsync(assetName, info, (b) => {
+                        AssetBundleManager.Instance.LoadAsync(assetName, typeof(T), info, (b) => {
                             End(AssetBundleManager.Instance.GetAssetObject<T>(info.AssetBundlePath, info.AssetPath[0]));
                         });
                         return;
@@ -617,7 +617,7 @@ namespace F8Framework.Core
                             return;
                         }
                         
-                        ab.Expand();
+                        ab.Expand(typeof(T));
                         End(AssetBundleManager.Instance.GetAssetObject<T>(info.AssetBundlePath, info.AssetPath[0]));
                     }
                 }
@@ -674,7 +674,7 @@ namespace F8Framework.Core
                     AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePath);
                     if (ab == null || ab.AssetBundleContent == null || ab.GetDependentNamesLoadFinished() < ab.AddDependentNames())
                     {
-                        yield return AssetBundleManager.Instance.LoadAsyncCoroutine(assetName, info);
+                        yield return AssetBundleManager.Instance.LoadAsyncCoroutine(assetName, typeof(T), info);
                         yield return AssetBundleManager.Instance.GetAssetObject<T>(info.AssetBundlePath, info.AssetPath[0]);
                     }
                     else
@@ -686,7 +686,7 @@ namespace F8Framework.Core
                         }
                         else
                         {
-                            ab.Expand();
+                            ab.Expand(typeof(T));
                             yield return AssetBundleManager.Instance.GetAssetObject<T>(info.AssetBundlePath, info.AssetPath[0]);
                         }
                     }
@@ -699,7 +699,7 @@ namespace F8Framework.Core
             /// <param name="assetName">资产路径字符串。</param>
             /// <param name="assetType">目标资产类型。</param>
             /// <param name="mode">访问模式。</param>
-            public IEnumerator LoadAsyncCoroutine(string assetName, System.Type assetType = default, AssetAccessMode mode = AssetAccessMode.UNKNOWN)
+            public IEnumerator LoadAsyncCoroutine(string assetName, System.Type assetType, AssetAccessMode mode = AssetAccessMode.UNKNOWN)
             {
                 AssetInfo info = GetAssetInfo(assetName, mode);
                 if (!IsLegal(ref info))
@@ -742,7 +742,7 @@ namespace F8Framework.Core
                     AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePath);
                     if (ab == null || ab.AssetBundleContent == null || ab.GetDependentNamesLoadFinished() < ab.AddDependentNames())
                     {
-                        yield return AssetBundleManager.Instance.LoadAsyncCoroutine(assetName, info);
+                        yield return AssetBundleManager.Instance.LoadAsyncCoroutine(assetName, assetType, info);
                         yield return AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], assetType);
                     }
                     else
@@ -754,7 +754,7 @@ namespace F8Framework.Core
                         }
                         else
                         {
-                            ab.Expand();
+                            ab.Expand(assetType);
                             yield return AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], assetType);
                         }
                     }
@@ -804,7 +804,7 @@ namespace F8Framework.Core
                         AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(subInfo.AssetBundlePath);
                         if (ab == null || ab.AssetBundleContent == null || ab.GetDependentNamesLoadFinished() < ab.AddDependentNames())
                         {
-                            AssetBundleManager.Instance.LoadAsync(subAssetName, 
+                            AssetBundleManager.Instance.LoadAsync(subAssetName, default,
                                 subInfo, (b) =>
                                 {
                                     if (++assetCount >= info.AssetPath.Length)
@@ -825,7 +825,7 @@ namespace F8Framework.Core
                                 continue;
                             }
                             
-                            ab.Expand();
+                            ab.Expand(default);
                             if (++assetCount >= info.AssetPath.Length)
                             {
                                 End();
@@ -877,7 +877,7 @@ namespace F8Framework.Core
                         AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(subInfo.AssetBundlePath);
                         if (ab == null || ab.AssetBundleContent == null || ab.GetDependentNamesLoadFinished() < ab.AddDependentNames())
                         {
-                            yield return AssetBundleManager.Instance.LoadAsyncCoroutine(subAssetName, subInfo);
+                            yield return AssetBundleManager.Instance.LoadAsyncCoroutine(subAssetName, default, subInfo);
                             if (++assetCount >= info.AssetPath.Length)
                             {
                                 yield break;
@@ -895,7 +895,7 @@ namespace F8Framework.Core
                                 continue;
                             }
                             
-                            ab.Expand();
+                            ab.Expand(default);
                             if (++assetCount >= info.AssetPath.Length)
                             {
                                 yield break;
@@ -956,7 +956,7 @@ namespace F8Framework.Core
                     if (ab == null ||
                         ab.AssetBundleContent == null)
                     {
-                        AssetBundleManager.Instance.LoadAsync(assetName, info, (b) => {
+                        AssetBundleManager.Instance.LoadAsync(assetName, assetType, info, (b) => {
                             End(AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], assetType));
                         });
                         return;
@@ -970,7 +970,7 @@ namespace F8Framework.Core
                             return;
                         }
             
-                        ab.Expand();
+                        ab.Expand(assetType);
                         End(AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], assetType));
                     }
                 }
@@ -1030,7 +1030,7 @@ namespace F8Framework.Core
                     if (ab == null ||
                         ab.AssetBundleContent == null)
                     {
-                        AssetBundleManager.Instance.LoadAsync(assetName, info, (b) => {
+                        AssetBundleManager.Instance.LoadAsync(assetName, default, info, (b) => {
                             End(AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0]));
                         });
                         return;
@@ -1044,7 +1044,7 @@ namespace F8Framework.Core
                             return;
                         }
             
-                        ab.Expand();
+                        ab.Expand(default);
                         End(AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0]));
                     }
                 }

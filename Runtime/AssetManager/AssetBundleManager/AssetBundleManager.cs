@@ -21,9 +21,10 @@ namespace F8Framework.Core
         /// 如果重复加载资产，则将直接从资源池中提供。
         /// </summary>
         /// <param name="assetName">资产名称。</param>
+        /// <param name="assetType">资产类型。</param>
         /// <param name="info">资产信息。</param>
         /// <returns>要完成扩展的对象列表。</returns>
-        public AssetBundle Load(string assetName, ref AssetManager.AssetInfo info)
+        public AssetBundle Load(string assetName, System.Type assetType, ref AssetManager.AssetInfo info)
         {
             AssetBundle result;
 
@@ -64,7 +65,7 @@ namespace F8Framework.Core
                 ++loadedCount;
                 if (loadedCount == assetBundlePaths.Count)
                 {
-                    loader.Expand();
+                    loader.Expand(assetType);
                 }
             }
 
@@ -77,10 +78,12 @@ namespace F8Framework.Core
         /// 如果重复加载资产，则将直接从资源池中提供。
         /// </summary>
         /// <param name="assetName">资产名称。</param>
+        /// <param name="assetType">资产类型。</param>
         /// <param name="info">资产信息。</param>
         /// <param name="loadCallback">异步加载完成的回调。</param>
         public void LoadAsync(
             string assetName,
+            System.Type assetType,
             AssetManager.AssetInfo info,
             AssetBundleLoader.OnLoadFinished loadCallback = null)
         {
@@ -124,7 +127,7 @@ namespace F8Framework.Core
                         if (loadedCount == assetBundlePaths.Count)
                         {
                             // 所有依赖项加载完成后，加载主资源
-                            lastLoader.ExpandAsync(() =>
+                            lastLoader.ExpandAsync(assetType, () =>
                             {
                                 // 主资源加载完成后，如果需要展开，则在展开完成后回调
                                 loadCallback?.Invoke(GetAssetBundle(info.AssetBundlePath));
@@ -135,7 +138,7 @@ namespace F8Framework.Core
             }
         }
 
-        public IEnumerator LoadAsyncCoroutine(string assetName, AssetManager.AssetInfo info)
+        public IEnumerator LoadAsyncCoroutine(string assetName, System.Type assetType, AssetManager.AssetInfo info)
         {
             List<string> assetBundlePaths = new List<string>(GetDependenciedAssetBundles(info.AbName));
 
@@ -176,7 +179,7 @@ namespace F8Framework.Core
                 if (loadedCount == assetBundlePaths.Count)
                 {
                     // 所有依赖项加载完成后，加载主资源
-                    yield return lastLoader.ExpandAsyncCoroutine();
+                    yield return lastLoader.ExpandAsyncCoroutine(assetType);
                     yield break;
                 }
             }

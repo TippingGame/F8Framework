@@ -23,7 +23,7 @@ namespace F8Framework.Tests
 
             // 使用名称或GameObject或者Component创建对象
             GameObject spawnedClone = FF8.GameObjectPool.Spawn("name");
-            GameObject spawnedClone = FF8.GameObjectPool.Spawn(_gameObjectPrefab);
+            spawnedClone = FF8.GameObjectPool.Spawn(_gameObjectPrefab);
             DemoGameObjectPool component =
                 FF8.GameObjectPool.Spawn(_componentPrefab, Vector3.zero, Quaternion.identity, this.transform);
 
@@ -37,7 +37,7 @@ namespace F8Framework.Tests
 
             // 如何获取对象池
             F8GameObjectPool _pool = FF8.GameObjectPool.GetPoolByPrefab(_gameObjectPrefab);
-            F8GameObjectPool _pool = FF8.GameObjectPool.GetPoolByPrefabName(_gameObjectPrefab.name);
+            _pool = FF8.GameObjectPool.GetPoolByPrefabName(_gameObjectPrefab.name);
 
             // 对每个池执行操作。
             FF8.GameObjectPool.ForEachPool(LogF8.Log);

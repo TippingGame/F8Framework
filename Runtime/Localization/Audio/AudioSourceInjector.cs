@@ -4,10 +4,12 @@ namespace F8Framework.Core
 {
 	public class AudioSourceInjector : IInjector
 	{
+		readonly string localizedTextID;
 		readonly AudioSource audio;
 
-		public AudioSourceInjector(AudioSource audio)
+		public AudioSourceInjector(AudioSource audio, string localizedTextID)
 		{
+			this.localizedTextID = localizedTextID;
 			this.audio = audio;
 		}
 
@@ -18,17 +20,33 @@ namespace F8Framework.Core
 			if (isPlaying) audio.Stop();
 			var playFromSamePosition = (localizer as AudioLocalizer)?.playFromSamePositionWhenInject;
 
-			audio.clip = localizedData as AudioClip;
-			if (isPlaying)
+			if (localizedTextID.IsNullOrEmpty())
 			{
-				audio.Play();
-				if (playFromSamePosition.HasValue && playFromSamePosition.Value)
+				Play(localizedData as AudioClip);
+			}
+			else
+			{
+				string textIDValue = Localization.Instance.GetTextFromId(localizedTextID);
+				AssetManager.Instance.LoadAsync<AudioClip>(textIDValue, (asset) =>
 				{
-					audio.time = time;
-				}
-				else
+					Play(asset);
+				});
+			}
+			
+			void Play(AudioClip audioClip)
+			{
+				audio.clip = audioClip;
+				if (isPlaying)
 				{
-					audio.time = 0f;
+					audio.Play();
+					if (playFromSamePosition.HasValue && playFromSamePosition.Value)
+					{
+						audio.time = time;
+					}
+					else
+					{
+						audio.time = 0f;
+					}
 				}
 			}
 		}

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Security.Authentication;
 using F8Framework.Core;
-using JamesFrowen.SimpleWeb;
+using Mirror.SimpleWeb;
 using UnityEngine;
 
 namespace F8Framework.Tests
@@ -38,7 +38,7 @@ namespace F8Framework.Tests
             SslConfig sslConfig = SslConfigLoader.Load(sslEnabled, sslCertJson, sslProtocols);
             server = new SimpleWebServer(_maxMessagePerTick, tcpConfig, _maxMessageSize, _maxHandShakeSize, sslConfig);
 
-            server.onConnect += (id) => { connection = true; LogF8.LogNet($"New Client connected, id:{id}"); };
+            server.onConnect += (id, ip) => { connection = true; LogF8.LogNet($"New Client connected, id:{id}, ip:{ip}"); };
             server.onDisconnect += (id) => LogF8.LogNet($"Client disconnected, id:{id}");
             server.onData += OnData;
             server.onError += (id, exception) => LogF8.LogNet($"Error because of Client, id:{id}, Error:{exception}");

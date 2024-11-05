@@ -1,6 +1,6 @@
 using System;
 using F8Framework.Core;
-using JamesFrowen.SimpleWeb;
+using Mirror.SimpleWeb;
 using UnityEngine;
 
 namespace F8Framework.Tests

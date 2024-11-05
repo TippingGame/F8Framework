@@ -25,7 +25,7 @@ namespace F8Framework.Core.Editor
 
 			if (keys.Count == 0)
 			{
-				EditorGUILayout.HelpBox("没有可用的数据。\n请将LocalizedStrings.tsv放在StreamingAssets/localization文件夹中。", MessageType.Info);
+				EditorGUILayout.HelpBox("没有可用的数据。\n请将本地化表放在Excel存放文件夹中。", MessageType.Info);
 				return;
 			}
 

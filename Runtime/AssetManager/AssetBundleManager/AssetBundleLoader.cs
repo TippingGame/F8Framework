@@ -228,7 +228,7 @@ namespace F8Framework.Core
         /// 对于Unity中无法扩展的流场景资产包类型，
         /// 此扩展函数将忽略它，并直接将其标记为已展开。
         /// </summary>
-        public virtual void Expand()
+        public virtual void Expand(System.Type type)
         {
             if (assetBundleContent == null)
             {
@@ -244,9 +244,16 @@ namespace F8Framework.Core
                 return;
 
             expandCount = 0;
-            foreach (string path in assetPaths)
+            for (int i = 0; i < assetPaths.Count; i++)
             {
-                LoadAssetObject(path);
+                if (i == assetPaths.Count - 1)
+                {
+                    LoadAssetObject(assetPaths[i], type);
+                }
+                else
+                {
+                    LoadAssetObject(assetPaths[i]);
+                }
             }
             expandCount = assetPaths.Count;
 
@@ -259,7 +266,7 @@ namespace F8Framework.Core
         /// 对于无法在Unity中展开的流场景资产束类型，
         /// 此扩展函数将忽略它，并直接将其标记为已扩展。
         /// </summary>
-        public virtual void ExpandAsync(OnExpandFinished callback = null)
+        public virtual void ExpandAsync(System.Type assetType, OnExpandFinished callback = null)
         {
             if (assetBundleContent == null)
             {
@@ -277,9 +284,16 @@ namespace F8Framework.Core
             {
                 expandCount = 0;
                 assetBundleExpandState = LoaderState.WORKING;
-                foreach (string path in assetPaths)
+                for (int i = 0; i < assetPaths.Count; i++)
                 {
-                    LoadAssetObjectAsync(path, OnOneExpandCallBack);
+                    if (i == assetPaths.Count - 1)
+                    {
+                        LoadAssetObjectAsync(assetPaths[i], assetType, OnOneExpandCallBack);
+                    }
+                    else
+                    {
+                        LoadAssetObjectAsync(assetPaths[i], OnOneExpandCallBack);
+                    }
                 }
             }
         }
@@ -290,7 +304,7 @@ namespace F8Framework.Core
         /// 有机会assetBundle还未加载完，所以就没有展开。
         /// </summary>
         /// <returns></returns>
-        public IEnumerator ExpandAsyncCoroutine()
+        public IEnumerator ExpandAsyncCoroutine(System.Type assetType)
         {
             if (assetBundleContent == null)
             {
@@ -305,10 +319,16 @@ namespace F8Framework.Core
             {
                 expandCount = 0;
                 assetBundleExpandState = LoaderState.WORKING;
-                foreach (string path in assetPaths)
+                for (int i = 0; i < assetPaths.Count; i++)
                 {
-                    yield return LoadAssetObjectAsyncCoroutine(path);
+                    Util.Unity.StartCoroutine(LoadAssetObjectAsyncCoroutine(assetPaths[i],
+                        i == assetPaths.Count - 1 ? assetType : default));
                 }
+                yield return new WaitUntil(() => ExpandProgress >= 1f);
+            }
+            else if (assetBundleExpandState == LoaderState.WORKING)
+            {
+                yield return new WaitUntil(() => ExpandProgress >= 1f);
             }
         }
         
@@ -412,15 +432,24 @@ namespace F8Framework.Core
             if (assetBundleContent.isStreamedSceneAssetBundle)
                 return null;
 
-            Object o = assetBundleContent.LoadAsset(assetPath, assetType);
+            Object o = assetType == default ? 
+                assetBundleContent.LoadAsset(assetPath) :
+                assetBundleContent.LoadAsset(assetPath, assetType);
             SetAssetObject(assetPath, o);
-            if (assetType.IsAssignableFrom(o.GetType()))
+            if (assetType == default)
             {
                 return o;
             }
             else
             {
-                return null;
+                if (assetType.IsAssignableFrom(o.GetType()))
+                {
+                    return o;
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
 
@@ -502,19 +531,28 @@ namespace F8Framework.Core
                 return;
             }
 
-            AssetBundleRequest rq = assetBundleContent.LoadAssetAsync(assetPath, assetType);
+            AssetBundleRequest rq = assetType == default ? 
+                assetBundleContent.LoadAssetAsync(assetPath) :
+                assetBundleContent.LoadAssetAsync(assetPath, assetType);
             rq.completed +=
                 ao => {
                     Object o = rq.asset;
                     SetAssetObject(assetPath, o);
 
-                    if (assetType.IsAssignableFrom(o.GetType()))
+                    if (assetType == default)
                     {
                         End(o);
                     }
                     else
                     {
-                        End();
+                        if (assetType.IsAssignableFrom(o.GetType()))
+                        {
+                            End(o);
+                        }
+                        else
+                        {
+                            End();
+                        }
                     }
                 };
 
@@ -558,7 +596,7 @@ namespace F8Framework.Core
             }
         }
 
-        public IEnumerator LoadAssetObjectAsyncCoroutine(string assetPath)
+        public IEnumerator LoadAssetObjectAsyncCoroutine(string assetPath, System.Type assetType)
         {
             // 流化场景资产包不需要扩展，
             // 但必须通过UnityEngine进行访问。场景管理。场景管理器。
@@ -567,11 +605,14 @@ namespace F8Framework.Core
                 yield break;
             }
             
-            AssetBundleRequest rq = assetBundleContent.LoadAssetAsync(assetPath);
+            AssetBundleRequest rq = assetType == default ?
+                assetBundleContent.LoadAssetAsync(assetPath) :
+                assetBundleContent.LoadAssetAsync(assetPath, assetType);
             yield return rq;
 
             Object o = rq.asset;
             SetAssetObject(assetPath, o);
+            ++expandCount;
         }
         
         /// <summary>
@@ -983,7 +1024,7 @@ namespace F8Framework.Core
         }
 
         /// <summary>
-        /// 扩大进度。
+        /// 展开进度。
         /// 值的范围从0到1。
         /// </summary>
         public float ExpandProgress
