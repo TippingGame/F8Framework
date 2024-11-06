@@ -120,5 +120,5 @@ Unity F8 CacheStorage组件，高速本地缓存，下载并缓存byte、json、
         }
 ```
 ## 拓展功能
-1. 高速本地缓存（https://github.com/nhn/gpm.unity.git）  
+1. 高速本地缓存 https://github.com/nhn/gpm.unity.git  
 
