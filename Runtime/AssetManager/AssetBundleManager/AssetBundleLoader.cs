@@ -321,8 +321,14 @@ namespace F8Framework.Core
                 assetBundleExpandState = LoaderState.WORKING;
                 for (int i = 0; i < assetPaths.Count; i++)
                 {
-                    Util.Unity.StartCoroutine(LoadAssetObjectAsyncCoroutine(assetPaths[i],
-                        i == assetPaths.Count - 1 ? assetType : default));
+                    if (i == assetPaths.Count - 1)
+                    {
+                        LoadAssetObjectAsync(assetPaths[i], assetType, OnOneExpandCallBack);
+                    }
+                    else
+                    {
+                        LoadAssetObjectAsync(assetPaths[i], OnOneExpandCallBack);
+                    }
                 }
                 yield return new WaitUntil(() => ExpandProgress >= 1f);
             }

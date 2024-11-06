@@ -220,7 +220,7 @@ namespace F8Framework.Core
                     {
                         return o;
                     }
-                    LogF8.LogError("获取不到资产AssetObject");
+                    LogF8.LogError("获取不到资产或者类型错误！");
                 }
 
                 return null;
@@ -272,7 +272,7 @@ namespace F8Framework.Core
                     {
                         return o;
                     }
-                    LogF8.LogError("获取不到资产AssetObject");
+                    LogF8.LogError("获取不到资产或者类型错误！");
                 }
 
                 return null;
@@ -322,7 +322,7 @@ namespace F8Framework.Core
                     {
                         return o;
                     }
-                    LogF8.LogError("获取不到资产AssetObject");
+                    LogF8.LogError("获取不到资产！");
                 }
 
                 return null;
@@ -675,7 +675,6 @@ namespace F8Framework.Core
                     if (ab == null || ab.AssetBundleContent == null || ab.GetDependentNamesLoadFinished() < ab.AddDependentNames())
                     {
                         yield return AssetBundleManager.Instance.LoadAsyncCoroutine(assetName, typeof(T), info);
-                        yield return AssetBundleManager.Instance.GetAssetObject<T>(info.AssetBundlePath, info.AssetPath[0]);
                     }
                     else
                     {
@@ -743,7 +742,6 @@ namespace F8Framework.Core
                     if (ab == null || ab.AssetBundleContent == null || ab.GetDependentNamesLoadFinished() < ab.AddDependentNames())
                     {
                         yield return AssetBundleManager.Instance.LoadAsyncCoroutine(assetName, assetType, info);
-                        yield return AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], assetType);
                     }
                     else
                     {
