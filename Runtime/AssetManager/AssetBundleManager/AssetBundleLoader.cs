@@ -454,6 +454,7 @@ namespace F8Framework.Core
                 }
                 else
                 {
+                    LogF8.LogError("与输入的资产类型不一致：" + assetPath);
                     return null;
                 }
             }
@@ -557,6 +558,7 @@ namespace F8Framework.Core
                         }
                         else
                         {
+                            LogF8.LogError("与输入的资产类型不一致：" + assetPath);
                             End();
                         }
                     }
@@ -941,6 +943,7 @@ namespace F8Framework.Core
             if (assetPath == null ||
                 obj == null)
             {
+                LogF8.LogError("加载资产对象Object为空，请检查类型和路径：" + assetPath);
                 return;
             }
 

@@ -21,7 +21,7 @@ namespace F8Framework.Core
             }
             else if (localizedData is string textIDValue)
             {
-                AssetManager.Instance.LoadAsync(textIDValue, (asset) =>
+                AssetManager.Instance.LoadAsync(textIDValue, typeof(Sprite), (asset) =>
                 {
                     if (asset is Texture2D texture)
                     {

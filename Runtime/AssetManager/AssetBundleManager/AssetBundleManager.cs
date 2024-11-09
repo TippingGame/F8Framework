@@ -457,9 +457,7 @@ namespace F8Framework.Core
                     bool success = loader.TryGetAsset(assetPath, out Object obj);
                     if (success)
                     {
-                        if (obj is T t)
-                            return t;
-                        return null;
+                        return obj as T;
                     }
                 }
             }
@@ -484,16 +482,7 @@ namespace F8Framework.Core
                     bool success = loader.TryGetAsset(assetPath, out Object obj);
                     if (success)
                     {
-                        if (assetType == default)
-                        {
-                            return obj;
-                        }
-                        else
-                        {
-                            if (assetType.IsAssignableFrom(obj.GetType()))
-                                return obj;
-                            return null;
-                        }
+                        return obj;
                     }
                 }
             }

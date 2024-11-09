@@ -369,21 +369,7 @@ namespace F8Framework.Core
                     resourcePath,
                     out ResourcesLoader loader))
                 {
-                    if (resourceType == default)
-                    {
-                        return loader.ResouceObject;
-                    }
-                    else
-                    {
-                        if (resourceType.IsAssignableFrom(loader.ResouceObject.GetType()))
-                        {
-                            return loader.ResouceObject;
-                        }
-                        else
-                        {
-                            return null;
-                        }
-                    }
+                    return loader.ResouceObject;
                 }
             }
 

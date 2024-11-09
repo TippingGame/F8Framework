@@ -203,6 +203,7 @@ namespace F8Framework.Core
                         }
                         else
                         {
+                            LogF8.LogError("与输入的资产类型不一致：" + resourcePath);
                             End();
                         }
                     };
