@@ -15,15 +15,23 @@ namespace F8Framework.Core
 
 			if (component is AudioSource audio)
 			{
-				injector = new AudioSourceInjector(audio, localizedTextID);
+				injector = new AudioSourceInjector(audio);
 			}
 		}
 
 		internal override void Localize()
 		{
-			ChangeID(localizedTextID);
+			if (injector == null)
+			{
+				return;
+			}
+			if (!localizedTextID.IsNullOrEmpty())
+			{
+				ChangeID(localizedTextID);
+				return;
+			}
 			var index = Localization.Instance.CurrentLanguageIndex;
-			injector.Inject(clips[index], this);
+			injector.Inject(clips?[index], this);
 		}
 		
 		public bool ChangeID(string textId)
@@ -54,7 +62,7 @@ namespace F8Framework.Core
 		public void Clear()
 		{
 			localizedTextID = null;
-			injector.Inject("", this);
+			injector?.Inject("", this);
 		}
 	}
 }

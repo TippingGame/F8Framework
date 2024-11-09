@@ -18,25 +18,33 @@ namespace F8Framework.Core
 			
 			if (component is Image image)
 			{
-				injector = new UIImageInjector(image, localizedTextID, sprites);
+				injector = new UIImageInjector(image, sprites);
 			}
 			else if (component is RawImage rawImage)
 			{
-				injector = new RawImageInjector(rawImage, localizedTextID, textures);
+				injector = new RawImageInjector(rawImage, textures);
 			}
 			else if (component is SpriteRenderer spriteRenderer)
 			{
-				injector = new SpriteRendererInjector(spriteRenderer, localizedTextID, sprites);
+				injector = new SpriteRendererInjector(spriteRenderer, sprites);
 			}
 			else if (component is Renderer renderer)
 			{
-				injector = new TextureInjector(renderer, localizedTextID, propertyName, texture2Ds);
+				injector = new TextureInjector(renderer, propertyName, texture2Ds);
 			}
 		}
 
 		internal override void Localize()
 		{
-			ChangeID(localizedTextID);
+			if (injector == null)
+			{
+				return;
+			}
+			if (!localizedTextID.IsNullOrEmpty())
+			{
+				ChangeID(localizedTextID);
+				return;
+			}
 			var index = Localization.Instance.CurrentLanguageIndex;
 			injector.Inject(index, this);
 		}
@@ -69,7 +77,7 @@ namespace F8Framework.Core
 		public void Clear()
 		{
 			localizedTextID = null;
-			injector.Inject("", this);
+			injector?.Inject("", this);
 		}
 	}
 }

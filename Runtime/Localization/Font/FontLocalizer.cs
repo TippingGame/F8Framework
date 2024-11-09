@@ -1,15 +1,20 @@
-﻿#if LOCALIZER_TMP
+﻿using UnityEngine;
+using UnityEngine.UI;
+#if LOCALIZER_TMP
 using TMPro;
 #endif
-using UnityEngine;
-using UnityEngine.UI;
 
 namespace F8Framework.Core
 {
-	public class TextLocalizer : LocalizerBase
+	public class FontLocalizer : LocalizerBase
 	{
-		public string textId;
-
+		public string localizedTextID = "";
+		public Font[] fonts;
+#if LOCALIZER_TMP
+		public TMP_FontAsset[] TMP_fontAsset;
+#endif
+		private bool hasTMP_Text = false;
+		
 		protected override void Prepare()
 		{
 #if LOCALIZER_TMP
@@ -21,16 +26,17 @@ namespace F8Framework.Core
 
 			if (component is TextMesh textMesh)
 			{
-				injector = new TextMeshInjector(textMesh);
+				injector = new FontInjector(textMesh);
 			}
 			else if (component is Text text)
 			{
-				injector = new UITextInjector(text);
+				injector = new FontInjector(text);
 			}
 #if LOCALIZER_TMP
 			else if (component is TMP_Text tmp)
 			{
-				injector = new TMPInjector(tmp);
+				injector = new FontInjector(tmp);
+				hasTMP_Text = true;
 			}
 #endif
 		}
@@ -41,9 +47,24 @@ namespace F8Framework.Core
 			{
 				return;
 			}
-			ChangeID(textId);
+			if (!localizedTextID.IsNullOrEmpty())
+			{
+				ChangeID(localizedTextID);
+				return;
+			}
+			var index = Localization.Instance.CurrentLanguageIndex;
+			if (!hasTMP_Text)
+			{
+				injector.Inject(fonts?[index], this);
+			}
+#if LOCALIZER_TMP
+			else
+			{
+				injector.Inject(TMP_fontAsset?[index], this);
+			}
+#endif
 		}
-
+		
 		public bool ChangeID(string textId)
 		{
 			if (string.IsNullOrEmpty(textId)) return false;
@@ -63,7 +84,7 @@ namespace F8Framework.Core
 				return false;
 			}
 
-			this.textId = textId;
+			this.localizedTextID = textId;
 			var text = Localization.Instance.GetTextFromId(textId);
 			injector.Inject(text, this);
 			return true;
@@ -71,7 +92,7 @@ namespace F8Framework.Core
 
 		public void Clear()
 		{
-			textId = null;
+			localizedTextID = null;
 			injector?.Inject("", this);
 		}
 	}
