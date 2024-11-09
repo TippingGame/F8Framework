@@ -54,7 +54,7 @@ namespace F8Framework.Core.Editor
 
 			if (string.IsNullOrEmpty(localizer.localizedTextID))
 			{
-				EditorGUILayout.HelpBox($"输入 Text ID 或 拖拽音频 到上方", MessageType.Info);
+				EditorGUILayout.HelpBox($"输入 Text ID 或 拖拽字体 到上方", MessageType.Info);
 
 				var postfix = keys.Count > 5 ? $"\n\n<i>还有更多（共 {keys.Count.ToString()} 个ID）</i>" : "";
 				ShowSuggestion(keys.ToList(), postfix);
