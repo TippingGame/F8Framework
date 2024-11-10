@@ -29,28 +29,38 @@ namespace F8Framework.Core
             IsFrameTimer = isFrameTimer;
         }
          
-        public bool Update(float dt)
+        public int Update(float dt)
         {
+            int triggerCount = 0; // 记录触发次数
+
             if (!isDelayCompleted)
             {
                 Delay -= dt;
                 if (Delay <= 0f)
                 {
                     isDelayCompleted = true;
-                    elapsedTime = 0f;
-                    return true;
+                    elapsedTime = -Delay; // 保留超出部分时间
+                    triggerCount++;
+                    Delay = 0f;
                 }
-                return false;
+                else
+                {
+                    return triggerCount;
+                }
+            }
+            else
+            {
+                elapsedTime += dt;
             }
 
-            elapsedTime += dt;
-
-            if (elapsedTime >= Step)
+            // 计算需要触发的次数
+            while (elapsedTime >= Step)
             {
                 elapsedTime -= Step;
-                return true;
+                triggerCount++;
             }
-            return false;
+
+            return triggerCount;
         }
     }
 }

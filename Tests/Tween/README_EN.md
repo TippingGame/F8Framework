@@ -19,7 +19,7 @@ public RectTransform canvasRect;
 
 void Start()
 {
-    // 播放动画
+    // 播放动画，设置Ease动画，设置OnComplete完成回调
     int id = gameObject.ScaleTween(Vector3.one, 1f).SetEase(Ease.Linear).SetOnComplete(OnViewOpen).ID;
 
     void OnViewOpen()
@@ -31,6 +31,7 @@ void Start()
     gameObject.RotateTween(Vector3.one, 1f);
     // 位移
     gameObject.Move(Vector3.one, 1f);
+    gameObject.MoveAtSpeed(Vector3.one, 2f);
     // 渐变
     gameObject.GetComponent<CanvasGroup>().Fade(0f, 1f);
     gameObject.GetComponent<Image>().ColorTween(Color.green, 1f);
@@ -41,17 +42,13 @@ void Start()
     gameObject.CancelTween(id);
     gameObject.CancelAllTweens();
 
-    // 根据相对坐标移动UI
-    // (0.0 , 1.0) _______________________(1.0 , 1.0)
-    //            |                      |
-    //            |                      |                  
-    //            |                      |
-    //            |                      |
-    // (0.0 , 0.0)|______________________|(1.0 , 0.0)
-    transform.GetComponent<RectTransform>().MoveUI(new Vector2(1f, 1f), canvasRect, 1f)
-        .SetEase(Ease.EaseOutBounce);
+    // 设置Delay
+    gameObject.Move(Vector3.one, 1.0f).SetDelay(2.0f);
     
-    // 你也可以这样使用
+    // 设置Event，在动画的某一时间调用
+    gameObject.Move(Vector3.one, 5.0f).SetEvent(OnViewOpen, 2.5f);
+    
+    // 你也可以这样使用，设置OnUpdate
     // 数字缓动变化
     BaseTween valueTween = FF8.Tween.ValueTween(0f, 100f, 3f).SetOnUpdateFloat((float v) =>
     {
@@ -67,6 +64,16 @@ void Start()
     });
     
     FF8.Tween.CancelTween(gameObjectTween.ID);
+    
+    // 根据相对坐标移动UI
+    // (0.0 , 1.0) _______________________(1.0 , 1.0)
+    //            |                      |
+    //            |                      |                  
+    //            |                      |
+    //            |                      |
+    // (0.0 , 0.0)|______________________|(1.0 , 0.0)
+    transform.GetComponent<RectTransform>().MoveUI(new Vector2(1f, 1f), canvasRect, 1f)
+        .SetEase(Ease.EaseOutBounce);
 }
 ```
 

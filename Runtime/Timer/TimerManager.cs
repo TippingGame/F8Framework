@@ -60,25 +60,34 @@ namespace F8Framework.Core
                 Timer timer = pair.Value;
                 int id = timer.ID;
 
-                if (timer.IsFrameTimer ? timer.Update(frameTime) : timer.Update(dt)) // 根据计时器类型更新计时器
+                // 调用计时器
+                int triggerCount = timer.IsFrameTimer ? timer.Update(frameTime) : timer.Update(dt);
+
+                if (triggerCount > 0) // 如果本帧触发次数大于0，执行相关逻辑
                 {
-                    if (timer.IsFinish || timer.Handle == null || timer.Handle.Equals(null)) // 若计时器已经完成，若对象为空，标记计时器为完成，并将其ID添加到待删除列表
+                    if (timer.IsFinish || timer.Handle == null || timer.Handle.Equals(null)) 
                     {
                         deleteTimes.Add(pair.Key);
                         continue;
                     }
+
                     int field = timer.Field; // 获取计时器剩余字段值
-                    field = field > 0 ? field - 1 : field; // 减少计时器字段值
-                    if (field == 0) // 若字段值为0，触发onSecond事件，并执行OnTimerComplete
+
+                    for (int i = 0; i < triggerCount; i++)
                     {
-                        timer.Field = field; // 更新计时器剩余字段值
-                        timer.OnSecond?.Invoke();
-                        OnTimerComplete(id);
-                    }
-                    else
-                    {
-                        timer.Field = field; // 更新计时器剩余字段值
-                        timer.OnSecond?.Invoke();
+                        field = field > 0 ? field - 1 : field; // 每次减少计时器字段值
+
+                        if (field == 0) // 若字段值为0，触发onSecond事件，并执行OnTimerComplete
+                        {
+                            timer.Field = field; // 更新计时器剩余字段值
+                            timer.OnSecond?.Invoke();
+                            OnTimerComplete(id);
+                        }
+                        else
+                        {
+                            timer.Field = field; // 更新计时器剩余字段值
+                            timer.OnSecond?.Invoke();
+                        }
                     }
                 }
             }
