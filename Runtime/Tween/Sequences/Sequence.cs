@@ -38,8 +38,11 @@ namespace F8Framework.Core
 				if (timeEvents[n].Time < timer)
 				{
 					timeEvents[n].Action.Invoke();
-					timeEvents.RemoveAt(n);
-					n--;
+					if (timeEvents.Count > 0)
+					{
+						timeEvents.RemoveAt(n);
+						n--;
+					}
 				}
 			}
 
@@ -113,9 +116,8 @@ namespace F8Framework.Core
 				PlayTweenInmediatly(tween, PlayMode.Join);
 				return;
 			}
-
-			var tweenP = GetPenultimate();
-			PlayTweenOnComplete(tween, tweenP, PlayMode.Join);
+			
+			PlayTweenOnComplete(tween, head, PlayMode.Join);
 		}
 
 		private void PlayTweenInmediatly(BaseTween tween, PlayMode playMode)
@@ -135,17 +137,18 @@ namespace F8Framework.Core
 		private void PlayTweenOnComplete(BaseTween tween, BaseTween previousTween, PlayMode playMode)
 		{
 			tweenList.Add(tween);
-			
-			//pause the tween until it can actually run
-			tween.SetIsPause(true);
-			tween.SetOnComplete(() => tween.SetIsPause(true));
-			previousTween.SetOnComplete(delegate { RunTween(tween); });
-			
+
+			// 如果是 Append 模式，让动画暂停直到上一个动画完成
+			if (playMode == PlayMode.Append)
+			{
+				tween.SetIsPause(true);
+			}
+    
+			previousTween.SetOnComplete(() => RunTween(tween));
 			tween.SetOnComplete(CheckIfSequenceIsComplete);
 
 			if (!ignoreCommands)
 			{
-				
 				commandQueue.Add(GetCommand(playMode, tween));
 			}
 		}
@@ -210,6 +213,10 @@ namespace F8Framework.Core
 
 		public void Reset()
 		{
+			foreach (var tween in tweenList)
+			{
+				tween.SetIsPause(true);
+			}
 			tweenList.Clear();
 			timeEvents.Clear();
 			timer = 0.0f;

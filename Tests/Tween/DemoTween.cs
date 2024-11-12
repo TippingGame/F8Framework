@@ -12,6 +12,7 @@ namespace F8Framework.Tests
 
         void Start()
         {
+            /*--------------------------普通用法--------------------------*/
             // 播放动画，设置Ease动画，设置OnComplete完成回调
             int id = gameObject.ScaleTween(Vector3.one, 1f).SetEase(Ease.Linear).SetOnComplete(OnViewOpen).ID;
 
@@ -67,6 +68,26 @@ namespace F8Framework.Tests
             // (0.0 , 0.0)|______________________|(1.0 , 0.0)
             transform.GetComponent<RectTransform>().MoveUI(new Vector2(1f, 1f), canvasRect, 1f)
                 .SetEase(Ease.EaseOutBounce);
+            
+            /*--------------------------动画组合--------------------------*/
+            // 初始化，依次执行动画/并行执行动画，回调
+            var sequence = SequenceManager.GetSequence();
+            
+            sequence.Append(valueTween); // 第一个动画
+            sequence.Join(gameObjectTween);   // 与第一个动画同时执行
+            sequence.Append(valueTween); // 第二个动画完成后执行
+            sequence.Append(() => LogF8.Log("完成了！")); // 动画序列结束后的回调
+            sequence.SetOnComplete(() => LogF8.Log("Sequence 完成"));
+            
+            // 设置循环次数，-1代表无限循环
+            sequence.SetLoops(3);
+            
+            // 设置特定时间运行事件或动画
+            sequence.RunAtTime(() => LogF8.Log("半途事件"), 1.5f); // 在1.5秒时执行回调
+            sequence.RunAtTime(gameObjectTween, 2.0f); // 在2秒时开始执行特定动画
+            
+            // 回收Sequence，并停止所有动画
+            SequenceManager.KillSequence(sequence);
         }
     }
 }

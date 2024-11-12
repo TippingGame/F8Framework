@@ -21,11 +21,11 @@ Unity F8 AssetManager资产加载组件。
 1. 点击F8，自动获取 Resources 下的所有资产，生成索引（注意：资产名称唯一）  
           自动获取 Assets / AssetBundles 下的所有资产，生成索引（注意：资产名称唯一）  
           自动生成索引文件 Assets / F8Framework / AssetMap 目录下面  
-![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_20240205225637.png)
-![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_20240205230012.png)
+![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_20240205225637.png)  
+![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_20240205230012_2.png)  
 ---------------------------------
 2. 生成AssetBundles目录，自动赋予资产AB名称（已有AB名不会覆盖），打包 AssetBundle，目录 StreamingAssets / AssetBundles / Windows（不同平台例如 Windows / iOS ）  
-![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_20240205225815.png)
+![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_20240205225815.png)  
 ---------------------------------
 3. 假如没有报错，就可以愉快地使用了（注意：编辑器下加载不同平台的AB，Shader会变紫色，Scene也会加载失败（解决方案：FF8.Asset.IsEditorMode = true））  
 
@@ -106,4 +106,7 @@ Unity F8 AssetManager资产加载组件。
 ```
 
 ### 编辑器拓展功能
-![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_20240216212631.png)
+![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_20240216212631.png)  
+
+#### 你可以在资源栏 **鼠标指着** 文件/文件夹并按下 **键盘空格键** ，跳转到系统资源管理器：如windows文件夹  
+![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_20241112212631.png)  
