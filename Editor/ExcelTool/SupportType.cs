@@ -36,9 +36,11 @@ namespace F8Framework.Core.Editor
                                     "\n字段名为空:" + (Names == null));
             }
             // 使用LINQ的GroupBy和Any来找出重复的元素  
-            var duplicates = Names.GroupBy(name => name)  
-                .Where(group => group.Count() > 1)  
-                .Select(group => group.Key)  
+            var duplicates = Names
+                .Where(name => !string.IsNullOrEmpty(name))  // 检查是否为 null 或空字符串
+                .GroupBy(name => name)
+                .Where(group => group.Count() > 1)
+                .Select(group => group.Key)
                 .ToList();
             if (duplicates.Count > 0)
             {
@@ -79,7 +81,6 @@ namespace F8Framework.Core.Editor
             //设置成员
             for (int i = 0; i < fields.Length; ++i)
             {
-                classSource.Append("\t\t[Preserve]\n");
                 classSource.Append(PropertyString(types[i], fields[i]));
             }
 
@@ -139,10 +140,12 @@ namespace F8Framework.Core.Editor
                 StringBuilder sbProperty = new StringBuilder();
                 if (type.EndsWith("[]"))
                 {
+                    sbProperty.Append("\t\t[Preserve]\n");
                     sbProperty.Append("\t\tpublic " + type + " " + propertyName + ";\n");
                 }
                 else
                 {
+                    sbProperty.Append("\t\t[Preserve]\n");
                     sbProperty.Append("\t\tpublic " + type + " " + propertyName + ";\n");
                 }
 
