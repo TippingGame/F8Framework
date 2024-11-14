@@ -1356,56 +1356,56 @@ namespace F8Framework.Core
 #endif
 
 #if UNITY_EDITOR
-        // 编辑器下加载资源
-        private T EditorLoadAsset<T>(string assetPath, string subAssetName) where T : Object
-        {
-            if (subAssetName.IsNullOrEmpty())
+            // 编辑器下加载资源
+            private T EditorLoadAsset<T>(string assetPath, string subAssetName) where T : Object
             {
-                T o = UnityEditor.AssetDatabase.LoadAssetAtPath<T>(assetPath);
-                return o;
-            }
-            else
-            {
-                var objs = UnityEditor.AssetDatabase.LoadAllAssetsAtPath(assetPath);
-                foreach (var obj in objs)
+                if (subAssetName.IsNullOrEmpty())
                 {
-                    if (obj.name == subAssetName)
+                    T o = UnityEditor.AssetDatabase.LoadAssetAtPath<T>(assetPath);
+                    return o;
+                }
+                else
+                {
+                    var objs = UnityEditor.AssetDatabase.LoadAllAssetsAtPath(assetPath);
+                    foreach (var obj in objs)
                     {
-                        return obj as T;
+                        if (obj.name == subAssetName)
+                        {
+                            return obj as T;
+                        }
                     }
                 }
+                
+                return null;
             }
-
-            return null;
-        }
-            
-        private Object EditorLoadAsset(string assetPath, System.Type assetType = default, string subAssetName = null)
-        {
-            if (subAssetName.IsNullOrEmpty())
+                
+            private Object EditorLoadAsset(string assetPath, System.Type assetType = default, string subAssetName = null)
             {
-                if (assetType == default)
+                if (subAssetName.IsNullOrEmpty())
                 {
-                    return UnityEditor.AssetDatabase.LoadAssetAtPath<Object>(assetPath);
-                }
-                return UnityEditor.AssetDatabase.LoadAssetAtPath(assetPath, assetType);
-            }
-            else
-            {
-                var objs = UnityEditor.AssetDatabase.LoadAllAssetsAtPath(assetPath);
-                foreach (var obj in objs)
-                {
-                    if (obj.name == subAssetName)
+                    if (assetType == default)
                     {
-                        return obj;
+                        return UnityEditor.AssetDatabase.LoadAssetAtPath<Object>(assetPath);
+                    }
+                    return UnityEditor.AssetDatabase.LoadAssetAtPath(assetPath, assetType);
+                }
+                else
+                {
+                    var objs = UnityEditor.AssetDatabase.LoadAllAssetsAtPath(assetPath);
+                    foreach (var obj in objs)
+                    {
+                        if (obj.name == subAssetName)
+                        {
+                            return obj;
+                        }
                     }
                 }
+                
+                return null;
             }
-
-            return null;
-        }
 #endif
         
-        public void OnInit(object createParam)
+            public void OnInit(object createParam)
             {
                 _assetBundleManager = ModuleCenter.CreateModule<AssetBundleManager>();
                 _resourcesManager = ModuleCenter.CreateModule<ResourcesManager>();
