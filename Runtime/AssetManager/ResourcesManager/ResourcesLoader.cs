@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace F8Framework.Core
@@ -11,7 +12,8 @@ namespace F8Framework.Core
     {
         private string resourcePath;
         private Object resouceObject;
-
+        private Dictionary<string, Object> resouceObjects = new Dictionary<string, Object>();
+        
         private LoaderType loadType;
         private LoaderState resourceLoadState;
         private ResourceRequest resourceLoadRequest;
@@ -285,6 +287,69 @@ namespace F8Framework.Core
             }
         }
 
+        public virtual T LoadAll<T>(string assetName, string subAssetName = null)
+            where T : Object
+        {
+            if (resourceLoadState == LoaderState.FINISHED)
+            {
+                return resouceObject as T;
+            }
+
+            loadType = LoaderType.SYNC;
+            resourceLoadState = LoaderState.WORKING;
+            T[] result = Resources.LoadAll<T>(resourcePath);
+            foreach (T obj in result)
+            {
+                SetResouceObject(resourcePath + obj.name, obj);
+                if (!subAssetName.IsNullOrEmpty() && obj.name.Equals(subAssetName))
+                {
+                    resouceObject = obj;
+                }
+                else if (obj.name.Equals(assetName))
+                {
+                    resouceObject = obj;
+                }
+            }
+            resourceLoadState = LoaderState.FINISHED;
+            return resouceObject as T;
+        }
+        
+        public virtual Object LoadAll(string assetName, System.Type assetType = default, string subAssetName = null)
+        {
+            if (resourceLoadState == LoaderState.FINISHED)
+            {
+                return resouceObject;
+            }
+
+            loadType = LoaderType.SYNC;
+            resourceLoadState = LoaderState.WORKING;
+            
+            Object[] result;
+            if (assetType == default)
+            {
+                result = Resources.LoadAll(resourcePath);
+            }
+            else
+            {
+                result = Resources.LoadAll(resourcePath, assetType);
+            }
+            
+            foreach (Object obj in result)
+            {
+                SetResouceObject(resourcePath + obj.name, obj);
+                if (!subAssetName.IsNullOrEmpty() && obj.name.Equals(subAssetName))
+                {
+                    resouceObject = obj;
+                }
+                else if (obj.name.Equals(assetName))
+                {
+                    resouceObject = obj;
+                }
+            }
+            resourceLoadState = LoaderState.FINISHED;
+            return resouceObject;
+        }
+        
         /// <summary>
         /// 清除加载器内容。
         /// </summary>
@@ -295,6 +360,13 @@ namespace F8Framework.Core
                !(resouceObject is GameObject))
                 Resources.UnloadAsset(resouceObject);
 
+            foreach (var re in resouceObjects.Values)
+            {
+                if(re != null &&
+                   !(re is GameObject))
+                    Resources.UnloadAsset(re);
+            }
+            
             loadType = LoaderType.NONE;
             resourceLoadState = LoaderState.NONE;
             resourceLoadRequest = null;
@@ -308,6 +380,36 @@ namespace F8Framework.Core
             get => resouceObject;
         }
 
+        public bool TryGetAsset(string resourcePath, out Object obj)
+        {
+            if (resouceObjects.ContainsKey(resourcePath))
+            {
+                obj = resouceObjects[resourcePath];
+                return true;
+            }
+            obj = null;
+            return false;
+        }
+        
+        public void SetResouceObject(string resourcePath, Object obj)
+        {
+            if (resourcePath == null ||
+                obj == null)
+            {
+                LogF8.LogError("加载资产对象Object为空，请检查类型和路径：" + resourcePath);
+                return;
+            }
+
+            if (resouceObjects.ContainsKey(resourcePath))
+            {
+                resouceObjects[resourcePath] = obj;
+            }
+            else
+            {
+                resouceObjects.Add(resourcePath, obj);
+            }
+        }
+        
         /// <summary>
         /// 确定资源加载是否完成。
         /// </summary>

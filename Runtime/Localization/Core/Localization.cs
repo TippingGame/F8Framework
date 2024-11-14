@@ -173,6 +173,7 @@ namespace F8Framework.Core
 
             CurrentLanguageName = LanguageList[languageIndex];
             LocalizationSettings.SaveLanguageSettings();
+            InjectAll();
         }
 
         /// <summary>
@@ -183,7 +184,6 @@ namespace F8Framework.Core
         {
             var prevIndex = (int)Mathf.Repeat(CurrentLanguageIndex - 1, LanguageList.Count);
             ChangeLanguage(LanguageList[prevIndex]);
-            InjectAll();
             return LanguageList[prevIndex];
         }
 
@@ -195,7 +195,6 @@ namespace F8Framework.Core
         {
             var nextIndex = (int)Mathf.Repeat(CurrentLanguageIndex + 1, LanguageList.Count);
             ChangeLanguage(LanguageList[nextIndex]);
-            InjectAll();
             return LanguageList[nextIndex];
         }
 

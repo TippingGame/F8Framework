@@ -243,9 +243,9 @@ namespace F8Framework.Core.Editor
 
                         if (tempNames.Contains(fileNameWithoutExtension.ToLower()))
                         {
-                            LogF8.LogError("AssetName重复，请检查资源地址（大小写不敏感）：" + filePath);
                             string id = Guid.NewGuid().ToString(); // 生成一个唯一的ID
                             fileNameWithoutExtension += id;
+                            LogF8.Log("资源名称重复（大小写不敏感）：" + filePath + "，增加唯一识别ID后为：" + fileNameWithoutExtension);
                         }
                         tempNames.Add(fileNameWithoutExtension.ToLower());
 
@@ -272,9 +272,9 @@ namespace F8Framework.Core.Editor
                         
                         if (tempNames.Contains(fileNameWithoutExtension))
                         {
-                            LogF8.LogError("AssetName重复，请检查文件夹地址（大小写不敏感）：" + filePath);
                             string id = Guid.NewGuid().ToString(); // 生成一个唯一的ID
                             fileNameWithoutExtension += id;
+                            LogF8.Log("文件夹名称重复（大小写不敏感）：" + filePath + "，增加唯一识别ID后为：" + fileNameWithoutExtension);
                         }
                         tempNames.Add(fileNameWithoutExtension);
                         
@@ -355,9 +355,9 @@ namespace F8Framework.Core.Editor
                         
                     if (tempNames.Contains(fileNameWithoutExtension))
                     {
-                        LogF8.LogError("ResourceName重复，请检查资源：" + filePath);
                         string id = Guid.NewGuid().ToString(); // 生成一个唯一的ID
                         fileNameWithoutExtension += id;
+                        LogF8.Log("资源名称重复（大小写不敏感）：" + filePath + "，增加唯一识别ID后为：" + fileNameWithoutExtension);
                     }
                     tempNames.Add(fileNameWithoutExtension);
                     

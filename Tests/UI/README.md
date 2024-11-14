@@ -37,9 +37,9 @@ UI界面分为三大类：
         
         // 初始化
         FF8.UI.Initialize(configs);
-        // 设置UI Canvas属性
+        // 设置UI Canvas属性（如果不懂属性有什么用，可自建Canvas进行试验）
         FF8.UI.SetCanvas(null, 1, "Default", RenderMode.ScreenSpaceCamera, false, Camera.main);
-        // 设置UI CanvasScaler属性
+        // 设置UI CanvasScaler属性（如果不懂属性有什么用，可自建Canvas进行试验）
         FF8.UI.SetCanvasScaler(null, CanvasScaler.ScaleMode.ConstantPixelSize, 1f, 100f);
         FF8.UI.SetCanvasScaler(LayerType.UI, CanvasScaler.ScaleMode.ScaleWithScreenSize, new Vector2(1920, 1080), CanvasScaler.ScreenMatchMode.MatchWidthOrHeight, 0f, 100f);
         FF8.UI.SetCanvasScaler(LayerType.UI, CanvasScaler.ScaleMode.ConstantPhysicalSize, CanvasScaler.Unit.Points, 96f, 100f, 100f);
@@ -109,13 +109,13 @@ UI界面分为三大类：
 ```
 ## 拓展功能
 1. 编辑器功能
-* 1. 图片自动切割九宫格
-* 2. 图集切割
-* 3. 图片尺寸设为4的倍数
+* 1. 图片自动切割九宫格（将图片中间部分相同颜色切除，减少图片体积）
+* 2. 图集切割（需要预先点击 Sprite Editor 的 Slice 切分图片，图片 Read/Write 勾选，压缩等级设置为None）
+* 3. 图片尺寸设为4的倍数（更适合图片压缩优化）
 * 4. 收集UI所有的中文放入本地化表
 ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_20240315025120.png)
 ----------------------------------
-2. UI常用组件：[https://github.com/nhn/gpm.unity.git](https://github.com/nhn/gpm.unity.git)（已内置，参考目录：F8Framework/Tests/UI/Example）  
+2. UI常用组件：[https://github.com/nhn/gpm.unity.git](https://github.com/nhn/gpm.unity.git)（已内置，参考目录：F8Framework/Tests/UI/Example）如要使用Tests目录下的示例，请在 Project Setting -> Player -> Script Compilation 处添加宏定义 BUILD_F8FRAMEWORK_TEST  
 * 嵌套布局  
 ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_20240302173446.png)
 ----------------------------------

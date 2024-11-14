@@ -165,7 +165,7 @@ namespace F8Framework.Core.Editor
             GenerateCodeFiles(codeList);
             ScriptGenerator.CreateDataManager(codeList);
             AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
+            AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
             // 等待脚本编译完成
             CompilationPipeline.compilationFinished += (object s) =>
             {
