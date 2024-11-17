@@ -202,7 +202,11 @@ namespace F8Framework.Core
         int GetLanguageIndex(string languageName)
         {
             var i = LanguageList.FindIndex(s => s.Contains(languageName));
-            if (i == -1) LogF8.LogError($"不可用的语言名称: {languageName}");
+            if (i == -1)
+            {
+                LogF8.LogError($"不可用的语言名称: {languageName}");
+                return 0;
+            }
             return i;
         }
 
