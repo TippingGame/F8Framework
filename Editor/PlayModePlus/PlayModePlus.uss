@@ -1,0 +1,131 @@
+.plus-button {
+    background-color: rgb(56, 56, 56);
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-color: rgba(56, 56, 56, 0);
+    border-width: 11px;
+}
+
+.plus-button:hover {
+    background-color: rgb(75, 75, 75);
+    -unity-background-image-tint-color: rgb(255, 255, 255);
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.plus-button:active {
+    background-color: rgb(0, 0, 0);
+    -unity-background-image-tint-color: rgb(89, 158, 94);
+}
+
+.unity-base-field {
+    width: 31px;
+    height: 100%;
+    background-image: none;
+    background-color: rgba(0, 0, 0, 0);
+    -unity-background-scale-mode: scale-to-fit;
+    justify-content: center;
+    margin-left: 0px;
+    margin-right: 1px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    border-top-width: 0px;
+}
+
+.unity-base-field:hover .unity-base-popup-field__input {
+    background-color: rgb(75, 75, 75);
+    -unity-background-image-tint-color: rgb(255, 255, 255);
+}
+
+.unity-base-field__input {
+    padding-bottom: 0px;
+    border-width: 0px;
+    border-top-width: 0px;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.unity-base-popup-field__input {
+    border-radius: 0px;
+    -unity-background-scale-mode: scale-to-fit;
+    border-top-width: 0px;
+    min-width: 31px;
+    background-color: rgb(56, 56, 56);
+    background-image: none;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.scene-select-dropdown .unity-base-popup-field__input {
+    background-image: url('project://database/Packages/com.disillusion.play-mode-plus/Editor/Resources/com.disillusion.play-mode-plus/CustomDropdownArrow.png?fileID=2800000&guid=d56d19b3e6d0fc0419cda6972838d5ba&type=3#CustomDropdownArrow');
+    -unity-background-scale-mode: scale-to-fit;
+    width: 14px;
+    height: 21px;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    justify-content: center;
+    padding-left: 0px;
+    padding-right: 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-color: rgba(56, 56, 56, 0);
+    border-width: 11px;
+}
+
+.play-mode-settings-dropdown .unity-base-popup-field__input {
+    background-image: url('project://database/Packages/com.disillusion.play-mode-plus/Editor/Resources/com.disillusion.play-mode-plus/CustomSceneCogButton.png?fileID=2800000&guid=b620a07f1fa7bf54b874f9661d2c6140&type=3#CustomSceneCogButton');
+    -unity-background-scale-mode: scale-to-fit;
+    border-color: rgba(56, 56, 56, 0);
+    border-width: 11px;
+    border-radius: 5px;
+}
+
+.build-settings-select-dropdown .unity-base-popup-field__input {
+    background-image: url('project://database/Packages/com.disillusion.play-mode-plus/Editor/Resources/com.disillusion.play-mode-plus/CustomDropdownArrow.png?fileID=2800000&guid=d56d19b3e6d0fc0419cda6972838d5ba&type=3#CustomDropdownArrow');
+    -unity-background-scale-mode: scale-to-fit;
+    width: auto;
+    height: 21px;
+    justify-content: center;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-color: rgba(56, 56, 56, 0);
+    border-width: 11px;
+}
+
+.dropdown-override {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-color: rgba(56, 56, 56, 0);
+    border-width: 8px;
+    width: 6px;
+    margin-left: 9px;
+    margin-right: 12px;
+    padding: 0px;
+}
+
+.unity-base-popup-field__input:hover {
+    background-color: rgb(75, 75, 75);
+    -unity-background-image-tint-color: rgb(255, 255, 255);
+}
+
+.unity-base-popup-field__arrow {
+    display: none;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-color: rgba(56, 56, 56, 0);
+    border-width: 11px;
+}
+
+.unity-base-popup-field__text {
+    display: none;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-color: rgba(56, 56, 56, 0);
+    border-width: 11px;
+}
