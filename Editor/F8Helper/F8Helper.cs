@@ -30,22 +30,40 @@ namespace F8Framework.Core.Editor
 
         public static void CopyAndroidManifest()
         {
+#if UNITY_6000
+            string androidPJ = "6000";
+#elif UNITY_2022
+            string androidPJ = "2022";
+#else
+            string androidPJ = "2021";
+#endif
             if (!File.Exists(Application.dataPath + "/Plugins/Android/AndroidManifest.xml"))
             {
                 FileTools.SafeCopyFile(
                     FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) +
-                    "/Runtime/SDKManager/Plugins_Android/AndroidManifest.xml",
+                    "/Runtime/SDKManager/Plugins_Android/AndroidPJ" + androidPJ + "/AndroidManifest",
                     Application.dataPath + "/Plugins/Android/AndroidManifest.xml");
                 LogF8.Log("复制 AndroidManifest.xml 至 " + Application.dataPath + "/Plugins/Android");
                 AssetDatabase.Refresh();
             }
+            
             if (!File.Exists(Application.dataPath + "/Plugins/Android/mainTemplate.gradle"))
             {
                 FileTools.SafeCopyFile(
                     FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) +
-                    "/Runtime/SDKManager/Plugins_Android/mainTemplate.gradle",
+                    "/Runtime/SDKManager/Plugins_Android/AndroidPJ" + androidPJ + "/mainTemplate",
                     Application.dataPath + "/Plugins/Android/mainTemplate.gradle");
                 LogF8.Log("复制 mainTemplate.gradle 至 " + Application.dataPath + "/Plugins/Android");
+                AssetDatabase.Refresh();
+            }
+            
+            if (!File.Exists(Application.dataPath + "/Plugins/Android/UnityAndroidDemo-release" + androidPJ + ".aar"))
+            {
+                FileTools.SafeCopyFile(
+                    FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) +
+                    "/Runtime/SDKManager/Plugins_Android/AndroidPJ" + androidPJ + "/UnityAndroidDemo-release",
+                    Application.dataPath + "/Plugins/Android/UnityAndroidDemo-release.aar");
+                LogF8.Log("复制 UnityAndroidDemo-release.aar 至 " + Application.dataPath + "/Plugins/Android");
                 AssetDatabase.Refresh();
             }
         }
