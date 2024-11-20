@@ -47,23 +47,37 @@ Unity F8 SDKManager组件，与原生平台交互，接入多个平台或者渠�
 ```
 
 ## 安卓工程使用方法
-* 勾选两个选项 Project Settings -> Player -> Publishing Settings -> Build（F8后自动执行）  
-  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20240324030616.png)
+### 如需要接入隐私政策，或接入安卓端SDK与安卓端交互，可按照下方教程手动操作
+
+* （注意：首先确定你的unity使用什么Gradle版本）[unity文档Gradle版本](https://docs.unity3d.com/2021.3/Documentation/Manual/android-gradle-overview.html)
+* 框架只适配下列版本，unity的Gradle版本也可以在安装目录查看，如：（C:\Program Files\Unity\Hub\Editor\2021.3.15f1\Editor\Data\PlaybackEngines\AndroidPlayer\Tools\gradle\lib）
+* unity2021各个版本（2021.2 / 2021.1 starting from 2021.1.16f1：Gradle6.1.1）  
+  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20241120134318.png)
+* unity2022各个版本（2022.1：Gradle6.1.1）  
+  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20241120134325.png)
+* unity2023各个版本（2023.1：Gradle7.6）  
+  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20241121004145.png)
+* unity6000各个版本  
+  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20241120134329.png)
 ------------------------------
-* 勾选自动生成后替换这三个文件 [AndroidManifest.xml](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/AndroidManifest) 和 [mainTemplate.gradle](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/mainTemplate) 和 [UnityAndroidDemo-release.aar](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/UnityAndroidDemo-release)（F8后自动执行）  
-  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20240324030626_2.png)
+* 根据你版本，选择正确的目录，复制下面这两个文件到工程 Assets/Plugins/Android 目录
+* 给文件 [AndroidManifest.xml](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/Gradle6.1.1/AndroidManifest) 添加上后缀.xml
+* 给文件 [UnityAndroidDemo-release.aar](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/Gradle6.1.1/UnityAndroidDemo-release) 添加上后缀.aar  
+  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20241120213148.png)  
+  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20241120213210.png)
 ------------------------------
-* 注意：每个unity版本略有差异，打包Android会问题频出，更换Unity版本后请手动删除这三个文件
+* 注意：每个unity版本略有差异，更换unity版本后请手动删除这两个文件
 ------------------------------
-* （可选）使用安卓工程打包aar [UnityAndroidDemo2021.3.15f1.zip](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/UnityAndroidDemo2021.3.15f1.zip)，用作导出 [UnityAndroidDemo-release.aar](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/UnityAndroidDemo-release) 和 [AndroidManifest.xml](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/AndroidManifest)
+* （可选）使用安卓工程打包aar [UnityAndroidDemo2021.3.15f1.zip](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/UnityAndroidDemo2021.3.15f1.zip)，用作导出 [UnityAndroidDemo-release.aar](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/Gradle6.1.1/UnityAndroidDemo-release) 和 [AndroidManifest.xml](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/Gradle6.1.1/AndroidManifest)
   1. 下载 [Android Studio](https://developer.android.google.cn/studio/archive/) （网页右上角语言改为英文）
   2. 选择版本：unity2022 / 2023：android-studio-2022.2.1.20-windows，unity2023 / 6000：2023.3.1.20-windows
-  3. 解压工程打开后，修改 SDK JDK为Unity安装自带的
+  3. 解压工程打开后，修改 SDK JDK 为unity安装自带的
   4. 上方菜单栏 Build -> Rebuild Project 导出后会生成aar文件
   5. 使用可以读取zip的压缩软件，删除aar里 libs/classes.jar 文件
-  6. 再打开根目录的 classes.jar ，删除里面的 UnityPlayerActivity.java 文件（unity6000不需要此步骤）
+  6. 再打开根目录的 classes.jar ，删除里面的 UnityPlayerActivity.java 文件（unity2023 / 6000不需要此步骤）
 ------------------------------
-* 各个unity版本的安卓工程
+
+* 提供四个unity版本的安卓工程
   1. unity2021.3.15f1：[UnityAndroidDemo2021.3.15f1.zip](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/UnityAndroidDemo2021.3.15f1.zip)
   2. unity2022.3.52f1：[UnityAndroidDemo2022.3.52f1.zip](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2022/UnityAndroidDemo2022.3.52f1.zip)
   3. unity2023.2.20f1（2023已被unity弃用）：[UnityAndroidDemo2023.2.20f1.zip](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2023/UnityAndroidDemo2023.2.20f1.zip)
@@ -72,7 +86,7 @@ Unity F8 SDKManager组件，与原生平台交互，接入多个平台或者渠�
 * 打包成功后运行可以看到这个界面  
   1.如果你不想显示这个界面  
   2.请打开 [AndroidManifest.xml](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/AndroidManifest) 把 MoeNativeActivity 和 MainActivity 互换即可  
-  3.[UnityAndroidDemo-release.aar](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/UnityAndroidDemo-release) 里面的 AndroidManifest.xml 也要同步修改  
+  3.[UnityAndroidDemo-release.aar](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/UnityAndroidDemo-release) 里面的 AndroidManifest.xml 也要修改  
   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20241119233017.png)
 ---
 
