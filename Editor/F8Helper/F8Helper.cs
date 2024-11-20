@@ -32,6 +32,8 @@ namespace F8Framework.Core.Editor
         {
 #if UNITY_6000
             string androidPJ = "6000";
+#elif UNITY_2023
+            string androidPJ = "2023";
 #elif UNITY_2022
             string androidPJ = "2022";
 #else
