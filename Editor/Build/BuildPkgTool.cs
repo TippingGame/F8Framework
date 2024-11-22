@@ -232,6 +232,15 @@ namespace F8Framework.Core.Editor
             // 空包
             if (enableNullPackage)
             {
+                var resAssetBundleMappings = Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(Resources.Load<TextAsset>(nameof(AssetBundleMap)).ToString());
+                foreach (var resAssetMapping in resAssetBundleMappings.Values)
+                {
+                    resAssetMapping.MD5 = ""; // 空包原始MD5清空
+                }
+                string assetBundleMapPath = Application.dataPath + "/F8Framework/AssetMap/Resources/" + nameof(AssetBundleMap) + ".json";
+                FileTools.CheckFileAndCreateDirWhenNeeded(assetBundleMapPath);
+                FileTools.SafeWriteAllText(assetBundleMapPath, Util.LitJson.ToJson(resAssetBundleMappings));
+                
                 string toPath = FileTools.TruncatePath(Application.dataPath, 1) + "/temp_NullPackage";
                 FileTools.SafeDeleteDir(toPath);
                 FileTools.SafeCopyDirectory(URLSetting.GetAssetBundlesOutPath(), toPath, true, new[] { URLSetting.GetPlatformName(), URLSetting.GetPlatformName() + ".manifest" });
