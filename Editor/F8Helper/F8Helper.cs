@@ -34,12 +34,7 @@ namespace F8Framework.Core.Editor
             // HybridCLR.Editor.Commands.PrebuildCommand.GenerateAll();
             // FileTools.SafeClearDir(Application.dataPath + "/AssetBundles/Code");
             // FileTools.CheckDirAndCreateWhenNeeded(Application.dataPath + "/AssetBundles/Code");
-            // List<string> hotUpdateDll = new List<string>()
-            // {
-            //     "F8Framework.F8ExcelDataClass", // 自行添加需要热更的程序集
-            //     "F8Framework.Launcher"
-            // };
-            // foreach (var dll in hotUpdateDll)
+            // foreach (var dll in HybridCLR.Editor.SettingsUtil.HotUpdateAssemblyNamesExcludePreserved) // 获取HybridCLR设置面板的dll名称
             // {
             //     FileTools.SafeCopyFile(
             //         HybridCLR.Editor.SettingsUtil.GetHotUpdateDllsOutputDirByTarget(EditorUserBuildSettings.activeBuildTarget) + "/" + dll + ".dll",
