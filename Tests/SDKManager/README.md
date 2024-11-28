@@ -120,7 +120,7 @@ private static bool appendHashToAssetBundleName = false;
 public static bool DisableUnityCacheOnWebGL = false;
 ```
 ---
-* 解除两个注释。
+* 注意：WebGL不能使用同步加载（会自动转换为异步）
 1. [GameLauncher.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/Launcher/GameLauncher.cs)
 ```C#
 yield return AssetBundleManager.Instance.LoadAssetBundleManifest(); // WebGL专用
