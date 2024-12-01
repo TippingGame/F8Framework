@@ -935,7 +935,7 @@ namespace F8Framework.Core
             if (manifestPath == null)
                 yield break;
 #if UNITY_EDITOR
-                manifestPath = "file://" + manifestPath;
+            manifestPath = Path.IsPathRooted(manifestPath) ? "file://" + manifestPath : manifestPath;
 #endif
             DownloadRequest assetBundleDownloadRequest = new DownloadRequest(manifestPath, default);
             yield return assetBundleDownloadRequest.SendAssetBundleDownloadRequestCoroutine(manifestPath);
