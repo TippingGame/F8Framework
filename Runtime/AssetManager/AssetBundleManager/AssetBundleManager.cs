@@ -931,7 +931,7 @@ namespace F8Framework.Core
         // WebGL专用异步加载AssetBundleManifest
         public IEnumerator LoadAssetBundleManifest()  
         {
-            string manifestPath = AssetBundleHelper.GetAssetBundleManifestPath(AssetManager.ForceRemoteAssetBundle ? AssetBundleHelper.SourceType.REMOTE_ADDRESS : default);
+            string manifestPath = AssetBundleHelper.GetAssetBundleManifestPath(AssetManager.ForceRemoteAssetBundle ? AssetBundleHelper.SourceType.REMOTE_ADDRESS : AssetBundleHelper.SourceType.STREAMING_ASSETS);
             if (manifestPath == null)
                 yield break;
 #if UNITY_EDITOR
@@ -949,7 +949,7 @@ namespace F8Framework.Core
 #if UNITY_WEBGL
             LogF8.LogAsset("（提示）由于WebGL异步加载AssetBundleManifest，请在创建资产模块之后加上：yield return AssetBundleManager.Instance.LoadAssetBundleManifest();");
 #else
-            string manifestPath = AssetBundleHelper.GetAssetBundleManifestPath(AssetManager.ForceRemoteAssetBundle ? AssetBundleHelper.SourceType.REMOTE_ADDRESS : default);
+            string manifestPath = AssetBundleHelper.GetAssetBundleManifestPath(AssetManager.ForceRemoteAssetBundle ? AssetBundleHelper.SourceType.REMOTE_ADDRESS : AssetBundleHelper.SourceType.STREAMING_ASSETS);
             if (manifestPath == null)
                 return;
             var assetBundle = AssetBundle.LoadFromFile(manifestPath);
