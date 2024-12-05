@@ -939,9 +939,16 @@ namespace F8Framework.Core
 #endif
             DownloadRequest assetBundleDownloadRequest = new DownloadRequest(manifestPath, default);
             yield return assetBundleDownloadRequest.SendAssetBundleDownloadRequestCoroutine(manifestPath);
-            manifest = assetBundleDownloadRequest.DownloadedAssetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
-            manifest.GetAllAssetBundles();
-            assetBundleDownloadRequest.DownloadedAssetBundle.Unload(false);
+            if (assetBundleDownloadRequest.DownloadedAssetBundle)
+            {
+                manifest = assetBundleDownloadRequest.DownloadedAssetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
+                manifest.GetAllAssetBundles();
+                assetBundleDownloadRequest.DownloadedAssetBundle.Unload(false);
+            }
+            else
+            {
+                LogF8.LogError("如果游戏中没有使用任何AB包加载资源，可以删除此方法的调用！");
+            }
         }
         
         public void OnInit(object createParam)
@@ -958,6 +965,10 @@ namespace F8Framework.Core
                 manifest = assetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
                 manifest.GetAllAssetBundles();
                 assetBundle.Unload(false);
+            }
+            else
+            {
+                LogF8.LogError("如果游戏中没有使用任何AB包加载资源，可以删除此方法的调用！");
             }
 #endif
         }
