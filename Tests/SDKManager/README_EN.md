@@ -85,8 +85,8 @@ Unity F8 SDKManager组件，与原生平台交互，接入多个平台或者渠�
 ------------------------------
 * 打包成功后运行可以看到这个界面  
   1.如果你不想显示这个界面  
-  2.请打开 [AndroidManifest.xml](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/AndroidManifest) 把 MoeNativeActivity 和 MainActivity 互换即可  
-  3.[UnityAndroidDemo-release.aar](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/UnityAndroidDemo-release) 里面的 AndroidManifest.xml 也要修改  
+  2.请打开 [AndroidManifest.xml](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/Gradle6.1.1/AndroidManifest) 把 MoeNativeActivity 和 MainActivity 互换即可  
+  3.[UnityAndroidDemo-release.aar](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/Gradle6.1.1/UnityAndroidDemo-release) 里面的 AndroidManifest.xml 也要修改  
   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20241119233017.png)
 ---
 

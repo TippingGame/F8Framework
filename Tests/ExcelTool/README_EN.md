@@ -33,13 +33,20 @@ Unity 读取 Excel 的工具
 2. 点击菜单的**开发工具**项 -> **导入配置表**\_F8（快捷键），在 Assets/AssetBundles/Config/BinConfigData 下生成 **bytes** 文件（WebGL下生成 **Json** 文件）
 
 
-3. 如无意外，根目录下会生成 **Assets/F8Framework/ConfigData/** 目录和相关文件，（注意：F8后会清除框架自带的，并重新生成，一切报错均来自这些代码的冲突）  
+3. 注意：如果你不想生成在AssetBundles目录下，在代码 [ExcelDataTool](https://github.com/TippingGame/F8Framework/blob/main/Editor/ExcelTool/ExcelDataTool.cs) 中修改 "BinDataFolder" 的值
+    ```C#
+    // 序列化的数据文件都会放在此文件夹内,此文件夹位于AssetBundles或Resources文件夹下用于读取数据
+    public const string BinDataFolder = "/AssetBundles/Config/BinConfigData";
+    ```
+
+
+4. 如无意外，根目录下会生成 **Assets/F8Framework/ConfigData/** 目录和相关文件，（注意：F8后会清除框架自带的，并重新生成，一切报错均来自这些代码的冲突）  
    ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/ExcelTool/ui_20241112212632.png)
 
-4. （可选项）更改Excel存放目录，**开发工具**项 -> **设置Excel存放目录**
+5. （可选项）更改Excel存放目录，**开发工具**项 -> **设置Excel存放目录**
 
 
-5. （可选项）通过 Editor，可在运行时读取 Excel 数据：点击菜单的**开发工具**项 -> **运行时读取 Excel**\_F7（快捷键）
+6. （可选项）通过 Editor，可在运行时读取 Excel 数据：点击菜单的**开发工具**项 -> **运行时读取 Excel**\_F7（快捷键）
 
 
 ## Excel 示例
