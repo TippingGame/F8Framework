@@ -91,7 +91,6 @@ namespace F8Framework.Core
                     assetBundlePath = GetRemoteAddress();
                     break;
                 default:
-                    LogF8.LogError("AssetBundle的源类型不能为空");
                     return null;
             }
             

@@ -12,7 +12,7 @@ namespace F8Framework.Core.Editor
     public class ABBuildTool : ScriptableObject
     {
         private static Dictionary<string, AssetBundleMap.AssetMapping> assetMapping;
-        private static Dictionary<string, string[]> resourceMapping;
+        private static Dictionary<string, string> resourceMapping;
         // AssetBundle名与资产文件名不同时查找
         private static Dictionary<string, string> DiscrepantAssetPathMapping;
 
@@ -270,8 +270,6 @@ namespace F8Framework.Core.Editor
                             .Select(path => Path.GetFileNameWithoutExtension(path))
                             .ToArray();
                         
-                        fileNameWithoutExtension += AssetManager.DirSuffix;
-                        
                         if (tempNames.Contains(fileNameWithoutExtension))
                         {
                             string id = Guid.NewGuid().ToString(); // 生成一个唯一的ID
@@ -325,75 +323,45 @@ namespace F8Framework.Core.Editor
             {
                 return;
             }
+            
             string[] dics = Directory.GetDirectories(Application.dataPath, "Resources", SearchOption.AllDirectories);
-            
             List<string> tempNames = new List<string>();
-            
-            resourceMapping = new Dictionary<string, string[]>();
-            
+            resourceMapping = new Dictionary<string, string>();
             foreach (string dic in dics)
             {
-                // 获取文件夹的路径
-                string[] folderPaths = Directory.GetDirectories(dic, "*", SearchOption.AllDirectories);
-                // 获取文件的路径
-                string[] filePaths = Directory.GetFiles(dic, "*", SearchOption.AllDirectories);
-                // 合并文件夹和文件的路径，可以根据需要调整顺序
-                string[] allPaths = filePaths.Concat(folderPaths).ToArray();
+                if (!Directory.Exists(dic))
+                    continue;
 
-                foreach (string _filePath in allPaths)
+                string[] files = Directory.GetFiles(dic, "*", SearchOption.AllDirectories);
+                
+                foreach (string file in files)
                 {
-                    string filePath = FileTools.FormatToUnityPath(_filePath);
-
-                    if (filePath.EndsWith(".meta") || filePath.EndsWith(".DS_Store"))
-                    {
+                    string filePath = FileTools.FormatToUnityPath(file);
+                    if (!File.Exists(filePath))
                         continue;
-                    }
 
+                    if (filePath.EndsWith(".meta") ||
+                        filePath.EndsWith(".DS_Store"))
+                        continue;
+                    
                     // 获取不带扩展名的文件名
                     string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
 
-                    if (File.Exists(filePath)) // 文件
+                    string notSuffix = Path.ChangeExtension(file, null);
+
+                    string resourcesPath = GetResourcesPath(notSuffix);
+                    
+                    string realPath = resourcesPath.Replace(URLSetting.ResourcesPath, "");
+                        
+                    if (tempNames.Contains(fileNameWithoutExtension))
                     {
-                        string notSuffix = Path.ChangeExtension(filePath, null);
-
-                        string resourcesPath = GetResourcesPath(notSuffix);
-
-                        string realPath = resourcesPath.Replace(URLSetting.ResourcesPath, "");
-
-                        if (tempNames.Contains(fileNameWithoutExtension))
-                        {
-                            string id = Guid.NewGuid().ToString(); // 生成一个唯一的ID
-                            fileNameWithoutExtension += id;
-                            LogF8.Log("资源名称重复（大小写不敏感）：" + filePath + "，增加唯一识别ID后为：" + fileNameWithoutExtension);
-                        }
-
-                        tempNames.Add(fileNameWithoutExtension);
-
-                        resourceMapping.Add(fileNameWithoutExtension, new[] { realPath });
+                        string id = Guid.NewGuid().ToString(); // 生成一个唯一的ID
+                        fileNameWithoutExtension += id;
+                        LogF8.Log("资源名称重复（大小写不敏感）：" + filePath + "，增加唯一识别ID后为：" + fileNameWithoutExtension);
                     }
-                    else if (Directory.Exists(filePath)) // 文件夹
-                    {
-                        // 文件夹资产信息，使用资产名名代替
-                        string[] assetNameDir = Directory.GetFiles(filePath, "*", SearchOption.TopDirectoryOnly)
-                            .Where(path =>
-                                !path.EndsWith(".meta", StringComparison.OrdinalIgnoreCase) &&
-                                !path.EndsWith(".DS_Store", StringComparison.OrdinalIgnoreCase))
-                            .Select(path => Path.GetFileNameWithoutExtension(path))
-                            .ToArray();
-
-                        fileNameWithoutExtension += AssetManager.DirSuffix;
-
-                        if (tempNames.Contains(fileNameWithoutExtension))
-                        {
-                            string id = Guid.NewGuid().ToString(); // 生成一个唯一的ID
-                            fileNameWithoutExtension += id;
-                            LogF8.Log("文件夹名称重复（大小写不敏感）：" + filePath + "，增加唯一识别ID后为：" + fileNameWithoutExtension);
-                        }
-
-                        tempNames.Add(fileNameWithoutExtension);
-
-                        resourceMapping.Add(fileNameWithoutExtension, assetNameDir);
-                    }
+                    tempNames.Add(fileNameWithoutExtension);
+                    
+                    resourceMapping.Add(fileNameWithoutExtension, realPath);
                 }
             }
 
