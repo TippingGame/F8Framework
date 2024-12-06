@@ -27,7 +27,8 @@ UI界面分为三大类：
 ### 代码使用方法
 ```C#
         private Dictionary<int, UIConfig> configs = new Dictionary<int, UIConfig>
-        {
+        {   
+            // 兼容枚举作为Key
             { 1, new UIConfig(LayerType.UI, "UITip") },
             // 手动添加UI配置
         };
@@ -35,19 +36,29 @@ UI界面分为三大类：
         
         /*----------------------------UI管理功能----------------------------*/
         
-        // 初始化
+        // 初始化（必须执行，兼容枚举作为Key的configs）
         FF8.UI.Initialize(configs);
+        
         // 设置UI Canvas属性（如果不懂属性有什么用，可自建Canvas进行试验）
+        // null代表设置所有Layer
+        // sortOrder层级
+        // sortingLayerName层级名称
+        // RenderMode渲染模式
+        // pixelPerfect像素模式
+        // camera设置主相机
         FF8.UI.SetCanvas(null, 1, "Default", RenderMode.ScreenSpaceCamera, false, Camera.main);
+        
         // 设置UI CanvasScaler属性（如果不懂属性有什么用，可自建Canvas进行试验）
         FF8.UI.SetCanvasScaler(null, CanvasScaler.ScaleMode.ConstantPixelSize, 1f, 100f);
         FF8.UI.SetCanvasScaler(LayerType.UI, CanvasScaler.ScaleMode.ScaleWithScreenSize, new Vector2(1920, 1080), CanvasScaler.ScreenMatchMode.MatchWidthOrHeight, 0f, 100f);
         FF8.UI.SetCanvasScaler(LayerType.UI, CanvasScaler.ScaleMode.ConstantPhysicalSize, CanvasScaler.Unit.Points, 96f, 100f, 100f);
-        // 打开UI，可选参数：data，new UICallbacks()
+        
+        // 打开UI，兼容枚举作为UIid传入，可选参数：data，new UICallbacks()
         FF8.UI.Open(1, data, new UICallbacks());
-        FF8.UI.OpenAsync(1);
+        
         // 打开提示类Notify
         FF8.UI.ShowNotify(1, "tip");
+        
         // UI是否存在
         FF8.UI.Has(1);
         // 关闭UI，可选参数：isDestroy

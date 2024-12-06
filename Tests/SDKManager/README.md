@@ -85,8 +85,8 @@ Unity F8 SDKManager组件，与原生平台交互，接入多个平台或者渠�
 ------------------------------
 * 打包成功后运行可以看到这个界面  
   1.如果你不想显示这个界面  
-  2.请打开 [AndroidManifest.xml](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/AndroidManifest) 把 MoeNativeActivity 和 MainActivity 互换即可  
-  3.[UnityAndroidDemo-release.aar](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/UnityAndroidDemo-release) 里面的 AndroidManifest.xml 也要修改  
+  2.请打开 [AndroidManifest.xml](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/Gradle6.1.1/AndroidManifest) 把 MoeNativeActivity 和 MainActivity 互换即可  
+  3.[UnityAndroidDemo-release.aar](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/Gradle6.1.1/UnityAndroidDemo-release) 里面的 AndroidManifest.xml 也要修改  
   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20241119233017.png)  
 ---
 
@@ -120,14 +120,18 @@ private static bool appendHashToAssetBundleName = false;
 public static bool DisableUnityCacheOnWebGL = false;
 ```
 ---
-* 解除两个注释。
+* 注意：WebGL不能使用同步加载（会自动转换为异步）
 1. [GameLauncher.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/Launcher/GameLauncher.cs)
 ```C#
 yield return AssetBundleManager.Instance.LoadAssetBundleManifest(); // WebGL专用
 ...
 yield return F8DataManager.Instance.LoadLocalizedStringsIEnumerator(); // WebGL专用
 ```
+* （注意）由于微信小游戏只能使用远程AB加载，请点击F5，配置好资产远程地址后构建一次游戏。  
+  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20241203214539.png)  
+* 也可以在此处直接修改 [GameVersion.json](https://github.com/TippingGame/F8Framework/blob/main/AssetMap/Resources/GameVersion.json) 里的 "AssetRemoteAddress" 参数  
+  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20241203214624.png)  
 * 构建设置。  
-  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20240329230924.png)
+  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20240329230924.png)  
 
 ### 如构建失败：请尝试使用Unity自带的Build一次后再尝试

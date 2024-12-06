@@ -33,7 +33,7 @@ namespace F8Framework.Core
             
             for (int i = 0; i < assetBundlePaths.Count; i++)
             {
-                assetBundlePaths[i] = GetAssetBundlePathWithoutAbByAbName(assetBundlePaths[i]) + assetBundlePaths[i];
+                assetBundlePaths[i] = GetAssetBundlePathByAbName(assetBundlePaths[i]);
             }
 
             assetBundlePaths.Add(info.AssetBundlePath);
@@ -94,7 +94,7 @@ namespace F8Framework.Core
 
             for (int i = 0; i < assetBundlePaths.Count; i++)
             {
-                assetBundlePaths[i] = GetAssetBundlePathWithoutAbByAbName(assetBundlePaths[i]) + assetBundlePaths[i];
+                assetBundlePaths[i] = GetAssetBundlePathByAbName(assetBundlePaths[i]);
             }
             AssetBundleLoader lastLoader = null;
             assetBundlePaths.Add(info.AssetBundlePath);
@@ -149,7 +149,7 @@ namespace F8Framework.Core
 
             for (int i = 0; i < assetBundlePaths.Count; i++)
             {
-                assetBundlePaths[i] = GetAssetBundlePathWithoutAbByAbName(assetBundlePaths[i]) + assetBundlePaths[i];
+                assetBundlePaths[i] = GetAssetBundlePathByAbName(assetBundlePaths[i]);
             }
             AssetBundleLoader lastLoader = null;
             assetBundlePaths.Add(info.AssetBundlePath);
@@ -855,25 +855,25 @@ namespace F8Framework.Core
         /// </summary>
         /// <param name="abName"></param>
         /// <returns></returns>
-        public static string GetAssetBundlePathWithoutAbByAbName(string abName)
+        public static string GetAssetBundlePathByAbName(string abName)
         {
             string fullPath;
             
             if (GameConfig.LocalGameVersion.EnableHotUpdate && File.Exists(AssetBundleHelper.GetAssetBundleFullName(abName, AssetBundleHelper.SourceType.HOT_UPDATE_PATH)))
             {
-                fullPath = AssetBundleHelper.GetAssetBundleFullName(null, AssetBundleHelper.SourceType.HOT_UPDATE_PATH);
+                fullPath = AssetBundleHelper.GetAssetBundleFullName(abName, AssetBundleHelper.SourceType.HOT_UPDATE_PATH);
             }
             else if (GameConfig.LocalGameVersion.EnablePackage && File.Exists(AssetBundleHelper.GetAssetBundleFullName(abName, AssetBundleHelper.SourceType.PACKAGE_PATH)))
             {
-                fullPath = AssetBundleHelper.GetAssetBundleFullName(null, AssetBundleHelper.SourceType.PACKAGE_PATH);
+                fullPath = AssetBundleHelper.GetAssetBundleFullName(abName, AssetBundleHelper.SourceType.PACKAGE_PATH);
             }
             else if (AssetManager.ForceRemoteAssetBundle)
             {
-                fullPath = AssetBundleHelper.GetAssetBundleFullName(null, AssetBundleHelper.SourceType.REMOTE_ADDRESS);
+                fullPath = AssetBundleHelper.GetAssetBundleFullName(abName, AssetBundleHelper.SourceType.REMOTE_ADDRESS);
             }
             else
             {
-                fullPath = AssetBundleHelper.GetAssetBundleFullName(null, AssetBundleHelper.SourceType.STREAMING_ASSETS);
+                fullPath = AssetBundleHelper.GetAssetBundleFullName(abName, AssetBundleHelper.SourceType.STREAMING_ASSETS);
             }
             
             return fullPath;
@@ -929,27 +929,34 @@ namespace F8Framework.Core
         }
 
         // WebGL专用异步加载AssetBundleManifest
-        public IEnumerator LoadAssetBundleManifest()  
+        public IEnumerator LoadAssetBundleManifest()
         {
-            string manifestPath = AssetBundleHelper.GetAssetBundleManifestPath();
+            string manifestPath = GetAssetBundlePathByAbName(URLSetting.GetPlatformName());
             if (manifestPath == null)
                 yield break;
 #if UNITY_EDITOR
-                manifestPath = "file://" + manifestPath;
+            manifestPath = Path.IsPathRooted(manifestPath) ? "file://" + manifestPath : manifestPath;
 #endif
             DownloadRequest assetBundleDownloadRequest = new DownloadRequest(manifestPath, default);
             yield return assetBundleDownloadRequest.SendAssetBundleDownloadRequestCoroutine(manifestPath);
-            manifest = assetBundleDownloadRequest.DownloadedAssetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
-            manifest.GetAllAssetBundles();
-            assetBundleDownloadRequest.DownloadedAssetBundle.Unload(false);
+            if (assetBundleDownloadRequest.DownloadedAssetBundle)
+            {
+                manifest = assetBundleDownloadRequest.DownloadedAssetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
+                manifest.GetAllAssetBundles();
+                assetBundleDownloadRequest.DownloadedAssetBundle.Unload(false);
+            }
+            else
+            {
+                LogF8.LogError("如果游戏中没有使用任何AB包加载资源，可以删除此方法的调用！");
+            }
         }
         
         public void OnInit(object createParam)
         {
 #if UNITY_WEBGL
-            LogF8.LogAsset("（提示）由于WebGL异步加载AssetBundleManifest，请在创建资产模块之后加上：yield return AssetBundleManager.Instance.LoadAssetBundleManifest();");
+            LogF8.LogAsset("（提示）由于WebGL需要异步加载AssetBundleManifest，已在资产模块之后加上：yield return AssetBundleManager.Instance.LoadAssetBundleManifest();");
 #else
-            string manifestPath = AssetBundleHelper.GetAssetBundleManifestPath(AssetBundleHelper.SourceType.STREAMING_ASSETS);
+            string manifestPath = GetAssetBundlePathByAbName(URLSetting.GetPlatformName());
             if (manifestPath == null)
                 return;
             var assetBundle = AssetBundle.LoadFromFile(manifestPath);
@@ -958,6 +965,10 @@ namespace F8Framework.Core
                 manifest = assetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
                 manifest.GetAllAssetBundles();
                 assetBundle.Unload(false);
+            }
+            else
+            {
+                LogF8.LogError("如果游戏中没有使用任何AB包加载资源，可以删除此方法的调用！");
             }
 #endif
         }

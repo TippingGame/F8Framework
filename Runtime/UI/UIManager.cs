@@ -42,6 +42,19 @@ namespace F8Framework.Core
         
         // 将所有的层放入一个字典中
         private Dictionary<LayerType, LayerUI> _layers;
+
+        // 使用枚举作为参数
+        public void Initialize<T>(Dictionary<T, UIConfig> configs) where T : Enum
+        {
+            Dictionary<int, UIConfig> intConfigs = new Dictionary<int, UIConfig>();
+            
+            foreach (var kvp in configs)
+            {
+                intConfigs.Add((int)(object)kvp.Key, kvp.Value);
+            }
+            
+            Initialize(intConfigs);
+        }
         
         public void Initialize(Dictionary<int, UIConfig> configs)
         {
@@ -191,6 +204,13 @@ namespace F8Framework.Core
             Destroy(gameObject);
         }
         
+        // 异步加载，使用枚举作为参数
+        public string ShowNotify<T>(T eventName, string content, UICallbacks callbacks = null) where T : Enum, IConvertible
+        {
+            int uiId = (int)(object)eventName;
+            return ShowNotify(uiId, content, callbacks);
+        }
+        
         public string ShowNotify(int uiId, string content, UICallbacks callbacks = null)
         {
             if (!_configs.TryGetValue(uiId, out UIConfig config))
@@ -209,8 +229,8 @@ namespace F8Framework.Core
         // 异步加载，使用枚举作为参数
         public string Open<T>(T eventName, object[] uiArgs = null, UICallbacks callbacks = null) where T : Enum, IConvertible
         {
-            int tempName = (int)(object)eventName;
-            return Open(tempName, uiArgs, callbacks);
+            int uiId = (int)(object)eventName;
+            return Open(uiId, uiArgs, callbacks);
         }
         
         // 异步加载，使用id作为参数

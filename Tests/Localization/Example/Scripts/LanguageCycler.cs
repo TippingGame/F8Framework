@@ -27,14 +27,14 @@ namespace F8Framework.Tests
 			FF8.GameObjectPool = ModuleCenter.CreateModule<GameObjectPool>();
 			FF8.Asset = ModuleCenter.CreateModule<AssetManager>();
 #if UNITY_WEBGL
-            yield return AssetBundleManager.Instance.LoadAssetBundleManifest(); // WebGL专用
+            yield return AssetBundleManager.Instance.LoadAssetBundleManifest(); // WebGL专用，如果游戏中没有使用任何AB包加载资源，可以删除此方法的调用！
 #endif
 			FF8.Config = ModuleCenter.CreateModule<F8DataManager>();
 			FF8.Audio = ModuleCenter.CreateModule<AudioManager>();
 			FF8.Tween = ModuleCenter.CreateModule<Tween>();
 			FF8.UI = ModuleCenter.CreateModule<UIManager>();
 #if UNITY_WEBGL
-            yield return F8DataManager.Instance.LoadLocalizedStringsIEnumerator(); // WebGL专用
+            yield return F8DataManager.Instance.LoadLocalizedStringsIEnumerator(); // WebGL专用，如果游戏中没有使用本地化，可以删除此方法的调用！
 #endif
 			FF8.Local = ModuleCenter.CreateModule<Localization>();
 			FF8.SDK = ModuleCenter.CreateModule<SDKManager>();

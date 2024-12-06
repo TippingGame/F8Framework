@@ -20,11 +20,16 @@ namespace F8Framework.Core
         //强制更改资产加载模式为远程（微信小游戏使用）
         public static bool ForceRemoteAssetBundle = false;
         
+        public const string DirSuffix = "_Directory";
+        
         //资产信息
         public struct AssetInfo
         {
             //目标资产类型
             public readonly AssetTypeEnum AssetType;
+            
+            //AssetName
+            public readonly string AssetName;
             
             //直接资产请求路径相对路径，Assets开头的
             public readonly string[] AssetPath;
@@ -34,14 +39,15 @@ namespace F8Framework.Core
             
             //AB名
             public readonly string AbName;
-            
             public AssetInfo(
                 AssetTypeEnum assetType = default,
+                string assetName = default,
                 string[] assetPath = default,
                 string assetBundlePathWithoutAb = default,
                 string abName = default)
             {
                 AssetType = assetType;
+                AssetName = assetName;
                 AssetPath = assetPath;
                 AssetBundlePath = assetBundlePathWithoutAb + abName;
                 AbName = abName;
@@ -92,18 +98,30 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                 if (_isEditorMode)
                 {
-                    return true;
+                    if (assetInfo.AssetType == AssetTypeEnum.RESOURCE)
+                        if (assetInfo.AssetPath != default || SearchAsset(assetInfo.AssetName) != null)
+                        {
+                            return true;
+                        }
+                    
+                    if (assetInfo.AssetType == AssetTypeEnum.ASSET_BUNDLE)
+                        if ((assetInfo.AssetPath != default && assetInfo.AssetBundlePath != default) || SearchAsset(assetInfo.AssetName) != null)
+                        {
+                            return true;
+                        }
+
+                    return false;
                 }
 #endif
                 if (assetInfo.AssetType == AssetTypeEnum.NONE)
                     return false;
 
                 if (assetInfo.AssetType == AssetTypeEnum.RESOURCE &&
-                    assetInfo.AssetPath == null)
+                    assetInfo.AssetPath == default)
                     return false;
 
                 if (assetInfo.AssetType == AssetTypeEnum.ASSET_BUNDLE &&
-                    (assetInfo.AssetPath == null || assetInfo.AssetBundlePath == null))
+                    (assetInfo.AssetPath == default || assetInfo.AssetBundlePath == default))
                     return false;
 
                 return true;
@@ -133,7 +151,7 @@ namespace F8Framework.Core
                 {
                     bool showTip = !_isEditorMode;
                     
-                    return GetAssetInfoFromAssetBundle(assetName, showTip);
+                    return GetAssetInfoFromAssetBundle(assetName, false, showTip);
                 }
                 else if (accessMode.HasFlag(AssetAccessMode.UNKNOWN))
                 {
@@ -196,7 +214,7 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                     if (_isEditorMode)
                     {
-                        assetPath = info.AssetPath == null ? SearchAsset(assetName, typeof(T), AssetAccessMode.RESOURCE) : info.AssetPath[0];
+                        assetPath = info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0];
                     }
 #endif
                     T o = ResourcesManager.Instance.GetResouceObject<T>(assetPath, subAssetName);
@@ -207,7 +225,7 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                     if (_isEditorMode)
                     {
-                        return EditorLoadAsset<T>(info.AssetPath == null ? SearchAsset(assetName, typeof(T)) : info.AssetPath[0], subAssetName);
+                        return EditorLoadAsset<T>(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], subAssetName);
                     }
 #endif
                     T o = AssetBundleManager.Instance.GetAssetObject<T>(info.AssetBundlePath, info.AssetPath[0], subAssetName);
@@ -250,7 +268,7 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                     if (_isEditorMode)
                     {
-                        assetPath = info.AssetPath == null ? SearchAsset(assetName, default, AssetAccessMode.RESOURCE) : info.AssetPath[0];
+                        assetPath = info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0];
                     }
 #endif
                     Object o = ResourcesManager.Instance.GetResouceObject(assetPath, assetType, subAssetName);
@@ -302,7 +320,7 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                     if (_isEditorMode)
                     {
-                        assetPath = info.AssetPath == null ? SearchAsset(assetName, default, AssetAccessMode.RESOURCE) : info.AssetPath[0];
+                        assetPath = info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0];
                     }
 #endif
                     Object o = ResourcesManager.Instance.GetResouceObject(assetPath, default, subAssetName);
@@ -359,7 +377,7 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                     if (_isEditorMode)
                     {
-                        assetPath = info.AssetPath == null ? SearchAsset(assetName, typeof(T), AssetAccessMode.RESOURCE) : info.AssetPath[0];
+                        assetPath = info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0];
                     }
 #endif
                     T o = ResourcesManager.Instance.GetResouceObject<T>(assetPath, subAssetName);
@@ -379,7 +397,7 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                     if (_isEditorMode)
                     {
-                        return EditorLoadAsset<T>(info.AssetPath == null ? SearchAsset(assetName, typeof(T)) : info.AssetPath[0], subAssetName);
+                        return EditorLoadAsset<T>(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], subAssetName);
                     }
 #endif
                     AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePath);
@@ -412,13 +430,37 @@ namespace F8Framework.Core
                 string assetName,
                 AssetAccessMode mode = AssetAccessMode.UNKNOWN)
             {
+                assetName += DirSuffix;
                 AssetInfo info = GetAssetInfo(assetName, mode);
                 if (!IsLegal(ref info))
                     return;
                 
                 if (info.AssetType == AssetTypeEnum.RESOURCE)
                 {
-                    LogF8.LogAsset("Resources不支持加载文件夹功能");
+#if UNITY_EDITOR
+                    if (_isEditorMode)
+                    {
+                        LogF8.LogAsset("编辑器模式下无需加载文件夹");
+                        return;
+                    }
+#endif
+                    string[] assetPaths = info.AssetPath;
+                    if (assetPaths == default || assetPaths.Length <= 0)
+                    {
+                        return;
+                    }
+
+                    foreach (var subAssetName in assetPaths)
+                    {
+                        AssetInfo subInfo = GetAssetInfo(subAssetName, mode);
+                        string assetPath = subInfo.AssetPath?[0];
+                        Object o = ResourcesManager.Instance.GetResouceObject(assetPath);
+                    
+                        if (o == null)
+                        {
+                            ResourcesManager.Instance.Load(assetPath);
+                        }
+                    }
                 }
                 else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
                 {
@@ -468,7 +510,7 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                     if (_isEditorMode)
                     {
-                        assetPath = info.AssetPath == null ? SearchAsset(assetName, default, AssetAccessMode.RESOURCE) : info.AssetPath[0];
+                        assetPath = info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0];
                     }
 #endif
                     Object o = ResourcesManager.Instance.GetResouceObject(assetPath, assetType, subAssetName);
@@ -534,7 +576,7 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                     if (_isEditorMode)
                     {
-                        assetPath = info.AssetPath == null ? SearchAsset(assetName, default, AssetAccessMode.RESOURCE) : info.AssetPath[0];
+                        assetPath = info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0];
                     }
 #endif
                     Object o = ResourcesManager.Instance.GetResouceObject(assetPath, default, subAssetName);
@@ -605,7 +647,7 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                     if (_isEditorMode)
                     {
-                        assetPath = info.AssetPath == null ? SearchAsset(assetName, typeof(T), AssetAccessMode.RESOURCE) : info.AssetPath[0];
+                        assetPath = info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0];
                     }
 #endif
                     T o = ResourcesManager.Instance.GetResouceObject<T>(assetPath, subAssetName);
@@ -630,7 +672,7 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                     if (_isEditorMode)
                     {
-                        T o = EditorLoadAsset<T>(info.AssetPath == null ? SearchAsset(assetName, typeof(T)) : info.AssetPath[0], subAssetName);
+                        T o = EditorLoadAsset<T>(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], subAssetName);
                         End(o);
                         return;
                     }
@@ -684,7 +726,7 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                     if (_isEditorMode)
                     {
-                        assetPath = info.AssetPath == null ? SearchAsset(assetName, typeof(T), AssetAccessMode.RESOURCE) : info.AssetPath[0];
+                        assetPath = info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0];
                     }
 #endif
                     T o = ResourcesManager.Instance.GetResouceObject<T>(assetPath, subAssetName);
@@ -709,7 +751,7 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                     if (_isEditorMode)
                     {
-                        T o = EditorLoadAsset<T>(info.AssetPath == null ? SearchAsset(assetName, typeof(T)) : info.AssetPath[0], subAssetName);
+                        T o = EditorLoadAsset<T>(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], subAssetName);
                         yield return o;
                         yield break;
                     }
@@ -756,7 +798,7 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                     if (_isEditorMode)
                     {
-                        assetPath = info.AssetPath == null ? SearchAsset(assetName, assetType, AssetAccessMode.RESOURCE) : info.AssetPath[0];
+                        assetPath = info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0];
                     }
 #endif
                     Object o = ResourcesManager.Instance.GetResouceObject(assetPath, assetType, subAssetName);
@@ -819,6 +861,7 @@ namespace F8Framework.Core
                 Action callback = null,
                 AssetAccessMode mode = AssetAccessMode.UNKNOWN)
             {
+                assetName += DirSuffix;
                 AssetInfo info = GetAssetInfo(assetName, mode);
                 if (!IsLegal(ref info))
                 {
@@ -828,7 +871,45 @@ namespace F8Framework.Core
 
                 if (info.AssetType == AssetTypeEnum.RESOURCE)
                 {
-                    LogF8.LogAsset("Resources不支持加载文件夹功能");
+#if UNITY_EDITOR
+                    if (_isEditorMode)
+                    {
+                        LogF8.LogAsset("编辑器模式下无需加载文件夹");
+                        End();
+                        return;
+                    }
+#endif
+                    string[] assetPaths = info.AssetPath;
+                    if (assetPaths == default || assetPaths.Length <= 0)
+                    {
+                        End();
+                        return;
+                    }
+                    
+                    int assetCount = 0;
+                    foreach (var subAssetName in assetPaths)
+                    {
+                        AssetInfo subInfo = GetAssetInfo(subAssetName, mode);
+                        string assetPath = subInfo.AssetPath?[0];
+                        Object o = ResourcesManager.Instance.GetResouceObject(assetPath);
+                        if (o != null)
+                        {
+                            if (++assetCount >= info.AssetPath?.Length)
+                            {
+                                End();
+                            }
+                        }
+                        else
+                        {
+                            ResourcesManager.Instance.LoadAsync(assetPath, (b) =>
+                            {
+                                if (++assetCount >= info.AssetPath?.Length)
+                                {
+                                    End();
+                                }
+                            });
+                        }
+                    }
                 }
                 else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
                 {
@@ -894,6 +975,7 @@ namespace F8Framework.Core
             /// <param name="mode">访问模式。</param>
             public IEnumerable LoadDirAsyncCoroutine(string assetName, AssetAccessMode mode = AssetAccessMode.UNKNOWN)
             {
+                assetName += DirSuffix;
                 AssetInfo info = GetAssetInfo(assetName, mode);
                 if (!IsLegal(ref info))
                 {
@@ -902,7 +984,34 @@ namespace F8Framework.Core
 
                 if (info.AssetType == AssetTypeEnum.RESOURCE)
                 {
-                    LogF8.LogAsset("Resources不支持加载文件夹功能");
+#if UNITY_EDITOR
+                    if (_isEditorMode)
+                    {
+                        LogF8.LogAsset("编辑器模式下无需加载文件夹");
+                        yield break;
+                    }
+#endif
+                    string[] assetPaths = info.AssetPath;
+                    if (assetPaths == default || assetPaths.Length <= 0)
+                    {
+                        yield break;
+                    }
+
+                    foreach (var subAssetName in assetPaths)
+                    {
+                        AssetInfo subInfo = GetAssetInfo(subAssetName, mode);
+                        string assetPath = subInfo.AssetPath?[0];
+                        Object o = ResourcesManager.Instance.GetResouceObject(assetPath);
+                    
+                        if (o != null)
+                        {
+                            yield return o;
+                        }
+                        else
+                        {
+                            yield return ResourcesManager.Instance.LoadAsyncCoroutine(assetPath);
+                        }
+                    }
                 }
                 else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
                 {
@@ -980,7 +1089,7 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                     if (_isEditorMode)
                     {
-                        assetPath = info.AssetPath == null ? SearchAsset(assetName, default, AssetAccessMode.RESOURCE) : info.AssetPath[0];
+                        assetPath = info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0];
                     }
 #endif
                     Object o = ResourcesManager.Instance.GetResouceObject(assetPath, assetType, subAssetName);
@@ -1064,7 +1173,7 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                     if (_isEditorMode)
                     {
-                        assetPath = info.AssetPath == null ? SearchAsset(assetName, default, AssetAccessMode.RESOURCE) : info.AssetPath[0];
+                        assetPath = info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0];
                     }
 #endif
                     Object o = ResourcesManager.Instance.GetResouceObject(assetPath, default, subAssetName);
@@ -1125,16 +1234,16 @@ namespace F8Framework.Core
             
             private AssetInfo GetAssetInfoFromResource(string assetName, bool showTip = false)
             {
-                if (ResourceMap.Mappings.TryGetValue(assetName, out string value))
+                if (ResourceMap.Mappings.TryGetValue(assetName, out string[] value))
                 {
-                    return new AssetInfo(AssetTypeEnum.RESOURCE, new []{value}, null, null);
+                    return new AssetInfo(AssetTypeEnum.RESOURCE, assetName, value, default, default);
                 }
 
                 if (showTip)
                 {
                     LogF8.LogError("Resource找不到指定资源可用的索引：" + assetName);
                 }
-                return new AssetInfo(AssetTypeEnum.RESOURCE);
+                return new AssetInfo(AssetTypeEnum.RESOURCE, assetName);
             }
             
             private AssetInfo GetAssetInfoFromAssetBundle(string assetName, bool remote = false, bool showTip = false)
@@ -1143,11 +1252,11 @@ namespace F8Framework.Core
                 {
                     if (remote || ForceRemoteAssetBundle)
                     {
-                        return new AssetInfo(AssetTypeEnum.ASSET_BUNDLE, assetmpping.AssetPath, AssetBundleManager.GetRemoteAssetBundleCompletePath(), assetmpping.AbName);
+                        return new AssetInfo(AssetTypeEnum.ASSET_BUNDLE, assetName, assetmpping.AssetPath, AssetBundleManager.GetRemoteAssetBundleCompletePath(), assetmpping.AbName);
                     }
                     else
                     {
-                        return new AssetInfo(AssetTypeEnum.ASSET_BUNDLE, assetmpping.AssetPath, AssetBundleManager.GetAssetBundlePathWithoutAb(assetName), assetmpping.AbName);
+                        return new AssetInfo(AssetTypeEnum.ASSET_BUNDLE, assetName, assetmpping.AssetPath, AssetBundleManager.GetAssetBundlePathWithoutAb(assetName), assetmpping.AbName);
                     }
                 }
 
@@ -1155,7 +1264,7 @@ namespace F8Framework.Core
                 {
                     LogF8.LogError("AssetBundle找不到指定资源可用的索引：" + assetName);
                 }
-                return new AssetInfo(AssetTypeEnum.ASSET_BUNDLE);
+                return new AssetInfo(AssetTypeEnum.ASSET_BUNDLE, assetName);
             }
             
             /// <summary>
@@ -1313,7 +1422,7 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
             private List<string> searchDirs = new List<string>();
             private Dictionary<string, string> findAssetPaths = new Dictionary<string, string>();
-            private string SearchAsset(string assetName, System.Object type = default, AssetAccessMode mode = AssetAccessMode.UNKNOWN)
+            private string SearchAsset(string assetName)
             {
                 // 缓存路径
                 if (findAssetPaths.TryGetValue(assetName, out string value))
@@ -1342,13 +1451,10 @@ namespace F8Framework.Core
                     // 将 GUID 转换为路径
                     string assetPath = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
     
-                    if (type == default || ReferenceEquals(UnityEditor.AssetDatabase.GetMainAssetTypeAtPath(assetPath), type))
+                    if (Path.GetFileNameWithoutExtension(assetPath) == assetName)
                     {
-                        if (Path.GetFileNameWithoutExtension(assetPath) == assetName)
-                        {
-                            findAssetPaths[assetName] = assetPath;
-                            return assetPath;
-                        }
+                        findAssetPaths[assetName] = assetPath;
+                        return assetPath;
                     }
                 }
                 return null;
@@ -1419,7 +1525,7 @@ namespace F8Framework.Core
                 {
                     AssetBundleMap.Mappings = Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(Resources.Load<TextAsset>(nameof(AssetBundleMap)).ToString());
                 }
-                ResourceMap.Mappings = Util.LitJson.ToObject<Dictionary<string, string>>(Resources.Load<TextAsset>(nameof(ResourceMap)).ToString());
+                ResourceMap.Mappings = Util.LitJson.ToObject<Dictionary<string, string[]>>(Resources.Load<TextAsset>(nameof(ResourceMap)).ToString());
             }
 
             public void OnUpdate()
