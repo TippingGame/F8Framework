@@ -201,6 +201,7 @@ namespace F8Framework.Core
             procedureProcessor.OnProcedureNodeAdd += ProcedureNodeAddCallback;
             procedureProcessor.OnProcedureNodeRemove += ProcedureNodeRemoveCallback;
             procedureProcessor.OnProcedureNodeChange += ProcedureNodeChangedCallback;
+            procedureProcessor.FindAllProcedureNode();
         }
 
         public void OnUpdate()

@@ -19,23 +19,24 @@ Unity F8 Procedure游戏流程管理组件。
     void Start()
     {
         // 添加流程节点
+        // 可选（会在初始化模块时自动搜索ProcedureNode的子类添加）
         FF8.Procedure.AddProcedureNodes(new DemoInitState());
-        
+
         // 运行指定类型的流程节点
         FF8.Procedure.RunProcedureNode<DemoInitState>();
-        
+
         // 移除指定类型的流程节点
         FF8.Procedure.RemoveProcedureNode<DemoInitState>();
-        
+
         // 检查是否存在指定类型的流程节点
         FF8.Procedure.HasProcedureNode<DemoInitState>();
-        
+
         // 获取指定类型的流程节点
         FF8.Procedure.PeekProcedureNode(out DemoInitState initState);
-        
+
         // 获取当前流程节点
         ProcedureNode procedureNode = FF8.Procedure.CurrentProcedureNode;
-        
+
         // 获取流程节点的数量
         int procedureNodeCount = FF8.Procedure.ProcedureNodeCount;
     }

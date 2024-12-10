@@ -45,15 +45,19 @@ namespace F8Framework.Core
             _staticModules = new Dictionary<Type, StaticModule>();
 
             Type baseType = typeof(StaticModule);
-            foreach (Type type in Assembly.GetAssembly(baseType).GetTypes())
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            foreach (var assembly in assemblies)
             {
-                if (type.IsSubclassOf(baseType) && !type.IsAbstract)
+                foreach (Type type in assembly.GetTypes())
                 {
-                    // 使用 Activator.CreateInstance 创建实例
-                    StaticModule staticModule = (StaticModule)Activator.CreateInstance(type);
-                    
-                    // 将子类的类型作为索引，实例作为值存储到字典中
-                    _staticModules[type] = staticModule;
+                    if (type.IsSubclassOf(baseType) && !type.IsAbstract)
+                    {
+                        // 使用 Activator.CreateInstance 创建实例
+                        StaticModule staticModule = (StaticModule)Activator.CreateInstance(type);
+
+                        // 将子类的类型作为索引，实例作为值存储到字典中
+                        _staticModules[type] = staticModule;
+                    }
                 }
             }
         }

@@ -9,6 +9,7 @@ namespace F8Framework.Tests
         void Start()
         {
             // 添加流程节点
+            // 可选（会在初始化模块时自动搜索ProcedureNode的子类添加）
             FF8.Procedure.AddProcedureNodes(new DemoInitState());
 
             // 运行指定类型的流程节点

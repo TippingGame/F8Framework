@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace F8Framework.Core
 {
@@ -49,6 +50,25 @@ namespace F8Framework.Core
         {
             Handle = handle;
         }
+
+        public void FindAllProcedureNode()
+        {
+            Type baseType = typeof(ProcedureNode);
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            foreach (var assembly in assemblies)
+            {
+                foreach (Type type in assembly.GetTypes())
+                {
+                    if (type.IsSubclassOf(baseType) && !type.IsAbstract)
+                    {
+                        // 使用 Activator.CreateInstance 创建实例
+                        ProcedureNode staticModule = (ProcedureNode)Activator.CreateInstance(type);
+                        AddNode(staticModule);
+                    }
+                }
+            }
+        }
+        
         /// <summary>
         /// 添加一个状态；
         /// </summary>
