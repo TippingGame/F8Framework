@@ -7,7 +7,7 @@ namespace F8Framework.Core.Editor
     public class CaptureWindow : EditorWindow
     {
         private string saveFileName = string.Empty;
-        private string saveDirPath = string.Empty;
+        private string saveDirPathKey = "CaptureSaveDirPathKey";
 
         [UnityEditor.MenuItem("开发工具/截图工具", false, 102)]
         private static void Capture()
@@ -24,26 +24,23 @@ namespace F8Framework.Core.Editor
 
         private void OnGUI()
         {
+            string buildPath = F8EditorPrefs.GetString(saveDirPathKey, Application.dataPath);
             EditorGUILayout.LabelField("输出目录 : ");
-            EditorGUILayout.LabelField(saveDirPath + "/");
-
-            if (string.IsNullOrEmpty(saveDirPath))
-            {
-                saveDirPath = Application.dataPath + "/..";
-            }
+            EditorGUILayout.LabelField(buildPath);
 
             if (GUILayout.Button("选择目录"))
             {
-                string path = EditorUtility.OpenFolderPanel("选择目录", saveDirPath, Application.dataPath);
+                string path = EditorUtility.OpenFolderPanel("选择目录", buildPath, Application.dataPath);
                 if (!string.IsNullOrEmpty(path))
                 {
-                    saveDirPath = path;
+                    F8EditorPrefs.SetString(saveDirPathKey, path);
                 }
             }
 
             if (GUILayout.Button("打开目录"))
             {
-                System.Diagnostics.Process.Start(saveDirPath);
+                string openPath = F8EditorPrefs.GetString(saveDirPathKey, Application.dataPath);
+                System.Diagnostics.Process.Start(openPath);
             }
 
             // insert blank line
@@ -54,7 +51,8 @@ namespace F8Framework.Core.Editor
                 var resolution = GetMainGameViewSize();
                 int x = (int)resolution.x;
                 int y = (int)resolution.y;
-                var outputPath = saveDirPath.Replace("Assets/..", "") + DateTime.Now.ToString($"{x}x{y}_yyyy_MM_dd_HH_mm_ss") + ".png";
+                LogF8.LogConfig(buildPath);
+                var outputPath = buildPath + "/" + DateTime.Now.ToString($"{x}x{y}_yyyy_MM_dd_HH_mm_ss") + ".png";
                 ScreenCapture.CaptureScreenshot(outputPath);
                 LogF8.Log("保存路径：" + outputPath);
             }

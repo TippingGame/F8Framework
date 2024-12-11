@@ -34,7 +34,7 @@ namespace F8Framework.Tests
 			FF8.Tween = ModuleCenter.CreateModule<Tween>();
 			FF8.UI = ModuleCenter.CreateModule<UIManager>();
 #if UNITY_WEBGL
-            yield return F8DataManager.Instance.LoadLocalizedStringsIEnumerator(); // WebGL专用，如果游戏中没有使用本地化，可以删除此方法的调用！
+            yield return F8DataManager.Instance.LoadLocalizedStringsIEnumerator(); // WebGL专用
 #endif
 			FF8.Local = ModuleCenter.CreateModule<Localization>();
 			FF8.SDK = ModuleCenter.CreateModule<SDKManager>();
