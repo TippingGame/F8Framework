@@ -36,15 +36,15 @@ namespace F8Framework.Core.Editor
                     return;
                 }
 
-                //更改图片属性，可读，否则无法获取Pixel
-                importer.isReadable = true;
-                importer.SaveAndReimport();
-
                 if (tex.width % 4 == 0 && tex.height % 4 == 0)
                 {
                     return;
                 }
 
+                //更改图片属性，可读，否则无法获取Pixel
+                importer.isReadable = true;
+                importer.SaveAndReimport();
+                
                 Vector2Int v2 = GetFourSize(tex.width, tex.height);
                 var texCopy = new Texture2D(v2.x, v2.y);
                 //从原来图像上根据现在的大小计算像素点
