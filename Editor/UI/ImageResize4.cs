@@ -8,7 +8,7 @@ namespace F8Framework.Core.Editor
     {
         public static bool IsToBig = true; //向着更大缩放
 
-        [MenuItem("Assets/（F8UI界面管理功能）/（图片尺寸设为4的倍数）", false, -4)]
+        [MenuItem("Assets/（F8UI界面管理功能）/（图片尺寸设为4的倍数）", false, 1024)]
         public static void ResizeImages()
         {
             // 获取所有选中 文件、文件夹的 GUID

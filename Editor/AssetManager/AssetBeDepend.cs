@@ -10,7 +10,7 @@ namespace F8Framework.Core.Editor
         
         private static List<string> referenceCacheList = new List<string>();
         
-        [MenuItem("Assets/（F8资产功能）/（寻找资源是否被引用）", false , 1000)]
+        [MenuItem("Assets/（F8资产功能）/（寻找资源是否被引用）", false , 1010)]
         private static void FindReferences()
         {
             referenceCacheList.Clear();

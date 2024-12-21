@@ -5,7 +5,7 @@ namespace F8Framework.Core.Editor
 {
     public class CreateUIScript : ScriptableObject
     {
-        [MenuItem("Assets/（F8UI界面管理功能）/（BaseItem.cs）", false, -1)]
+        [MenuItem("Assets/（F8UI界面管理功能）/（BaseItem.cs）", false, 1020)]
         static void CreateBaseItemScript()
         {
             string path = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 1)) +
@@ -14,7 +14,7 @@ namespace F8Framework.Core.Editor
             ProjectWindowUtil.CreateScriptAssetFromTemplateFile(path, "BaseItem.cs");
         }
         
-        [MenuItem("Assets/（F8UI界面管理功能）/（BaseView.cs）", false, -1)]
+        [MenuItem("Assets/（F8UI界面管理功能）/（BaseView.cs）", false, 1021)]
         static void CreateBaseViewScript()
         {
             string path = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 1)) +

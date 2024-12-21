@@ -95,25 +95,25 @@
                 v2f OUT;
                 UNITY_SETUP_INSTANCE_ID(v);
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(OUT);
+                
+                // 初始化所有输出字段
                 OUT.worldPosition = v.vertex;
                 OUT.vertex = UnityObjectToClipPos(OUT.worldPosition);
-
                 OUT.texcoord = TRANSFORM_TEX(v.texcoord, _MainTex);
-
                 OUT.color = v.color;
-
-                #ifdef UNITY_UI_CLIP_RECT
                 
+                // 确保 mask 字段总是被初始化
+                OUT.mask = half4(1.0, 1.0, 1.0, 1.0);  // 默认初始化为 1
+            
+                #ifdef UNITY_UI_CLIP_RECT
                 half2 xy = ((_ClipRect.zw - OUT.worldPosition.xy));
                 half2 zw = ((OUT.worldPosition.xy - _ClipRect.xy));
-                
                 OUT.mask.x = xy.x * _SoftnessRight;
                 OUT.mask.y = zw.y * _SoftnessBottom;
                 OUT.mask.z = zw.x * _SoftnessLeft;
                 OUT.mask.w = xy.y * _SoftnessTop;
-                
                 #endif
-
+            
                 return OUT;
             }
 

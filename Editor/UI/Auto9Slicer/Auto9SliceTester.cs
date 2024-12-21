@@ -15,7 +15,7 @@ namespace F8Framework.Core.Editor
 
         private static List<string> texture2DList;
 
-        [MenuItem("Assets/（F8UI界面管理功能）/（图片自动切割九宫格）", false, -2)]
+        [MenuItem("Assets/（F8UI界面管理功能）/（图片自动切割九宫格）", false, 1022)]
         public static void Auto9Slice()
         {
             texture2DList = new List<string>();

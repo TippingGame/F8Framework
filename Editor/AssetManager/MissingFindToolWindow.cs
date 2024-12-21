@@ -7,7 +7,7 @@ namespace F8Framework.Core.Editor
 {
     public class MissingFindToolWindow : EditorWindow
     {
-        [MenuItem("Assets/（F8资产功能）/（全局空引用查找）", false , 1003)]
+        [MenuItem("Assets/（F8资产功能）/（全局空引用查找）", false , 1013)]
         public static void ShowWindow()
         {
             if (HasOpenInstances<MissingFindToolWindow>())
