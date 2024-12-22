@@ -691,12 +691,23 @@ namespace F8Framework.Core
             return ProcessTween(tween);
         }
 
+        public BaseTween LocalMove(Transform obj, Transform to, float t)
+        {
+            return Move(obj, to, t);
+        }
+        
         public BaseTween MoveAtSpeed(Transform obj, Transform to, float speed)
         {
             float t = Vector3.Distance(obj.position, to.position) / speed;
             return Move(obj, to, t);
         }
 
+        public BaseTween LocalMoveAtSpeed(Transform obj, Transform to, float speed)
+        {
+            float t = Vector3.Distance(obj.localPosition, to.localPosition) / speed;
+            return Move(obj, to, t);
+        }
+        
         public BaseTween Move(Transform obj, Vector3 to, float t)
         {
             Vector3Tween tween = TweenPool.GetVector3Tween(obj.position, to, t);
@@ -714,57 +725,123 @@ namespace F8Framework.Core
             return ProcessTween(tween);
         }
 
+        public BaseTween LocalMove(Transform obj, Vector3 to, float t)
+        {
+            Vector3Tween tween = TweenPool.GetVector3Tween(obj.localPosition, to, t);
+            tween.PauseReset += () => tween.Init(obj.localPosition, to, t);
+            tween.SetOnUpdateVector3((Vector3 pos) =>
+            {
+                if (obj == null)
+                {
+                    CancelTween(tween);
+                    return;
+                }
+
+                obj.localPosition = pos;
+            });
+            return ProcessTween(tween);
+        }
+        
         public BaseTween MoveAtSpeed(Transform obj, Vector3 to, float speed)
         {
             float t = Vector3.Distance(obj.position, to) / speed;
             return Move(obj, to, t);
         }
 
+        public BaseTween LocalMoveAtSpeed(Transform obj, Vector3 to, float speed)
+        {
+            float t = Vector3.Distance(obj.localPosition, to) / speed;
+            return LocalMove(obj, to, t);
+        }
 
         public BaseTween Move(GameObject obj, Transform to, float t)
         {
             return Move(obj.transform, to, t);
         }
 
+        public BaseTween LocalMove(GameObject obj, Transform to, float t)
+        {
+            return Move(obj.transform, to, t);
+        }
+        
         public BaseTween MoveAtSpeed(GameObject obj, Transform to, float speed)
         {
             float t = Vector3.Distance(obj.transform.position, to.position) / speed;
             return Move(obj, to, t);
         }
 
+        public BaseTween LocalMoveAtSpeed(GameObject obj, Transform to, float speed)
+        {
+            float t = Vector3.Distance(obj.transform.localPosition, to.localPosition) / speed;
+            return Move(obj, to, t);
+        }
+        
         public BaseTween Move(GameObject obj, Vector3 to, float t)
         {
             return Move(obj.transform, to, t);
         }
 
+        public BaseTween LocalMove(GameObject obj, Vector3 to, float t)
+        {
+            return LocalMove(obj.transform, to, t);
+        }
+        
         public BaseTween MoveAtSpeed(GameObject obj, Vector3 to, float speed)
         {
             float t = Vector3.Distance(obj.transform.position, to) / speed;
             return Move(obj, to, t);
         }
 
+        public BaseTween LocalMoveAtSpeed(GameObject obj, Vector3 to, float speed)
+        {
+            float t = Vector3.Distance(obj.transform.localPosition, to) / speed;
+            return LocalMove(obj, to, t);
+        }
+        
         public BaseTween Move(GameObject obj, GameObject to, float t)
         {
             return Move(obj.transform, to.transform, t);
         }
 
+        public BaseTween LocalMove(GameObject obj, GameObject to, float t)
+        {
+            return Move(obj.transform, to.transform, t);
+        }
+        
         public BaseTween MoveAtSpeed(GameObject obj, GameObject to, float speed)
         {
             float t = Vector3.Distance(obj.transform.position, to.transform.position) / speed;
             return Move(obj, to, t);
         }
 
+        public BaseTween LocalMoveAtSpeed(GameObject obj, GameObject to, float speed)
+        {
+            float t = Vector3.Distance(obj.transform.localPosition, to.transform.localPosition) / speed;
+            return Move(obj, to, t);
+        }
+        
         public BaseTween Move(Transform obj, GameObject to, float t)
         {
             return Move(obj, to.transform, t);
         }
-
+        
+        public BaseTween LocalMove(Transform obj, GameObject to, float t)
+        {
+            return Move(obj, to.transform, t);
+        }
+        
         public BaseTween MoveAtSpeed(Transform obj, GameObject to, float speed)
         {
             float t = Vector3.Distance(obj.position, to.transform.position) / speed;
             return Move(obj, to, t);
         }
 
+        public BaseTween LocalMoveAtSpeed(Transform obj, GameObject to, float speed)
+        {
+            float t = Vector3.Distance(obj.localPosition, to.transform.localPosition) / speed;
+            return Move(obj, to, t);
+        }
+        
         public BaseTween Move(RectTransform rect, Vector2 pos, float t)
         {
 
@@ -835,6 +912,139 @@ namespace F8Framework.Core
             return MoveUIAtSpeed(rect, finalPos, canvas, speed, pivotPreset);
         }
 
+        #endregion
+        
+        #region SHAKE_TWEEN
+        
+        public Sequence ShakePosition(Transform obj, Vector3 vibrato, int shakeCount = 8, float t = 0.05f, bool fadeOut = false)
+        {
+            var sequence = SequenceManager.GetSequence();
+            
+            for (int i = 1; i <= shakeCount; i++)
+            {
+                if (fadeOut)
+                {
+                    vibrato /= i;
+                }
+                Vector3 toVector3 = new Vector3(
+                    obj.position.x + UnityEngine.Random.Range(-vibrato.x, vibrato.x),
+                    obj.position.y + UnityEngine.Random.Range(-vibrato.y, vibrato.y),
+                    obj.position.z + UnityEngine.Random.Range(-vibrato.z, vibrato.z));
+                BaseTween tween = Move(obj, toVector3, t);
+                sequence.Append(tween);
+                if (i == shakeCount)
+                {
+                    Vector3 endVector3 = obj.position;
+                    BaseTween tweenEnd = Move(obj, endVector3, t);
+                    sequence.Append(tweenEnd);
+                }
+            }
+            
+            return sequence;
+        }
+
+        public Sequence ShakePositionAtSpeed(Transform obj, Vector3 vibrato, int shakeCount = 8, float speed = 5f, bool fadeOut = false)
+        {
+            float t = Vector3.Distance(obj.transform.position, vibrato) / speed;
+            return ShakeScale(obj, vibrato, shakeCount, t);
+        }
+        
+        public Sequence ShakePosition(GameObject obj, Vector3 vibrato, int shakeCount = 8, float t = 0.05f, bool fadeOut = false)
+        {
+            return ShakeScale(obj.transform, vibrato, shakeCount, t);
+        }
+        
+        public Sequence ShakePositionAtSpeed(GameObject obj, Vector3 vibrato, int shakeCount = 8, float speed = 5f, bool fadeOut = false)
+        {
+            return ShakePositionAtSpeed(obj.transform, vibrato, shakeCount, speed);
+        }
+        
+        public Sequence ShakeRotation(Transform obj, Vector3 vibrato, int shakeCount = 8, float t = 0.05f, bool fadeOut = false)
+        {
+            var sequence = SequenceManager.GetSequence();
+            
+            for (int i = 1; i <= shakeCount; i++)
+            {
+                if (fadeOut)
+                {
+                    vibrato /= i;
+                }
+                Vector3 toVector3 = new Vector3(
+                    obj.rotation.x + UnityEngine.Random.Range(-vibrato.x, vibrato.x),
+                    obj.rotation.y + UnityEngine.Random.Range(-vibrato.y, vibrato.y),
+                    obj.rotation.z + UnityEngine.Random.Range(-vibrato.z, vibrato.z));
+                BaseTween tween = RotateTween(obj, toVector3, t);
+                sequence.Append(tween);
+                if (i == shakeCount)
+                {
+                    Vector3 endVector3 = obj.rotation.eulerAngles;
+                    BaseTween tweenEnd = RotateTween(obj, endVector3, t);
+                    sequence.Append(tweenEnd);
+                }
+            }
+            
+            return sequence;
+        }
+
+        public Sequence ShakeRotationAtSpeed(Transform obj, Vector3 vibrato, int shakeCount = 8, float speed = 5f, bool fadeOut = false)
+        {
+            float t = Vector3.Distance(obj.transform.eulerAngles, vibrato) / speed;
+            return ShakeRotation(obj, vibrato, shakeCount, t);
+        }
+        
+        public Sequence ShakeRotation(GameObject obj, Vector3 vibrato, int shakeCount = 8, float t = 0.05f, bool fadeOut = false)
+        {
+            return ShakeRotation(obj.transform, vibrato, shakeCount, t);
+        }
+        
+        public Sequence ShakeRotationAtSpeed(GameObject obj, Vector3 vibrato, int shakeCount = 8, float speed = 5f, bool fadeOut = false)
+        {
+            return ShakeRotationAtSpeed(obj.transform, vibrato, shakeCount, speed);
+        }
+        
+        public Sequence ShakeScale(Transform obj, Vector3 vibrato, int shakeCount = 8, float t = 0.05f, bool fadeOut = false)
+        {
+            var sequence = SequenceManager.GetSequence();
+            
+            for (int i = 1; i <= shakeCount; i++)
+            {
+                if (fadeOut)
+                {
+                    vibrato /= i;
+                }
+                Vector3 toVector3 = new Vector3(
+                    obj.localScale.x + UnityEngine.Random.Range(-vibrato.x, vibrato.x),
+                    obj.localScale.y + UnityEngine.Random.Range(-vibrato.y, vibrato.y),
+                    obj.localScale.z + UnityEngine.Random.Range(-vibrato.z, vibrato.z));
+                BaseTween tween = ScaleTween(obj, toVector3, t);
+                sequence.Append(tween);
+                if (i == shakeCount)
+                {
+                    Vector3 endVector3 = obj.localScale;
+                    BaseTween tweenEnd = ScaleTween(obj, endVector3, t);
+                    sequence.Append(tweenEnd);
+                }
+            }
+            
+            return sequence;
+        }
+
+        public Sequence ShakeScaleAtSpeed(Transform obj, Vector3 vibrato, int shakeCount = 8, float speed = 5f, bool fadeOut = false)
+        {
+            float t = Vector3.Distance(obj.transform.localScale, vibrato) / speed;
+            return ShakeScale(obj, vibrato, shakeCount, t);
+        }
+        
+        public Sequence ShakeScale(GameObject obj, Vector3 vibrato, int shakeCount = 8, float t = 0.05f, bool fadeOut = false)
+        {
+            return ShakeScale(obj.transform, vibrato, shakeCount, t);
+        }
+        
+        public Sequence ShakeScaleAtSpeed(GameObject obj, Vector3 vibrato, int shakeCount = 8, float speed = 5f, bool fadeOut = false)
+        {
+            return ShakeScaleAtSpeed(obj.transform, vibrato, shakeCount, speed);
+        }
+        
         #endregion
     }
 

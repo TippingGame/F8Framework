@@ -26,11 +26,18 @@ namespace F8Framework.Tests
             // 位移
             gameObject.Move(Vector3.one, 1f);
             gameObject.MoveAtSpeed(Vector3.one, 2f);
+            gameObject.LocalMove(Vector3.one, 1f);
+            gameObject.LocalMoveAtSpeed(Vector3.one, 1f);
             // 渐变
             gameObject.GetComponent<CanvasGroup>().Fade(0f, 1f);
             gameObject.GetComponent<Image>().ColorTween(Color.green, 1f);
             // 填充
             gameObject.GetComponent<Image>().FillAmountTween(1f, 1f);
+            // 震动
+            gameObject.ShakePosition(Vector3.one, shakeCount: 8, t: 0.05f, fadeOut: false);
+            gameObject.ShakeRotation(Vector3.one);
+            gameObject.ShakeScale(Vector3.one);
+            gameObject.ShakePositionAtSpeed(Vector3.one, shakeCount: 8, speed: 5f, fadeOut: false);
 
             // 终止动画
             gameObject.CancelTween(id);

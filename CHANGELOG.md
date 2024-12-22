@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.86] - 2024-12-22
+1.Tween模块增加LocalMove，ShakePosition，ShakeRotation，ShakeScale方法  
+2.默认动画插值改为Ease.EaseOutQuad  
+
 ## [1.0.85] - 2024-12-21
 1.优化编辑器工具的UI位置  
 2.优化内置Shader的警告  
