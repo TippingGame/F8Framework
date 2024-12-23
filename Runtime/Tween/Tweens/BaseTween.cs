@@ -227,7 +227,7 @@ namespace F8Framework.Core
             startTime = 0.0f;
             duration = 0.0f;
             currentTime = 0.0f;
-            ease = Ease.Linear;
+            ease = Ease.EaseOutQuad;
             updateMode = UpdateMode.Update;
             owner = null;
             timeSinceStart = 0.0f;

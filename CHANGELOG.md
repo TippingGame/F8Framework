@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.0.87] - 2024-12-24
+1.默认动画插值改为Ease.EaseOutQuad  
+
 ## [1.0.86] - 2024-12-22
 1.Tween模块增加LocalMove，ShakePosition，ShakeRotation，ShakeScale方法  
 2.默认动画插值改为Ease.EaseOutQuad  
