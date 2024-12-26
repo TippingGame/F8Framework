@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.0.88] - 2024-12-26
+1.修复StaticModule缺少Init  
+
 ## [1.0.87] - 2024-12-24
 1.默认动画插值改为Ease.EaseOutQuad  
 

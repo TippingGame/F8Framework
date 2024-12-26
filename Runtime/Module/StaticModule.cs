@@ -57,6 +57,7 @@ namespace F8Framework.Core
 
                         // 将子类的类型作为索引，实例作为值存储到字典中
                         _staticModules[type] = staticModule;
+                        staticModule.Init();
                     }
                 }
             }
