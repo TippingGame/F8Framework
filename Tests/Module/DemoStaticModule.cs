@@ -21,7 +21,7 @@ namespace F8Framework.Tests
         }
     }
 
-// 继承StaticModule的自定义静态模块
+    // 继承StaticModule的自定义静态模块
     public class StaticModuleClass : StaticModule
     {
         public static StaticModuleClass Instance => GetInstance<StaticModuleClass>();

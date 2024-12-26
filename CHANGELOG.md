@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.0.89] - 2024-12-27
+1.完善Module文档  
+
 ## [1.0.88] - 2024-12-26
 1.修复StaticModule缺少Init  
 

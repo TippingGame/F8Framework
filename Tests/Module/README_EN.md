@@ -39,7 +39,7 @@ Unity F8 Module模块中心组件。提供三种模块可使用。
         [UpdateRefresh]
         [LateUpdateRefresh]
         [FixedUpdateRefresh]
-        public class DemoModuleCenterMonoClass : ModuleSingletonMono<DemoModuleCenterMonoClass>, IModule
+        public class DemoModuleCenterClass : ModuleSingleton<DemoModuleCenterClass>, IModule
         {
             public void OnInit(object createParam)
             {
@@ -70,16 +70,16 @@ Unity F8 Module模块中心组件。提供三种模块可使用。
         
         /*----------------------------自定义静态模块功能----------------------------*/
         
-        // 获取所有模块，并调用进入游戏
-        foreach (var center in StaticModule.GetSubCenter())
+        // 获取所有静态模块，并调用进入游戏
+        foreach (var center in StaticModule.GetStaticModule())
         {
             center.Value.OnEnterGame();
         }
-        
-        // 获取指定模块
-        StaticModule demo = StaticModule.GetCenterByType(typeof(StaticModuleClass));
-        
-        // 使用模块
+
+        // 获取指定静态模块
+        StaticModule demo = StaticModule.GetStaticModuleByType(typeof(StaticModuleClass));
+
+        // 使用静态模块
         StaticModuleClass.Instance.OnEnterGame();
         
         // 继承StaticModule的自定义模块
