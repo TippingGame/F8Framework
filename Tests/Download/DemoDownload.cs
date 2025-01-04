@@ -10,8 +10,7 @@ namespace F8Framework.Tests
     {
         private string[] fileInfos = new[]
         {
-            "https://raw.githubusercontent.com/TippingGame/F8Framework/main/Tests/AssetManager/ui_20240216212631.png",
-            "https://raw.githubusercontent.com/TippingGame/F8Framework/main/Tests/AssetManager/ui_20240205230012.png"
+            "https://raw.githubusercontent.com/TippingGame/F8Framework/refs/heads/main/Tests/Logo.png"
         };
 
         private Downloader downloader;

@@ -16,8 +16,7 @@ Unity F8 Download组件，支持localhost与http地址文件的下载，可**本
 ```C#
         private string[] fileInfos = new[]
         {
-            "https://raw.githubusercontent.com/TippingGame/F8Framework/main/Tests/AssetManager/ui_20240216212631.png",
-            "https://raw.githubusercontent.com/TippingGame/F8Framework/main/Tests/AssetManager/ui_20240205230012.png"
+            "https://raw.githubusercontent.com/TippingGame/F8Framework/refs/heads/main/Tests/Logo.png"
         };
 
         private Downloader downloader;

@@ -84,6 +84,11 @@ namespace F8Framework.Core
         /// <param name="obj">要写入的对象。</param>
         public void SetObject<T>(string key, T obj, bool user = false)
         {
+            if (obj == null)
+            {
+                LogF8.LogError("本地数据存入对象不能为空");
+                return;
+            }
             PlayerPrefs.SetString(GetKeywords(key, user), Util.LitJson.ToJson(obj));
         }
         

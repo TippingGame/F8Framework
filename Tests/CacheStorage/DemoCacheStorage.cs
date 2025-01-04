@@ -7,7 +7,7 @@ namespace F8Framework.Tests
 {
     public class DemoCacheStorage : MonoBehaviour
     {
-        string url = "https://raw.githubusercontent.com/TippingGame/F8Framework/main/Tests/AssetManager/ui_20240216212631.png";
+        string url = "https://raw.githubusercontent.com/TippingGame/F8Framework/refs/heads/main/Tests/Logo.png";
         
         void Start()
         {
