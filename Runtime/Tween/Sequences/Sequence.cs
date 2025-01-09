@@ -48,14 +48,13 @@ namespace F8Framework.Core
 
 		}
 
-		public void SetOnComplete(Action action)
+		public void SetOnComplete(Action<Sequence> action)
 		{
-			OnComplete += action;
+			Recycle += action;
 		}
 
 		private void CheckLoops()
 		{
-			tweenList.Clear();
 			
 			if (loops < 0 || loops > 0)
 			{
@@ -68,9 +67,10 @@ namespace F8Framework.Core
 				//recicle all tweens
 				foreach (var tween in tweenList)
 				{
+					tween.HandleBySequence = false;
 					tween.Recycle(tween);
 				}
-				
+				tweenList.Clear();
 				
 				//we are ready to let this object go
 				Recycle?.Invoke(this);
@@ -80,9 +80,6 @@ namespace F8Framework.Core
 		private void RunAigan()
 		{
 			timer = 0.0f;
-			OnComplete = null;
-			
-			OnComplete += CheckLoops;
 			ignoreCommands = true;
 			
 			for (int n = 0; n < commandQueue.Count; n++)
@@ -114,10 +111,12 @@ namespace F8Framework.Core
 			if (ShouldPlayInmediatly())
 			{
 				PlayTweenInmediatly(tween, PlayMode.Join);
+				head = tween;
 				return;
 			}
 			
 			PlayTweenOnComplete(tween, head, PlayMode.Join);
+			head = tween;
 		}
 
 		private void PlayTweenInmediatly(BaseTween tween, PlayMode playMode)
@@ -129,7 +128,6 @@ namespace F8Framework.Core
 
 			if (!ignoreCommands)
 			{
-				
 				commandQueue.Add(GetCommand(playMode, tween));
 			}
 		}
@@ -157,7 +155,7 @@ namespace F8Framework.Core
 		{
 			if (mode == PlayMode.Append)
 			{
-				return  new AppendTweenCommand(tween, this);
+				return new AppendTweenCommand(tween, this);
 			}
 			else
 			{
@@ -220,7 +218,10 @@ namespace F8Framework.Core
 			tweenList.Clear();
 			timeEvents.Clear();
 			timer = 0.0f;
-			OnComplete = null;
+			loops = 0;
+			ignoreCommands = false;
+			commandQueue.Clear();
+			head = null;
 		}
 
 		private void RunTween(BaseTween tween)
@@ -279,7 +280,6 @@ namespace F8Framework.Core
 		public override void Execute()
 		{
 			tween.ReplayReset();
-			tween.SetOnComplete(() => tween.IsComplete = true);
 			sequence.Append(tween);
 		}
 	}
@@ -296,7 +296,6 @@ namespace F8Framework.Core
 		public override void Execute()
 		{
 			tween.ReplayReset();
-			tween.SetOnComplete(() => tween.IsComplete = true);
 			sequence.Join(tween);
 		}
 	}

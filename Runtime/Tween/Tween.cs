@@ -547,7 +547,7 @@ namespace F8Framework.Core
             {
                 if (material == null)
                 {
-                    TweenPool.FinishTween(tween);
+                    CancelTween(tween);
                     return;
                 }
 
@@ -563,7 +563,7 @@ namespace F8Framework.Core
             {
                 if (sprite == null)
                 {
-                    TweenPool.FinishTween(tween);
+                    CancelTween(tween);
                     return;
                 }
 

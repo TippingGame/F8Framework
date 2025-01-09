@@ -17,7 +17,7 @@ namespace F8Framework.Core
 
         public override void Update(float deltaTime)
         {
-            if(isPause)
+            if(isPause || isComplete)
                 return;
             
             //wait a delay

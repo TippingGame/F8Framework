@@ -105,7 +105,6 @@ namespace F8Framework.Core
             isComplete = false;
             isPause = false;
             currentTime = 0.0f;
-            onComplete = null;
         }
 
         /// <summary>

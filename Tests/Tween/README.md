@@ -91,7 +91,7 @@ void Start()
     sequence.Join(gameObjectTween);   // 与第一个动画同时执行
     sequence.Append(valueTween); // 第二个动画完成后执行
     sequence.Append(() => LogF8.Log("完成了！")); // 动画序列结束后的回调
-    sequence.SetOnComplete(() => LogF8.Log("Sequence 完成"));
+    sequence.SetOnComplete((seq) => LogF8.Log("Sequence 完成"));
     
     // 设置循环次数，-1代表无限循环
     sequence.SetLoops(3);

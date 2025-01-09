@@ -22,7 +22,7 @@ namespace F8Framework.Core
         /// </summary>
         public override void Update(float deltaTime)
         {
-            if(isPause)
+            if(isPause || isComplete)
                 return;
 
             //wait a delay

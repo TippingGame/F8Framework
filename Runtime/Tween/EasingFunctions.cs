@@ -692,18 +692,21 @@ public static class EasingFunctions
 
     public static float SpringD(float start, float end, float value)
     {
-        value = Mathf.Clamp01( value );
-        end -= start;
+        value = Mathf.Clamp01(value);
+        float delta = end - start;
 
-        // Damn... Thanks http://www.derivative-calculator.net/
-        // TODO: And it's a little bit wrong
-        return end * ( 6f * ( 1f - value ) / 5f + 1f ) * ( -2.2f * Mathf.Pow( 1f - value, 1.2f ) *
-            Mathf.Sin( Mathf.PI * value * ( 2.5f * value * value * value + 0.2f ) ) + Mathf.Pow( 1f - value, 2.2f ) *
-            ( Mathf.PI * ( 2.5f * value * value * value + 0.2f ) + 7.5f * Mathf.PI * value * value * value ) *
-            Mathf.Cos( Mathf.PI * value * ( 2.5f * value * value * value + 0.2f ) ) + 1f ) -
-            6f * end * ( Mathf.Pow( 1 - value, 2.2f ) * Mathf.Sin( Mathf.PI * value * ( 2.5f * value * value * value + 0.2f ) ) + value
-            / 5f );
+        // 提取公用部分
+        float oneMinusValue = 1f - value;
+        float power1 = Mathf.Pow(oneMinusValue, 1.2f);
+        float power2 = Mathf.Pow(oneMinusValue, 2.2f);
+        float sinPart = Mathf.Sin(Mathf.PI * value * (2.5f * value * value * value + 0.2f));
+        float cosPart = Mathf.Cos(Mathf.PI * value * (2.5f * value * value * value + 0.2f));
+        float factor = 2.5f * value * value * value + 0.2f;
 
+        // 改进后的公式
+        return delta * ((6f * oneMinusValue / 5f + 1f) * 
+            (-2.2f * power1 * sinPart + power2 * (Mathf.PI * factor + 7.5f * Mathf.PI * value * value * value) * cosPart + 1f) -
+            6f * power2 * sinPart + value / 5f);
     }
 
     public delegate float Function(float s, float e, float v);

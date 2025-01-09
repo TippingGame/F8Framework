@@ -79,7 +79,7 @@ git clone https://github.com/TippingGame/F8Framework.git
 
 ## 新手指南
 
-* [游戏启动器：](https://github.com/TippingGame/F8Framework/blob/main/Launcher/GameLauncher.cs)游戏启动器示例。[GameLauncher.cs](https://github.com/TippingGame/F8Framework/blob/main/Launcher/GameLauncher.cs)  
+* [游戏启动器：](https://github.com/TippingGame/F8Framework/blob/main/Launcher/GameLauncher.cs)游戏启动器示例（注意：使用框架前必须先启动框架）。[GameLauncher.cs](https://github.com/TippingGame/F8Framework/blob/main/Launcher/GameLauncher.cs)  
 * [模块自定义改名：](https://github.com/TippingGame/F8Framework/blob/main/Launcher/FF8.cs)模块自定义改名。[FF8.cs](https://github.com/TippingGame/F8Framework/blob/main/Launcher/FF8.cs)  
 
 ## 视频教程
@@ -88,7 +88,12 @@ git clone https://github.com/TippingGame/F8Framework.git
 * 游戏项目Demo：[https://github.com/TippingGame/F8FrameworkDemo](https://github.com/TippingGame/F8FrameworkDemo)  
 
 ## 社区
-* qq开发交流群：722647431
+* qq开发交流群：[722647431](https://qm.qq.com/q/uTxdVIJykE)  
+* Discord聊天组：[https://discord.gg/dwWQ8EHz](https://discord.gg/dwWQ8EHz)  
+
+## 赞助
+![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/Sponsorship_icon_356.png)
+#### 感谢
 
 ---
 

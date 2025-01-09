@@ -38,38 +38,45 @@ namespace F8Framework.Core
         }
         public static void FinishTween(BaseTween tween)
         {
-            _activeTweens.Remove(tween);
-            AddTweenToPool(tween);
+            if (!tween.HandleBySequence)
+            {
+                _activeTweens.Remove(tween);
+                AddTweenToPool(tween);
+            }
+            else
+            {
+                
+            }
         }
 
         private static void AddTweenToPool(BaseTween tween)
         {
             tween.Reset();
             
-            if (tween is ValueTween)
-            {
-                valueTweens.Add(tween as ValueTween);
-            }
-            else if (tween is MoveTween)
-            {
-                moveTweens.Add(tween as MoveTween);
-            }
-            else if (tween is Vector2Tween)
-            {
-                vector2Tweens.Add(tween as Vector2Tween);
-            }
-            else if (tween is Vector3Tween)
-            {
-                vector3Tweens.Add(tween as Vector3Tween);
-            }
-            else if (tween is ColorTween)
-            {
-                colorTweens.Add(tween as ColorTween);
-            }
-            else if (tween is QuaternionTween)
-            {
-                quaternionTweens.Add(tween as QuaternionTween);
-            }
+            // if (tween is ValueTween)
+            // {
+            //     valueTweens.Add(tween as ValueTween);
+            // }
+            // else if (tween is MoveTween)
+            // {
+            //     moveTweens.Add(tween as MoveTween);
+            // }
+            // else if (tween is Vector2Tween)
+            // {
+            //     vector2Tweens.Add(tween as Vector2Tween);
+            // }
+            // else if (tween is Vector3Tween)
+            // {
+            //     vector3Tweens.Add(tween as Vector3Tween);
+            // }
+            // else if (tween is ColorTween)
+            // {
+            //     colorTweens.Add(tween as ColorTween);
+            // }
+            // else if (tween is QuaternionTween)
+            // {
+            //     quaternionTweens.Add(tween as QuaternionTween);
+            // }
 
         }
 
