@@ -37,7 +37,14 @@ namespace F8Framework.Core
             
             if (Application.isPlaying)
             {
-                Util.Assembly.InvokeMethod("F8DataManager", "LoadLocalizedStrings", new object[] { });
+                try
+                {
+                    Util.Assembly.InvokeMethod("F8DataManager", "LoadLocalizedStrings", new object[] { });
+                }
+                catch
+                {
+                    LogF8.LogError("缺少本地化表或加载本地化表失败！");
+                }
             }
             else
             {
@@ -70,7 +77,14 @@ namespace F8Framework.Core
             LogF8.LogConfig("（提示）由于WebGL需要异步加载本地化表，已在本地化模块之前加上：yield return F8DataManager.Instance.LoadLocalizedStringsIEnumerator();");
             LoadSuccess();
 #else
-            Util.Assembly.InvokeMethod("F8DataManager", "LoadLocalizedStrings", new object[] { });
+            try
+            {
+                Util.Assembly.InvokeMethod("F8DataManager", "LoadLocalizedStrings", new object[] { });
+            }
+            catch
+            {
+                LogF8.LogError("缺少本地化表或加载本地化表失败！");
+            }
             LoadSuccess();
 #endif
         }

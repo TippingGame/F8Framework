@@ -80,7 +80,7 @@ namespace F8Framework.Core
                 get
                 {
 #if UNITY_EDITOR
-                    return _isEditorMode;
+                    return _isEditorMode || UnityEditor.EditorPrefs.GetBool(Application.dataPath.GetHashCode() + "IsEditorMode", false);
 #else
                     return false;
 #endif
@@ -96,7 +96,7 @@ namespace F8Framework.Core
             public bool IsLegal(ref AssetInfo assetInfo)
             {
 #if UNITY_EDITOR
-                if (_isEditorMode)
+                if (IsEditorMode)
                 {
                     if (assetInfo.AssetType == AssetTypeEnum.RESOURCE)
                         if (assetInfo.AssetPath != default || SearchAsset(assetInfo.AssetName) != null)
@@ -143,13 +143,13 @@ namespace F8Framework.Core
                 
                 if (accessMode.HasFlag(AssetAccessMode.RESOURCE))
                 {
-                    bool showTip = !_isEditorMode;
+                    bool showTip = !IsEditorMode;
                     
                     return GetAssetInfoFromResource(assetName, showTip);
                 }
                 else if (accessMode.HasFlag(AssetAccessMode.ASSET_BUNDLE))
                 {
-                    bool showTip = !_isEditorMode;
+                    bool showTip = !IsEditorMode;
                     
                     return GetAssetInfoFromAssetBundle(assetName, false, showTip);
                 }
@@ -212,7 +212,7 @@ namespace F8Framework.Core
                 {
                     string assetPath = info.AssetPath?[0];
 #if UNITY_EDITOR
-                    if (_isEditorMode)
+                    if (IsEditorMode)
                     {
                         assetPath = info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0];
                     }
@@ -223,7 +223,7 @@ namespace F8Framework.Core
                 else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
                 {
 #if UNITY_EDITOR
-                    if (_isEditorMode)
+                    if (IsEditorMode)
                     {
                         return EditorLoadAsset<T>(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], subAssetName);
                     }
@@ -266,7 +266,7 @@ namespace F8Framework.Core
                 {
                     string assetPath = info.AssetPath?[0];
 #if UNITY_EDITOR
-                    if (_isEditorMode)
+                    if (IsEditorMode)
                     {
                         assetPath = info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0];
                     }
@@ -277,7 +277,7 @@ namespace F8Framework.Core
                 else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
                 {
 #if UNITY_EDITOR
-                    if (_isEditorMode)
+                    if (IsEditorMode)
                     {
                         return EditorLoadAsset(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], assetType, subAssetName);
                     }
@@ -318,7 +318,7 @@ namespace F8Framework.Core
                 {
                     string assetPath = info.AssetPath?[0];
 #if UNITY_EDITOR
-                    if (_isEditorMode)
+                    if (IsEditorMode)
                     {
                         assetPath = info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0];
                     }
@@ -329,7 +329,7 @@ namespace F8Framework.Core
                 else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
                 {
 #if UNITY_EDITOR
-                    if (_isEditorMode)
+                    if (IsEditorMode)
                     {
                         return EditorLoadAsset<Object>(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], subAssetName);
                     }
@@ -375,7 +375,7 @@ namespace F8Framework.Core
                 {
                     string assetPath = info.AssetPath?[0];
 #if UNITY_EDITOR
-                    if (_isEditorMode)
+                    if (IsEditorMode)
                     {
                         assetPath = info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0];
                     }
@@ -395,7 +395,7 @@ namespace F8Framework.Core
                 else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
                 {
 #if UNITY_EDITOR
-                    if (_isEditorMode)
+                    if (IsEditorMode)
                     {
                         return EditorLoadAsset<T>(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], subAssetName);
                     }
@@ -438,7 +438,7 @@ namespace F8Framework.Core
                 if (info.AssetType == AssetTypeEnum.RESOURCE)
                 {
 #if UNITY_EDITOR
-                    if (_isEditorMode)
+                    if (IsEditorMode)
                     {
                         LogF8.LogAsset("编辑器模式下无需加载文件夹");
                         return;
@@ -465,7 +465,7 @@ namespace F8Framework.Core
                 else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
                 {
 #if UNITY_EDITOR
-                    if (_isEditorMode)
+                    if (IsEditorMode)
                     {
                         return;
                     }
@@ -508,7 +508,7 @@ namespace F8Framework.Core
                 {
                     string assetPath = info.AssetPath?[0];
 #if UNITY_EDITOR
-                    if (_isEditorMode)
+                    if (IsEditorMode)
                     {
                         assetPath = info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0];
                     }
@@ -528,7 +528,7 @@ namespace F8Framework.Core
                 else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
                 {
 #if UNITY_EDITOR
-                    if (_isEditorMode)
+                    if (IsEditorMode)
                     {
                         return EditorLoadAsset(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], assetType, subAssetName);
                     }
@@ -574,7 +574,7 @@ namespace F8Framework.Core
                 {
                     string assetPath = info.AssetPath?[0];
 #if UNITY_EDITOR
-                    if (_isEditorMode)
+                    if (IsEditorMode)
                     {
                         assetPath = info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0];
                     }
@@ -594,7 +594,7 @@ namespace F8Framework.Core
                 else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
                 {
 #if UNITY_EDITOR
-                    if (_isEditorMode)
+                    if (IsEditorMode)
                     {
                         return EditorLoadAsset<Object>(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], subAssetName);
                     }
@@ -645,7 +645,7 @@ namespace F8Framework.Core
                 {
                     string assetPath = info.AssetPath?[0];
 #if UNITY_EDITOR
-                    if (_isEditorMode)
+                    if (IsEditorMode)
                     {
                         assetPath = info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0];
                     }
@@ -670,7 +670,7 @@ namespace F8Framework.Core
                 else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
                 {
 #if UNITY_EDITOR
-                    if (_isEditorMode)
+                    if (IsEditorMode)
                     {
                         T o = EditorLoadAsset<T>(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], subAssetName);
                         End(o);
@@ -724,7 +724,7 @@ namespace F8Framework.Core
                 {
                     string assetPath = info.AssetPath?[0];
 #if UNITY_EDITOR
-                    if (_isEditorMode)
+                    if (IsEditorMode)
                     {
                         assetPath = info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0];
                     }
@@ -749,7 +749,7 @@ namespace F8Framework.Core
                 else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
                 {
 #if UNITY_EDITOR
-                    if (_isEditorMode)
+                    if (IsEditorMode)
                     {
                         T o = EditorLoadAsset<T>(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], subAssetName);
                         yield return o;
@@ -796,7 +796,7 @@ namespace F8Framework.Core
                 {
                     string assetPath = info.AssetPath?[0];
 #if UNITY_EDITOR
-                    if (_isEditorMode)
+                    if (IsEditorMode)
                     {
                         assetPath = info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0];
                     }
@@ -822,7 +822,7 @@ namespace F8Framework.Core
                 else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
                 {
 #if UNITY_EDITOR
-                    if (_isEditorMode)
+                    if (IsEditorMode)
                     {
                         var o = EditorLoadAsset(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], assetType, subAssetName);
                         yield return o;
@@ -872,7 +872,7 @@ namespace F8Framework.Core
                 if (info.AssetType == AssetTypeEnum.RESOURCE)
                 {
 #if UNITY_EDITOR
-                    if (_isEditorMode)
+                    if (IsEditorMode)
                     {
                         LogF8.LogAsset("编辑器模式下无需加载文件夹");
                         End();
@@ -914,7 +914,7 @@ namespace F8Framework.Core
                 else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
                 {
 #if UNITY_EDITOR
-                    if (_isEditorMode)
+                    if (IsEditorMode)
                     {
                         LogF8.LogAsset("编辑器模式下无需加载文件夹");
                         End();
@@ -985,7 +985,7 @@ namespace F8Framework.Core
                 if (info.AssetType == AssetTypeEnum.RESOURCE)
                 {
 #if UNITY_EDITOR
-                    if (_isEditorMode)
+                    if (IsEditorMode)
                     {
                         LogF8.LogAsset("编辑器模式下无需加载文件夹");
                         yield break;
@@ -1016,7 +1016,7 @@ namespace F8Framework.Core
                 else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
                 {
 #if UNITY_EDITOR
-                    if (_isEditorMode)
+                    if (IsEditorMode)
                     {
                         LogF8.LogAsset("编辑器模式下无需加载文件夹");
                         yield break;
@@ -1087,7 +1087,7 @@ namespace F8Framework.Core
                 {
                     string assetPath = info.AssetPath?[0];
 #if UNITY_EDITOR
-                    if (_isEditorMode)
+                    if (IsEditorMode)
                     {
                         assetPath = info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0];
                     }
@@ -1111,7 +1111,7 @@ namespace F8Framework.Core
                 else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
                 {
 #if UNITY_EDITOR
-                    if (_isEditorMode)
+                    if (IsEditorMode)
                     {
                         Object o = EditorLoadAsset(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], assetType, subAssetName);
                         End(o);
@@ -1171,7 +1171,7 @@ namespace F8Framework.Core
                 {
                     string assetPath = info.AssetPath?[0];
 #if UNITY_EDITOR
-                    if (_isEditorMode)
+                    if (IsEditorMode)
                     {
                         assetPath = info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0];
                     }
@@ -1195,7 +1195,7 @@ namespace F8Framework.Core
                 else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
                 {
 #if UNITY_EDITOR
-                    if (_isEditorMode)
+                    if (IsEditorMode)
                     {
                         Object o = EditorLoadAsset<Object>(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], subAssetName);
                         End(o);
@@ -1275,7 +1275,7 @@ namespace F8Framework.Core
             public void Unload(string assetName, bool unloadAllLoadedObjects = false)
             {
 #if UNITY_EDITOR
-                if (_isEditorMode)
+                if (IsEditorMode)
                 {
                     return;
                 }
@@ -1308,7 +1308,7 @@ namespace F8Framework.Core
             public void UnloadAsync(string assetName, bool unloadAllLoadedObjects = false, AssetBundleLoader.OnUnloadFinished callback = null)
             {
 #if UNITY_EDITOR
-                if (_isEditorMode)
+                if (IsEditorMode)
                 {
                     return;
                 }
@@ -1335,7 +1335,7 @@ namespace F8Framework.Core
             public float GetLoadProgress(string assetName)
             {
 #if UNITY_EDITOR
-                if (_isEditorMode)
+                if (IsEditorMode)
                 {
                     return 1f;
                 }
@@ -1396,7 +1396,7 @@ namespace F8Framework.Core
             public float GetLoadProgress()
             {
 #if UNITY_EDITOR
-                if (_isEditorMode)
+                if (IsEditorMode)
                 {
                     return 1f;
                 }

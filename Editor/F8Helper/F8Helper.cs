@@ -7,7 +7,7 @@ namespace F8Framework.Core.Editor
 {
     public class F8Helper : ScriptableObject
     {
-        [MenuItem("开发工具/设置Excel存放目录")]
+        [MenuItem("开发工具/设置Excel存放目录", false, 104)]
         public static void SetExcelPath()
         {
             string lastExcelPath = F8EditorPrefs.GetString("ExcelPath", default);
@@ -17,6 +17,21 @@ namespace F8Framework.Core.Editor
                 F8EditorPrefs.SetString("ExcelPath", tempExcelPath);
             }
             LogF8.LogConfig("设置Excel存放目录：" + tempExcelPath);
+        }
+        
+        [MenuItem("开发工具/编辑器模式（勾选）", true)]
+        public static bool SetIsEditorMode()
+        {
+            bool isEditorMode = F8EditorPrefs.GetBool("IsEditorMode", false);
+            Menu.SetChecked("开发工具/编辑器模式（勾选）", isEditorMode);
+            return true;
+        }
+        
+        [MenuItem("开发工具/编辑器模式（勾选）")]
+        public static void SwitchIsEditorMode()
+        {
+            bool isEditorMode = F8EditorPrefs.GetBool("IsEditorMode", false);
+            F8EditorPrefs.SetBool("IsEditorMode", !isEditorMode);
         }
         
         [MenuItem("开发工具/F8Run _F8")]

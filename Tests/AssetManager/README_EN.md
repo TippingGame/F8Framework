@@ -28,11 +28,15 @@ Unity F8 AssetManager资产加载组件。
    打包 AssetBundle 后，在目录 StreamingAssets / AssetBundles / Windows 生成AB包（不同平台例如 Windows 或 iOS ，**注意**：如果没有加载任何AB包时，请手动清空此目录）  
    ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_20240205225815.png)
 ---------------------------------
-3. **注意**：编辑器下加载不同平台的AB包（Android平台，iOS平台，WebGL平台），Shader会变紫色，Scene会加载失败，音频加载失败等（解决方案：FF8.Asset.IsEditorMode = true）
+3. **注意**：编辑器下加载不同平台的AB包（Android平台，iOS平台，WebGL平台），Shader会变紫色，Scene会加载失败，音频加载失败等（解决方案：启用编辑器模式）
 ---------------------------------
-4. **注意**：Unity的WebGL平台不能使用同步加载
+4. **注意**：如何启用编辑器模式，代码中调用：FF8.Asset.IsEditorMode = true  
+或者在编辑器中勾选编辑器模式：  
+![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_20251736474182.png)  
 ---------------------------------
-5. 假如没有报错，就可以愉快地使用了
+5. **注意**：Unity的WebGL平台不能使用同步加载AB包，可以使用Resources进行同步加载
+---------------------------------
+6. 假如没有报错，就可以愉快地使用了
 
 ### 代码使用方法
 ```C#
