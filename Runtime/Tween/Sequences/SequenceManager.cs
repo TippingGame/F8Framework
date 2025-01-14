@@ -23,12 +23,12 @@ namespace F8Framework.Core
 				sequence.Reset();
 			}
 
-			sequence.Recycle = KillSequence;
+			sequence.Recycle = sequence.KillSequence;
 			Tween.Instance.OnUpdateAction += sequence.Update;
 			return sequence;
 		}
 
-		public static void KillSequence(Sequence sequence)
+		public static void KillSequence(this Sequence sequence)
 		{
 			Tween.Instance.OnUpdateAction -= sequence.Update;
 			sequence.Reset();

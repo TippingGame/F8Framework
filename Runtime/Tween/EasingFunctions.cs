@@ -716,170 +716,173 @@ public static class EasingFunctions
     /// to return.
     /// </summary>
     /// <param name="easingFunction">The enum associated with the easing function.</param>
+    /// <param name="start"></param>
+    /// <param name="end"></param>
+    /// <param name="value"></param>
     /// <returns>The easing function</returns>
-    public static Function GetEasingFunction(Ease easingFunction)
+    public static float GetEasingFunction(Ease easingFunction, float start, float end, float value)
     {
         if (easingFunction == Ease.EaseInQuad)
         {
-            return EaseInQuad;
+            return EaseInQuad(start, end, value);
         }
 
         if (easingFunction == Ease.EaseOutQuad)
         {
-            return EaseOutQuad;
+            return EaseOutQuad(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInOutQuad)
         {
-            return EaseInOutQuad;
+            return EaseInOutQuad(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInCubic)
         {
-            return EaseInCubic;
+            return EaseInCubic(start, end, value);
         }
 
         if (easingFunction == Ease.EaseOutCubic)
         {
-            return EaseOutCubic;
+            return EaseOutCubic(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInOutCubic)
         {
-            return EaseInOutCubic;
+            return EaseInOutCubic(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInQuart)
         {
-            return EaseInQuart;
+            return EaseInQuart(start, end, value);
         }
 
         if (easingFunction == Ease.EaseOutQuart)
         {
-            return EaseOutQuart;
+            return EaseOutQuart(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInOutQuart)
         {
-            return EaseInOutQuart;
+            return EaseInOutQuart(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInQuint)
         {
-            return EaseInQuint;
+            return EaseInQuint(start, end, value);
         }
 
         if (easingFunction == Ease.EaseOutQuint)
         {
-            return EaseOutQuint;
+            return EaseOutQuint(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInOutQuint)
         {
-            return EaseInOutQuint;
+            return EaseInOutQuint(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInSine)
         {
-            return EaseInSine;
+            return EaseInSine(start, end, value);
         }
 
         if (easingFunction == Ease.EaseOutSine)
         {
-            return EaseOutSine;
+            return EaseOutSine(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInOutSine)
         {
-            return EaseInOutSine;
+            return EaseInOutSine(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInExpo)
         {
-            return EaseInExpo;
+            return EaseInExpo(start, end, value);
         }
 
         if (easingFunction == Ease.EaseOutExpo)
         {
-            return EaseOutExpo;
+            return EaseOutExpo(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInOutExpo)
         {
-            return EaseInOutExpo;
+            return EaseInOutExpo(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInCirc)
         {
-            return EaseInCirc;
+            return EaseInCirc(start, end, value);
         }
 
         if (easingFunction == Ease.EaseOutCirc)
         {
-            return EaseOutCirc;
+            return EaseOutCirc(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInOutCirc)
         {
-            return EaseInOutCirc;
+            return EaseInOutCirc(start, end, value);
         }
 
         if (easingFunction == Ease.Linear)
         {
-            return Linear;
+            return Linear(start, end, value);
         }
 
         if (easingFunction == Ease.Spring)
         {
-            return Spring;
+            return Spring(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInBounce)
         {
-            return EaseInBounce;
+            return EaseInBounce(start, end, value);
         }
 
         if (easingFunction == Ease.EaseOutBounce)
         {
-            return EaseOutBounce;
+            return EaseOutBounce(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInOutBounce)
         {
-            return EaseInOutBounce;
+            return EaseInOutBounce(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInBack)
         {
-            return EaseInBack;
+            return EaseInBack(start, end, value);
         }
 
         if (easingFunction == Ease.EaseOutBack)
         {
-            return EaseOutBack;
+            return EaseOutBack(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInOutBack)
         {
-            return EaseInOutBack;
+            return EaseInOutBack(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInElastic)
         {
-            return EaseInElastic;
+            return EaseInElastic(start, end, value);
         }
 
         if (easingFunction == Ease.EaseOutElastic)
         {
-            return EaseOutElastic;
+            return EaseOutElastic(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInOutElastic)
         {
-            return EaseInOutElastic;
+            return EaseInOutElastic(start, end, value);
         }
 
-        return null;
+        return 0.0f;
     }
 
     /// <summary>
@@ -887,191 +890,195 @@ public static class EasingFunctions
     /// function can get you the speed at a given time (normalized).
     /// </summary>
     /// <param name="easingFunction"></param>
+    /// <param name="start"></param>
+    /// <param name="end"></param>
+    /// <param name="value"></param>
     /// <returns>The derivative function</returns>
-    public static Function GetEasingFunctionDerivative(Ease easingFunction)
+    public static float GetEasingFunctionDerivative(Ease easingFunction, float start, float end, float value)
     {
         if (easingFunction == Ease.EaseInQuad)
         {
-            return EaseInQuadD;
+            return EaseInQuadD(start, end, value);
         }
 
         if (easingFunction == Ease.EaseOutQuad)
         {
-            return EaseOutQuadD;
+            return EaseOutQuadD(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInOutQuad)
         {
-            return EaseInOutQuadD;
+            return EaseInOutQuadD(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInCubic)
         {
-            return EaseInCubicD;
+            return EaseInCubicD(start, end, value);
         }
 
         if (easingFunction == Ease.EaseOutCubic)
         {
-            return EaseOutCubicD;
+            return EaseOutCubicD(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInOutCubic)
         {
-            return EaseInOutCubicD;
+            return EaseInOutCubicD(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInQuart)
         {
-            return EaseInQuartD;
+            return EaseInQuartD(start, end, value);
         }
 
         if (easingFunction == Ease.EaseOutQuart)
         {
-            return EaseOutQuartD;
+            return EaseOutQuartD(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInOutQuart)
         {
-            return EaseInOutQuartD;
+            return EaseInOutQuartD(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInQuint)
         {
-            return EaseInQuintD;
+            return EaseInQuintD(start, end, value);
         }
 
         if (easingFunction == Ease.EaseOutQuint)
         {
-            return EaseOutQuintD;
+            return EaseOutQuintD(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInOutQuint)
         {
-            return EaseInOutQuintD;
+            return EaseInOutQuintD(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInSine)
         {
-            return EaseInSineD;
+            return EaseInSineD(start, end, value);
         }
 
         if (easingFunction == Ease.EaseOutSine)
         {
-            return EaseOutSineD;
+            return EaseOutSineD(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInOutSine)
         {
-            return EaseInOutSineD;
+            return EaseInOutSineD(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInExpo)
         {
-            return EaseInExpoD;
+            return EaseInExpoD(start, end, value);
         }
 
         if (easingFunction == Ease.EaseOutExpo)
         {
-            return EaseOutExpoD;
+            return EaseOutExpoD(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInOutExpo)
         {
-            return EaseInOutExpoD;
+            return EaseInOutExpoD(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInCirc)
         {
-            return EaseInCircD;
+            return EaseInCircD(start, end, value);
         }
 
         if (easingFunction == Ease.EaseOutCirc)
         {
-            return EaseOutCircD;
+            return EaseOutCircD(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInOutCirc)
         {
-            return EaseInOutCircD;
+            return EaseInOutCircD(start, end, value);
         }
 
         if (easingFunction == Ease.Linear)
         {
-            return LinearD;
+            return LinearD(start, end, value);
         }
 
         if (easingFunction == Ease.Spring)
         {
-            return SpringD;
+            return SpringD(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInBounce)
         {
-            return EaseInBounceD;
+            return EaseInBounceD(start, end, value);
         }
 
         if (easingFunction == Ease.EaseOutBounce)
         {
-            return EaseOutBounceD;
+            return EaseOutBounceD(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInOutBounce)
         {
-            return EaseInOutBounceD;
+            return EaseInOutBounceD(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInBack)
         {
-            return EaseInBackD;
+            return EaseInBackD(start, end, value);
         }
 
         if (easingFunction == Ease.EaseOutBack)
         {
-            return EaseOutBackD;
+            return EaseOutBackD(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInOutBack)
         {
-            return EaseInOutBackD;
+            return EaseInOutBackD(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInElastic)
         {
-            return EaseInElasticD;
+            return EaseInElasticD(start, end, value);
         }
 
         if (easingFunction == Ease.EaseOutElastic)
         {
-            return EaseOutElasticD;
+            return EaseOutElasticD(start, end, value);
         }
 
         if (easingFunction == Ease.EaseInOutElastic)
         {
-            return EaseInOutElasticD;
+            return EaseInOutElasticD(start, end, value);
         }
 
-        return null;
+        return 0.0f;
     }
 
-    public static float ChangeFloat(float start , float end , float value , Ease ease)
+    public static float ChangeFloat(float start, float end, float value, Ease ease)
     {
-        Function easeFunction = GetEasingFunction( ease );
-        return easeFunction( start , end , value);
+        return GetEasingFunction(ease, start, end, value);
     }
 
-    public static Vector3 ChangeVector(Vector3 start , Vector3 end , float value, Ease ease)
+    public static void ChangeVector(Vector3 start , Vector3 end , float value, Ease ease, ref Vector3 outValue)
     {
-        float x = GetEasingFunction(ease)( start.x, end.x , value);
-        float y = GetEasingFunction( ease )( start.y, end.y, value );
-        float z = GetEasingFunction( ease )( start.z, end.z, value );
-        return new Vector3( x, y, z );
+        float x = GetEasingFunction(ease, start.x, end.x, value);
+        float y = GetEasingFunction(ease, start.y, end.y, value);
+        float z = GetEasingFunction(ease, start.z, end.z, value);
+        outValue.x = x;
+        outValue.y = y;
+        outValue.z = z;
     }
 
-    public static Vector3 ChangeVector(Vector2 start, Vector2 end, float value, Ease ease)
+    public static void ChangeVector(Vector2 start, Vector2 end, float value, Ease ease, ref Vector2 outValue)
     {
-        float x = GetEasingFunction( ease )( start.x, end.x, value );
-        float y = GetEasingFunction( ease )( start.y, end.y, value );
-        
-        return new Vector2( x, y);
+        float x = GetEasingFunction(ease, start.x, end.x, value);
+        float y = GetEasingFunction(ease, start.y, end.y, value);
+        outValue.x = x;
+        outValue.y = y;
     }
 }

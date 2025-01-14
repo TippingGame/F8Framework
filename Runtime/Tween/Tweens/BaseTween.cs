@@ -17,12 +17,11 @@ namespace F8Framework.Core
     /// Base tween class
     /// </summary>
     
-    public abstract class BaseTween : IRecyclable<BaseTween>
+    public abstract class BaseTween
     {
         #region PROTECTED
         protected int id = 0;
         protected float delay = 0.0f;
-        protected float startTime = 0.0f;
         protected float duration = 0.0f;
         protected float currentTime = 0.0f;
         protected Ease ease = Ease.EaseOutQuad;
@@ -33,44 +32,53 @@ namespace F8Framework.Core
         private float timeSinceStart = 0.0f;
         #endregion
 
-        public int ID { get { return id; } }
+        public int ID
+        {
+            get => id;
+            set => id = value;
+        }
         public bool IsComplete 
         { 
-            get { return isComplete; }
-            set { isComplete = value; }
+            get => isComplete;
+            set => isComplete = value;
         }
-
+        
         #region EVENTS
         protected Action onComplete = null;
-        public Action onUpdate = null;
+        protected Action onCompleteSequence = null;
+        protected Action onUpdate = null;
         protected Action<Vector3> onUpdateVector3 = null;
         protected Action<float> onUpdateFloat = null;
         protected Action<Color> onUpdateColor = null;
         protected Action<Vector2> onUpdateVector2 = null;
         protected Action<Quaternion> onUpdateQuaternion = null;
         protected List<TimeEvent> events = new List<TimeEvent>();
-        public Action<BaseTween> Recycle { get; set; }
         #endregion
 
         public GameObject Owner { get { return owner; } }
         public UpdateMode UpdateMode { get { return updateMode; } }
-        public bool HandleBySequence { get; set; }
-
         public Action PauseReset = null;
-
+        public bool CanRecycle = true;
+        public bool IsRecycle = false;
         public BaseTween()
         {
-            onComplete += CheckIfTweenIsComplete;
+            onComplete = FinishTween;
         }
 
-        private void CheckIfTweenIsComplete()
+        private void FinishTween()
         {
-            if (!HandleBySequence)
+            IsComplete = true;
+            // 可以回收
+            if (CanRecycle)
             {
-                //Recycle(this);
-            }            
+                IsRecycle = true;
+            }
+            else
+            {
+                onCompleteSequence?.Invoke();
+            }
         }
-
+        
         /// <summary>
         /// Called to update this tween
         /// </summary>
@@ -102,9 +110,10 @@ namespace F8Framework.Core
 
         public virtual void ReplayReset()
         {
-            isComplete = false;
+            IsComplete = false;
             isPause = false;
             currentTime = 0.0f;
+            onCompleteSequence = null;
         }
 
         /// <summary>
@@ -140,6 +149,12 @@ namespace F8Framework.Core
             return this;
         }
 
+        public virtual BaseTween SetOnCompleteSequence(Action action)
+        {
+            onCompleteSequence += action;
+            return this;
+        }
+        
         /// <summary>
         /// set a delay
         /// </summary>
@@ -148,7 +163,6 @@ namespace F8Framework.Core
         public virtual BaseTween SetDelay(float t)
         {
             delay = t;
-
             return this;
         }
 
@@ -223,18 +237,16 @@ namespace F8Framework.Core
         {
             id = 0;
             delay = 0.0f;
-            startTime = 0.0f;
             duration = 0.0f;
             currentTime = 0.0f;
             ease = Ease.EaseOutQuad;
             updateMode = UpdateMode.Update;
             owner = null;
             timeSinceStart = 0.0f;
-            isComplete = false;
+            IsComplete = false;
             isPause = false;
-            HandleBySequence = false;
-
-            onComplete = null;
+            CanRecycle = true;
+            
             onUpdate = null;
             onUpdateVector3 = null;
             onUpdateFloat = null;
@@ -243,11 +255,11 @@ namespace F8Framework.Core
             onUpdateQuaternion = null;
             PauseReset = null;
             events.Clear();
+            IsRecycle = false;
+            onCompleteSequence = null;
 
-            onComplete += CheckIfTweenIsComplete;
+            onComplete = FinishTween;
         }
-
-        
     }
 
     public class TimeEvent

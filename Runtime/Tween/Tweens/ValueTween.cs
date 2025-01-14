@@ -20,6 +20,7 @@ namespace F8Framework.Core
             this.from = from;
             this.to = to;
             this.duration = t;
+            this.PauseReset = () => this.Init(from, to, t);
         }
 
         /// <summary>
@@ -27,7 +28,7 @@ namespace F8Framework.Core
         /// </summary>
         public override void Update(float deltaTime)
         {
-            if(isPause || isComplete)
+            if(isPause || IsComplete || IsRecycle)
                 return;
 
             //wait a delay
@@ -45,7 +46,6 @@ namespace F8Framework.Core
             //if time ends
             if (currentTime >= duration)
             {
-
                 if (onUpdateFloat != null)
                     onUpdateFloat(to);
 
@@ -53,7 +53,7 @@ namespace F8Framework.Core
                 return;
             }
 
-            //get new value           
+            //get new value
             float value = EasingFunctions.ChangeFloat(from, to, currentTime / duration, ease);
 
             //call update if we have it

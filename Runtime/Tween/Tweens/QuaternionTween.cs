@@ -21,6 +21,7 @@ namespace F8Framework.Core
             this.from = from;
             this.to = to;
             this.duration = t;
+            this.PauseReset = () => this.Init(from, to, t);
         }
 
         /// <summary>
@@ -28,7 +29,7 @@ namespace F8Framework.Core
         /// </summary>
         public override void Update(float deltaTime)
         {
-            if(isPause || isComplete)
+            if(isPause || IsComplete || IsRecycle)
                 return;
             
             //wait a delay

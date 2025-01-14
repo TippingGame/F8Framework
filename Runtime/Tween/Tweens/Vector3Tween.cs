@@ -8,6 +8,7 @@ namespace F8Framework.Core
         #region PRIVATE
         private Vector3 from = Vector3.zero;
         private Vector3 to = Vector3.zero;
+        private Vector3 tempValue = Vector3.zero;
         #endregion
 
         #region PUBLIC
@@ -17,12 +18,20 @@ namespace F8Framework.Core
             this.id = id;
         }
 
+        internal void Init(Vector3 from, Vector3 to, float t)
+        {
+            this.from = from;
+            this.to = to;
+            this.duration = t;
+            this.PauseReset = () => this.Init(from, to, t);
+        }
+
         /// <summary>
         /// called every frame
         /// </summary>
         public override void Update(float deltaTime)
         {
-            if(isPause || isComplete)
+            if(isPause || IsComplete || IsRecycle)
                 return;
 
             //wait a delay
@@ -52,21 +61,21 @@ namespace F8Framework.Core
             }
 
             //get new value           
-            Vector3 value = EasingFunctions.ChangeVector(from, to, currentTime / duration, ease);
+            EasingFunctions.ChangeVector(from, to, currentTime / duration, ease, ref tempValue);
 
             //call update if we have it
             if (onUpdateVector3 != null)
-                onUpdateVector3(value);
+                onUpdateVector3(tempValue);
 
             if (onUpdateVector2 != null)
-                onUpdateVector2(value);
+                onUpdateVector2(tempValue);
         }
 
-        internal void Init(Vector3 from, Vector3 to, float time)
+        public override void Reset()
         {
-            this.from = from;
-            this.to = to;
-            this.duration = time;
+            base.Reset();
+            from = Vector3.zero;
+            to = Vector3.zero;
         }
 
         public override void ReplayReset()

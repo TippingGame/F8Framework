@@ -9,7 +9,7 @@ namespace F8Framework.Core
 		Join
 	}
 
-	public class Sequence : IRecyclable<Sequence>
+	public class Sequence
 	{
 		private List<BaseTween> tweenList = new List<BaseTween>();
 		private List<TimeEvent> timeEvents = new List<TimeEvent>();
@@ -22,7 +22,7 @@ namespace F8Framework.Core
 
 		public Action OnComplete = null;
 		
-		public Action<Sequence> Recycle { get; set; }
+		public Action Recycle { get; set; }
 
 		public Sequence()
 		{
@@ -48,14 +48,13 @@ namespace F8Framework.Core
 
 		}
 
-		public void SetOnComplete(Action<Sequence> action)
+		public void SetOnComplete(Action action)
 		{
 			Recycle += action;
 		}
 
 		private void CheckLoops()
 		{
-			
 			if (loops < 0 || loops > 0)
 			{
 				loops--;
@@ -63,17 +62,16 @@ namespace F8Framework.Core
 			}
 			else
 			{
-				
 				//recicle all tweens
 				foreach (var tween in tweenList)
 				{
-					tween.HandleBySequence = false;
-					tween.Recycle(tween);
+					tween.CanRecycle = true;
+					tween.IsRecycle = true;
 				}
 				tweenList.Clear();
 				
 				//we are ready to let this object go
-				Recycle?.Invoke(this);
+				Recycle?.Invoke();
 			}
 		}
 
@@ -91,7 +89,7 @@ namespace F8Framework.Core
 
 		public void Append(BaseTween tween)
 		{
-			tween.HandleBySequence = true;
+			tween.CanRecycle = false;
 			
 			if (ShouldPlayInmediatly())
 			{
@@ -106,7 +104,7 @@ namespace F8Framework.Core
 		
 		public void Join(BaseTween tween)
 		{
-			tween.HandleBySequence = true;
+			tween.CanRecycle = false;
 			
 			if (ShouldPlayInmediatly())
 			{
@@ -123,8 +121,8 @@ namespace F8Framework.Core
 		{
 			tweenList.Add(tween);
 			
-			tween.SetOnComplete(CheckIfSequenceIsComplete);
-			tween.SetOnComplete(() => tween.SetIsPause(true));
+			tween.SetOnCompleteSequence(CheckIfSequenceIsComplete);
+			tween.SetOnCompleteSequence(() => tween.SetIsPause(true));
 
 			if (!ignoreCommands)
 			{
@@ -142,8 +140,8 @@ namespace F8Framework.Core
 				tween.SetIsPause(true);
 			}
     
-			previousTween.SetOnComplete(() => RunTween(tween));
-			tween.SetOnComplete(CheckIfSequenceIsComplete);
+			previousTween.SetOnCompleteSequence(() => RunTween(tween));
+			tween.SetOnCompleteSequence(CheckIfSequenceIsComplete);
 
 			if (!ignoreCommands)
 			{
@@ -184,7 +182,7 @@ namespace F8Framework.Core
 				return;
 			}
 			
-			head.SetOnComplete(callback);
+			head.SetOnCompleteSequence(callback);
 		}
 
 		public void Join(Action callback)
@@ -195,7 +193,7 @@ namespace F8Framework.Core
 				return;
 			}
 			
-			GetPenultimate().SetOnComplete(callback);
+			GetPenultimate().SetOnCompleteSequence(callback);
 		}
 
 		public void RunAtTime(Action callback, float time)
@@ -213,7 +211,8 @@ namespace F8Framework.Core
 		{
 			foreach (var tween in tweenList)
 			{
-				tween.SetIsPause(true);
+				tween.CanRecycle = true;
+				tween.IsRecycle = true;
 			}
 			tweenList.Clear();
 			timeEvents.Clear();
@@ -222,6 +221,8 @@ namespace F8Framework.Core
 			ignoreCommands = false;
 			commandQueue.Clear();
 			head = null;
+			OnComplete = null;
+			Recycle = null;
 		}
 
 		private void RunTween(BaseTween tween)

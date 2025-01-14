@@ -46,10 +46,6 @@ void Start()
     gameObject.ShakeScale(Vector3.one);
     gameObject.ShakePositionAtSpeed(Vector3.one, shakeCount: 8, speed: 5f, fadeOut: false);
 
-    // 终止动画
-    gameObject.CancelTween(id);
-    gameObject.CancelAllTweens();
-
     // 设置Delay
     gameObject.Move(Vector3.one, 1.0f).SetDelay(2.0f);
     
@@ -63,15 +59,24 @@ void Start()
         LogF8.Log(v);
     });
     
-    FF8.Tween.CancelTween(valueTween);
+    // 取消动画，只允许使用ID取消动画，动画基类会回收再利用，但ID唯一递增
+    int id2 = valueTween.ID;
+    FF8.Tween.CancelTween(id2);
     
     // 物体移动
     BaseTween gameObjectTween = FF8.Tween.Move(gameObject, Vector3.one, 3f).SetOnUpdateVector3((Vector3 v) =>
     {
         LogF8.Log(v);
     });
-    
-    FF8.Tween.CancelTween(gameObjectTween.ID);
+
+    // 重播动画，先设置动画为不可回收，记得手动回收
+    gameObjectTween.CanRecycle = false;
+    gameObjectTween.ReplayReset();
+        
+    // 设置动画拥有者后，可使用此取消方式
+    gameObjectTween.SetOwner(gameObject);
+    FF8.Tween.CancelTween(gameObject);
+    gameObject.CancelAllTweens();
     
     // 根据相对坐标移动UI
     // (0.0 , 1.0) _______________________(1.0 , 1.0)
@@ -91,7 +96,7 @@ void Start()
     sequence.Join(gameObjectTween);   // 与第一个动画同时执行
     sequence.Append(valueTween); // 第二个动画完成后执行
     sequence.Append(() => LogF8.Log("完成了！")); // 动画序列结束后的回调
-    sequence.SetOnComplete((seq) => LogF8.Log("Sequence 完成"));
+    sequence.SetOnComplete(() => LogF8.Log("Sequence 完成"));
     
     // 设置循环次数，-1代表无限循环
     sequence.SetLoops(3);

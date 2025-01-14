@@ -15,9 +15,17 @@ namespace F8Framework.Core
             this.id = id;
         }
 
+        internal void Init(Color from, Color to, float t)
+        {
+            this.from = from;
+            this.to = to;
+            this.duration = t;
+            this.PauseReset = () => this.Init(from, to, t);
+        }
+        
         public override void Update(float deltaTime)
         {
-            if(isPause || isComplete)
+            if(isPause || IsComplete || IsRecycle)
                 return;
             
             //wait a delay
@@ -50,11 +58,11 @@ namespace F8Framework.Core
                 onUpdateColor(color);
         }
 
-        internal void Init(Color from, Color to, float t)
+        public override void Reset()
         {
-            this.from = from;
-            this.to = to;
-            this.duration = t;
+            base.Reset();
+            from = Color.white;
+            to = Color.white;
         }
 
         public override void ReplayReset()

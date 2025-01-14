@@ -12,7 +12,7 @@ namespace F8Framework.Core
         private bool _isPlay = false;
         public int Priority;
         public AudioSource MusicSource;
-        public BaseTween AudioTween;
+        public int AudioTween;
 
         // 获取音乐播放进度
         public float Progress
@@ -73,7 +73,7 @@ namespace F8Framework.Core
                 float tempVolume = MusicSource.volume;
                 MusicSource.volume = 0f;
                 AudioTween = Tween.Instance.ValueTween(0f, tempVolume, fadeDuration)
-                    .SetOnUpdateFloat((float v) => { MusicSource.volume = v; });
+                    .SetOnUpdateFloat((float v) => { MusicSource.volume = v; }).ID;
             }
         }
             

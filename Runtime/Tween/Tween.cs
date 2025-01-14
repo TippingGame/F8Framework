@@ -5,7 +5,6 @@ using System;
 
 namespace F8Framework.Core
 {
-
     /// <summary>
     /// Tween engine
     /// </summary>
@@ -15,7 +14,7 @@ namespace F8Framework.Core
     public class Tween : ModuleSingleton<Tween>, IModule
     {
         #region PRIVATE
-        private List<BaseTween> tweens = TweenPool.activeTweens;
+        public List<BaseTween> tweens = new List<BaseTween>();
         private Dictionary<GameObject, List<int>> tweenConnections = new Dictionary<GameObject, List<int>>();
         #endregion
 
@@ -33,70 +32,67 @@ namespace F8Framework.Core
             if(OnUpdateAction != null)
                 OnUpdateAction.Invoke(Time.deltaTime);
             
-            for(int n = 0; n < tweens.Count; n++)
+            for (int i = 0; i < tweens.Count; i++)
             {
-                int lastTweenSize = tweens.Count;
-                
-                if (tweens[n].UpdateMode == UpdateMode.Update)
-                    tweens[n].Update(Time.deltaTime);
-                
-                //was any tween remove in this update?
-                if (lastTweenSize != tweens.Count)
+                if (tweens[i].IsRecycle)
                 {
-                    n--;
+                    TweenPool.AddTweenToPool(tweens[i]);
+                    tweens.RemoveAt(i);
+                    i--;
+                    continue;
                 }
+                
+                if (tweens[i].UpdateMode == UpdateMode.Update)
+                    tweens[i].Update(Time.deltaTime);
             }
         }
 
         public void OnLateUpdate()
         {
-            for (int n = 0; n < tweens.Count; n++)
+            for (int i = 0; i < tweens.Count; i++)
             {
-                int lastTweenSize = tweens.Count;
-
-                if (tweens[n].UpdateMode == UpdateMode.LateUpdate)
-                    tweens[n].Update(Time.deltaTime);
-
-                //was any tween remove in this update?
-                if (lastTweenSize != tweens.Count)
+                if (tweens[i].IsRecycle == true)
                 {
-                    n--;
+                    TweenPool.AddTweenToPool(tweens[i]);
+                    tweens.RemoveAt(i);
+                    i--;
+                    continue;
                 }
+                
+                if (tweens[i].UpdateMode == UpdateMode.LateUpdate)
+                    tweens[i].Update(Time.deltaTime);
             }
         }
 
         public void OnFixedUpdate()
         {
-            for (int n = 0; n < tweens.Count; n++)
+            for (int i = 0; i < tweens.Count; i++)
             {
-                int lastTweenSize = tweens.Count;
-
-                if (tweens[n].UpdateMode == UpdateMode.FixedUpdate)
-                    tweens[n].Update(Time.deltaTime);
-
-                //was any tween remove in this update?
-                if (lastTweenSize != tweens.Count)
+                if (tweens[i].IsRecycle == true)
                 {
-                    n--;
+                    TweenPool.AddTweenToPool(tweens[i]);
+                    tweens.RemoveAt(i);
+                    i--;
+                    continue;
                 }
+                
+                if (tweens[i].UpdateMode == UpdateMode.FixedUpdate)
+                    tweens[i].Update(Time.deltaTime);
             }
         }
 
         public void OnTermination()
         {
+            for (int i = 0; i < tweens.Count; i++)
+            {
+                tweens[i].IsRecycle = true;
+            }
+            tweens.Clear();
+            tweenConnections.Clear();
             base.Destroy();
         }
 
         #endregion
-
-
-
-        private BaseTween ProcessTween(BaseTween tween)
-        {
-            tween.SetOnComplete(() => tween.IsComplete = true);
-            tween.SetOnComplete(() => tween.Recycle(tween));
-            return tween;
-        }
 
         public void ProcessConnection(BaseTween tween)
         {
@@ -119,24 +115,22 @@ namespace F8Framework.Core
 
         public void CancelTween(int id)
         {
-
             for (int n = 0; n < tweens.Count; n++)
             {
                 if (tweens[n].ID == id)
                 {
-                    tweens[n].Recycle(tweens[n]);
+                    tweens[n].IsRecycle = true;
                     break;
                 }
-            }            
-
+            }
         }
 
-        public void CancelTween(BaseTween tween)
+        // 内部使用
+        private void CancelTween(BaseTween tween)
         {
             if (tween != null)
-                CancelTween(tween.ID);
+                tween.IsRecycle = true;
         }
-
 
         public void CancelTween(GameObject owner)
         {
@@ -160,19 +154,16 @@ namespace F8Framework.Core
         public BaseTween ScaleTween(Transform t, Vector3 to, float time)
         {
             Vector3Tween tween = TweenPool.GetVector3Tween(t.localScale, to, time);
-            tween.PauseReset += () => tween.Init(t.localScale, to, time);
-            tween.SetOnUpdateVector3(delegate (Vector3 v)
+            tween.SetOnUpdateVector3((Vector3 v) =>
             {
                 if (t == null)
                 {
                     CancelTween(tween);
                     return;
                 }
-
-
                 t.localScale = v;
             });
-            return ProcessTween(tween);
+            return tween;
         }
 
         public BaseTween ScaleTween(GameObject go, Vector3 to, float time)
@@ -188,29 +179,28 @@ namespace F8Framework.Core
         public BaseTween ScaleTweenAtSpeed(Transform t, Vector3 to, float speed)
         {
             float time = Vector3.Distance(t.position, to) / speed;
-
             return ScaleTween(t, to, time);
         }
 
         public BaseTween ScaleTweenAtSpeed(GameObject go, Vector3 to, float speed)
         {
             float time = Vector3.Distance(go.transform.position, to) / speed;
-
             return ScaleTween(go, to, time);
         }
 
         public BaseTween ScaleTweenAtSpeed(RectTransform rect, Vector3 to, float speed)
         {
             float time = Vector3.Distance(rect.transform.position, to) / speed;
-
             return ScaleTween(rect.transform, to, time);
         }
         public BaseTween ScaleX(Transform obj, float value, float t)
         {
-            return ValueTween(obj.localScale.x, value, t).SetOnUpdateFloat((float v) =>
+            ValueTween tween = TweenPool.GetValueTween(obj.localScale.x, value, t);
+            tween.SetOnUpdateFloat((float v) =>
             {
                 if (obj == null)
                 {
+                    CancelTween(tween);
                     return;
                 }
 
@@ -218,6 +208,7 @@ namespace F8Framework.Core
                 currentScale.x = v;
                 obj.localScale = currentScale;
             });
+            return tween;
         }
 
         public BaseTween ScaleX(GameObject obj, float value, float t)
@@ -251,15 +242,20 @@ namespace F8Framework.Core
 
         public BaseTween ScaleY(Transform obj, float value, float t)
         {
-            return ValueTween(obj.localScale.y, value, t).SetOnUpdateFloat((float v) =>
+            ValueTween tween = TweenPool.GetValueTween(obj.localScale.y, value, t);
+            tween.SetOnUpdateFloat((float v) =>
             {
                 if (obj == null)
+                {
+                    CancelTween(tween);
                     return;
+                }
 
                 Vector3 currentScale = obj.localScale;
                 currentScale.y = v;
                 obj.localScale = currentScale;
             });
+            return tween;
         }
 
         public BaseTween ScaleY(GameObject obj, float value, float t)
@@ -294,15 +290,20 @@ namespace F8Framework.Core
 
         public BaseTween ScaleZ(Transform obj, float value, float t)
         {
-            return ValueTween(obj.localScale.z, value, t).SetOnUpdateFloat((float v) =>
+            ValueTween tween = TweenPool.GetValueTween(obj.localScale.z, value, t);
+            tween.SetOnUpdateFloat((float v) =>
             {
                 if (obj == null)
+                {
+                    CancelTween(tween);
                     return;
+                }
 
                 Vector3 currentScale = obj.localScale;
                 currentScale.z = v;
                 obj.localScale = currentScale;
             });
+            return tween;
         }
 
         public BaseTween ScaleZ(GameObject obj, float value, float t)
@@ -340,8 +341,7 @@ namespace F8Framework.Core
         public BaseTween RotateTween(Transform t, Quaternion to, float time)
         {
             QuaternionTween tween = TweenPool.GetQuaternionTween(t.rotation, to, time);
-
-            tween.SetOnUpdateQuaternion(delegate (Quaternion v)
+            tween.SetOnUpdateQuaternion((Quaternion v) =>
             {
                 if (t != null)
                 {
@@ -351,10 +351,9 @@ namespace F8Framework.Core
                 {
                     CancelTween(tween);
                 }
-
             });
             
-            return ProcessTween(tween);
+            return tween;
         }
 
         public BaseTween RotateTween(Transform t, Vector3 to, float time)
@@ -408,7 +407,7 @@ namespace F8Framework.Core
         public BaseTween Fade(CanvasGroup cg, float to, float t)
         {
             ValueTween tween = TweenPool.GetValueTween(cg.alpha, to, t);
-            tween.SetOnUpdateFloat(delegate (float v)
+            tween.SetOnUpdateFloat((float v) =>
             {
                 if (cg == null)
                 {
@@ -418,7 +417,7 @@ namespace F8Framework.Core
 
                 cg.alpha = v;
             });
-            return ProcessTween(tween);
+            return tween;
         }
 
         public BaseTween FadeAtSpeed(CanvasGroup cg, float to, float speed)
@@ -442,14 +441,14 @@ namespace F8Framework.Core
                 c.a = v;
                 image.color = c;
             });
-            return ProcessTween(tween);
+            return tween;
         }
 
         internal BaseTween SetFloatProperty(Material material, int propertyHash, float value, float t)
         {
             ValueTween tween = TweenPool.GetValueTween(material.GetFloat(propertyHash), value, t);
             tween.SetOnUpdateFloat(v => material.SetFloat(propertyHash, v));
-            return ProcessTween(tween);
+            return tween;
         }
 
         public BaseTween FadeAtSpeed(Image img, float to, float speed)
@@ -483,7 +482,7 @@ namespace F8Framework.Core
         public BaseTween Fade(SpriteRenderer sprite, float to, float t)
         {
             ValueTween tween = TweenPool.GetValueTween(sprite.color.a, to, t);
-            tween.SetOnUpdateFloat(delegate (float v)
+            tween.SetOnUpdateFloat((float v) =>
             {
                 if (sprite == null)
                 {
@@ -495,7 +494,7 @@ namespace F8Framework.Core
                 c.a = v;
                 sprite.color = c;
             });
-            return ProcessTween(tween);
+            return tween;
         }
 
         public BaseTween FadeAtSpeed(SpriteRenderer sprite, float to, float speed)
@@ -543,7 +542,7 @@ namespace F8Framework.Core
         public BaseTween ColorTween(Material material, Color to, float t)
         {
             ColorTween tween = TweenPool.GetColorTween(material.color, to, t);
-            tween.SetOnUpdateColor(delegate (Color c)
+            tween.SetOnUpdateColor((Color c) =>
             {
                 if (material == null)
                 {
@@ -553,13 +552,13 @@ namespace F8Framework.Core
 
                 material.color = c;
             });
-            return ProcessTween(tween);
+            return tween;
         }
         
         public BaseTween ColorTween(SpriteRenderer sprite, Color to, float t)
         {
             ColorTween tween = TweenPool.GetColorTween(sprite.color, to, t);
-            tween.SetOnUpdateColor(delegate (Color c)
+            tween.SetOnUpdateColor((Color c) =>
             {
                 if (sprite == null)
                 {
@@ -569,7 +568,7 @@ namespace F8Framework.Core
 
                 sprite.color = c;
             });
-            return ProcessTween(tween);
+            return tween;
         }
 
         public BaseTween ColorTweenAtSpeed(SpriteRenderer sprite, Color to, float speed)
@@ -581,7 +580,7 @@ namespace F8Framework.Core
         public BaseTween ColorTween(Image image, Color to, float t)
         {
             ColorTween tween = TweenPool.GetColorTween(image.color, to, t);
-            tween.SetOnUpdateColor(delegate (Color c)
+            tween.SetOnUpdateColor((Color c) =>
             {
                 if (image == null)
                 {
@@ -591,7 +590,7 @@ namespace F8Framework.Core
 
                 image.color = c;
             });
-            return ProcessTween(tween);
+            return tween;
         }
 
         public BaseTween ColorTweenAtSpeed(Image img, Color to, float speed)
@@ -603,7 +602,7 @@ namespace F8Framework.Core
         public BaseTween ColorTween(Color from, Color to, float t)
         {
             ColorTween tween = TweenPool.GetColorTween(from, to, t);
-            return ProcessTween(tween);
+            return tween;
         }
 
         public BaseTween ColorTweenAtSpeed(Color from, Color to, float speed)
@@ -617,7 +616,7 @@ namespace F8Framework.Core
         public BaseTween FillAmountTween(Image img, float to, float t)
         {
             BaseTween tween = ValueTween(img.fillAmount, to, t);
-            tween.SetOnUpdateFloat( delegate (float v)
+            tween.SetOnUpdateFloat((float v) =>
             {
                 if (img != null)                
                     img.fillAmount = v;               
@@ -631,7 +630,7 @@ namespace F8Framework.Core
         public BaseTween FillAmountTweenAtSpeed(Image img, float to, float speed)
         {
             BaseTween tween = ValueTweenAtSpeed(img.fillAmount, to, speed);
-            tween.SetOnUpdateFloat(delegate (float v)
+            tween.SetOnUpdateFloat((float v) =>
             {
                 if (img != null)
                     img.fillAmount = v;
@@ -646,7 +645,7 @@ namespace F8Framework.Core
         public BaseTween VectorTween(Vector2 from, Vector2 to, float t)
         {
             Vector2Tween tween = TweenPool.GetVector2Tween(from, to, t);
-            return ProcessTween(tween);
+            return tween;
         }
 
         public BaseTween VectorTweenAtSpeed(Vector2 from, Vector2 to, float speed)
@@ -658,7 +657,7 @@ namespace F8Framework.Core
         public BaseTween VectorTween(Vector3 from, Vector3 to, float t)
         {
             Vector3Tween tween = TweenPool.GetVector3Tween(from, to, t);
-            return ProcessTween(tween);
+            return tween;
         }
 
         public BaseTween VectorTweenAtSpeed(Vector3 from, Vector3 to, float speed)
@@ -674,7 +673,7 @@ namespace F8Framework.Core
         public BaseTween ValueTween(float from, float to, float t)
         {
             var tween = TweenPool.GetValueTween(from, to, t);
-            return ProcessTween(tween);
+            return tween;
         }
 
         public BaseTween ValueTweenAtSpeed(float from, float to, float speed)
@@ -687,13 +686,12 @@ namespace F8Framework.Core
         #region MOVE_TWEEN
         public BaseTween Move(Transform obj, Transform to, float t)
         {
-            MoveTween tween = TweenPool.GetMoveTween(obj, to, t);
-            return ProcessTween(tween);
+            return Move(obj, to.position, t);
         }
 
         public BaseTween LocalMove(Transform obj, Transform to, float t)
         {
-            return Move(obj, to, t);
+            return LocalMove(obj, to.localPosition, t);
         }
         
         public BaseTween MoveAtSpeed(Transform obj, Transform to, float speed)
@@ -705,13 +703,12 @@ namespace F8Framework.Core
         public BaseTween LocalMoveAtSpeed(Transform obj, Transform to, float speed)
         {
             float t = Vector3.Distance(obj.localPosition, to.localPosition) / speed;
-            return Move(obj, to, t);
+            return LocalMove(obj, to, t);
         }
         
         public BaseTween Move(Transform obj, Vector3 to, float t)
         {
             Vector3Tween tween = TweenPool.GetVector3Tween(obj.position, to, t);
-            tween.PauseReset += () => tween.Init(obj.position, to, t);
             tween.SetOnUpdateVector3((Vector3 pos) =>
             {
                 if (obj == null)
@@ -722,13 +719,12 @@ namespace F8Framework.Core
 
                 obj.position = pos;
             });
-            return ProcessTween(tween);
+            return tween;
         }
 
         public BaseTween LocalMove(Transform obj, Vector3 to, float t)
         {
             Vector3Tween tween = TweenPool.GetVector3Tween(obj.localPosition, to, t);
-            tween.PauseReset += () => tween.Init(obj.localPosition, to, t);
             tween.SetOnUpdateVector3((Vector3 pos) =>
             {
                 if (obj == null)
@@ -739,7 +735,7 @@ namespace F8Framework.Core
 
                 obj.localPosition = pos;
             });
-            return ProcessTween(tween);
+            return tween;
         }
         
         public BaseTween MoveAtSpeed(Transform obj, Vector3 to, float speed)
@@ -761,7 +757,7 @@ namespace F8Framework.Core
 
         public BaseTween LocalMove(GameObject obj, Transform to, float t)
         {
-            return Move(obj.transform, to, t);
+            return LocalMove(obj.transform, to, t);
         }
         
         public BaseTween MoveAtSpeed(GameObject obj, Transform to, float speed)
@@ -773,7 +769,7 @@ namespace F8Framework.Core
         public BaseTween LocalMoveAtSpeed(GameObject obj, Transform to, float speed)
         {
             float t = Vector3.Distance(obj.transform.localPosition, to.localPosition) / speed;
-            return Move(obj, to, t);
+            return LocalMove(obj, to, t);
         }
         
         public BaseTween Move(GameObject obj, Vector3 to, float t)
@@ -805,7 +801,7 @@ namespace F8Framework.Core
 
         public BaseTween LocalMove(GameObject obj, GameObject to, float t)
         {
-            return Move(obj.transform, to.transform, t);
+            return LocalMove(obj.transform, to.transform, t);
         }
         
         public BaseTween MoveAtSpeed(GameObject obj, GameObject to, float speed)
@@ -817,7 +813,7 @@ namespace F8Framework.Core
         public BaseTween LocalMoveAtSpeed(GameObject obj, GameObject to, float speed)
         {
             float t = Vector3.Distance(obj.transform.localPosition, to.transform.localPosition) / speed;
-            return Move(obj, to, t);
+            return LocalMove(obj, to, t);
         }
         
         public BaseTween Move(Transform obj, GameObject to, float t)
@@ -827,7 +823,7 @@ namespace F8Framework.Core
         
         public BaseTween LocalMove(Transform obj, GameObject to, float t)
         {
-            return Move(obj, to.transform, t);
+            return LocalMove(obj, to.transform, t);
         }
         
         public BaseTween MoveAtSpeed(Transform obj, GameObject to, float speed)
@@ -839,24 +835,28 @@ namespace F8Framework.Core
         public BaseTween LocalMoveAtSpeed(Transform obj, GameObject to, float speed)
         {
             float t = Vector3.Distance(obj.localPosition, to.transform.localPosition) / speed;
-            return Move(obj, to, t);
+            return LocalMove(obj, to, t);
         }
         
         public BaseTween Move(RectTransform rect, Vector2 pos, float t)
         {
-
-            return VectorTween(new Vector3(rect.anchoredPosition.x, rect.anchoredPosition.y, 0.0f), new Vector3(pos.x, pos.y, 0.0f), t).SetOnUpdateVector3((Vector3 value) =>
+            Vector2Tween tween = TweenPool.GetVector2Tween(rect.anchoredPosition, pos, t);
+            tween.SetOnUpdateVector2((Vector2 value) =>
             {
                 if (rect == null)
+                {
+                    CancelTween(tween);
                     return;
+                }
 
-                rect.anchoredPosition = new Vector2(value.x, value.y);
+                rect.anchoredPosition = value;
             });
+            return tween;
         }
 
         public BaseTween MoveAtSpeed(RectTransform rect, Vector2 pos, float speed)
         {
-            float t = Vector2.Distance(new Vector2(rect.anchoredPosition.x, rect.anchoredPosition.y), new Vector2(rect.anchoredPosition.x, rect.anchoredPosition.y)) / speed;
+            float t = Vector2.Distance(rect.anchoredPosition, pos) / speed;
             return Move(rect, pos, t);
         }
 
@@ -877,21 +877,18 @@ namespace F8Framework.Core
         /// <param name="absolutePosition"></param>
         /// <param name="canvas"></param>
         /// <param name="t"></param>
+        /// <param name="pivotPreset"></param>
         /// <returns></returns>        
-
         public BaseTween MoveUI(RectTransform rect, Vector2 absolutePosition, RectTransform canvas, float t, PivotPreset pivotPreset = PivotPreset.MiddleCenter)
         {
             Vector2 pos = rect.FromAbsolutePositionToAnchoredPosition(absolutePosition, canvas, pivotPreset);
-
             return Move(rect, pos, t);
         }
 
         public BaseTween MoveUIAtSpeed(RectTransform rect, Vector2 absolutePosition, RectTransform canvas, float speed, PivotPreset pivotPreset = PivotPreset.MiddleCenter)
         {
-
             Vector2 pos = rect.FromAbsolutePositionToAnchoredPosition(absolutePosition, canvas, pivotPreset);
-
-            float time = Vector3.Distance(rect.anchoredPosition, pos) / speed;
+            float time = Vector2.Distance(rect.anchoredPosition, pos) / speed;
 
             return MoveUI(rect, absolutePosition, canvas, time, pivotPreset);
         }

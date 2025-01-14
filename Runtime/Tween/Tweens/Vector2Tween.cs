@@ -6,8 +6,9 @@ namespace F8Framework.Core
     public class Vector2Tween : BaseTween
     {
         #region PRIVATE
-        private Vector2 from = Vector3.zero;
-        private Vector2 to = Vector3.zero;
+        private Vector2 from = Vector2.zero;
+        private Vector2 to = Vector2.zero;
+        private Vector2 tempValue = Vector2.zero;
         #endregion
 
         #region PUBLIC
@@ -16,13 +17,21 @@ namespace F8Framework.Core
             Init(from, to, t);
             this.id = id;
         }
-
+        
+        internal void Init(Vector2 from, Vector2 to, float t)
+        {
+            this.from = from;
+            this.to = to;
+            this.duration = t;
+            this.PauseReset = () => this.Init(from, to, t);
+        }
+        
         /// <summary>
         /// called every frame
         /// </summary>
         public override void Update(float deltaTime)
         {
-            if(isPause || isComplete)
+            if(isPause || IsComplete || IsRecycle)
                 return;
 
             //wait a delay
@@ -49,26 +58,24 @@ namespace F8Framework.Core
             }
 
             //get the new value
-            Vector2 value = EasingFunctions.ChangeVector(from, to, currentTime / duration, ease);
-
-            //Vector2 vector2Value = new Vector2(value.x , value.y);
+            EasingFunctions.ChangeVector(from, to, currentTime / duration, ease, ref tempValue);
 
             //call update if we have it
             if(onUpdateVector2 != null)
-                onUpdateVector2(value);
+                onUpdateVector2(tempValue);
         }
 
-        internal void Init(Vector2 from, Vector2 to, float t)
+        public override void Reset()
         {
-            this.from = from;
-            this.to = to;
-            this.duration = t;
+            base.Reset();
+            from = Vector2.zero;
+            to = Vector2.zero;
         }
-
+        
         public override void ReplayReset()
         {
             base.ReplayReset();
-            Init(@from, to, duration);
+            Init(from, to, duration);
         }
 
         #endregion
