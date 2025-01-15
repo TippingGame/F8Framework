@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.94] - 2025-01-16
+1.新增Tween模块支持协程和async/await等待动画  
+2.新增UI序列帧动画组件SpriteSequenceFrame  
+
 ## [1.0.93] - 2025-01-15
 1.优化Tween模块为零GC  
 2.完善文档  

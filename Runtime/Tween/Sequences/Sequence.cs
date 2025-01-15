@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace F8Framework.Core
 {
@@ -9,7 +11,7 @@ namespace F8Framework.Core
 		Join
 	}
 
-	public class Sequence
+	public class Sequence : IEnumerator
 	{
 		private List<BaseTween> tweenList = new List<BaseTween>();
 		private List<TimeEvent> timeEvents = new List<TimeEvent>();
@@ -254,6 +256,44 @@ namespace F8Framework.Core
 			return tweenList[tweenList.Count - 2];
 		}
 
+		/// <summary>使用此方法在协程中等待Sequence。</summary>
+		/// <example><code>
+		/// IEnumerator Coroutine() {
+		///		var sequence = SequenceManager.GetSequence();
+		///		var baseTween = gameObject.Move(Vector3.one, 1f);
+		///		sequence.Append(baseTween);
+		///		yield return sequence;
+		/// }
+		/// </code></example>
+		bool IEnumerator.MoveNext() {
+			return Recycle != null;
+		}
+
+		object IEnumerator.Current {
+			get {
+				if (Recycle == null)
+				{
+					LogF8.LogError("已回收的Sequence无法访问当前值");
+				}
+				return null;
+			}
+		}
+
+		void IEnumerator.Reset() => throw new NotSupportedException();
+        
+		/// <summary>此方法是异步/等待支持所必需的。不要直接使用它。</summary>
+		/// <example><code>
+		/// async void Coroutine() {
+		///		var sequence = SequenceManager.GetSequence();
+		///		var baseTween = gameObject.Move(Vector3.one, 1f);
+		///		sequence.Append(baseTween);
+		///     await sequence;
+		/// }
+		/// </code></example>
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		public SwquenceAwaiter GetAwaiter() {
+			return new SwquenceAwaiter(this);
+		}
 	}
 
 	public abstract class Command

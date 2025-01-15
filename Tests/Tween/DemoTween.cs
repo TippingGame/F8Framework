@@ -1,3 +1,4 @@
+using System.Collections;
 using F8Framework.Core;
 using F8Framework.Launcher;
 using UnityEngine;
@@ -12,7 +13,7 @@ namespace F8Framework.Tests
 
         void Start()
         {
-            /*--------------------------普通用法--------------------------*/
+            /*-----------------------------------------普通用法-----------------------------------------*/
             // 播放动画，设置Ease动画，设置OnComplete完成回调
             int id = gameObject.ScaleTween(Vector3.one, 1f).SetEase(Ease.Linear).SetOnComplete(OnViewOpen).ID;
 
@@ -81,7 +82,8 @@ namespace F8Framework.Tests
             transform.GetComponent<RectTransform>().MoveUI(new Vector2(1f, 1f), canvasRect, 1f)
                 .SetEase(Ease.EaseOutBounce);
             
-            /*--------------------------动画组合--------------------------*/
+            
+            /*-----------------------------------------动画组合-----------------------------------------*/
             // 初始化，依次执行动画/并行执行动画，回调
             var sequence = SequenceManager.GetSequence();
             
@@ -100,6 +102,26 @@ namespace F8Framework.Tests
             
             // 回收Sequence，并停止所有动画
             SequenceManager.KillSequence(sequence);
+        }
+        
+        /*-----------------------------------------使用协程等待动画和动画组-----------------------------------------*/
+        IEnumerator Coroutine() {
+            yield return gameObject.Move(Vector3.one, 1f);
+            
+            var sequence = SequenceManager.GetSequence();
+            var baseTween = gameObject.Move(Vector3.one, 1f);
+            sequence.Append(baseTween);
+            yield return sequence;
+        }
+        
+        /*-----------------------------------------使用async/await等待动画和动画组-----------------------------------------*/
+        async void Async() {
+            await gameObject.Move(Vector3.one, 1f);
+            
+            var sequence = SequenceManager.GetSequence();
+            var baseTween = gameObject.Move(Vector3.one, 1f);
+            sequence.Append(baseTween);
+            await sequence;
         }
     }
 }
