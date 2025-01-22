@@ -47,52 +47,65 @@ IEnumerator Start()
     // 编辑器模式，无需每次修改资源都按F8
     FF8.Asset.IsEditorMode = true;
     
-    /*-------------------------------------同步加载-------------------------------------*/
     
+    /*-------------------------------------同步加载-------------------------------------*/
     GameObject go = FF8.Asset.Load<GameObject>("Cube");
 
-    // subAssetName：使用Multiple模式的Sprite图片则可使用
+    // assetName：资产名
+    // subAssetName：子资产名，使用Multiple模式的Sprite图片则可使用
     // 指定加载模式REMOTE_ASSET_BUNDLE，加载远程AssetBundle资产，需要配置AssetRemoteAddress = "http://127.0.0.1:6789/remote"
-    Sprite go5 = FF8.Asset.Load<Sprite>("PackForest01", "PackForest01_12", AssetManager.AssetAccessMode.REMOTE_ASSET_BUNDLE);
-
+    Sprite sprite = FF8.Asset.Load<Sprite>("PackForest01", "PackForest01_12", AssetManager.AssetAccessMode.REMOTE_ASSET_BUNDLE);
+    
     
     /*-------------------------------------异步加载-------------------------------------*/
-
     FF8.Asset.LoadAsync<GameObject>("Cube", (go) =>
     {
         GameObject goo = Instantiate(go);
     });
 
-    // 协程
-    var load = FF8.Asset.LoadAsyncCoroutine<GameObject>("Cube");
-    yield return load;
-    GameObject go2 = FF8.Asset.GetAssetObject<GameObject>("Cube");
-
+    // async/await方式（无多线程，WebGL也可使用）
+    // BaseLoader load = FF8.Asset.LoadAsync<GameObject>("Cube");
+    // await load;
     
-    /*-------------------------------------加载文件夹首层内资产-------------------------------------*/
+    // 协程方式
+    BaseLoader load2 = FF8.Asset.LoadAsync<GameObject>("Cube");
+    yield return load2.LoaderSuccess;
+    GameObject go2 = load2.GetAssetObject<GameObject>();
     
-    // 加载文件夹内资产（不遍历所有文件夹）
+    
+    /*-------------------------------------加载文件夹内首层资产-------------------------------------*/
+    // 加载文件夹内首层资产（不遍历所有文件夹）
     FF8.Asset.LoadDir("NewFolder");
     
+    // async/await方式（无多线程，WebGL也可使用）
+    // BaseDirLoader loadDir = FF8.Asset.LoadDirAsync("NewFolder", () => { });
+    // await loadDir;
+    
     // 加载文件夹内资产
-    FF8.Asset.LoadDirAsync("NewFolder", () => { });
-
-    // 协程，迭代文件夹内资产（不遍历所有文件夹）
+    BaseDirLoader loadDir2 = FF8.Asset.LoadDirAsync("NewFolder", () => { });
+    yield return loadDir2;
+    
+    // 你可以查看所有资产的BaseLoader
+    List<BaseLoader> loaders = loadDir2.Loaders;
+    
+    // 也可以这样设置查看加载进度
     foreach (var item in FF8.Asset.LoadDirAsyncCoroutine("NewFolder"))
     {
         yield return item;
     }
 
     // 也可以这样
-    var loadDir = FF8.Asset.LoadDirAsyncCoroutine("NewFolder").GetEnumerator();
-    while (loadDir.MoveNext())
+    var loadDir3 = FF8.Asset.LoadDirAsyncCoroutine("NewFolder").GetEnumerator();
+    while (loadDir3.MoveNext())
     {
-        yield return loadDir.Current;
+        yield return loadDir3.Current;
     }
     
     
     /*-------------------------------------其他功能-------------------------------------*/
-
+    // 获取资产
+    GameObject go3 = FF8.Asset.GetAssetObject<GameObject>("Cube");
+    
     // 获取加载进度
     float loadProgress = FF8.Asset.GetLoadProgress("Cube");
 
@@ -102,7 +115,7 @@ IEnumerator Start()
     // 同步卸载资产
     FF8.Asset.Unload("Cube", false); //根据AbPath卸载资产，如果设置为 true，完全卸载。
 
-    // 步卸载资产
+    // 异步卸载资产
     FF8.Asset.UnloadAsync("Cube", false, () =>
     {
         // 卸载资产完成
@@ -110,13 +123,13 @@ IEnumerator Start()
     
     
     /*-------------------------------------其他类型加载示例-------------------------------------*/
-    
     // 加载场景，别忘了加载天空盒材质，不然会变紫色
     FF8.Asset.Load("Scene");
     SceneManager.LoadScene("Scene");
     
     // 使用图集首先需要，加载图集
     FF8.Asset.Load("SpriteAtlas");
+    
     // 假如将图集与图片改为同一AB名，则无需预先加载图集
     FF8.Asset.LoadAsync<Sprite>("PackForest_2", sprite =>
     {

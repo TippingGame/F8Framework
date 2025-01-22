@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace F8Framework.Core
 {
@@ -11,6 +12,14 @@ namespace F8Framework.Core
     {
         
         private Dictionary<string, ResourcesLoader> resourceLoaders = new Dictionary<string, ResourcesLoader>();
+        
+        public ResourcesLoader GetResourceLoader(string resourcePath)
+        {
+            if (resourceLoaders.TryGetValue(resourcePath, out ResourcesLoader loader))
+                return loader;
+
+            return null;
+        }
         
         /// <summary>
         /// 通过相对资源名称同步加载。
@@ -91,7 +100,7 @@ namespace F8Framework.Core
         /// <typeparam name="T">Asset对象的目标对象类型。</typeparam>
         /// <param name="resourcePath">资源文件夹的相对路径。</param>
         /// <param name="callback">异步加载完成的回调。</param>
-        public void LoadAsync<T>(
+        public ResourcesLoader LoadAsync<T>(
             string resourcePath,
             OnAssetObject<T> callback = null)
             where T : Object
@@ -109,6 +118,7 @@ namespace F8Framework.Core
             }
 
             loader.LoadAsync<T>(callback);
+            return loader;
         }
 
         public IEnumerator LoadAsyncCoroutine<T>(string resourcePath) where T : Object
@@ -135,7 +145,7 @@ namespace F8Framework.Core
         /// <param name="resourcePath">资源文件夹的相对路径。</param>
         /// <param name="resourceType">Asset对象的目标对象类型。</param>
         /// <param name="callback">异步加载完成的回调。</param>
-        public void LoadAsync(
+        public ResourcesLoader LoadAsync(
             string resourcePath,
             System.Type resourceType,
             OnAssetObject<Object> callback = null)
@@ -153,6 +163,7 @@ namespace F8Framework.Core
             }
 
             loader.LoadAsync(resourceType, callback);
+            return loader;
         }
 
         public IEnumerator LoadAsyncCoroutine(string resourcePath, System.Type resourceType = default)
@@ -178,7 +189,7 @@ namespace F8Framework.Core
         /// </summary>
         /// <param name="resourcePath">资源文件夹的相对路径。</param>
         /// <param name="callback">异步加载完成的回调。</param>
-        public void LoadAsync(
+        public ResourcesLoader LoadAsync(
             string resourcePath,
             OnAssetObject<Object> callback = null)
         {
@@ -195,6 +206,7 @@ namespace F8Framework.Core
             }
 
             loader.LoadAsync(callback);
+            return loader;
         }
 
         /// <summary>
@@ -289,65 +301,63 @@ namespace F8Framework.Core
                 Resources.UnloadAsset(obj);
             }
         }
-        
+
         /// <summary>
         /// 加载所有资源。
         /// </summary>
-        /// <param name="assetName">资产名。</param>
         /// <param name="resourcePath">资源文件夹的相对路径。</param>
         /// <param name="subAssetName">子资产名称。</param>
+        /// <param name="loader">ResourcesLoader</param>
         /// <returns>加载的资源对象。</returns>
         public T LoadAll<T>(
-            string assetName,
             string resourcePath,
-            string subAssetName = null)
+            string subAssetName,
+            out ResourcesLoader loader)
             where T : Object
         {
-            ResourcesLoader loader;
+            ResourcesLoader loader2;
             if (resourceLoaders.ContainsKey(resourcePath))
             {
-                loader = resourceLoaders[resourcePath];
+                loader2 = resourceLoaders[resourcePath];
             }
             else
             {
-                loader = new ResourcesLoader();
-                loader.Init(resourcePath);
-                resourceLoaders.Add(resourcePath, loader);
+                loader2 = new ResourcesLoader();
+                loader2.Init(resourcePath);
+                resourceLoaders.Add(resourcePath, loader2);
             }
-
-            T result = loader.LoadAll<T>(assetName, subAssetName);
-
+            loader = loader2;
+            T result = loader2.LoadAll<T>(subAssetName);
             return result;
         }
-        
+
         /// <summary>
         /// 加载所有资源。
         /// </summary>
-        /// <param name="assetName">资产名。</param>
         /// <param name="resourcePath">资源文件夹的相对路径。</param>
         /// <param name="assetType">返回对象的类型筛选器。</param>
         /// <param name="subAssetName">子资产名称。</param>
+        /// <param name="loader">ResourcesLoader</param>
         /// <returns>加载的资源对象。</returns>
         public Object LoadAll(
-            string assetName,
             string resourcePath,
-            System.Type assetType = default,
-            string subAssetName = null)
+            System.Type assetType,
+            string subAssetName,
+            out ResourcesLoader loader)
         {
-            ResourcesLoader loader;
+            ResourcesLoader loader2;
             if (resourceLoaders.ContainsKey(resourcePath))
             {
-                loader = resourceLoaders[resourcePath];
+                loader2 = resourceLoaders[resourcePath];
             }
             else
             {
-                loader = new ResourcesLoader();
-                loader.Init(resourcePath);
-                resourceLoaders.Add(resourcePath, loader);
+                loader2 = new ResourcesLoader();
+                loader2.Init(resourcePath);
+                resourceLoaders.Add(resourcePath, loader2);
             }
-
-            Object result = loader.LoadAll(assetName, assetType, subAssetName);
-
+            loader = loader2;
+            Object result = loader2.LoadAll(assetType, subAssetName);
             return result;
         }
 
@@ -357,28 +367,28 @@ namespace F8Framework.Core
         /// <typeparam name="T">Asset对象的目标对象类型。</typeparam>
         /// <param name="resourcePath">资源文件夹的相对路径。</param>
         /// <param name="subAssetName">子资产名字。</param>
+        /// <param name="loader">ResourcesLoader</param>
         /// <returns>加载的资源对象。</returns>
-        public T GetResouceObject<T>(string resourcePath, string subAssetName = null)
+        public T GetAssetObject<T>(string resourcePath, string subAssetName, out ResourcesLoader loader)
             where T : Object
         {
             if (IsLoadFinished(resourcePath))
             {
-                if (resourceLoaders.TryGetValue(
-                    resourcePath,
-                    out ResourcesLoader loader))
+                if (resourceLoaders.TryGetValue(resourcePath, out ResourcesLoader loader2))
                 {
+                    loader = loader2;
                     if (subAssetName.IsNullOrEmpty())
                     {
-                        return loader.ResouceObject as T;
+                        return loader2.ResouceObject as T;
                     }
-                    bool success = loader.TryGetAsset(resourcePath + subAssetName, out Object obj);
+                    bool success = loader2.TryGetAsset(resourcePath + subAssetName, out Object obj);
                     if (success)
                     {
                         return obj as T;
                     }
                 }
             }
-
+            loader = null;
             return null;
         }
 
@@ -388,27 +398,27 @@ namespace F8Framework.Core
         /// <param name="resourcePath">资源文件夹的相对路径。</param>
         /// <param name="resourceType">Asset对象的目标对象类型。</param>
         /// <param name="subAssetName">子资产名字。</param>
+        /// <param name="loader">ResourcesLoader</param>
         /// <returns>加载的资源对象。</returns>
-        public Object GetResouceObject(string resourcePath, System.Type resourceType = default, string subAssetName = null)
+        public Object GetAssetObject(string resourcePath, System.Type resourceType, string subAssetName, out ResourcesLoader loader)
         {
             if (IsLoadFinished(resourcePath))
             {
-                if (resourceLoaders.TryGetValue(
-                    resourcePath,
-                    out ResourcesLoader loader))
+                if (resourceLoaders.TryGetValue(resourcePath, out ResourcesLoader loader2))
                 {
+                    loader = loader2;
                     if (subAssetName.IsNullOrEmpty())
                     {
-                        return loader.ResouceObject;
+                        return loader2.ResouceObject;
                     }
-                    bool success = loader.TryGetAsset(resourcePath + subAssetName, out Object obj);
+                    bool success = loader2.TryGetAsset(resourcePath + subAssetName, out Object obj);
                     if (success)
                     {
                         return obj;
                     }
                 }
             }
-
+            loader = null;
             return null;
         }
 

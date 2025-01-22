@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.95] - 2025-01-22
+1.新增资产模块LoadAsync支持async/await和协程异步方式  
+2.修复资产模块先加载资源，再加载同名资源的子资产后失败的问题  
+
 ## [1.0.94] - 2025-01-16
 1.新增Tween模块支持协程和async/await等待动画  
 2.新增UI序列帧动画组件SpriteSequenceFrame  

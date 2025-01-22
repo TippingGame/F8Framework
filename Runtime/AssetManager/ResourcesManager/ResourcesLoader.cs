@@ -8,15 +8,18 @@ namespace F8Framework.Core
     /// 一个资源加载器。
     /// 管理资源的加载行为。
     /// </summary>
-    public class ResourcesLoader
+    public class ResourcesLoader : BaseLoader
     {
-        private string resourcePath;
+        private string resourcePath = "";
+        private string subAssetName = "";
         private Object resouceObject;
         private Dictionary<string, Object> resouceObjects = new Dictionary<string, Object>();
         
         private LoaderType loadType;
         private LoaderState resourceLoadState;
         private ResourceRequest resourceLoadRequest;
+        
+        public override bool LoaderSuccess => resourceLoadState == LoaderState.FINISHED;
         
         /// <summary>
         /// 加载类型：同步或异步本地加载。
@@ -68,6 +71,72 @@ namespace F8Framework.Core
             resourceLoadRequest = null;
         }
 
+        public override T GetAssetObject<T>(string subAssetName = null)
+        {
+            if (IsLoadFinished)
+            {
+                if (subAssetName.IsNullOrEmpty())
+                {
+                    if (this.subAssetName.IsNullOrEmpty())
+                    {
+                        return this.ResouceObject as T;
+                    }
+                    bool success = TryGetAsset(resourcePath + this.subAssetName, out Object obj);
+                    if (success)
+                    {
+                        return obj as T;
+                    }
+                }
+                else
+                {
+                    if (subAssetName.IsNullOrEmpty())
+                    {
+                        return this.ResouceObject as T;
+                    }
+                    bool success = TryGetAsset(resourcePath + subAssetName, out Object obj);
+                    if (success)
+                    {
+                        return obj as T;
+                    }
+                }
+            }
+            
+            return null;
+        }
+        
+        public override Object GetAssetObject(string subAssetName = null)
+        {
+            if (IsLoadFinished)
+            {
+                if (subAssetName.IsNullOrEmpty())
+                {
+                    if (this.subAssetName.IsNullOrEmpty())
+                    {
+                        return this.ResouceObject;
+                    }
+                    bool success = TryGetAsset(resourcePath + this.subAssetName, out Object obj);
+                    if (success)
+                    {
+                        return obj;
+                    }
+                }
+                else
+                {
+                    if (subAssetName.IsNullOrEmpty())
+                    {
+                        return this.ResouceObject;
+                    }
+                    bool success = TryGetAsset(resourcePath + subAssetName, out Object obj);
+                    if (success)
+                    {
+                        return obj;
+                    }
+                }
+            }
+
+            return null;
+        }
+        
         /// <summary>
         /// 同步加载资源。
         /// </summary>
@@ -155,6 +224,7 @@ namespace F8Framework.Core
             {
                 if (callback != null)
                     callback(o);
+                base.OnComplete();
             }
         }
 
@@ -223,6 +293,7 @@ namespace F8Framework.Core
             {
                 if (callback != null)
                     callback(o);
+                base.OnComplete();
             }
         }
 
@@ -284,70 +355,82 @@ namespace F8Framework.Core
             {
                 if (callback != null)
                     callback(o);
+                base.OnComplete();
             }
         }
 
-        public virtual T LoadAll<T>(string assetName, string subAssetName = null)
+        public virtual T LoadAll<T>(string subAssetName = null)
             where T : Object
         {
             if (resourceLoadState == LoaderState.FINISHED)
             {
-                return resouceObject as T;
+                if (subAssetName.IsNullOrEmpty())
+                {
+                    return resouceObject as T;
+                }
+                bool success = TryGetAsset(resourcePath + subAssetName, out Object obj);
+                if (success)
+                {
+                    return obj as T;
+                }
             }
 
             loadType = LoaderType.SYNC;
             resourceLoadState = LoaderState.WORKING;
+            resouceObject = Resources.Load<T>(resourcePath);
             T[] result = Resources.LoadAll<T>(resourcePath);
+            Object _resouceObject = null;
             foreach (T obj in result)
             {
                 SetResouceObject(resourcePath + obj.name, obj);
                 if (!subAssetName.IsNullOrEmpty() && obj.name.Equals(subAssetName))
                 {
-                    resouceObject = obj;
-                }
-                else if (obj.name.Equals(assetName))
-                {
-                    resouceObject = obj;
+                    _resouceObject = obj;
                 }
             }
             resourceLoadState = LoaderState.FINISHED;
-            return resouceObject as T;
+            return _resouceObject == null ? _resouceObject as T : resouceObject as T;
         }
         
-        public virtual Object LoadAll(string assetName, System.Type assetType = default, string subAssetName = null)
+        public virtual Object LoadAll(System.Type assetType = default, string subAssetName = null)
         {
             if (resourceLoadState == LoaderState.FINISHED)
             {
-                return resouceObject;
+                if (subAssetName.IsNullOrEmpty())
+                {
+                    return resouceObject;
+                }
+                bool success = TryGetAsset(resourcePath + subAssetName, out Object obj);
+                if (success)
+                {
+                    return obj;
+                }
             }
 
             loadType = LoaderType.SYNC;
             resourceLoadState = LoaderState.WORKING;
-            
             Object[] result;
             if (assetType == default)
             {
+                resouceObject = Resources.Load(resourcePath);
                 result = Resources.LoadAll(resourcePath);
             }
             else
             {
+                resouceObject = Resources.Load(resourcePath, assetType);
                 result = Resources.LoadAll(resourcePath, assetType);
             }
-            
+            Object _resouceObject = null;
             foreach (Object obj in result)
             {
                 SetResouceObject(resourcePath + obj.name, obj);
                 if (!subAssetName.IsNullOrEmpty() && obj.name.Equals(subAssetName))
                 {
-                    resouceObject = obj;
-                }
-                else if (obj.name.Equals(assetName))
-                {
-                    resouceObject = obj;
+                    _resouceObject = obj;
                 }
             }
             resourceLoadState = LoaderState.FINISHED;
-            return resouceObject;
+            return _resouceObject == null ? _resouceObject : resouceObject;
         }
         
         /// <summary>
@@ -356,6 +439,7 @@ namespace F8Framework.Core
         public void Clear()
         {
             resourcePath = "";
+            subAssetName = "";
             if(resouceObject != null &&
                !(resouceObject is GameObject))
                 Resources.UnloadAsset(resouceObject);
@@ -400,14 +484,7 @@ namespace F8Framework.Core
                 return;
             }
 
-            if (resouceObjects.ContainsKey(resourcePath))
-            {
-                resouceObjects[resourcePath] = obj;
-            }
-            else
-            {
-                resouceObjects.Add(resourcePath, obj);
-            }
+            resouceObjects[resourcePath] = obj;
         }
         
         /// <summary>

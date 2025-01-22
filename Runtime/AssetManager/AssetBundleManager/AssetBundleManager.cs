@@ -83,7 +83,7 @@ namespace F8Framework.Core
         /// <param name="info">资产信息。</param>
         /// <param name="subAssetName">子资产名称。</param>
         /// <param name="loadCallback">异步加载完成的回调。</param>
-        public void LoadAsync(
+        public AssetBundleLoader LoadAsync(
             string assetName,
             System.Type assetType,
             AssetManager.AssetInfo info,
@@ -141,6 +141,7 @@ namespace F8Framework.Core
                     }
                 );
             }
+            return lastLoader;
         }
 
         public IEnumerator LoadAsyncCoroutine(string assetName, System.Type assetType, AssetManager.AssetInfo info, string subAssetName = null)
@@ -445,27 +446,29 @@ namespace F8Framework.Core
         /// 通过资产捆绑加载程序和对象名称获取资产对象。
         /// </summary>
         /// <typeparam name="T">资产对象的目标对象类型。</typeparam>
-        /// <param name="assetName">资产名称。</param>
         /// <param name="assetBundlePath">assetBundle路径。</param>
         /// <param name="assetPath">assetPath名。（小写）</param>
         /// <param name="subAssetName">子资产名称。</param>
+        /// <param name="loader">AssetBundleLoader</param>
         /// <returns>找到的资产对象。</returns>
-        public T GetAssetObject<T>(string assetBundlePath, string assetPath, string subAssetName = null)
+        public T GetAssetObject<T>(string assetBundlePath, string assetPath, string subAssetName, out AssetBundleLoader loader)
             where T : Object
         {
-            if (assetBundleLoaders.TryGetValue(assetBundlePath, out AssetBundleLoader loader))
+            if (assetBundleLoaders.TryGetValue(assetBundlePath, out AssetBundleLoader loader2))
             {
-                if (loader != null &&
-                    loader.IsLoadFinished &&
-                    loader.IsExpandFinished)
+                if (loader2 != null &&
+                    loader2.IsLoadFinished &&
+                    loader2.IsExpandFinished)
                 {
-                    bool success = loader.TryGetAsset(subAssetName.IsNullOrEmpty() ? assetPath : assetPath + subAssetName, out Object obj);
+                    loader = loader2;
+                    bool success = loader2.TryGetAsset(subAssetName.IsNullOrEmpty() ? assetPath : assetPath + subAssetName, out Object obj);
                     if (success)
                     {
                         return obj as T;
                     }
                 }
             }
+            loader = null;
             return null;
         }
 
@@ -476,23 +479,25 @@ namespace F8Framework.Core
         /// <param name="assetPath">assetPath名。（小写）</param>
         /// <param name="assetType">资产对象的目标对象类型。</param>
         /// <param name="subAssetName">子资产名称。</param>
+        /// <param name="loader">AssetBundleLoader</param>
         /// <returns>找到的资产对象。</returns>
-        public Object GetAssetObject(string assetBundlePath, string assetPath, System.Type assetType = default, string subAssetName = null)
+        public Object GetAssetObject(string assetBundlePath, string assetPath, System.Type assetType, string subAssetName, out AssetBundleLoader loader)
         {
-            if (assetBundleLoaders.TryGetValue(assetBundlePath, out AssetBundleLoader loader))
+            if (assetBundleLoaders.TryGetValue(assetBundlePath, out AssetBundleLoader loader2))
             {
-                if (loader != null &&
-                    loader.IsLoadFinished &&
-                    loader.IsExpandFinished)
+                if (loader2 != null &&
+                    loader2.IsLoadFinished &&
+                    loader2.IsExpandFinished)
                 {
-                    bool success = loader.TryGetAsset(subAssetName.IsNullOrEmpty() ? assetPath : assetPath + subAssetName, out Object obj);
+                    loader = loader2;
+                    bool success = loader2.TryGetAsset(subAssetName.IsNullOrEmpty() ? assetPath : assetPath + subAssetName, out Object obj);
                     if (success)
                     {
                         return obj;
                     }
                 }
             }
-
+            loader = null;
             return null;
         }
 
