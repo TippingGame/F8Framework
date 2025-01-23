@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.0.97] - 2025-01-23
+1.修复配置表模块容器类型互相嵌套时的错误问题  
+
 ## [1.0.96] - 2025-01-23
 1.优化配置表模块可为基础类型和容器类型，可自由组合  
 2.新增配置表更多字段类型，如基础类型：bool，byte，short，容器类型：[][][]，list<>，dictionary<,>，Unity基础类型vector2，vector3，vector4，vector2int，vector3int，quaternion，color  

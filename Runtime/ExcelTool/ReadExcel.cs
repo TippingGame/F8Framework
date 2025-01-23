@@ -289,7 +289,7 @@ namespace F8Framework.Core
                 if (type.EndsWith(SupportType.ARRAY))
                 {
                     string innerType = type.Substring(0, type.Length - 2);
-                    data = data.Substring(1, data.Length - 2); // 移除最外层的 '[' 和 ']'
+                    data = RemoveOuterBracketsIfPaired(data); // 移除最外层的 '[' 和 ']' '{' 和 '}'
                     var elements = ParseElements(data).ToArray();
                     int elementsLength = elements.Length;
                     var array = (Array)Activator.CreateInstance(Type.GetType(GetTrueType(innerType) + "[]"),
@@ -305,9 +305,10 @@ namespace F8Framework.Core
                 else if (type.StartsWith(SupportType.LIST) && type.EndsWith(">"))
                 {
                     string innerType = type.Substring(5, type.Length - 6);
+                    data = RemoveOuterBracketsIfPaired(data); // 移除最外层的 '[' 和 ']' '{' 和 '}'
                     var elements = ParseElements(data).ToArray();
                     int elementsLength = elements.Length;
-                    Type elementType = Type.GetType(GetTrueType(innerType));
+                    Type elementType = Type.GetType(GetTrueType(innerType, "", "", false));
                     var list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType));
                     for (int i = 0; i < elementsLength; i++)
                     {
@@ -318,22 +319,26 @@ namespace F8Framework.Core
                 }
                 else if ((type.StartsWith(SupportType.DICTIONARY) || type.StartsWith(SupportType.DICTIONARYFULL)) && type.EndsWith(">"))
                 {
-                    if (type.StartsWith(SupportType.DICTIONARY))
-                    {
-                        type = SupportType.DICTIONARYFULL;
-                    }
+                    data = RemoveOuterBracketsIfPaired(data); // 移除最外层的 '[' 和 ']' '{' 和 '}'
                     int commaIndex = type.IndexOf(',');
                     if (commaIndex == -1)
                     {
                         throw new Exception("Dictionary 类型必须包含两个用逗号分隔的类型");
                     }
-
-                    string keyType = type.Substring(11, commaIndex - 11);
+                    string keyType = null;
+                    if (type.StartsWith(SupportType.DICTIONARY))
+                    {
+                        keyType = type.Substring(5, commaIndex - 5);
+                    }
+                    else if(type.StartsWith(SupportType.DICTIONARYFULL))
+                    {
+                        keyType = type.Substring(11, commaIndex - 11);
+                    }
                     string valueType = type.Substring(commaIndex + 1, type.Length - commaIndex - 2);
                     var elements = ParseElements(data).ToArray();
                     int elementsLength = elements.Length;
                     Type keyElementType = Type.GetType(GetTrueType(keyType));
-                    Type valueElementType = Type.GetType(GetTrueType(valueType));
+                    Type valueElementType = Type.GetType(GetTrueType(valueType, "", "", false));
                     var dictionary =
                         (IDictionary)Activator.CreateInstance(
                             typeof(Dictionary<,>).MakeGenericType(keyElementType, valueElementType));
@@ -548,7 +553,7 @@ namespace F8Framework.Core
             return o;
         }
         
-        public static string GetTrueType(string type, string className = "", string inputPath = "")
+        public static string GetTrueType(string type, string className = "", string inputPath = "", bool writtenForm = true)
         {
             if (type.EndsWith(SupportType.ARRAY))
             {
@@ -558,22 +563,40 @@ namespace F8Framework.Core
             else if (type.StartsWith(SupportType.LIST) && type.EndsWith(">"))
             {
                 string innerType = type.Substring(5, type.Length - 6);
-                return "System.Collections.Generic.List<" + GetTrueType(innerType) + ">";
+                if (writtenForm)
+                {
+                    return "System.Collections.Generic.List<" + GetTrueType(innerType) + ">";
+                }
+                else
+                {
+                    return "System.Collections.Generic.List`1[" + GetTrueType(innerType) + "]";
+                }
             }
             else if ((type.StartsWith(SupportType.DICTIONARY) || type.StartsWith(SupportType.DICTIONARYFULL)) && type.EndsWith(">"))
             {
-                if (type.StartsWith(SupportType.DICTIONARY))
-                {
-                    type = SupportType.DICTIONARYFULL;
-                }
                 int commaIndex = type.IndexOf(',');
                 if (commaIndex == -1)
                 {
                     throw new Exception("Dictionary 类型必须包含两个用逗号分隔的类型");
                 }
-                string keyType = type.Substring(11, commaIndex - 11);
+                string keyType = null;
+                if (type.StartsWith(SupportType.DICTIONARY))
+                {
+                    keyType = type.Substring(5, commaIndex - 5);
+                }
+                else if(type.StartsWith(SupportType.DICTIONARYFULL))
+                {
+                    keyType = type.Substring(11, commaIndex - 11);
+                }
                 string valueType = type.Substring(commaIndex + 1, type.Length - commaIndex - 2);
-                return "System.Collections.Generic.Dictionary<" + GetTrueType(keyType) + "," + GetTrueType(valueType) + ">";
+                if (writtenForm)
+                {
+                    return "System.Collections.Generic.Dictionary<" + GetTrueType(keyType) + "," + GetTrueType(valueType) + ">";
+                }
+                else
+                {
+                    return "System.Collections.Generic.Dictionary`2[" + GetTrueType(keyType) + "," + GetTrueType(valueType) + "]";
+                }
             }
             else
             {
@@ -638,6 +661,55 @@ namespace F8Framework.Core
             }
 
             return type;
+        }
+        
+        private static string RemoveOuterBracketsIfPaired(string data)
+        {
+            if (string.IsNullOrEmpty(data))
+                return data;
+
+            if ((data.StartsWith("[") && data.EndsWith("]")) || (data.StartsWith("{") && data.EndsWith("}")))
+            {
+                Stack<char> stack = new Stack<char>();
+                char openingBracket = data[0];
+                char closingBracket = openingBracket == '[' ? ']' : '}';
+
+                // 先假设最外层括号可删除
+                bool canRemoveOuter = true;
+
+                // 从第二个字符开始遍历，到倒数第二个字符结束
+                for (int i = 1; i < data.Length - 1; i++)
+                {
+                    char c = data[i];
+                    if (c == openingBracket)
+                    {
+                        stack.Push(c);
+                    }
+                    else if (c == closingBracket)
+                    {
+                        if (stack.Count == 0)
+                        {
+                            // 遇到右括号但栈为空，说明括号不匹配，不能删除最外层括号
+                            canRemoveOuter = false;
+                            break;
+                        }
+                        stack.Pop();
+                    }
+                }
+
+                // 遍历结束后，若栈不为空，也不能删除最外层括号
+                if (stack.Count > 0)
+                {
+                    canRemoveOuter = false;
+                }
+
+                if (canRemoveOuter)
+                {
+                    return data.Substring(1, data.Length - 2);
+                }
+            }
+
+            return data;
         }
         
         private static List<string> ParseElements(string data)
