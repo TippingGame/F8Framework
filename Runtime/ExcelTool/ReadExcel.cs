@@ -2,6 +2,7 @@
 using System.IO;
 using System;
 using System.Collections;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -426,19 +427,51 @@ namespace F8Framework.Core
                             o = data;
                             break;
                         case SupportType.OBJ or SupportType.OBJFULL:
-                            if (data.EndsWith("\"") && data.StartsWith("\""))
+                            // 检查是否为带引号的字符串
+                            if (data.StartsWith("\"") && data.EndsWith("\""))
                             {
-                                string str = data.Substring(1);
-                                string str2 = str.Substring(0, str.Length - 1);
-                                o = str2;
+                                o = data.Trim('"');
                             }
-                            else if (data.Contains("."))
+                            // 使用正则表达式检查是否为浮点数字符串
+                            else if (Regex.IsMatch(data, @"[.\eE]"))
                             {
-                                o = ParseValue(SupportType.FLOAT, data, classname);
+                                if (float.TryParse(data, NumberStyles.Float, CultureInfo.InvariantCulture, out float floatValue))
+                                {
+                                    // 检查是否存在精度丢失
+                                    if (floatValue.ToString(NumberFormatInfo.InvariantInfo) == data)
+                                    {
+                                        o = floatValue;
+                                    }
+                                    else
+                                    {
+                                        if (double.TryParse(data, NumberStyles.Float, CultureInfo.InvariantCulture, out double doubleValue))
+                                        {
+                                            o = doubleValue;
+                                        }
+                                        else
+                                        {
+                                            o = data;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    o = data;
+                                }
+                            }
+                            // 尝试转换为 int 类型
+                            else if (int.TryParse(data, out int intValue))
+                            {
+                                o = intValue;
+                            }
+                            // 尝试转换为 long 类型
+                            else if (long.TryParse(data, out long longValue))
+                            {
+                                o = longValue;
                             }
                             else
                             {
-                                o = ParseValue(SupportType.INT, data, classname);
+                                o = data;
                             }
 
                             break;
