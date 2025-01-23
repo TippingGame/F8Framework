@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.96] - 2025-01-23
+1.优化配置表模块可为基础类型和容器类型，可自由组合  
+2.新增配置表更多字段类型，如基础类型：bool，byte，short，容器类型：[][][]，list<>，dictionary<,>，Unity基础类型vector2，vector3，vector4，vector2int，vector3int，quaternion，color  
+3.新增LitJson支持更多的字典Key值  
+
 ## [1.0.95] - 2025-01-22
 1.新增资产模块LoadAsync支持async/await和协程异步方式  
 2.修复资产模块先加载资源，再加载同名资源的子资产后失败的问题  

@@ -55,7 +55,7 @@ namespace F8Framework.Core.Editor
             {
                 if (Names[i].Equals("id", StringComparison.OrdinalIgnoreCase))
                 {
-                    return GetTrueType(Types[i]);
+                    return ReadExcel.GetTrueType(Types[i], ClassName, InputPath);
                 }
             }
 
@@ -72,7 +72,8 @@ namespace F8Framework.Core.Editor
             classSource.Append("\n");
             classSource.Append("using System;\n");
             classSource.Append("using System.Collections.Generic;\n");
-            classSource.Append("using UnityEngine.Scripting;\n\n");
+            classSource.Append("using UnityEngine.Scripting;\n");
+            classSource.Append("using UnityEngine;\n\n");
             classSource.Append("namespace " + ExcelDataTool.CODE_NAMESPACE + "\n");
             classSource.Append("{\n");
             classSource.Append("\t[Serializable]\n");
@@ -96,7 +97,7 @@ namespace F8Framework.Core.Editor
             {
                 if (fields[i].Equals("id", StringComparison.OrdinalIgnoreCase))
                 {
-                    idType = GetTrueType(types[i]);
+                    idType = ReadExcel.GetTrueType(types[i], ClassName, InputPath);
                     break;
                 }
             }
@@ -134,7 +135,7 @@ namespace F8Framework.Core.Editor
             if (string.IsNullOrEmpty(type) || string.IsNullOrEmpty(propertyName))
                 return null;
 
-            type = GetTrueType(type);
+            type = ReadExcel.GetTrueType(type, ClassName, InputPath);
             if (!string.IsNullOrEmpty(type))
             {
                 StringBuilder sbProperty = new StringBuilder();
@@ -155,71 +156,6 @@ namespace F8Framework.Core.Editor
             {
                 return "";
             }
-        }
-
-        private string GetTrueType(string type)
-        {
-            switch (type)
-            {
-                case SupportType.INT:
-                    type = "int";
-                    break;
-                case SupportType.LONG:
-                    type = "long";
-                    break;
-                case SupportType.FLOAT:
-                    type = "float";
-                    break;
-                case SupportType.DOUBLE:
-                    type = "double";
-                    break;
-                case SupportType.STRING or SupportType.STRINGFULL:
-                    type = "string";
-                    break;
-                case SupportType.OBJ or SupportType.OBJFULL:
-                    type = "System.Object";
-                    break;
-                case SupportType.ARRAY_INT:
-                    type = "int[]";
-                    break;
-                case SupportType.ARRAY_LONG:
-                    type = "long[]";
-                    break;
-                case SupportType.ARRAY_FLOAT:
-                    type = "float[]";
-                    break;
-                case SupportType.ARRAY_DOUBLE:
-                    type = "double[]";
-                    break;
-                case SupportType.ARRAY_STRING or SupportType.ARRAY_STRINGFULL:
-                    type = "string[]";
-                    break;
-                case SupportType.ARRAY_OBJ or SupportType.ARRAY_OBJFULL:
-                    type = "System.Object[]";
-                    break;
-                case SupportType.ARRAY_ARRAY_INT:
-                    type = "int[][]";
-                    break;
-                case SupportType.ARRAY_ARRAY_LONG:
-                    type = "long[][]";
-                    break;
-                case SupportType.ARRAY_ARRAY_FLOAT:
-                    type = "float[][]";
-                    break;
-                case SupportType.ARRAY_ARRAY_DOUBLE:
-                    type = "double[][]";
-                    break;
-                case SupportType.ARRAY_ARRAY_STRING or SupportType.ARRAY_ARRAY_STRINGFULL:
-                    type = "string[][]";
-                    break;
-                case SupportType.ARRAY_ARRAY_OBJ or SupportType.ARRAY_ARRAY_OBJFULL:
-                    type = "System.Object[][]";
-                    break;
-                default:
-                    throw new Exception("输入了错误的数据类型:  " + type + ", 类名:  " + ClassName + ", 位于:  " + InputPath);
-            }
-
-            return type;
         }
 
         //创建数据管理器脚本
@@ -365,44 +301,44 @@ namespace F8Framework.Core.Editor
             source.Append("\t\t[Preserve]\n");
             source.Append("\t\tpublic T Load<T>(string name)\n");
             source.Append("\t\t{\n");
-            source.Append("\t\t\tIFormatter f = new BinaryFormatter();\n");
+            // source.Append("\t\t\tIFormatter f = new BinaryFormatter();\n");
             source.Append("\t\t\tTextAsset textAsset = AssetManager.Instance.Load<TextAsset>(name);\n");
             source.Append("\t\t\tif (textAsset == null)\n");
             source.Append("\t\t\t{\n");
             source.Append("\t\t\t\treturn default(T);\n");
             source.Append("\t\t\t}\n");
             source.Append("\t\t\tAssetManager.Instance.Unload(name, false);\n");
-            source.Append("#if UNITY_WEBGL\n");
+            // source.Append("#if UNITY_WEBGL\n");
             source.Append("\t\t\tT obj = Util.LitJson.ToObject<T>(textAsset.text);\n");
             source.Append("\t\t\treturn obj;\n");
-            source.Append("#else\n");
-            source.Append("\t\t\tusing (MemoryStream memoryStream = new MemoryStream(textAsset.bytes))\n");
-            source.Append("\t\t\t{\n");
-            source.Append("\t\t\t\treturn (T)f.Deserialize(memoryStream);\n");
-            source.Append("\t\t\t}\n");
-            source.Append("#endif\n");
+            // source.Append("#else\n");
+            // source.Append("\t\t\tusing (MemoryStream memoryStream = new MemoryStream(textAsset.bytes))\n");
+            // source.Append("\t\t\t{\n");
+            // source.Append("\t\t\t\treturn (T)f.Deserialize(memoryStream);\n");
+            // source.Append("\t\t\t}\n");
+            // source.Append("#endif\n");
             source.Append("\t\t}\n\n");
             
             source.Append("\t\t[Preserve]\n");
             source.Append("\t\tpublic IEnumerator LoadAsync<T>(string name, Action<T> callback)\n");
             source.Append("\t\t{\n");
-            source.Append("\t\t\tIFormatter f = new BinaryFormatter();\n");
+            // source.Append("\t\t\tIFormatter f = new BinaryFormatter();\n");
             source.Append("\t\t\tvar load = AssetManager.Instance.LoadAsyncCoroutine<TextAsset>(name);\n");
             source.Append("\t\t\tyield return load;\n");
             source.Append("\t\t\tTextAsset textAsset = AssetManager.Instance.GetAssetObject<TextAsset>(name);\n");
             source.Append("\t\t\tif (textAsset != null)\n");
             source.Append("\t\t\t{\n");
             source.Append("\t\t\t\tAssetManager.Instance.Unload(name, false);\n");
-            source.Append("#if UNITY_WEBGL\n");
+            // source.Append("#if UNITY_WEBGL\n");
             source.Append("\t\t\t\tT obj = Util.LitJson.ToObject<T>(textAsset.text);\n");
             source.Append("\t\t\t\tcallback(obj);\n");
-            source.Append("#else\n");
-            source.Append("\t\t\t\tusing (Stream s = new MemoryStream(textAsset.bytes))\n");
-            source.Append("\t\t\t\t{\n");
-            source.Append("\t\t\t\t\tT obj = (T)f.Deserialize(s);\n");
-            source.Append("\t\t\t\t\tcallback(obj);\n");
-            source.Append("\t\t\t\t}\n");
-            source.Append("#endif\n");
+            // source.Append("#else\n");
+            // source.Append("\t\t\t\tusing (Stream s = new MemoryStream(textAsset.bytes))\n");
+            // source.Append("\t\t\t\t{\n");
+            // source.Append("\t\t\t\t\tT obj = (T)f.Deserialize(s);\n");
+            // source.Append("\t\t\t\t\tcallback(obj);\n");
+            // source.Append("\t\t\t\t}\n");
+            // source.Append("#endif\n");
             source.Append("\t\t\t}\n");
             source.Append("\t\t}\n\n");
             source.Append("\t\tpublic void OnInit(object createParam)\n");

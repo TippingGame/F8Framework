@@ -500,33 +500,42 @@ namespace F8Framework.Core.Editor
 
                 dict.GetType().GetMethod("Add").Invoke(dict, new System.Object[] { id, t });
             }
-#if UNITY_WEBGL
-            // 序列化对象
-            string json = Util.LitJson.ToJson(container);
-            // 写入到文件
-            string filePath = BinDataPath + "/" + container.GetType().Name + ".json";
-            FileTools.SafeWriteAllText(filePath, json);
-            // 记录日志
-            LogF8.LogConfig("已序列化 " + BinDataPath + "/<color=#FFFF00>" + container.GetType().Name + ".json</color>");
-#else
-            try
-            {
-                IFormatter formatter = new BinaryFormatter();
-                string filePath = Path.Combine(BinDataPath, container.GetType().Name + ".bytes");
 
-                // 使用 using 语句确保流被正确关闭
-                using (Stream stream = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None))
-                {
-                    formatter.Serialize(stream, container);
-                }
-
-                LogF8.LogConfig($"已序列化 {BinDataPath}/<color=#FFFF00>{container.GetType().Name}.bytes</color>");
-            }
-            catch (Exception ex)
+// #if UNITY_WEBGL
+			try
             {
-                Debug.LogError($"序列化失败: {ex.Message}");
+                // 序列化对象
+                string json = Util.LitJson.ToJson(container);
+                // 写入到文件
+                string filePath = BinDataPath + "/" + container.GetType().Name + ".json";
+                FileTools.SafeWriteAllText(filePath, json);
+                // 记录日志
+                LogF8.LogConfig("已序列化 " + BinDataPath + "/<color=#FFFF00>" + container.GetType().Name + ".json</color>");
             }
-#endif
+            catch (Exception e)
+            {
+                LogF8.LogError($"序列化失败: {e.Message}");
+            }
+// #else
+//             // 暂不使用BinaryFormatter序列化
+//             try
+//             {
+//                 IFormatter formatter = new BinaryFormatter();
+//                 string filePath = Path.Combine(BinDataPath, container.GetType().Name + ".bytes");
+//             
+//                 // 使用 using 语句确保流被正确关闭
+//                 using (Stream stream = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None))
+//                 {
+//                     formatter.Serialize(stream, container);
+//                 }
+//             
+//                 LogF8.LogConfig($"已序列化 {BinDataPath}/<color=#FFFF00>{container.GetType().Name}.bytes</color>");
+//             }
+//             catch (Exception e)
+//             {
+//                 LogF8.LogError($"序列化失败: {e.Message}");
+//             }
+// #endif
         }
     }
 }

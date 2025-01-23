@@ -38,7 +38,7 @@ namespace F8Framework.Tests
             
             // 协程方式
             BaseLoader load2 = FF8.Asset.LoadAsync<GameObject>("Cube");
-            yield return load2.LoaderSuccess;
+            yield return load2;
             GameObject go2 = load2.GetAssetObject<GameObject>();
             
             

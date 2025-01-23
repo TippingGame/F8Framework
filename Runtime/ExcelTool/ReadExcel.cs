@@ -1,16 +1,22 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System;
+using System.Collections;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using Excel;
+using UnityEngine;
 using Assembly = System.Reflection.Assembly;
 
 namespace F8Framework.Core
 {
     public class SupportType
     {
+        // 基础类型
+        public const string BOOL = "bool";
+        public const string BYTE = "byte";
+        public const string SHORT = "short";
         public const string INT = "int";
         public const string LONG = "long";
         public const string FLOAT = "float";
@@ -19,24 +25,25 @@ namespace F8Framework.Core
         public const string STRINGFULL = "string";
         public const string OBJ = "obj";
         public const string OBJFULL = "object";
-       
-        public const string ARRAY_INT = "int[]";
-        public const string ARRAY_LONG = "long[]";
-        public const string ARRAY_FLOAT = "float[]";
-        public const string ARRAY_DOUBLE = "double[]";
-        public const string ARRAY_STRING = "str[]";
-        public const string ARRAY_STRINGFULL = "string[]";
-        public const string ARRAY_OBJ = "obj[]";
-        public const string ARRAY_OBJFULL = "object[]";
+        public const string VECTOR2 = "vec2";
+        public const string VECTOR3 = "vec3";
+        public const string VECTOR4 = "vec4";
+        public const string VECTOR2FULL = "vector2";
+        public const string VECTOR3FULL = "vector3";
+        public const string VECTOR4FULL = "vector4";
+        public const string VECTOR2INT = "vec2int";
+        public const string VECTOR3INT = "vec3int";
+        public const string VECTOR2INTFULL = "vector2int";
+        public const string VECTOR3INTFULL = "vector3int";
+        public const string QUATERNION = "quat";
+        public const string QUATERNIONFULL = "quaternion";
+        public const string COLOR = "color";
         
-        public const string ARRAY_ARRAY_INT = "int[][]";
-        public const string ARRAY_ARRAY_LONG = "long[][]";
-        public const string ARRAY_ARRAY_FLOAT = "float[][]";
-        public const string ARRAY_ARRAY_DOUBLE = "double[][]";
-        public const string ARRAY_ARRAY_STRING = "str[][]";
-        public const string ARRAY_ARRAY_STRINGFULL = "string[][]";
-        public const string ARRAY_ARRAY_OBJ = "obj[][]";
-        public const string ARRAY_ARRAY_OBJFULL = "object[][]";
+        // 容器类型
+        public const string ARRAY = "[]";
+        public const string LIST = "list<";
+        public const string DICTIONARY = "dict<";
+        public const string DICTIONARYFULL = "dictionary<";
     }
 
     public class ReadExcel : Singleton<ReadExcel>
@@ -279,253 +286,258 @@ namespace F8Framework.Core
             object o = null;
             try
             {
-                switch (type)
+                if (type.EndsWith(SupportType.ARRAY))
                 {
-                    case SupportType.INT:
-                        int INT_int;
-                        if (int.TryParse(data, out INT_int) == false)
-                        {
-                            DebugError(type, data, classname);
-                            o = 0;
-                        }
+                    string innerType = type.Substring(0, type.Length - 2);
+                    data = data.Substring(1, data.Length - 2); // 移除最外层的 '[' 和 ']'
+                    var elements = ParseElements(data).ToArray();
+                    int elementsLength = elements.Length;
+                    var array = (Array)Activator.CreateInstance(Type.GetType(GetTrueType(innerType) + "[]"),
+                        elementsLength);
+                    for (int i = 0; i < elementsLength; i++)
+                    {
+                        // 递归解析内层元素
+                        array.SetValue(ParseValue(innerType, elements[i], classname), i);
+                    }
 
-                        o = INT_int;
-                        break;
-                    case SupportType.LONG:
-                        long LONG_long;
-                        if (long.TryParse(data, out LONG_long) == false)
-                        {
-                            DebugError(type, data, classname);
-                            o = 0;
-                        }
+                    o = array;
+                }
+                else if (type.StartsWith(SupportType.LIST) && type.EndsWith(">"))
+                {
+                    string innerType = type.Substring(5, type.Length - 6);
+                    var elements = ParseElements(data).ToArray();
+                    int elementsLength = elements.Length;
+                    Type elementType = Type.GetType(GetTrueType(innerType));
+                    var list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType));
+                    for (int i = 0; i < elementsLength; i++)
+                    {
+                        list.Add(ParseValue(innerType, elements[i], classname));
+                    }
 
-                        o = LONG_long;
-                        break;
-                    case SupportType.FLOAT:
-                        float FLOAT_float;
-                        if (float.TryParse(data, out FLOAT_float) == false)
-                        {
-                            DebugError(type, data, classname);
-                            o = 0;
-                        }
+                    o = list;
+                }
+                else if ((type.StartsWith(SupportType.DICTIONARY) || type.StartsWith(SupportType.DICTIONARYFULL)) && type.EndsWith(">"))
+                {
+                    if (type.StartsWith(SupportType.DICTIONARY))
+                    {
+                        type = SupportType.DICTIONARYFULL;
+                    }
+                    int commaIndex = type.IndexOf(',');
+                    if (commaIndex == -1)
+                    {
+                        throw new Exception("Dictionary 类型必须包含两个用逗号分隔的类型");
+                    }
 
-                        o = FLOAT_float;
-                        break;
-                    case SupportType.DOUBLE:
-                        double DOUBLE_double;
-                        if (double.TryParse(data, out DOUBLE_double) == false)
-                        {
-                            DebugError(type, data, classname);
-                            o = 0;
-                        }
+                    string keyType = type.Substring(11, commaIndex - 11);
+                    string valueType = type.Substring(commaIndex + 1, type.Length - commaIndex - 2);
+                    var elements = ParseElements(data).ToArray();
+                    int elementsLength = elements.Length;
+                    Type keyElementType = Type.GetType(GetTrueType(keyType));
+                    Type valueElementType = Type.GetType(GetTrueType(valueType));
+                    var dictionary =
+                        (IDictionary)Activator.CreateInstance(
+                            typeof(Dictionary<,>).MakeGenericType(keyElementType, valueElementType));
+                    for (int i = 0; i < elementsLength; i += 2)
+                    {
+                        object key = ParseValue(keyType, elements[i], classname);
+                        object value = ParseValue(valueType, elements[i + 1], classname);
+                        dictionary.Add(key, value);
+                    }
 
-                        o = DOUBLE_double;
-                        break;
-                    case SupportType.STRING or SupportType.STRINGFULL:
-                        o = data;
-                        break;
-                    case SupportType.OBJ or SupportType.OBJFULL:
-                        o = data as System.Object;
-                        break;
-                    case SupportType.ARRAY_OBJ or SupportType.ARRAY_OBJFULL:
-                        data = data.Substring(1, data.Length - 2); //移除 '['   ']'
-                        var ts = Regex.Matches(data, "(?:\"(?:[^\"]|\"\")*\"|[^,]+)") //逗号分隔
-                            .Cast<Match>()
-                            .Select(m => m.Value)
-                            .ToArray();
-                        int tsLength = ts.Length;
-                        System.Object[] obj = new System.Object[tsLength];
-                        for (int i = 0; i < tsLength; i++)
-                        {
-                            if (ts[i].EndsWith("\"") && ts[i].StartsWith("\""))
+                    o = dictionary;
+                }
+                else
+                {
+                    switch (type)
+                    {
+                        case SupportType.BOOL:
+                            string trueString = "true";
+                            string trueString2 = "1";
+                            bool BOOL_bool = trueString.Equals(data, StringComparison.OrdinalIgnoreCase) || trueString2.Equals(data, StringComparison.OrdinalIgnoreCase);
+                            
+                            o = BOOL_bool;
+                            break;
+                        case SupportType.BYTE:
+                            byte BYTE_byte;
+                            if (byte.TryParse(data, out BYTE_byte) == false)
                             {
-                                string str = ts[i].Substring(1);
-                                string str2 = str.Substring(0, str.Length - 1);
-                                obj[i] = str2;
+                                DebugError(type, data, classname);
+                                o = 0;
                             }
-                            else if (ts[i].Contains("."))
+
+                            o = BYTE_byte;
+                            break;
+                        case SupportType.SHORT:
+                            short SHORT_short;
+                            if (short.TryParse(data, out SHORT_short) == false)
                             {
-                                obj[i] = (float)ParseValue(SupportType.FLOAT, ts[i], classname);
+                                DebugError(type, data, classname);
+                                o = 0;
+                            }
+
+                            o = SHORT_short;
+                            break;
+                        case SupportType.INT:
+                            int INT_int;
+                            if (int.TryParse(data, out INT_int) == false)
+                            {
+                                DebugError(type, data, classname);
+                                o = 0;
+                            }
+
+                            o = INT_int;
+                            break;
+                        case SupportType.LONG:
+                            long LONG_long;
+                            if (long.TryParse(data, out LONG_long) == false)
+                            {
+                                DebugError(type, data, classname);
+                                o = 0;
+                            }
+
+                            o = LONG_long;
+                            break;
+                        case SupportType.FLOAT:
+                            float FLOAT_float;
+                            if (float.TryParse(data, out FLOAT_float) == false)
+                            {
+                                DebugError(type, data, classname);
+                                o = 0;
+                            }
+
+                            o = FLOAT_float;
+                            break;
+                        case SupportType.DOUBLE:
+                            double DOUBLE_double;
+                            if (double.TryParse(data, out DOUBLE_double) == false)
+                            {
+                                DebugError(type, data, classname);
+                                o = 0;
+                            }
+
+                            o = DOUBLE_double;
+                            break;
+                        case SupportType.STRING or SupportType.STRINGFULL:
+                            o = data;
+                            break;
+                        case SupportType.OBJ or SupportType.OBJFULL:
+                            if (data.EndsWith("\"") && data.StartsWith("\""))
+                            {
+                                string str = data.Substring(1);
+                                string str2 = str.Substring(0, str.Length - 1);
+                                o = str2;
+                            }
+                            else if (data.Contains("."))
+                            {
+                                o = ParseValue(SupportType.FLOAT, data, classname);
                             }
                             else
                             {
-                                obj[i] = (int)ParseValue(SupportType.INT, ts[i], classname);
+                                o = ParseValue(SupportType.INT, data, classname);
                             }
-                        }
 
-                        o = obj;
-                        break;
-                    case SupportType.ARRAY_INT:
-                        data = data.Substring(1, data.Length - 2); //移除 '['   ']'
-                        var ints = Regex.Matches(data, "(?:\"(?:[^\"]|\"\")*\"|[^,]+)") //逗号分隔
-                            .Cast<Match>()
-                            .Select(m => m.Value)
-                            .ToArray();
-                        int intsLength = ints.Length;
-                        int[] array = new int[intsLength];
-                        for (int i = 0; i < intsLength; i++)
-                        {
-                            array[i] = (int)ParseValue(SupportType.INT, ints[i], classname);
-                        }
-
-                        o = array;
-                        break;
-                    case SupportType.ARRAY_LONG:
-                        data = data.Substring(1, data.Length - 2); //移除 '['   ']'
-                        var longs = Regex.Matches(data, "(?:\"(?:[^\"]|\"\")*\"|[^,]+)") //逗号分隔
-                            .Cast<Match>()
-                            .Select(m => m.Value)
-                            .ToArray();
-                        int longsLength = longs.Length;
-                        long[] list = new long[longsLength];
-                        for (int i = 0; i < longsLength; i++)
-                        {
-                            list[i] = (long)ParseValue(SupportType.LONG, longs[i], classname);
-                        }
-
-                        o = list;
-                        break;
-                    case SupportType.ARRAY_FLOAT:
-                        data = data.Substring(1, data.Length - 2); //移除 '['   ']'
-                        var floats = Regex.Matches(data, "(?:\"(?:[^\"]|\"\")*\"|[^,]+)") //逗号分隔
-                            .Cast<Match>()
-                            .Select(m => m.Value)
-                            .ToArray();
-                        int floatsLength = floats.Length;
-                        float[] list2 = new float[floatsLength];
-                        for (int i = 0; i < floatsLength; i++)
-                        {
-                            list2[i] = (float)ParseValue(SupportType.FLOAT, floats[i], classname);
-                        }
-
-                        o = list2;
-                        break;
-                    case SupportType.ARRAY_DOUBLE:
-                        data = data.Substring(1, data.Length - 2); //移除 '['   ']'
-                        var dounbles = Regex.Matches(data, "(?:\"(?:[^\"]|\"\")*\"|[^,]+)") //逗号分隔
-                            .Cast<Match>()
-                            .Select(m => m.Value)
-                            .ToArray();
-                        int dounbles9Length = dounbles.Length;
-                        double[] list9 = new double[dounbles9Length];
-                        for (int i = 0; i < dounbles9Length; i++)
-                        {
-                            list9[i] = (double)ParseValue(SupportType.DOUBLE, dounbles[i], classname);
-                        }
-
-                        o = list9;
-                        break;
-                    case SupportType.ARRAY_STRING or SupportType.ARRAY_STRINGFULL:
-                        data = data.Substring(1, data.Length - 2); //移除 '['   ']'
-                        var strs = Regex.Matches(data, "(?:\"(?:[^\"]|\"\")*\"|[^,]+)") //逗号分隔
-                            .Cast<Match>()
-                            .Select(m => m.Value)
-                            .ToArray();
-                        int strsLength = strs.Length;
-                        string[] list3 = new string[strsLength];
-                        for (int i = 0; i < strsLength; i++)
-                        {
-                            list3[i] = strs[i];
-                        }
-
-                        o = list3;
-                        break;
-                    case SupportType.ARRAY_ARRAY_INT:
-                        data = data.Substring(1, data.Length - 2); //移除 '['   ']'
-                        //匹配[]内的内容，并忽略""内的[]，考虑了逗号出现在引号内的情况。它会匹配不在引号内的内容，并且会忽略引号内部的逗号
-                        var arr4 = Regex.Matches(data, @"\[[^\[\]\""]*(?:(?:""[^""]*""|'[^']*')[^\[\]\""]*)*\]")
-                            .Cast<Match>()
-                            .Select(m => m.Value)
-                            .ToArray();
-                        int arr4Length = arr4.Length;
-                        int[][] list4 = new int[arr4Length][];
-                        for (int i = 0; i < arr4Length; i++)
-                        {
-                            list4[i] = (int[])ParseValue(SupportType.ARRAY_INT, arr4[i], classname);
-                        }
-
-                        o = list4;
-                        break;
-                    case SupportType.ARRAY_ARRAY_LONG:
-                        data = data.Substring(1, data.Length - 2); //移除 '['   ']'
-                        //匹配[]内的内容，并忽略""内的[]，考虑了逗号出现在引号内的情况。它会匹配不在引号内的内容，并且会忽略引号内部的逗号
-                        var arr8 = Regex.Matches(data, @"\[[^\[\]\""]*(?:(?:""[^""]*""|'[^']*')[^\[\]\""]*)*\]")
-                            .Cast<Match>()
-                            .Select(m => m.Value)
-                            .ToArray();
-                        int arr8Length = arr8.Length;
-                        long[][] list8 = new long[arr8Length][];
-                        for (int i = 0; i < arr8Length; i++)
-                        {
-                            list8[i] = (long[])ParseValue(SupportType.ARRAY_LONG, arr8[i], classname);
-                        }
-
-                        o = list8;
-                        break;
-                    case SupportType.ARRAY_ARRAY_FLOAT:
-                        data = data.Substring(1, data.Length - 2); //移除 '['   ']'
-                        //匹配[]内的内容，并忽略""内的[]，考虑了逗号出现在引号内的情况。它会匹配不在引号内的内容，并且会忽略引号内部的逗号
-                        var arr5 = Regex.Matches(data, @"\[[^\[\]\""]*(?:(?:""[^""]*""|'[^']*')[^\[\]\""]*)*\]")
-                            .Cast<Match>()
-                            .Select(m => m.Value)
-                            .ToArray();
-                        int arr5Length = arr5.Length;
-                        float[][] list5 = new float[arr5Length][];
-                        for (int i = 0; i < arr5Length; i++)
-                        {
-                            list5[i] = (float[])ParseValue(SupportType.ARRAY_FLOAT, arr5[i], classname);
-                        }
-
-                        o = list5;
-                        break;
-                    case SupportType.ARRAY_ARRAY_DOUBLE:
-                        data = data.Substring(1, data.Length - 2); //移除 '['   ']'
-                        //匹配[]内的内容，并忽略""内的[]，考虑了逗号出现在引号内的情况。它会匹配不在引号内的内容，并且会忽略引号内部的逗号
-                        var arr9 = Regex.Matches(data, @"\[[^\[\]\""]*(?:(?:""[^""]*""|'[^']*')[^\[\]\""]*)*\]")
-                            .Cast<Match>()
-                            .Select(m => m.Value)
-                            .ToArray();
-                        int arr10Length = arr9.Length;
-                        double[][] list10 = new double[arr10Length][];
-                        for (int i = 0; i < arr10Length; i++)
-                        {
-                            list10[i] = (double[])ParseValue(SupportType.ARRAY_DOUBLE, arr9[i], classname);
-                        }
-
-                        o = list10;
-                        break;
-                    case SupportType.ARRAY_ARRAY_STRING or SupportType.ARRAY_ARRAY_STRINGFULL:
-                        data = data.Substring(1, data.Length - 2); //移除 '['   ']'
-                        //匹配[]内的内容，并忽略""内的[]，考虑了逗号出现在引号内的情况。它会匹配不在引号内的内容，并且会忽略引号内部的逗号
-                        var arr6 = Regex.Matches(data, @"\[[^\[\]\""]*(?:(?:""[^""]*""|'[^']*')[^\[\]\""]*)*\]")
-                            .Cast<Match>()
-                            .Select(m => m.Value)
-                            .ToArray();
-                        int arr6Length = arr6.Length;
-                        string[][] list6 = new string[arr6Length][];
-                        for (int i = 0; i < arr6Length; i++)
-                        {
-                            list6[i] = (string[])ParseValue(SupportType.ARRAY_STRING, arr6[i], classname);
-                        }
-
-                        o = list6;
-                        break;
-                    case SupportType.ARRAY_ARRAY_OBJ or SupportType.ARRAY_ARRAY_OBJFULL:
-                        data = data.Substring(1, data.Length - 2); //移除 '['   ']'
-                        //匹配[]内的内容，并忽略""内的[]，考虑了逗号出现在引号内的情况。它会匹配不在引号内的内容，并且会忽略引号内部的逗号
-                        var arr7 = Regex.Matches(data, @"\[[^\[\]\""]*(?:(?:""[^""]*""|'[^']*')[^\[\]\""]*)*\]")
-                            .Cast<Match>()
-                            .Select(m => m.Value)
-                            .ToArray();
-                        int arr7Length = arr7.Length;
-                        System.Object[][] list7 = new System.Object[arr7Length][];
-                        for (int i = 0; i < arr7Length; i++)
-                        {
-                            list7[i] = (System.Object[])ParseValue(SupportType.ARRAY_OBJ, arr7[i], classname);
-                        }
-
-                        o = list7;
-                        break;
+                            break;
+                        case SupportType.VECTOR2 or SupportType.VECTOR2FULL:
+                            var vector2 = Regex.Matches(data, "(?:\"(?:[^\"]|\"\")*\"|[^,]+)") //逗号分隔
+                                .Cast<Match>()
+                                .Select(m => m.Value)
+                                .ToArray();
+                            var vector22 = new Vector2();
+                            vector22.x = (float)ParseValue(SupportType.FLOAT, vector2.Length >= 1 ? vector2[0] : "0",
+                                classname);
+                            vector22.y = (float)ParseValue(SupportType.FLOAT, vector2.Length >= 2 ? vector2[1] : "0",
+                                classname);
+                            o = vector22;
+                            break;
+                        case SupportType.VECTOR3 or SupportType.VECTOR3FULL:
+                            var vector3 = Regex.Matches(data, "(?:\"(?:[^\"]|\"\")*\"|[^,]+)") //逗号分隔
+                                .Cast<Match>()
+                                .Select(m => m.Value)
+                                .ToArray();
+                            var vector33 = new Vector3();
+                            vector33.x = (float)ParseValue(SupportType.FLOAT, vector3.Length >= 1 ? vector3[0] : "0",
+                                classname);
+                            vector33.y = (float)ParseValue(SupportType.FLOAT, vector3.Length >= 2 ? vector3[1] : "0",
+                                classname);
+                            vector33.z = (float)ParseValue(SupportType.FLOAT, vector3.Length >= 3 ? vector3[2] : "0",
+                                classname);
+                            o = vector33;
+                            break;
+                        case SupportType.VECTOR4 or SupportType.VECTOR4FULL:
+                            var vector4 = Regex.Matches(data, "(?:\"(?:[^\"]|\"\")*\"|[^,]+)") //逗号分隔
+                                .Cast<Match>()
+                                .Select(m => m.Value)
+                                .ToArray();
+                            var vector44 = new Vector4();
+                            vector44.x = (float)ParseValue(SupportType.FLOAT, vector4.Length >= 1 ? vector4[0] : "0",
+                                classname);
+                            vector44.y = (float)ParseValue(SupportType.FLOAT, vector4.Length >= 2 ? vector4[1] : "0",
+                                classname);
+                            vector44.z = (float)ParseValue(SupportType.FLOAT, vector4.Length >= 3 ? vector4[2] : "0",
+                                classname);
+                            vector44.w = (float)ParseValue(SupportType.FLOAT, vector4.Length >= 4 ? vector4[3] : "0",
+                                classname);
+                            o = vector44;
+                            break;
+                        case SupportType.VECTOR2INT or SupportType.VECTOR2INTFULL:
+                            var vector2int = Regex.Matches(data, "(?:\"(?:[^\"]|\"\")*\"|[^,]+)") //逗号分隔
+                                .Cast<Match>()
+                                .Select(m => m.Value)
+                                .ToArray();
+                            var vector22int = new Vector2Int();
+                            vector22int.x = (int)ParseValue(SupportType.INT,
+                                vector2int.Length >= 1 ? vector2int[0] : "0", classname);
+                            vector22int.y = (int)ParseValue(SupportType.INT,
+                                vector2int.Length >= 2 ? vector2int[1] : "0", classname);
+                            o = vector22int;
+                            break;
+                        case SupportType.VECTOR3INT or SupportType.VECTOR3INTFULL:
+                            var vector3int = Regex.Matches(data, "(?:\"(?:[^\"]|\"\")*\"|[^,]+)") //逗号分隔
+                                .Cast<Match>()
+                                .Select(m => m.Value)
+                                .ToArray();
+                            var vector33int = new Vector3Int();
+                            vector33int.x = (int)ParseValue(SupportType.INT,
+                                vector3int.Length >= 1 ? vector3int[0] : "0", classname);
+                            vector33int.y = (int)ParseValue(SupportType.INT,
+                                vector3int.Length >= 2 ? vector3int[1] : "0", classname);
+                            vector33int.z = (int)ParseValue(SupportType.INT,
+                                vector3int.Length >= 3 ? vector3int[2] : "0", classname);
+                            o = vector33int;
+                            break;
+                        case SupportType.QUATERNION or SupportType.QUATERNIONFULL:
+                            var quaternion = Regex.Matches(data, "(?:\"(?:[^\"]|\"\")*\"|[^,]+)") //逗号分隔
+                                .Cast<Match>()
+                                .Select(m => m.Value)
+                                .ToArray();
+                            var quaternion1 = new Quaternion();
+                            quaternion1.x = (float)ParseValue(SupportType.FLOAT,
+                                quaternion.Length >= 1 ? quaternion[0] : "0", classname);
+                            quaternion1.y = (float)ParseValue(SupportType.FLOAT,
+                                quaternion.Length >= 2 ? quaternion[1] : "0", classname);
+                            quaternion1.z = (float)ParseValue(SupportType.FLOAT,
+                                quaternion.Length >= 3 ? quaternion[2] : "0", classname);
+                            quaternion1.w = (float)ParseValue(SupportType.FLOAT,
+                                quaternion.Length >= 4 ? quaternion[3] : "0", classname);
+                            o = quaternion1;
+                            break;
+                        case SupportType.COLOR:
+                            var color = Regex.Matches(data, "(?:\"(?:[^\"]|\"\")*\"|[^,]+)") //逗号分隔
+                                .Cast<Match>()
+                                .Select(m => m.Value)
+                                .ToArray();
+                            var color1 = new Color();
+                            color1.r = (float)ParseValue(SupportType.FLOAT, color.Length >= 1 ? color[0] : "0",
+                                classname);
+                            color1.g = (float)ParseValue(SupportType.FLOAT, color.Length >= 2 ? color[1] : "0",
+                                classname);
+                            color1.b = (float)ParseValue(SupportType.FLOAT, color.Length >= 3 ? color[2] : "0",
+                                classname);
+                            color1.a = (float)ParseValue(SupportType.FLOAT, color.Length >= 4 ? color[3] : "0",
+                                classname);
+                            o = color1;
+                            break;
+                    }
                 }
             }
             catch (Exception ex)
@@ -534,6 +546,147 @@ namespace F8Framework.Core
             }
 
             return o;
+        }
+        
+        public static string GetTrueType(string type, string className = "", string inputPath = "")
+        {
+            if (type.EndsWith(SupportType.ARRAY))
+            {
+                string innerType = type.Substring(0, type.Length - 2);
+                return GetTrueType(innerType) + "[]";
+            }
+            else if (type.StartsWith(SupportType.LIST) && type.EndsWith(">"))
+            {
+                string innerType = type.Substring(5, type.Length - 6);
+                return "System.Collections.Generic.List<" + GetTrueType(innerType) + ">";
+            }
+            else if ((type.StartsWith(SupportType.DICTIONARY) || type.StartsWith(SupportType.DICTIONARYFULL)) && type.EndsWith(">"))
+            {
+                if (type.StartsWith(SupportType.DICTIONARY))
+                {
+                    type = SupportType.DICTIONARYFULL;
+                }
+                int commaIndex = type.IndexOf(',');
+                if (commaIndex == -1)
+                {
+                    throw new Exception("Dictionary 类型必须包含两个用逗号分隔的类型");
+                }
+                string keyType = type.Substring(11, commaIndex - 11);
+                string valueType = type.Substring(commaIndex + 1, type.Length - commaIndex - 2);
+                return "System.Collections.Generic.Dictionary<" + GetTrueType(keyType) + "," + GetTrueType(valueType) + ">";
+            }
+            else
+            {
+                return ParseType(type, className, inputPath);
+            }
+        }
+        
+        private static string ParseType(string type, string className, string inputPath)
+        {
+            switch (type)
+            {
+                case SupportType.BOOL:
+                    type = "System.Boolean";
+                    break;
+                case SupportType.BYTE:
+                    type = "System.Byte";
+                    break;
+                case SupportType.SHORT:
+                    type = "System.Int16";
+                    break;
+                case SupportType.INT:
+                    type = "System.Int32";
+                    break;
+                case SupportType.LONG:
+                    type = "System.Int64";
+                    break;
+                case SupportType.FLOAT:
+                    type = "System.Single";
+                    break;
+                case SupportType.DOUBLE:
+                    type = "System.Double";
+                    break;
+                case SupportType.STRING or SupportType.STRINGFULL:
+                    type = "System.String";
+                    break;
+                case SupportType.OBJ or SupportType.OBJFULL:
+                    type = "System.Object";
+                    break;
+                case SupportType.VECTOR2 or SupportType.VECTOR2FULL:
+                    type = "UnityEngine.Vector2";
+                    break;
+                case SupportType.VECTOR3 or SupportType.VECTOR3FULL:
+                    type = "UnityEngine.Vector3";
+                    break;
+                case SupportType.VECTOR4 or SupportType.VECTOR4FULL:
+                    type = "UnityEngine.Vector4";
+                    break;
+                case SupportType.VECTOR2INT or SupportType.VECTOR2INTFULL:
+                    type = "UnityEngine.Vector2Int";
+                    break;
+                case SupportType.VECTOR3INT or SupportType.VECTOR3INTFULL:
+                    type = "UnityEngine.Vector3Int";
+                    break;
+                case SupportType.QUATERNION or SupportType.QUATERNIONFULL:
+                    type = "UnityEngine.Quaternion";
+                    break;
+                case SupportType.COLOR:
+                    type = "UnityEngine.Color";
+                    break;
+                default:
+                    throw new Exception("输入了错误的数据类型:  " + type + ", 类名:  " + className + ", 位于:  " + inputPath);
+            }
+
+            return type;
+        }
+        
+        private static List<string> ParseElements(string data)
+        {
+            List<string> elements = new List<string>();
+            string currentElement = "";
+            int bracketDepth = 0;
+            bool inQuotes = false;
+
+            foreach (char c in data)
+            {
+                if (c == '"')
+                {
+                    // 遇到引号，切换引号状态
+                    inQuotes = !inQuotes;
+                    currentElement += c;
+                }
+                else if (c == '[')
+                {
+                    // 遇到左括号，增加括号深度
+                    bracketDepth++;
+                    currentElement += c;
+                }
+                else if (c == ']')
+                {
+                    // 遇到右括号，减少括号深度
+                    bracketDepth--;
+                    currentElement += c;
+                }
+                else if (c == ',' && !inQuotes && bracketDepth == 0)
+                {
+                    // 如果不在引号内且括号深度为 0，遇到逗号则分割元素
+                    elements.Add(currentElement);
+                    currentElement = "";
+                }
+                else
+                {
+                    // 其他字符直接添加到当前元素
+                    currentElement += c;
+                }
+            }
+
+            // 添加最后一个元素
+            if (!string.IsNullOrEmpty(currentElement))
+            {
+                elements.Add(currentElement);
+            }
+
+            return elements;
         }
     }
 }

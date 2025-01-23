@@ -216,7 +216,10 @@ namespace LitJson
                     if (parameters.Length != 1)
                         continue;
 
-                    if (parameters[0].ParameterType == typeof (string) || parameters[0].ParameterType == typeof(int))
+                    if (parameters[0].ParameterType == typeof(string) || parameters[0].ParameterType == typeof(int) ||
+                        parameters[0].ParameterType == typeof(byte) || parameters[0].ParameterType == typeof(short) ||
+                        parameters[0].ParameterType == typeof(long) || parameters[0].ParameterType == typeof(float) ||
+                        parameters[0].ParameterType == typeof(double))
                         data.ElementType = p_info.PropertyType;
 
                     continue;
@@ -427,8 +430,8 @@ namespace LitJson
 
                 instance = Activator.CreateInstance (value_type);
                 
-                //字典key是否为int?
-                bool isIntKey = t_data.IsDictionary && value_type.GetGenericArguments()[0] == typeof(int);
+                // 处理字典key为非string的情况
+                Type keyType = t_data.IsDictionary ? value_type.GetGenericArguments()[0] : null;
                 
                 while (true) {
                     reader.Read ();
@@ -471,11 +474,10 @@ namespace LitJson
                                 continue;
                             }
                         }
-
-                        //处理字典key为int的情况
-                        if (isIntKey)
+                        // 处理字典key为非string的情况
+                        if (keyType != null)
                         {
-                            ((IDictionary)instance).Add(Convert.ToInt32(property), ReadValue(t_data.ElementType, reader));
+                            ((IDictionary)instance).Add(Convert.ChangeType(property, keyType), ReadValue(t_data.ElementType, reader));
                         }
                         else
                         {
