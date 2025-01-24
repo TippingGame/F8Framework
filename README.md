@@ -91,9 +91,15 @@ git clone https://github.com/TippingGame/F8Framework.git
 * qq开发交流群：[722647431](https://qm.qq.com/q/uTxdVIJykE)  
 * Discord聊天组：[https://discord.gg/dwWQ8EHz](https://discord.gg/dwWQ8EHz)  
 
+## 上架游戏
+| 脑光（[TapTap](https://www.taptap.cn/app/725455) / [WebGL](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/h5game/naoguang/index.html)）       | 待定                                              | 待定                                              | 待定                                             | 
+|-------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------|-------------------------------------------------|------------------------------------------------|
+| <img src='https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/naoguang_icon_256.png' width="256"/> | <img src='' width="256"/> | <img src='' width="256"/> | <img src='' width="256"/> |
+
+
 ## 赞助
 ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/Sponsorship_icon_356.png)
-#### 感谢
+###### 感谢赞助
 
 ---
 

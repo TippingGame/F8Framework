@@ -22,6 +22,7 @@ namespace F8Framework.Core
         public const string LONG = "long";
         public const string FLOAT = "float";
         public const string DOUBLE = "double";
+        public const string DECIMAL = "decimal";
         public const string STRING = "str";
         public const string STRINGFULL = "string";
         public const string OBJ = "obj";
@@ -281,7 +282,7 @@ namespace F8Framework.Core
         {
             LogF8.LogError(string.Format("数据类型错误：类型：{0}  数据：{1}  类名：{2}", type, data, classname));
         }
-
+        
         public static object ParseValue(string type, string data, string classname)
         {
             object o = null;
@@ -293,8 +294,7 @@ namespace F8Framework.Core
                     data = RemoveOuterBracketsIfPaired(data); // 移除最外层的 '[' 和 ']' '{' 和 '}'
                     var elements = ParseElements(data).ToArray();
                     int elementsLength = elements.Length;
-                    var array = (Array)Activator.CreateInstance(Type.GetType(GetTrueType(innerType) + "[]"),
-                        elementsLength);
+                    var array = (Array)Activator.CreateInstance(Type.GetType(GetTrueType(innerType) + "[]"), elementsLength);
                     for (int i = 0; i < elementsLength; i++)
                     {
                         // 递归解析内层元素
@@ -310,12 +310,12 @@ namespace F8Framework.Core
                     var elements = ParseElements(data).ToArray();
                     int elementsLength = elements.Length;
                     Type elementType = Type.GetType(GetTrueType(innerType, "", "", false));
-                    var list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType));
+                    var list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType), elementsLength);
                     for (int i = 0; i < elementsLength; i++)
                     {
                         list.Add(ParseValue(innerType, elements[i], classname));
                     }
-
+                    
                     o = list;
                 }
                 else if ((type.StartsWith(SupportType.DICTIONARY) || type.StartsWith(SupportType.DICTIONARYFULL)) && type.EndsWith(">"))
@@ -340,16 +340,21 @@ namespace F8Framework.Core
                     int elementsLength = elements.Length;
                     Type keyElementType = Type.GetType(GetTrueType(keyType));
                     Type valueElementType = Type.GetType(GetTrueType(valueType, "", "", false));
-                    var dictionary =
-                        (IDictionary)Activator.CreateInstance(
-                            typeof(Dictionary<,>).MakeGenericType(keyElementType, valueElementType));
+                    var dictionary = (IDictionary)Activator.CreateInstance(typeof(Dictionary<,>).MakeGenericType(keyElementType, valueElementType));
                     for (int i = 0; i < elementsLength; i += 2)
                     {
                         object key = ParseValue(keyType, elements[i], classname);
                         object value = ParseValue(valueType, elements[i + 1], classname);
-                        dictionary.Add(key, value);
+                        if (dictionary.Contains(key))
+                        {
+                            LogF8.LogError("Dictionary 重复Key值：{0}  Value值：{1}  类型：{2}  数据：{3}  类名：{4}",key, value, type, data, classname);
+                        }
+                        else
+                        {
+                            dictionary.Add(key, value);
+                        }
                     }
-
+                    
                     o = dictionary;
                 }
                 else
@@ -423,6 +428,16 @@ namespace F8Framework.Core
 
                             o = DOUBLE_double;
                             break;
+                        case SupportType.DECIMAL:
+                            decimal DECIMAL_decimal;
+                            if (decimal.TryParse(data, out DECIMAL_decimal) == false)
+                            {
+                                DebugError(type, data, classname);
+                                o = 0;
+                            }
+
+                            o = DECIMAL_decimal;
+                            break;
                         case SupportType.STRING or SupportType.STRINGFULL:
                             o = data;
                             break;
@@ -476,6 +491,7 @@ namespace F8Framework.Core
 
                             break;
                         case SupportType.VECTOR2 or SupportType.VECTOR2FULL:
+                            data = RemoveOuterBracketsIfPaired(data); // 移除最外层的 '[' 和 ']' '{' 和 '}'
                             var vector2 = Regex.Matches(data, "(?:\"(?:[^\"]|\"\")*\"|[^,]+)") //逗号分隔
                                 .Cast<Match>()
                                 .Select(m => m.Value)
@@ -488,6 +504,7 @@ namespace F8Framework.Core
                             o = vector22;
                             break;
                         case SupportType.VECTOR3 or SupportType.VECTOR3FULL:
+                            data = RemoveOuterBracketsIfPaired(data); // 移除最外层的 '[' 和 ']' '{' 和 '}'
                             var vector3 = Regex.Matches(data, "(?:\"(?:[^\"]|\"\")*\"|[^,]+)") //逗号分隔
                                 .Cast<Match>()
                                 .Select(m => m.Value)
@@ -502,6 +519,7 @@ namespace F8Framework.Core
                             o = vector33;
                             break;
                         case SupportType.VECTOR4 or SupportType.VECTOR4FULL:
+                            data = RemoveOuterBracketsIfPaired(data); // 移除最外层的 '[' 和 ']' '{' 和 '}'
                             var vector4 = Regex.Matches(data, "(?:\"(?:[^\"]|\"\")*\"|[^,]+)") //逗号分隔
                                 .Cast<Match>()
                                 .Select(m => m.Value)
@@ -518,6 +536,7 @@ namespace F8Framework.Core
                             o = vector44;
                             break;
                         case SupportType.VECTOR2INT or SupportType.VECTOR2INTFULL:
+                            data = RemoveOuterBracketsIfPaired(data); // 移除最外层的 '[' 和 ']' '{' 和 '}'
                             var vector2int = Regex.Matches(data, "(?:\"(?:[^\"]|\"\")*\"|[^,]+)") //逗号分隔
                                 .Cast<Match>()
                                 .Select(m => m.Value)
@@ -530,6 +549,7 @@ namespace F8Framework.Core
                             o = vector22int;
                             break;
                         case SupportType.VECTOR3INT or SupportType.VECTOR3INTFULL:
+                            data = RemoveOuterBracketsIfPaired(data); // 移除最外层的 '[' 和 ']' '{' 和 '}'
                             var vector3int = Regex.Matches(data, "(?:\"(?:[^\"]|\"\")*\"|[^,]+)") //逗号分隔
                                 .Cast<Match>()
                                 .Select(m => m.Value)
@@ -544,6 +564,7 @@ namespace F8Framework.Core
                             o = vector33int;
                             break;
                         case SupportType.QUATERNION or SupportType.QUATERNIONFULL:
+                            data = RemoveOuterBracketsIfPaired(data); // 移除最外层的 '[' 和 ']' '{' 和 '}'
                             var quaternion = Regex.Matches(data, "(?:\"(?:[^\"]|\"\")*\"|[^,]+)") //逗号分隔
                                 .Cast<Match>()
                                 .Select(m => m.Value)
@@ -560,6 +581,7 @@ namespace F8Framework.Core
                             o = quaternion1;
                             break;
                         case SupportType.COLOR:
+                            data = RemoveOuterBracketsIfPaired(data); // 移除最外层的 '[' 和 ']' '{' 和 '}'
                             var color = Regex.Matches(data, "(?:\"(?:[^\"]|\"\")*\"|[^,]+)") //逗号分隔
                                 .Cast<Match>()
                                 .Select(m => m.Value)
@@ -661,6 +683,9 @@ namespace F8Framework.Core
                     break;
                 case SupportType.DOUBLE:
                     type = "System.Double";
+                    break;
+                case SupportType.DECIMAL:
+                    type = "System.Decimal";
                     break;
                 case SupportType.STRING or SupportType.STRINGFULL:
                     type = "System.String";
