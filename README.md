@@ -24,8 +24,7 @@ Unity 2021.3.15f1+
 ## 文档快速预览 - 1分钟
 ### ----------可选功能----------
 * [1. 热更新版本管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/HotUpdateManager/README.md) - 选择打包平台，输出路径，版本号，远程资产加载地址，启用热更新，全量打包，分包，空包。
-* [2. 高速本地缓存（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/CacheStorage/README.md) - 高速本地缓存，下载并缓存byte、json、text、Texture等可序列化资产，设置缓存数量、大小、存活时间，清理缓存。
-* [3. 代码热更新（接入HybridCLR）](https://github.com/TippingGame/F8Framework/blob/main/Tests/HybridCLR/README.md) - [HybridCLR](https://github.com/focus-creative-games/hybridclr) 是一个特性完整、零成本、高性能、低内存的近乎完美的Unity全平台原生c#热更方案。
+* [2. 代码热更新（接入HybridCLR）](https://github.com/TippingGame/F8Framework/blob/main/Tests/HybridCLR/README.md) - [HybridCLR](https://github.com/focus-creative-games/hybridclr) 是一个特性完整、零成本、高性能、低内存的近乎完美的Unity全平台原生c#热更方案。
 ### ----------核心功能----------
 * [1. 配置表（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/ExcelTool/README.md) - 使用Excel作为配置表，兼顾**高性能、高适应性**，点击F8加载手动生成的 Excel 二进制缓存，运行时自动读取最新 Excel，无需频繁导表。
 * [2. 资源加载（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/AssetManager/README.md) - **编辑器下**：点击F8自动生成资产索引/AB名称，自动区分不同平台，清理多余AB和文件夹，Editor模式下减少开发周期。**运行时**：同步/异步加载单个资产，展开文件夹或同一AB下所有资产，自动判断是 Resources / AssetBundle 资产，加载Remote远程资产，获取加载进度，同步打断异步加载。你可以这样加载AssetBundle：**单个资产单个AB、指定文件夹名称（文件夹第一层的AB）、设置多个资产为同一AB名（指定任意资产名）**
@@ -53,8 +52,7 @@ Unity 2021.3.15f1+
 * [Mirror(内置):KCP](https://github.com/MirrorNetworking/kcp2k)：Reliable UDP
 * [Mirror(内置):Telepathy](https://github.com/MirrorNetworking/Telepathy)：TCP
 * [Mirror(内置):Websockets](https://github.com/MirrorNetworking/SimpleWebTransport)：Websockets
-* [LitJson](https://github.com/LitJSON/litjson)：序列化/反序列化 JSON（已修改字典Key可以使用int类型，增加Unity常用类型：Type，Vector2，Vector3，Vector4，Quaternion，GameObject，Transform，Color，Color32，Bounds，Rect，RectOffset，LayerMask，Vector2Int，Vector3Int，RangeInt，BoundsInt）
-* [MessagePack-CSharp](https://github.com/MessagePack-CSharp/MessagePack-CSharp)：序列化/反序列化数据
+* [LitJson](https://github.com/LitJSON/litjson)：序列化/反序列化 JSON（已修改字典Key支持更多非string的C#基础类型，增加Unity常用类型：Type，Vector2，Vector3，Vector4，Quaternion，GameObject，Transform，Color，Color32，Bounds，Rect，RectOffset，LayerMask，Vector2Int，Vector3Int，RangeInt，BoundsInt）
 
 ## 使用步骤
 
@@ -113,8 +111,7 @@ Support for building：Win / Android / iOS / Mac / Linux / WebGL / WeChat mini g
 ## Quick preview of document - 1 minute
 ### ----------Optional Features----------
 * [1. Hot update version manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/HotUpdateManager/README_EN.md) - Select packaging platform, output path, version number, remote asset loading address, enable hot update, full packaging, subcontracting, and empty packaging.
-* [2. High speed local cache (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/CacheStorage/README_EN.md) - High speed local caching, downloading and caching bytes Serializable assets such as JSON, text, and texture, set cache quantity, size, and lifetime, and clear cache.
-* [3. Code Hot Update (Import HybridCLR)](https://github.com/TippingGame/F8Framework/blob/main/Tests/HybridCLR/README_EN.md) - [HybridCLR](https://github.com/focus-creative-games/hybridclr) HybridCLR is a full-platform native c# hot update solution for Unity with complete features, zero cost, high performance, and low memory.
+* [2. Code Hot Update (Import HybridCLR)](https://github.com/TippingGame/F8Framework/blob/main/Tests/HybridCLR/README_EN.md) - [HybridCLR](https://github.com/focus-creative-games/hybridclr) HybridCLR is a full-platform native c# hot update solution for Unity with complete features, zero cost, high performance, and low memory.
 ### ----------Core Features----------
 * [1. Config table (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/ExcelTool/README_EN.md) - Using Excel as the configuration table, **balancing high performance and adaptability**, click F8 to load the manually generated Excel binary cache, and automatically read the latest Excel at runtime without the need for frequent table navigation.
 * [2. Asset Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/AssetManager/README_EN.md) - **At editor**: Click F8 to automatically generate asset index/AB name, automatically distinguish different platforms, and clean up excess AB and folders, Reduce development cycle in Editor mode. **At runtime**: load a single asset synchronously/asynchronously, expand a folder or all assets under the same AB, automatically determine whether it is a Resources/AssetBundle asset, load remote assets, obtain loading progress, and synchronously interrupt asynchronous loading. You can load AssetBundle in this way: **a single asset with a single AB, specify a folder name (AB on the first layer of the folder), set multiple assets to the same AB name (specify any asset name)**.
@@ -142,8 +139,7 @@ Support for building：Win / Android / iOS / Mac / Linux / WebGL / WeChat mini g
 * [Mirror(built in):KCP](https://github.com/MirrorNetworking/kcp2k)：Reliable UDP
 * [Mirror(built in):Telepathy](https://github.com/MirrorNetworking/Telepathy)：TCP
 * [Mirror(built in):Websockets](https://github.com/MirrorNetworking/SimpleWebTransport)：Websockets
-* [LitJson](https://github.com/LitJSON/litjson)：Serialize/Deserialize JSON (modified dictionary key can use int type, added Unity common types: Type，Vector2，Vector3，Vector4，Quaternion，GameObject，Transform，Color，Color32，Bounds，Rect，RectOffset，LayerMask，Vector2Int，Vector3Int，RangeInt，BoundsInt)
-* [MessagePack-CSharp](https://github.com/MessagePack-CSharp/MessagePack-CSharp)：Serialize/Deserialize data
+* [LitJson](https://github.com/LitJSON/litjson)：Serialize/Deserialize JSON (modified dictionary key to support more non string C # base types, added Unity common types: Type，Vector2，Vector3，Vector4，Quaternion，GameObject，Transform，Color，Color32，Bounds，Rect，RectOffset，LayerMask，Vector2Int，Vector3Int，RangeInt，BoundsInt)
 
 ## IMPORT
 ### Recommend (source code can be modified or updated)

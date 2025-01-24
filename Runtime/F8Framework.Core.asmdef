@@ -7,7 +7,6 @@
         "ICSharpCode.SharpZipLib",
         "Excel",
         "LitJson",
-        "MessagePack",
         "kcp2k",
         "Telepathy",
         "SimpleWebTransport",
