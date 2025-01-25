@@ -56,11 +56,11 @@ Unity 读取 Excel 的工具
 Unity基础类型支持（vec2 / vector2，vec3 / vector3，vec4 / vector4，vec2int / vector2int，vec3int / vector3int，quat / quaternion，color）  
 Excel 示例：（id 是唯一索引，必须添加！）  
 
-| int | long       | float    | double      | str      | vector3           | color              |
-| --- | ---------- | -------- | ----------- |----------|-------------------|--------------------|
-| id  | name1      | name2    | name3       | name4    | name5             | name6              |
-| 1   | 9935434343 | 2.725412 | 1.346655321 | 读取 Excel 工具 | 1.23,1.35,1.45    | 122,135,145,255    |
-| 2   | 9935434343 | 2.725412 | 1.346655321 | 读取 Excel 工具 | \[1.23,1.35,1.45] | \[122,135,145,255] |
+| int | long       | bool  | float    | double      | str         | vector3           | color              |
+| --- | ---------- |-------|----------|-------------|-------------|-------------------|--------------------|
+| id  | name1      | name2 | name3    | name4       | name5       | name6             | name7              |
+| 1   | 9935434343 | true  | 2.725412 | 1.346655321 | 读取 Excel 工具 | 1.23,1.35,1.45    | 122,135,145,255    |
+| 2   | 9935434343 | 1     | 2.725412 | 1.346655321 | 读取 Excel 工具 | \[1.23,1.35,1.45] | \[122,135,145,255] |
 
 * 2.容器类型支持（[] / [][] / [][][]，list<>，dict<,> / dictionary<,>）数组，交错数组，列表，字典（注意：key只能为byte，short，int，long，float，double，str / string 类型），容器内可以填写任意的类型  
 Excel 示例：（你可以任意拓展类型：[ReadExcel.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/ExcelTool/ReadExcel.cs)）

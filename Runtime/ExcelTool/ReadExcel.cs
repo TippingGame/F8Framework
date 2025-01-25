@@ -280,7 +280,7 @@ namespace F8Framework.Core
 
         private static void DebugError(string type, string data, string classname)
         {
-            LogF8.LogError(string.Format("数据类型错误：类型：{0}  数据：{1}  类名：{2}", type, data, classname));
+            LogF8.LogError(string.Format("数据类型错误，类型：{0}  数据：{1}  类名：{2}", type, data, classname));
         }
         
         public static object ParseValue(string type, string data, string classname)
@@ -343,8 +343,8 @@ namespace F8Framework.Core
                     var dictionary = (IDictionary)Activator.CreateInstance(typeof(Dictionary<,>).MakeGenericType(keyElementType, valueElementType));
                     for (int i = 0; i < elementsLength; i += 2)
                     {
-                        object key = ParseValue(keyType, elements[i], classname);
-                        object value = ParseValue(valueType, elements[i + 1], classname);
+                        object key = ParseValue(keyType, elementsLength >= i + 1 ? elements[i] : null, classname);
+                        object value = ParseValue(valueType, elementsLength >= i + 2 ? elements[i + 1] : null, classname);
                         if (dictionary.Contains(key))
                         {
                             LogF8.LogError("Dictionary 重复Key值：{0}  Value值：{1}  类型：{2}  数据：{3}  类名：{4}",key, value, type, data, classname);
@@ -374,6 +374,7 @@ namespace F8Framework.Core
                             {
                                 DebugError(type, data, classname);
                                 o = 0;
+                                break;
                             }
 
                             o = BYTE_byte;
@@ -384,6 +385,7 @@ namespace F8Framework.Core
                             {
                                 DebugError(type, data, classname);
                                 o = 0;
+                                break;
                             }
 
                             o = SHORT_short;
@@ -394,6 +396,7 @@ namespace F8Framework.Core
                             {
                                 DebugError(type, data, classname);
                                 o = 0;
+                                break;
                             }
 
                             o = INT_int;
@@ -404,6 +407,7 @@ namespace F8Framework.Core
                             {
                                 DebugError(type, data, classname);
                                 o = 0;
+                                break;
                             }
 
                             o = LONG_long;
@@ -413,7 +417,8 @@ namespace F8Framework.Core
                             if (float.TryParse(data, out FLOAT_float) == false)
                             {
                                 DebugError(type, data, classname);
-                                o = 0;
+                                o = 0f;
+                                break;
                             }
 
                             o = FLOAT_float;
@@ -423,7 +428,8 @@ namespace F8Framework.Core
                             if (double.TryParse(data, out DOUBLE_double) == false)
                             {
                                 DebugError(type, data, classname);
-                                o = 0;
+                                o = 0d;
+                                break;
                             }
 
                             o = DOUBLE_double;
@@ -433,7 +439,8 @@ namespace F8Framework.Core
                             if (decimal.TryParse(data, out DECIMAL_decimal) == false)
                             {
                                 DebugError(type, data, classname);
-                                o = 0;
+                                o = 0m;
+                                break;
                             }
 
                             o = DECIMAL_decimal;

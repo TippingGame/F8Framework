@@ -126,7 +126,14 @@ UI界面分为三大类：
 * 4. 收集UI所有的中文放入本地化表
 ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_20240315025120.png)
 ----------------------------------
-2. UI常用组件：[https://github.com/nhn/gpm.unity.git](https://github.com/nhn/gpm.unity.git)（已内置，参考目录：F8Framework/Tests/UI/Example）如要使用Tests目录下的示例，请在 Project Setting -> Player -> Script Compilation 处添加宏定义 BUILD_F8FRAMEWORK_TEST  
+2. 常用功能
+* 1.图片圆角遮罩 [SimpleRoundedImage.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/UI/Mask/SimpleRoundedImage.cs)
+* 2.UI安全区刘海防遮挡 [SimpleAnimationImage.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/UI/UIAdapter/SafeAreaAdapter.cs)
+* 3.粒子特效在UI上显示 [UIParticleSystem.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/UI/UIParticleSystem/UIParticleSystem.cs)
+* 4.红点系统 [UIRedDot.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/UI/UIRedDot/UIRedDot.cs)
+* 5.Sprite序列帧动画 [SpriteSequenceFrame.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/UI/SequenceFrame/SpriteSequenceFrame.cs)
+----------------------------------
+3. UI常用组件：[https://github.com/nhn/gpm.unity.git](https://github.com/nhn/gpm.unity.git)（已内置，参考目录：F8Framework/Tests/UI/Example）如要使用Tests目录下的示例，请在 Project Setting -> Player -> Script Compilation 处添加宏定义 BUILD_F8FRAMEWORK_TEST  
 * 嵌套布局  
 ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_20240302173446.png)
 ----------------------------------

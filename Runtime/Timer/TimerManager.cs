@@ -7,73 +7,71 @@ namespace F8Framework.Core
     [UpdateRefresh]
     public class TimerManager : ModuleSingleton<TimerManager>, IModule
     {
-        private Dictionary<int, Timer> times = new Dictionary<int, Timer>(); // 存储计时器的字典
-        private HashSet<int> deleteTimes = new HashSet<int>(); // 存储要删除的计时器ID的哈希集合
-        private Dictionary<int, Timer> addTimes = new Dictionary<int, Timer>(); // 存储要添加的计时器
+        private List<Timer> times = new List<Timer>(); // 存储计时器的列表
         private long initTime; // 初始化时间
         private long serverTime; // 服务器时间
         private long tempTime; // 临时时间
         private bool isFocus = true; // 是否处于焦点状态
         private int frameTime = 1; // 帧时间，默认为1
-        
+
         public void OnInit(object createParam)
         {
             initTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             serverTime = 0;
             tempTime = 0;
         }
-        
+
         public void OnLateUpdate()
         {
-            
+
         }
 
         public void OnFixedUpdate()
         {
-            
+
         }
 
         public void OnTermination()
         {
             MessageManager.Instance.RemoveEventListener(MessageEvent.ApplicationFocus, OnApplicationFocus, this);
             MessageManager.Instance.RemoveEventListener(MessageEvent.NotApplicationFocus, NotApplicationFocus, this);
+            times.Clear();
             base.Destroy();
         }
-        
+
         public void OnUpdate()
         {
-            foreach (var add in addTimes) //待添加字典
-            {
-                times.Add(add.Key, add.Value);
-            }
-            
-            addTimes.Clear();
-            
             if (isFocus == false || times.Count <= 0) // 如果失去焦点或者计时器数量为0，则返回
             {
                 return;
             }
             float dt = Time.deltaTime;
 
-            foreach (var pair in times)
+            for (int i = 0; i < times.Count; i++)
             {
-                Timer timer = pair.Value;
-                int id = timer.ID;
+                Timer timer = times[i];
+
+                if (timer.IsFinish)
+                {
+                    times.RemoveAt(i);
+                    i--;
+                    continue;
+                }
 
                 // 调用计时器
                 int triggerCount = timer.IsFrameTimer ? timer.Update(frameTime) : timer.Update(dt);
 
                 if (triggerCount > 0) // 如果本帧触发次数大于0，执行相关逻辑
                 {
-                    if (timer.IsFinish || timer.Handle == null || timer.Handle.Equals(null)) 
+                    if (timer.IsFinish || timer.Handle == null || timer.Handle.Equals(null))
                     {
-                        deleteTimes.Add(pair.Key);
+                        timer.IsFinish = true;
                         continue;
                     }
 
                     int field = timer.Field; // 获取计时器剩余字段值
 
-                    for (int i = 0; i < triggerCount; i++)
+                    for (int j = 0; j < triggerCount; j++)
                     {
                         field = field > 0 ? field - 1 : field; // 每次减少计时器字段值
 
@@ -81,7 +79,7 @@ namespace F8Framework.Core
                         {
                             timer.Field = field; // 更新计时器剩余字段值
                             timer.OnSecond?.Invoke();
-                            OnTimerComplete(id);
+                            OnTimerComplete(timer);
                         }
                         else
                         {
@@ -91,28 +89,14 @@ namespace F8Framework.Core
                     }
                 }
             }
-
-            foreach (var delete in deleteTimes) // 删除已完成的计时器
-            {
-                times.Remove(delete);
-            }
-            
-            deleteTimes.Clear();
         }
 
-       private void OnTimerComplete(int id)
+        private void OnTimerComplete(Timer timer)
         {
-            if (times.TryGetValue(id, out Timer timer)) // 根据ID获取计时器
+            timer.IsFinish = true;
+            if (timer.OnComplete is { } onComplete) // 若OnComplete事件存在，触发事件
             {
-                if (timer.OnComplete is { } onComplete) // 若OnComplete事件存在，触发事件
-                {
-                    onComplete.Invoke();
-                }
-                timer.IsFinish = true;
-            }
-            if (addTimes.TryGetValue(id, out Timer addtimer)) //有可能在待添加里
-            {
-                addtimer.IsFinish = true;
+                onComplete.Invoke();
             }
         }
 
@@ -121,7 +105,7 @@ namespace F8Framework.Core
         {
             int id = Guid.NewGuid().GetHashCode(); // 生成一个唯一的ID
             Timer timer = new Timer(handle, id, step, delay, field, onSecond, onComplete, false); // 创建一个计时器对象
-            addTimes.Add(id, timer);
+            times.Add(timer);
             return id;
         }
 
@@ -130,20 +114,20 @@ namespace F8Framework.Core
         {
             int id = Guid.NewGuid().GetHashCode(); // 生成一个唯一的ID
             Timer timer = new Timer(handle, id, stepFrame, delayFrame, field, onFrame, onComplete, true); // 创建一个以帧为单位的计时器对象
-            addTimes.Add(id, timer);
+            times.Add(timer);
             return id;
         }
 
         // 根据ID注销计时器
         public void RemoveTimer(int id)
         {
-            if (times.TryGetValue(id, out Timer timer)) // 根据ID获取计时器并标记为完成，将其ID添加到待删除列表
+            for (int i = 0; i < times.Count; i++)
             {
-                timer.IsFinish = true;
-            }
-            if (addTimes.TryGetValue(id, out Timer addtimer)) //有可能在待添加里
-            {
-                addtimer.IsFinish = true;
+                if (times[i].ID == id)
+                {
+                    times[i].IsFinish = true;
+                    break;
+                }
             }
         }
 
@@ -182,9 +166,9 @@ namespace F8Framework.Core
         // 暂停所有计时器
         public void Pause()
         {
-            foreach (var pair in times)
+            for (int i = 0; i < times.Count; i++)
             {
-               pair.Value.StartTime = GetTime();
+                times[i].StartTime = GetTime();
             }
         }
 
@@ -200,7 +184,7 @@ namespace F8Framework.Core
             Restart();
             isFocus = true;
         }
-        
+
         // 当应用程序失去焦点时调用
         void NotApplicationFocus()
         {
@@ -212,15 +196,15 @@ namespace F8Framework.Core
         public void Restart()
         {
             long currentTime = GetTime();
-
-            foreach (var pair in times)
+            for (int i = 0; i < times.Count; i++)
             {
-                if (pair.Value.StartTime != 0) // 如果计时器的开始时间不为0
+                Timer timer = times[i];
+                if (timer.StartTime != 0) // 如果计时器的开始时间不为0
                 {
-                    long startTime = pair.Value.StartTime; // 获取计时器的开始时间
+                    long startTime = timer.StartTime; // 获取计时器的开始时间
                     int interval = (int)((currentTime - startTime) / 1000); // 计算时间间隔（秒数）
-                    int field = pair.Value.Field; // 获取计时器字段值
-                    pair.Value.StartTime = 0; // 重置计时器的开始时间为0
+                    int field = timer.Field; // 获取计时器字段值
+                    timer.StartTime = 0; // 重置计时器的开始时间为0
 
                     if (field < 0)
                     {
@@ -232,12 +216,12 @@ namespace F8Framework.Core
                         if (field < 0) // 如果字段值小于0，将其置为0，并执行OnTimerComplete
                         {
                             field = 0;
-                            pair.Value.Field = field; // 更新计时器字段值
-                            OnTimerComplete(pair.Value.ID);
+                            timer.Field = field; // 更新计时器字段值
+                            OnTimerComplete(timer);
                         }
                         else
                         {
-                            pair.Value.Field = field; // 更新计时器字段值
+                            timer.Field = field; // 更新计时器字段值
                         }
                     }
                 }

@@ -219,7 +219,7 @@ namespace LitJson
                     if (parameters[0].ParameterType == typeof(string) || parameters[0].ParameterType == typeof(int) ||
                         parameters[0].ParameterType == typeof(byte) || parameters[0].ParameterType == typeof(short) ||
                         parameters[0].ParameterType == typeof(long) || parameters[0].ParameterType == typeof(float) ||
-                        parameters[0].ParameterType == typeof(double))
+                        parameters[0].ParameterType == typeof(double) || parameters[0].ParameterType == typeof(decimal))
                         data.ElementType = p_info.PropertyType;
 
                     continue;
