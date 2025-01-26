@@ -6,6 +6,8 @@ namespace F8Framework.Core
 {
     public class SpriteSequenceFrame : MonoBehaviour
     {
+        public Sprite[] sprites;
+        
         private Image image;
         private SpriteRenderer spriteRenderer;
 
@@ -112,11 +114,11 @@ namespace F8Framework.Core
         {
             if (image)
             {
-                image.sprite = AssetManager.Instance.Load<Sprite>(atlasName, spriteNames[currentFrame % aniNum]);
+                image.sprite = sprites.Length > 0 ? sprites[currentFrame % aniNum] : AssetManager.Instance.Load<Sprite>(atlasName, spriteNames[currentFrame % aniNum]);
             }
             else if (spriteRenderer)
             {
-                spriteRenderer.sprite = AssetManager.Instance.Load<Sprite>(atlasName, spriteNames[currentFrame % aniNum]);
+                spriteRenderer.sprite = sprites.Length > 0 ? sprites[currentFrame % aniNum] : AssetManager.Instance.Load<Sprite>(atlasName, spriteNames[currentFrame % aniNum]);
             }
         }
     }
