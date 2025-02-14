@@ -37,33 +37,11 @@ namespace F8Framework.Core
 
         public void OnInit(object createParam)
         {
-            var nowTime = DateTime.Now;
-            
-            if (Application.isEditor) return;
-            
-            Application.logMessageReceived += (LogHandler);
-
-            var files = Directory.GetFiles(Application.persistentDataPath, "log-*.txt",
-                SearchOption.TopDirectoryOnly);
-            if (files.Length > MAX_LOG_FILE_CNT)
-            {
-                for (int i = 0; i < files.Length - MAX_LOG_FILE_CNT; i++)
-                {
-                    File.Delete(files[i]);
-                }
-            }
-
-            var logFilePath = string.Format("{0}/log-{1}-{2}-{3}.txt", Application.persistentDataPath, nowTime.Year,
-                nowTime.Month, nowTime.Day);
-                
-            writer = new StreamWriter(logFilePath, true, Encoding.UTF8);
-
-            logTime = 0;
         }
 
         public void OnUpdate()
         {
-            if (!Application.isEditor && isEnableLog)
+            if (!Application.isEditor && isEnableLog && writer != null)
             {
                 if (Time.realtimeSinceStartup - logTime > LOG_TIME)
                 {
@@ -125,6 +103,45 @@ namespace F8Framework.Core
         public void OnEnterGame()
         {
             isEnableLog = true;
+            
+            var nowTime = DateTime.Now;
+            
+            if (Application.isEditor) return;
+            
+            Application.logMessageReceived += (LogHandler);
+
+            var files = Directory.GetFiles(Application.persistentDataPath, "log-*.txt",
+                SearchOption.TopDirectoryOnly);
+            if (files.Length > MAX_LOG_FILE_CNT)
+            {
+                for (int i = 0; i < files.Length - MAX_LOG_FILE_CNT; i++)
+                {
+                    File.Delete(files[i]);
+                }
+            }
+
+            var logFilePath = string.Format("{0}/log-{1}-{2}-{3}.txt", Application.persistentDataPath, nowTime.Year,
+                nowTime.Month, nowTime.Day);
+
+            try
+            {
+                writer = new StreamWriter(logFilePath, true, Encoding.UTF8);
+            }
+            catch (Exception e)
+            {
+                try
+                {
+                    writer = new StreamWriter(string.Format("{0}/log-{1}-{2}-{3}-{4}.txt", Application.persistentDataPath, nowTime.Year,
+                        nowTime.Month, nowTime.Day, Guid.NewGuid().GetHashCode()), true, Encoding.UTF8);
+                }
+                catch (Exception e2)
+                {
+                    writer = null;
+                    LogF8.LogException(e2);
+                }
+            }
+            
+            logTime = 0;
         }
 
         public void OnQuitGame()
@@ -142,6 +159,7 @@ namespace F8Framework.Core
                 writer = null;
             }
         }
+        
         private void LogOneMessage(LogType type, string msg, string stackTrace = null)
         {
             var logStackTrace = false;

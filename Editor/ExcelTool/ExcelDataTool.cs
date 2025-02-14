@@ -76,6 +76,7 @@ namespace F8Framework.Core.Editor
 
             // 将内容写入.asmdef文件
             FileTools.SafeWriteAllText(asmrefPath, asmdefContent);
+            LogF8.LogConfig("创建.asmdef文件 " + Application.dataPath + DLLFolder + "/" + "/<color=#FF9E59>" + CODE_NAMESPACE + ".asmdef" + "</color>");
         }
         
         public static void LoadAllExcelData()
@@ -110,20 +111,6 @@ namespace F8Framework.Core.Editor
                 LogF8.LogError("暂无可以导入的数据表！自动为你创建：【DemoWorkSheet.xlsx / Localization.xlsx】两个表格！" + lastExcelPath + " 目录");
             }
             
-            string F8DataManagerPath = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/ConfigData/F8DataManager";
-            FileTools.SafeClearDir(F8DataManagerPath);
-            LogF8.LogConfig("清空目录：" + F8DataManagerPath);
-            FileTools.CheckDirAndCreateWhenNeeded(F8DataManagerPath);
-            string F8ExcelDataClassPath = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/ConfigData/F8ExcelDataClass";
-            FileTools.SafeClearDir(F8ExcelDataClassPath);
-            LogF8.LogConfig("清空目录：" + F8ExcelDataClassPath);
-            FileTools.CheckDirAndCreateWhenNeeded(F8ExcelDataClassPath);
-            string F8ExcelDataClassPathDLL = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/ConfigData/" + CODE_NAMESPACE + ".asmdef";
-            FileTools.SafeDeleteFile(F8ExcelDataClassPathDLL);
-            LogF8.LogConfig("删除文件：" + F8ExcelDataClassPathDLL);
-            FileTools.SafeDeleteFile(F8ExcelDataClassPathDLL + ".meta");
-            FileTools.SafeDeleteFile(Application.dataPath + DataManagerFolder + "/F8DataManager.asmref");
-            CreateAsmdefFile();
             AssetDatabase.Refresh();
             
             if (codeList == null)
@@ -160,9 +147,31 @@ namespace F8Framework.Core.Editor
                 EditorUtility.DisplayDialog("注意！！！", "\n暂无可以导入的数据表！", "确定");
                 throw new Exception("暂无可以导入的数据表！");
             }
-            //编译代码,生成包含所有数据表内数据类型的dll
+            
+            string F8ExcelDataClassPath = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/ConfigData/F8ExcelDataClass";
+            FileTools.SafeClearDir(F8ExcelDataClassPath);
+            LogF8.LogConfig("清空目录：" + F8ExcelDataClassPath);
+            FileTools.CheckDirAndCreateWhenNeeded(F8ExcelDataClassPath);
+            AssetDatabase.Refresh();
+            // 编译代码,生成包含所有数据表内数据类型的dll
             GenerateCodeFiles(codeList);
+            
+            string F8DataManagerPath = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/ConfigData/F8DataManager";
+            FileTools.SafeClearDir(F8DataManagerPath);
+            LogF8.LogConfig("清空目录：" + F8DataManagerPath);
+            FileTools.CheckDirAndCreateWhenNeeded(F8DataManagerPath);
+            AssetDatabase.Refresh();
+            // 生成F8DataManager.cs
             ScriptGenerator.CreateDataManager(codeList);
+            
+            string F8ExcelDataClassPathDLL = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/ConfigData/" + CODE_NAMESPACE + ".asmdef";
+            FileTools.SafeDeleteFile(F8ExcelDataClassPathDLL);
+            LogF8.LogConfig("删除文件：" + F8ExcelDataClassPathDLL);
+            FileTools.SafeDeleteFile(F8ExcelDataClassPathDLL + ".meta");
+            FileTools.SafeDeleteFile(Application.dataPath + DataManagerFolder + "/F8DataManager.asmref");
+            CreateAsmdefFile();
+            AssetDatabase.Refresh();
+            
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
             // 等待脚本编译完成
@@ -447,7 +456,15 @@ namespace F8Framework.Core.Editor
             foreach (var kvp in codeList)
             {
                 string filePath = $"{path}/{kvp.Key}.cs";
-                File.WriteAllText(filePath, kvp.Value.Generate());
+                try
+                {
+                    File.WriteAllText(filePath, kvp.Value.Generate());
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("表格生成错误，修改后重试F8：" + kvp.Key + ".cs" + "\n" + e.Message);
+                }
+                
                 LogF8.LogConfig($"已生成代码 " + path + "/<color=#FF9E59>" + kvp.Key + ".cs</color>");
             }
         }

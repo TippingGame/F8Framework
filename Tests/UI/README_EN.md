@@ -1,8 +1,8 @@
 # F8 UIManager
 
-[![license](http://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)
-[![Unity Version](https://img.shields.io/badge/unity-2021.3.15f1-blue)](https://unity.com)
-[![Platform](https://img.shields.io/badge/platform-Win%20%7C%20Android%20%7C%20iOS%20%7C%20Mac%20%7C%20Linux%20%7C%20WebGL-orange)]()
+[![license](http://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT) 
+[![Unity Version](https://img.shields.io/badge/unity-2021.3.15f1-blue)](https://unity.com) 
+[![Platform](https://img.shields.io/badge/platform-Win%20%7C%20Android%20%7C%20iOS%20%7C%20Mac%20%7C%20Linux%20%7C%20WebGL-orange)]() 
 
 ## 简介（希望自己点击F8，就能开始制作游戏，不想多余的事）
 Unity F8 UIManager界面管理组件，处理界面加载，打开，关闭，查询，层级控制，自定义动画，自动获取组件索引。  
@@ -14,16 +14,16 @@ UI界面分为三大类：
 ## 导入插件（需要首先导入核心）
 注意！内置在->F8Framework核心：https://github.com/TippingGame/F8Framework.git  
 方式一：直接下载文件，放入Unity  
-方式二：Unity->点击菜单栏->Window->Package Manager->点击+号->Add Package from git URL->输入：https://github.com/TippingGame/F8Framework.git
+方式二：Unity->点击菜单栏->Window->Package Manager->点击+号->Add Package from git URL->输入：https://github.com/TippingGame/F8Framework.git  
 
 ### 初始化，创建UI，创建代码模板
 
-1. 制作UI预制体，放到AssetBundles或者Resources文件夹下任意目录
+1. 制作UI预制体，放到AssetBundles或者Resources文件夹下任意目录  
 2. 右键资源文件夹，看到（F8UI界面管理功能），创建BaseView模板，挂载到UI根层级上  
-   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_20240302154254.png)
+![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_20240302154254.png)
 --------------------------
 3. 生成UI组件的索引，可以在 [DefaultCodeBindNameTypeConfig.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/ComponentBind/DefaultCodeBindNameTypeConfig.cs) 中添加名称索引（可能需要点击两次）  
-   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_20240205223438.png)
+![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_20240205223438.png)
 ### 代码使用方法
 ```C#
         private Dictionary<int, UIConfig> configs = new Dictionary<int, UIConfig>
@@ -124,19 +124,26 @@ UI界面分为三大类：
 * 2. 图集切割（需要预先点击 Sprite Editor 的 Slice 切分图片，图片 Read/Write 勾选，压缩等级设置为None）
 * 3. 图片尺寸设为4的倍数（更适合图片压缩优化）
 * 4. 收集UI所有的中文放入本地化表
-     ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_20240315025120.png)
+![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_20240315025120.png)
 ----------------------------------
-2. UI常用组件：[https://github.com/nhn/gpm.unity.git](https://github.com/nhn/gpm.unity.git)（已内置，参考目录：F8Framework/Tests/UI/Example）如要使用Tests目录下的示例，请在 Project Setting -> Player -> Script Compilation 处添加宏定义 BUILD_F8FRAMEWORK_TEST
+2. 常用功能
+* 1.图片圆角遮罩 [SimpleRoundedImage.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/UI/Mask/SimpleRoundedImage.cs)
+* 2.UI安全区刘海防遮挡 [SafeAreaAdapter.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/UI/UIAdapter/SafeAreaAdapter.cs)
+* 3.粒子特效在UI上显示 [UIParticleSystem.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/UI/UIParticleSystem/UIParticleSystem.cs)
+* 4.红点系统 [UIRedDot.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/UI/UIRedDot/UIRedDot.cs)
+* 5.Sprite序列帧动画 [SpriteSequenceFrame.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/UI/SequenceFrame/SpriteSequenceFrame.cs)
+----------------------------------
+3. UI常用组件：[https://github.com/nhn/gpm.unity.git](https://github.com/nhn/gpm.unity.git)（已内置，参考目录：F8Framework/Tests/UI/Example）如要使用Tests目录下的示例，请在 Project Setting -> Player -> Script Compilation 处添加宏定义 BUILD_F8FRAMEWORK_TEST  
 * 嵌套布局  
-  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_20240302173446.png)
+![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_20240302173446.png)
 ----------------------------------
 * 无限列表  
-  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_20240302173458.png)
+![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_20240302173458.png)
 ----------------------------------
 * 拖拽  
-  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_20240302173503.png)
+![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_20240302173503.png)
 ----------------------------------
 * Tab标签页  
-  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_20240302173507.png)
+![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_20240302173507.png)
 ----------------------------------
 

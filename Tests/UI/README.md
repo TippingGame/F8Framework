@@ -128,7 +128,7 @@ UI界面分为三大类：
 ----------------------------------
 2. 常用功能
 * 1.图片圆角遮罩 [SimpleRoundedImage.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/UI/Mask/SimpleRoundedImage.cs)
-* 2.UI安全区刘海防遮挡 [SimpleAnimationImage.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/UI/UIAdapter/SafeAreaAdapter.cs)
+* 2.UI安全区刘海防遮挡 [SafeAreaAdapter.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/UI/UIAdapter/SafeAreaAdapter.cs)
 * 3.粒子特效在UI上显示 [UIParticleSystem.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/UI/UIParticleSystem/UIParticleSystem.cs)
 * 4.红点系统 [UIRedDot.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/UI/UIRedDot/UIRedDot.cs)
 * 5.Sprite序列帧动画 [SpriteSequenceFrame.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/UI/SequenceFrame/SpriteSequenceFrame.cs)

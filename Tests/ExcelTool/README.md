@@ -124,7 +124,7 @@ I18N.Other.dll\
 I18N.Rare.dll\
 I18N.West.dll\
 [ICSharpCode.SharpZipLib.dll](https://github.com/icsharpcode/SharpZipLib)  
-[LitJson.dll](https://github.com/LitJSON/litjson)（已修改字典Key可以使用int类型，增加UnityEngine基础类型）
+[LitJson.dll](https://github.com/LitJSON/litjson)（已修改字典Key支持更多非string的C#基础类型，增加Unity常用类型：Type，Vector2，Vector3，Vector4，Quaternion，GameObject，Transform，Color，Color32，Bounds，Rect，RectOffset，LayerMask，Vector2Int，Vector3Int，RangeInt，BoundsInt）
 
 ## 你可能需要写入Excel
 使用 [EPPlus.dll（已内置）](https://github.com/TippingGame/F8Framework/blob/main/Plugins/EPPlus.dll)但未启用，请手动选择编译的平台  
