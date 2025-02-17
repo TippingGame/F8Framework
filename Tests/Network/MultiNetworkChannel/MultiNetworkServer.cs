@@ -29,7 +29,7 @@ namespace F8Framework.Tests
             kcpServerChannel.OnDataReceived += KcpServer_OnDataReceived;
             kcpServerChannel.OnDisconnected += KcpServer_OnDisconnected;
             
-            // 可选
+            // 可选，开启多线程
             // FF8.Network.StartThread();
             
             //channel的TickRefresh函数可自定义管理轮询，networkManager的作用是存放通道并调用TickRefresh。

@@ -8,27 +8,44 @@ namespace F8Framework.Tests
 {
     public class DemoUIManager : MonoBehaviour
     {
-        private Dictionary<int, UIConfig> configs = new Dictionary<int, UIConfig>
+        // UI的定义，枚举
+        public enum UIID
         {
-            { 1, new UIConfig(LayerType.UI, "UIMain") }
+            UIMain = 1, // 游戏主界面
+        }
+        private Dictionary<UIID, UIConfig> configs = new Dictionary<UIID, UIConfig>
+        {
+            // 兼容int和枚举作为Key
+            { UIID.UIMain, new UIConfig(LayerType.UI, "UIMain") } // 手动添加UI配置
         };
 
         private object[] data = new object[] { 123123, "asdasd" };
 
+        
+        /*--------------------------UI管理功能--------------------------*/
         void Start()
         {
-            /*----------UI管理功能----------*/
-
-            // 初始化
+            // 初始化（必须执行，兼容int和枚举作为Key的configs）
             FF8.UI.Initialize(configs);
-            // 设置UI Canvas属性
+        
+            // 设置UI Canvas属性（如果不懂属性有什么用，可自建Canvas进行试验）
+            // null代表设置所有Layer
+            // sortOrder层级
+            // sortingLayerName层级名称
+            // RenderMode渲染模式
+            // pixelPerfect像素模式
+            // camera设置主相机
             FF8.UI.SetCanvas(null, 1, "Default", RenderMode.ScreenSpaceCamera, false, Camera.main);
-            // 设置UI CanvasScaler属性
-            FF8.UI.SetCanvasScaler(null, CanvasScaler.ScaleMode.ConstantPixelSize, 1f, 100f);
-            FF8.UI.SetCanvasScaler(LayerType.UI, CanvasScaler.ScaleMode.ScaleWithScreenSize, new Vector2(1920, 1080), CanvasScaler.ScreenMatchMode.MatchWidthOrHeight, 0f, 100f);
-            FF8.UI.SetCanvasScaler(LayerType.UI, CanvasScaler.ScaleMode.ConstantPhysicalSize, CanvasScaler.Unit.Points, 96f, 100f, 100f);
-            // 打开UI，可选参数：data，new UICallbacks()
-            FF8.UI.Open(1, data, new UICallbacks(
+        
+            // 设置UI CanvasScaler属性（如果不懂属性有什么用，可自建Canvas进行试验）
+            FF8.UI.SetCanvasScaler(null, CanvasScaler.ScaleMode.ConstantPixelSize, scaleFactor: 1f, referencePixelsPerUnit: 100f);
+            FF8.UI.SetCanvasScaler(LayerType.UI, CanvasScaler.ScaleMode.ScaleWithScreenSize, referenceResolution: new Vector2(1920, 1080),
+                CanvasScaler.ScreenMatchMode.MatchWidthOrHeight, matchWidthOrHeight: 0f, referencePixelsPerUnit: 100f);
+            FF8.UI.SetCanvasScaler(LayerType.UI, CanvasScaler.ScaleMode.ConstantPhysicalSize, CanvasScaler.Unit.Points,
+                fallbackScreenDPI: 96f, defaultSpriteDPI: 100f, referencePixelsPerUnit: 100f);
+
+            // 打开UI，兼容int和枚举，可选参数：data，new UICallbacks()
+            FF8.UI.Open(UIID.UIMain, data, new UICallbacks(
                 (parameters, id) => // onAdded
                 {
                     
@@ -39,12 +56,28 @@ namespace F8Framework.Tests
                 {
                     
                 }));
+            // 也可以这样，guid是唯一ID
+            string guid = FF8.UI.Open(1);
+            
             // 打开提示类Notify
+            FF8.UI.ShowNotify(UIID.UIMain, "tip");
             FF8.UI.ShowNotify(1, "tip");
+            
             // UI是否存在
+            FF8.UI.Has(UIID.UIMain);
             FF8.UI.Has(1);
+            
+            // 根据UIid获取UI物体列表
+            FF8.UI.GetByUIid(UIID.UIMain);
+            FF8.UI.GetByUIid(1);
+            
+            // 根据guid获取UI物体
+            FF8.UI.GetByGuid(guid);
+            
             // 关闭UI，可选参数：isDestroy
+            FF8.UI.Close(UIID.UIMain, true);
             FF8.UI.Close(1, true);
+            
             // 关闭所有UI（除了Notify类），可选参数：isDestroy
             FF8.UI.Clear(true);
         }
@@ -53,51 +86,49 @@ namespace F8Framework.Tests
     // 提供UI界面基类，BaseView
     public class UIMain : BaseView
     {
+        // Awake
         protected override void OnAwake()
         {
-            // Awake
         }
-
+    
+        // 参数传入，每次打开UI都会执行
         protected override void OnAdded(int uiId, object[] args = null)
         {
-            // 参数传入
         }
-
+    
+        // Start
         protected override void OnStart()
         {
-            // Start
-            object[] args = Args;
-            int uiId = UIid;
         }
-
+    
         protected override void OnViewTweenInit()
         {
-            transform.localScale = Vector3.one * 0.7f;
+            //transform.localScale = Vector3.one * 0.7f;
         }
-
+    
+        // 自定义打开界面动画
         protected override void OnPlayViewTween()
         {
-            // 打开界面动画，可自行添加关闭界面动画
-            transform.ScaleTween(Vector3.one, 0.1f).SetEase(Ease.Linear).SetOnComplete(OnViewOpen);
+            //transform.ScaleTween(Vector3.one, 0.1f).SetEase(Ease.Linear).SetOnComplete(OnViewOpen);
         }
-
+    
+        // 打开界面动画完成后
         protected override void OnViewOpen()
         {
-            // 打开界面动画完成后
         }
-
+    
+        // 删除之前，每次UI关闭前调用
         protected override void OnBeforeRemove()
         {
-            // 删除之前
         }
-
+    
+        // 删除，UI关闭后调用
         protected override void OnRemoved()
         {
-            // 删除
         }
-
+    
         // 自动获取组件（自动生成，不能删除）
-
+    
         // 自动获取组件（自动生成，不能删除）
     }
 }

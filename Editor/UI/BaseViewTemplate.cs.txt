@@ -13,7 +13,7 @@ public class #SCRIPTNAME# : BaseView
         #NOTRIM#
     }
     
-    // 参数传入
+    // 参数传入，每次打开UI都会执行
     protected override void OnAdded(int uiId, object[] args = null)
     {
         #NOTRIM#
@@ -42,13 +42,13 @@ public class #SCRIPTNAME# : BaseView
         #NOTRIM#
     }
     
-    // 删除之前
+    // 删除之前，每次UI关闭前调用
     protected override void OnBeforeRemove()
     {
         #NOTRIM#
     }
     
-    // 删除
+    // 删除，UI关闭后调用
     protected override void OnRemoved()
     {
         #NOTRIM#

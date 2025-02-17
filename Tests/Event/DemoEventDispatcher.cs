@@ -11,16 +11,16 @@ namespace F8Framework.Tests
         private void Awake()
         {
             AddEventListener(MessageEvent.ApplicationFocus, OnPlayerSpawned);
-            AddEventListener(MessageEvent.NotApplicationFocus, OnPlayerSpawned2);
+            AddEventListener(10001, OnPlayerSpawned2);
         }
 
         private void Start()
         {
             DispatchEvent(MessageEvent.ApplicationFocus);
-            DispatchEvent(MessageEvent.NotApplicationFocus, data);
+            DispatchEvent(10001, data);
             //可不执行，OnDestroy时会清理此脚本所有监听
             RemoveEventListener(MessageEvent.ApplicationFocus, OnPlayerSpawned);
-            RemoveEventListener(MessageEvent.NotApplicationFocus, OnPlayerSpawned2);
+            RemoveEventListener(10001, OnPlayerSpawned2);
         }
 
         private void OnPlayerSpawned()
@@ -31,8 +31,11 @@ namespace F8Framework.Tests
         private void OnPlayerSpawned2(params object[] obj)
         {
             LogF8.Log("OnPlayerSpawned2");
-            LogF8.Log(obj[0]);
-            LogF8.Log(obj[1]);
+            if (obj is { Length: > 0 })
+            {
+                LogF8.Log(obj[0]);
+                LogF8.Log(obj[1]);
+            }
         }
 
         private EventDispatcher _eventDispatcher = null;

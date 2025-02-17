@@ -35,25 +35,25 @@ Unity F8 Localization本地化组件。
 
 ### 代码使用方法
 ```C#
-        /*----------------------------本地化功能----------------------------*/
-        
-        // 切换语言
-        FF8.Localization.ChangeLanguage("English");
-        
-        // 获取翻译文本
-        string text = FF8.Localization.GetTextFromId("test", "Support", "Format");
-        string text1 = FF8.Localization.GetTextFromIdLanguage("test", "English");
-        
-        // 语言列表
-        FF8.Localization.LanguageList;
-        
-        // 当前语言
-        FF8.Localization.CurrentLanguageName;
-        
-        // 重新加载翻译表
-        FF8.Localization.Load();
-        
-        // 刷新所有本地化组件
-        FF8.Localization.InjectAll();
+/*----------------------------本地化功能----------------------------*/
+
+    // 切换语言
+    FF8.Localization.ChangeLanguage("English");
+    
+    // 获取翻译文本
+    string text = FF8.Localization.GetTextFromId("test", "Support", "Format");
+    string text1 = FF8.Localization.GetTextFromIdLanguage("test", "English");
+    
+    // 语言列表
+    FF8.Localization.LanguageList;
+    
+    // 当前语言
+    FF8.Localization.CurrentLanguageName;
+    
+    // 重新加载翻译表
+    FF8.Localization.Load();
+    
+    // 刷新所有本地化组件
+    FF8.Localization.InjectAll();
 ```
 

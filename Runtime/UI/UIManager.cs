@@ -261,6 +261,12 @@ namespace F8Framework.Core
             return default;
         }
 
+        public bool Has<T>(T eventName) where T : Enum, IConvertible
+        {
+            int uiId = (int)(object)eventName;
+            return Has(uiId);
+        }
+
         public bool Has(int uiId)
         {
             if (!_configs.TryGetValue(uiId, out UIConfig config))
@@ -319,7 +325,13 @@ namespace F8Framework.Core
             // 如果所有层都没有找到匹配的 GameObject，返回 null
             return null;
         }
-        
+
+        public List<GameObject> GetByUIid<T>(T eventName) where T : Enum, IConvertible
+        {
+            int uiId = (int)(object)eventName;
+            return GetByUIid(uiId);
+        }
+
         public List<GameObject> GetByUIid(int uiId)
         {
             if (!_configs.TryGetValue(uiId, out UIConfig config))
@@ -346,7 +358,13 @@ namespace F8Framework.Core
 
             return null;
         }
-        
+
+        public void Close<T>(T eventName, bool isDestroy = false, string guid = default) where T : Enum, IConvertible
+        {
+            int uiId = (int)(object)eventName;
+            Close(uiId, isDestroy, guid);
+        }
+
         public void Close(int uiId = default, bool isDestroy = false, string guid = default)
         {
             if (!_configs.TryGetValue(uiId, out UIConfig config))

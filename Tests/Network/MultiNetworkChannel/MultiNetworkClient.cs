@@ -33,7 +33,7 @@ namespace F8Framework.Tests
             kcpClientChannel.OnDataReceived += KcpClient_OnDataReceived;
             kcpClientChannel.OnDisconnected += KcpClient_OnDisconnected;
 
-            // 可选
+            // 可选，开启多线程
             // FF8.Network.StartThread();
             
             //channel的TickRefresh函数可自定义管理轮询，networkManager的作用是存放通道并调用TickRefresh。
@@ -83,6 +83,7 @@ namespace F8Framework.Tests
 
         void TcpClient_OnDataReceived(byte[] data)
         {
+            LogF8.LogNet($"TCP_CLIENT receive data: {Encoding.UTF8.GetString(data)}");
         }
 
         void TcpClient_OnDisconnected()

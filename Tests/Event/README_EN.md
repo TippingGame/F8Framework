@@ -14,40 +14,58 @@ Unity F8 Event组件，优雅的发送消息、事件监听系统，防止消息
 
 ### 代码使用方法
 ```C#
-        // 消息的定义，枚举
-        public enum MessageEvent
-        {
-            // 框架事件，10000起步
-            Empty = 10000,
-            ApplicationFocus = 10001, // 游戏对焦
-            NotApplicationFocus = 10002, // 游戏失焦
-            ApplicationQuit = 10003, // 游戏退出
-        }
-        
-        private object[] data = new object[] { 123123, "asdasd" };
-        
-        // 全局监听
-        FF8.Message.AddEventListener(MessageEvent.ApplicationFocus, OnPlayerSpawned, this);
-        FF8.Message.AddEventListener(10001, OnPlayerSpawned, this);
-        
-        // 发送全局消息（不带参数/带参数）
-        FF8.Message.DispatchEvent(MessageEvent.ApplicationFocus, data);
-        FF8.Message.DispatchEvent(10001, data);
-        
-        // 移除监听
-        FF8.Message.RemoveEventListener(MessageEvent.ApplicationFocus, OnPlayerSpawned, this);
-        FF8.Message.RemoveEventListener(10001, OnPlayerSpawned, this);
-        
-        
-        // EventDispatcher用法，用作在实体或UI上，简化代码，监听自动释放
-        AddEventListener(MessageEvent.ApplicationFocus, OnPlayerSpawned);
-        
-        // 发送全局消息（不带参数/带参数）
-        DispatchEvent(MessageEvent.ApplicationFocus);
-        
-        // 可不执行，Clear()时会清理此脚本所有监听
-        RemoveEventListener(MessageEvent.ApplicationFocus, OnPlayerSpawned);
+// 消息的定义，枚举
+public enum MessageEvent
+{
+    // 框架事件，10000起步
+    Empty = 10000,
+    ApplicationFocus = 10001, // 游戏对焦
+    NotApplicationFocus = 10002, // 游戏失焦
+    ApplicationQuit = 10003, // 游戏退出
+}
+
+private object[] data = new object[] { 123123, "asdasd" };
+
+private void Start()
+{
+    // 全局监听（参数兼容int和枚举）
+    FF8.Message.AddEventListener(MessageEvent.ApplicationFocus, OnPlayerSpawned, this);
+    FF8.Message.AddEventListener(10001, OnPlayerSpawned2, this);
+    
+    // 发送全局消息（不带参数/带参数）
+    FF8.Message.DispatchEvent(MessageEvent.ApplicationFocus);
+    FF8.Message.DispatchEvent(10001, data);
+    
+    // 移除监听
+    FF8.Message.RemoveEventListener(MessageEvent.ApplicationFocus, OnPlayerSpawned, this);
+    FF8.Message.RemoveEventListener(10001, OnPlayerSpawned2, this);
+}
+
+private void OnPlayerSpawned()
+{
+    LogF8.Log("OnPlayerSpawned");
+}
+
+private void OnPlayerSpawned2(params object[] obj)
+{
+    LogF8.Log("OnPlayerSpawned2");
+    if (obj is { Length: > 0 })
+    {
+        LogF8.Log(obj[0]);
+        LogF8.Log(obj[1]);
+    }
+}
+
+/*--------------------------EventDispatcher用法--------------------------*/
+// 用作在实体或UI上，简化代码，监听自动释放
+AddEventListener(MessageEvent.ApplicationFocus, OnPlayerSpawned);
+
+// 发送全局消息（不带参数/带参数）
+DispatchEvent(MessageEvent.ApplicationFocus);
+
+// 可不执行，Clear()时会清理此脚本所有监听
+RemoveEventListener(MessageEvent.ApplicationFocus, OnPlayerSpawned);
 ```
 
-## EventDispatcher使用方法[（参考）](https://github.com/TippingGame/F8Framework/blob/main/Runtime/UI/Base/BaseView.cs)
+## EventDispatcher使用方法[（参考BaseView.cs）](https://github.com/TippingGame/F8Framework/blob/main/Runtime/UI/Base/BaseView.cs)
 Demo直接拖拽DemoEventDispatcher.cs，挂载到GameObject  
