@@ -40,9 +40,9 @@ private Dictionary<UIID, UIConfig> configs = new Dictionary<UIID, UIConfig>
 private object[] data = new object[] { 123123, "asdasd" };
 
 
-/*----------------------------UI管理功能----------------------------*/
-void Start()
+IEnumerator Start()
 {
+    /*--------------------------UI管理功能--------------------------*/
     // 初始化（必须执行，兼容int和枚举作为Key的configs）
     FF8.UI.Initialize(configs);
 
@@ -62,6 +62,8 @@ void Start()
     FF8.UI.SetCanvasScaler(LayerType.UI, CanvasScaler.ScaleMode.ConstantPhysicalSize, CanvasScaler.Unit.Points,
         fallbackScreenDPI: 96f, defaultSpriteDPI: 100f, referencePixelsPerUnit: 100f);
 
+    
+    /*-------------------------------------同步加载-------------------------------------*/
     // 打开UI，兼容int和枚举，可选参数：data，new UICallbacks()
     FF8.UI.Open(UIID.UIMain, data, new UICallbacks(
         (parameters, id) => // onAdded
@@ -77,9 +79,29 @@ void Start()
     // 也可以这样，guid是唯一ID
     string guid = FF8.UI.Open(1);
     
+    
+    /*-------------------------------------异步加载-------------------------------------*/
+    // async/await方式（无多线程，WebGL也可使用）
+    // await FF8.UI.OpenAsync(UIID.UIMain);
+    // 或者
+    // UILoader load = FF8.UI.OpenAsync(UIID.UIMain);
+    // await load;
+    // string guid2 = load.Guid;
+    
+    // 协程方式
+    yield return FF8.UI.OpenAsync(UIID.UIMain);
+    // 或者
+    UILoader load2 = FF8.UI.OpenAsync(UIID.UIMain);
+    yield return load2;
+    string guid2 = load2.Guid;
+    
+    /*-------------------------------------其他功能-------------------------------------*/
     // 打开提示类Notify
     FF8.UI.ShowNotify(UIID.UIMain, "tip");
     FF8.UI.ShowNotify(1, "tip");
+    // 异步加载
+    // await FF8.UI.ShowNotifyAsync(UIID.UIMain, "tip");
+    // yield return FF8.UI.ShowNotifyAsync(UIID.UIMain, "tip");
     
     // UI是否存在
     FF8.UI.Has(UIID.UIMain);

@@ -204,7 +204,7 @@ namespace F8Framework.Core
             Destroy(gameObject);
         }
         
-        // 异步加载，使用枚举作为参数
+        // 同步加载，使用枚举作为参数
         public string ShowNotify<T>(T eventName, string content, UICallbacks callbacks = null) where T : Enum, IConvertible
         {
             int uiId = (int)(object)eventName;
@@ -221,19 +221,36 @@ namespace F8Framework.Core
             return _layerNotify.Show(uiId, config, content, callbacks);
         }
 
+        // 异步加载，使用枚举作为参数
+        public UILoader ShowNotifyAsync<T>(T eventName, string content, UICallbacks callbacks = null) where T : Enum, IConvertible
+        {
+            int uiId = (int)(object)eventName;
+            return ShowNotifyAsync(uiId, content, callbacks);
+        }
+        
+        public UILoader ShowNotifyAsync(int uiId, string content, UICallbacks callbacks = null)
+        {
+            if (!_configs.TryGetValue(uiId, out UIConfig config))
+            {
+                LogF8.LogView($"打开 ID 为 {uiId} 的 UI 失败，未找到配置。");
+                return default;
+            }
+            return _layerNotify.ShowAsync(uiId, config, content, callbacks);
+        }
+        
         public List<int> GetCurrentUIids()
         {
             return _currentUIids;
         }
 
-        // 异步加载，使用枚举作为参数
+        // 同步加载，使用枚举作为参数
         public string Open<T>(T eventName, object[] uiArgs = null, UICallbacks callbacks = null) where T : Enum, IConvertible
         {
             int uiId = (int)(object)eventName;
             return Open(uiId, uiArgs, callbacks);
         }
         
-        // 异步加载，使用id作为参数
+        // 同步加载，使用id作为参数
         public string Open(int uiId, object[] uiArgs = null, UICallbacks callbacks = null)
         {
             if (!_configs.TryGetValue(uiId, out UIConfig config))
@@ -261,6 +278,41 @@ namespace F8Framework.Core
             return default;
         }
 
+        // 异步加载，使用枚举作为参数
+        public UILoader OpenAsync<T>(T eventName, object[] uiArgs = null, UICallbacks callbacks = null) where T : Enum, IConvertible
+        {
+            int uiId = (int)(object)eventName;
+            return OpenAsync(uiId, uiArgs, callbacks);
+        }
+        
+        // 异步加载，使用id作为参数
+        public UILoader OpenAsync(int uiId, object[] uiArgs = null, UICallbacks callbacks = null)
+        {
+            if (!_configs.TryGetValue(uiId, out UIConfig config))
+            {
+                LogF8.LogView($"打开 ID 为 {uiId} 的 UI 失败，未找到配置。");
+                return null;
+            }
+            
+            switch (config.Layer)
+            {
+                case LayerType.Game:
+                    return _layerGame.AddAsync(uiId, config, uiArgs, callbacks);
+                case LayerType.UI:
+                    return _layerUI.AddAsync(uiId, config, uiArgs, callbacks);
+                case LayerType.PopUp:
+                    return _layerPopUp.AddAsync(uiId, config, uiArgs, callbacks);
+                case LayerType.Dialog:
+                    return _layerDialog.AddAsync(uiId, config, uiArgs, callbacks);
+                case LayerType.Notify:
+                    return _layerNotify.AddAsync(uiId, config, uiArgs, callbacks);
+                case LayerType.Guide:
+                    return _layerGuide.AddAsync(uiId, config, uiArgs, callbacks);
+            }
+
+            return null;
+        }
+        
         public bool Has<T>(T eventName) where T : Enum, IConvertible
         {
             int uiId = (int)(object)eventName;

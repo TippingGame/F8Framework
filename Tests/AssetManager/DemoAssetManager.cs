@@ -33,10 +33,14 @@ namespace F8Framework.Tests
             });
 
             // async/await方式（无多线程，WebGL也可使用）
+            // await FF8.Asset.LoadAsync<GameObject>("Cube");
+            // 或者
             // BaseLoader load = FF8.Asset.LoadAsync<GameObject>("Cube");
             // await load;
             
             // 协程方式
+            yield return FF8.Asset.LoadAsync<GameObject>("Cube");
+            // 或者
             BaseLoader load2 = FF8.Asset.LoadAsync<GameObject>("Cube");
             yield return load2;
             GameObject go2 = load2.GetAssetObject<GameObject>();

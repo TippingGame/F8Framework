@@ -12,6 +12,7 @@ namespace F8Framework.Core
             public object[] parameters;
             public UICallbacks callbacks;
             public string guid;
+            public UILoader uiLoader;
         }
 
         private Dictionary<int, Queue<DialogParam>> dialogParams = new Dictionary<int, Queue<DialogParam>>();
@@ -30,10 +31,11 @@ namespace F8Framework.Core
                 parameters = parameters,
                 callbacks = callbacks,
                 guid = guid,
+                uiLoader = null,
             });
             if (dialogQueue.Count > 1)
             {
-                return guid;
+                return dialogQueue.Peek().guid;
             }
             else
             {
@@ -41,27 +43,38 @@ namespace F8Framework.Core
             }
         }
 
+        public new UILoader AddAsync(int uiId, UIConfig config, object[] parameters = null, UICallbacks callbacks = null)
+        {
+            if (!dialogParams.TryGetValue(uiId, out Queue<DialogParam> dialogQueue))
+            {
+                dialogQueue = new Queue<DialogParam>();
+                dialogParams[uiId] = dialogQueue;
+            }
+            string guid = Guid.NewGuid().ToString(); // 生成一个唯一的ID
+            dialogQueue.Enqueue(new DialogParam
+            {
+                config = config,
+                parameters = parameters,
+                callbacks = callbacks,
+                guid = guid,
+                uiLoader = null,
+            });
+            if (dialogQueue.Count > 1)
+            {
+                return dialogQueue.Peek().uiLoader;
+            }
+            else
+            {
+                var dia = dialogQueue.Peek();
+                dia.uiLoader = ShowAsync(uiId, dialogQueue.Peek());
+                return dia.uiLoader;
+            }
+        }
+        
         private string Show(int uiId, DialogParam firstElement)
         {
             string prefabPath = firstElement.config.AssetName;
-            ViewParams viewParams;
-            
-            if (!uiViews.TryGetValue(prefabPath, out viewParams))
-            {
-                if (!uiCache.TryGetValue(prefabPath, out viewParams))
-                {
-                    viewParams = new ViewParams();
-                    viewParams.Guid = firstElement.guid;
-                    viewParams.PrefabPath = prefabPath;
-                    uiViews.Add(viewParams.PrefabPath, viewParams);
-                }
-                else
-                {
-                    viewParams.Guid = firstElement.guid;
-                    viewParams.PrefabPath = prefabPath;
-                    uiViews.Add(viewParams.PrefabPath, viewParams);
-                }
-            }
+            ViewParams viewParams = GetOrCreateViewParams(prefabPath, firstElement.guid);
 
             viewParams.UIid = uiId;
             viewParams.Valid = true;
@@ -77,8 +90,30 @@ namespace F8Framework.Core
             
             viewParams.Params = firstElement.parameters;
             Load(viewParams);
-
+            firstElement.uiLoader = viewParams.UILoader;
             return viewParams.Guid;
+        }
+        
+        private UILoader ShowAsync(int uiId, DialogParam firstElement)
+        {
+            string prefabPath = firstElement.config.AssetName;
+            ViewParams viewParams = GetOrCreateViewParams(prefabPath, firstElement.guid);
+
+            viewParams.UIid = uiId;
+            viewParams.Valid = true;
+
+            viewParams.Callbacks = firstElement.callbacks ?? new UICallbacks();
+            UICallbacks.OnAddedEventDelegate onRemoveSource = viewParams.Callbacks.OnRemoved;
+            
+            viewParams.Callbacks.OnRemoved = (param, id) =>
+            {
+                onRemoveSource?.Invoke(param, id);
+                StartCoroutine(DelayedNext(id));
+            };
+            
+            viewParams.Params = firstElement.parameters;
+            
+            return LoadAsync(viewParams);
         }
         
         private IEnumerator DelayedNext(int id)

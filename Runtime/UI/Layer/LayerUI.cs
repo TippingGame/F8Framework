@@ -67,33 +67,18 @@ namespace F8Framework.Core
             _canvasScaler.defaultSpriteDPI = defaultSpriteDPI;
             _canvasScaler.referencePixelsPerUnit = referencePixelsPerUnit;
         }
-        
+
         public string Add(int uiId, UIConfig config, object[] parameters = null, UICallbacks callbacks = null)
         {
             var prefabPath = config.AssetName;
-            var guid = Guid.NewGuid().ToString(); // 生成一个唯一的ID
-            if (uiViews.TryGetValue(prefabPath, out var viewParams) && viewParams.Valid)
+            var guid = Guid.NewGuid().ToString();
+
+            if (IsDuplicateLoad(prefabPath, out var viewParams))
             {
-                LogF8.LogView($"UI重复加载：{prefabPath}");
                 return string.Empty;
             }
 
-            if (!uiViews.TryGetValue(prefabPath, out viewParams))
-            {
-                if (!uiCache.TryGetValue(prefabPath, out viewParams))
-                {
-                    viewParams = new ViewParams();
-                    viewParams.Guid = guid;
-                    viewParams.PrefabPath = prefabPath;
-                    uiViews.Add(viewParams.PrefabPath, viewParams);
-                }
-                else
-                {
-                    viewParams.Guid = guid;
-                    viewParams.PrefabPath = prefabPath;
-                    uiViews.Add(viewParams.PrefabPath, viewParams);
-                }
-            }
+            viewParams = GetOrCreateViewParams(prefabPath, guid);
 
             viewParams.UIid = uiId;
             viewParams.Params = parameters;
@@ -105,6 +90,51 @@ namespace F8Framework.Core
             return guid;
         }
 
+        public UILoader AddAsync(int uiId, UIConfig config, object[] parameters = null, UICallbacks callbacks = null)
+        {
+            var prefabPath = config.AssetName;
+            var guid = Guid.NewGuid().ToString();
+
+            if (IsDuplicateLoad(prefabPath, out var viewParams))
+            {
+                return viewParams.UILoader;
+            }
+
+            viewParams = GetOrCreateViewParams(prefabPath, guid);
+
+            viewParams.UIid = uiId;
+            viewParams.Params = parameters;
+            viewParams.Callbacks = callbacks;
+            viewParams.Valid = true;
+
+            return LoadAsync(viewParams);
+        }
+
+        protected bool IsDuplicateLoad(string prefabPath, out ViewParams viewParams)
+        {
+            if (uiViews.TryGetValue(prefabPath, out viewParams) && viewParams.Valid)
+            {
+                LogF8.LogView($"UI重复加载：{prefabPath}");
+                return true;
+            }
+            return false;
+        }
+
+        protected ViewParams GetOrCreateViewParams(string prefabPath, string guid)
+        {
+            if (!uiViews.TryGetValue(prefabPath, out var viewParams))
+            {
+                if (!uiCache.TryGetValue(prefabPath, out viewParams))
+                {
+                    viewParams = new ViewParams();
+                }
+                viewParams.Guid = guid;
+                viewParams.PrefabPath = prefabPath;
+                uiViews.Add(viewParams.PrefabPath, viewParams);
+            }
+            return viewParams;
+        }
+
         protected void Load(ViewParams viewParams)
         {
             var vp = uiCache.GetValueOrDefault(viewParams.PrefabPath);
@@ -114,6 +144,34 @@ namespace F8Framework.Core
             }
             else
             {
+                GameObject res = AssetManager.Instance.Load<GameObject>(viewParams.PrefabPath);
+                GameObject childNode = Instantiate(res, gameObject.transform, false);
+                childNode.name = viewParams.PrefabPath;
+                viewParams.Go = childNode;
+                
+                DelegateComponent comp = childNode.AddComponent<DelegateComponent>();
+                viewParams.DelegateComponent = comp;
+                viewParams.BaseView = childNode.GetComponent<BaseView>();
+                comp.ViewParams = viewParams;
+                
+                viewParams.UILoader = new UILoader();
+                viewParams.UILoader.Guid = viewParams.Guid;
+                CreateNode(viewParams);
+                viewParams.UILoader.UILoadSuccess();
+            }
+        }
+
+        protected UILoader LoadAsync(ViewParams viewParams)
+        {
+            var vp = uiCache.GetValueOrDefault(viewParams.PrefabPath);
+            if (vp != null && vp.Go != null)
+            {
+                return CreateNode(vp);
+            }
+            else
+            {
+                viewParams.UILoader = new UILoader();
+                viewParams.UILoader.Guid = viewParams.Guid;
                 AssetManager.Instance.LoadAsync<GameObject>(viewParams.PrefabPath, (res) =>
                 {
                     GameObject childNode = Instantiate(res, gameObject.transform, false);
@@ -124,13 +182,15 @@ namespace F8Framework.Core
                     viewParams.DelegateComponent = comp;
                     viewParams.BaseView = childNode.GetComponent<BaseView>();
                     comp.ViewParams = viewParams;
-                
                     CreateNode(viewParams);
+                    viewParams.UILoader.UILoadSuccess();
                 });
+                
+                return viewParams.UILoader;
             }
         }
-
-        public void CreateNode(ViewParams viewParams)
+        
+        public UILoader CreateNode(ViewParams viewParams)
         {
             UIManager.Instance.GetCurrentUIids().Add(viewParams.UIid);
             
@@ -144,6 +204,8 @@ namespace F8Framework.Core
             }
             
             comp.Add();
+            
+            return viewParams.UILoader;
         }
 
         public void Close(string prefabPath, bool isDestroy)

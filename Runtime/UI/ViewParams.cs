@@ -36,5 +36,6 @@ namespace F8Framework.Core
         public GameObject Go;
         public DelegateComponent DelegateComponent;
         public BaseView BaseView;
+        public UILoader UILoader;
     }
 }

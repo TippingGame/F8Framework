@@ -8,6 +8,11 @@ namespace F8Framework.Core
             return base.Add(uiId, config, parameters, callbacks);
         }
 
+        public new UILoader AddAsync(int uiId, UIConfig config, object[] parameters = null, UICallbacks callbacks = null)
+        {
+            return base.AddAsync(uiId, config, parameters, callbacks);
+        }
+        
         public new void Close(string prefabPath, bool isDestroy)
         {
             base.Close(prefabPath, isDestroy);
