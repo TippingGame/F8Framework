@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.2.106] - 2025-02-22
+1.StorageManager模块新增SetEncrypt方式加密数据  
+2.新增Util.Encryption常用加密方法AES/RSA  
+
 ## [1.2.105] - 2025-02-20
 1.UI模块新增OpenAsync异步方法  
 2.UI模块原有的Open方法，改为同步  
