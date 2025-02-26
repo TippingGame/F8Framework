@@ -96,7 +96,7 @@ namespace F8Framework.Core
                             continue;
                         componentNames.Add(componentType);
 
-                        if (componentType != nameof(GameObject) && !child.GetComponent(componentType))
+                        if (componentType != typeof(UnityEngine.GameObject).ToString() && !child.GetComponent(componentType))
                             continue;
                             
                         string normalizeName = RemoveSpecialCharacters(child.gameObject.name);
@@ -114,7 +114,7 @@ namespace F8Framework.Core
                         generatedCode.AppendLine($"    [SerializeField] private {componentType} {normalizeName}_{normalizeKey};");
                         // 生成引用代码
                         string childPath = GetChildPath(child, prefab.transform);
-                        if (componentType == "GameObject")
+                        if (componentType == typeof(UnityEngine.GameObject).ToString())
                         {
                             referenceCode.AppendLine($"        {normalizeName}_{normalizeKey} = transform.Find(\"{SelectiveEscape(childPath)}\").gameObject;");
                         }

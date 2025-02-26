@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.2.107] - 2025-02-27
+1.组件绑定功能加上名称空间  
+
 ## [1.2.106] - 2025-02-22
 1.StorageManager模块新增SetEncrypt方式加密数据  
 2.新增Util.Encryption常用加密方法AES/RSA  

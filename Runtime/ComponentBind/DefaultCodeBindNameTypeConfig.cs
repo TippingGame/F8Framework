@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace F8Framework.Core
 {
@@ -7,30 +8,30 @@ namespace F8Framework.Core
     {
         public static readonly Dictionary<string, string> BindNameTypeDict = new Dictionary<string, string>()
         {
-            { "GameObject", nameof (GameObject) },{ "go", nameof (UnityEngine.GameObject) },
-            { "Transform", nameof (UnityEngine.Transform) },{ "tf", nameof (UnityEngine.Transform) },
-            { "Animation", nameof (UnityEngine.Animation) },
-            { "Animator", nameof (UnityEngine.Animator) },
-            { "RectTransform", nameof (UnityEngine.RectTransform) },
-            { "Canvas", nameof (UnityEngine.Canvas) },
-            { "CanvasGroup", nameof (UnityEngine.CanvasGroup) },
-            { "SpriteRenderer", nameof (UnityEngine.SpriteRenderer) },{ "spr", nameof (UnityEngine.SpriteRenderer) },
-            { "VerticalLayoutGroup", nameof (UnityEngine.UI.VerticalLayoutGroup) },
-            { "HorizontalLayoutGroup", nameof (UnityEngine.UI.HorizontalLayoutGroup) },
-            { "GridLayoutGroup", nameof (UnityEngine.UI.GridLayoutGroup) },
-            { "ToggleGroup", nameof (UnityEngine.UI.ToggleGroup) },
-            { "Button", nameof (UnityEngine.UI.Button) },{ "btn", nameof (UnityEngine.UI.Button) },
-            { "Image", nameof (UnityEngine.UI.Image) },{ "img", nameof (UnityEngine.UI.Image) },
-            { "RawImage", nameof (UnityEngine.UI.RawImage) },{ "rimg", nameof (UnityEngine.UI.RawImage) },
-            { "Text (Legacy)", nameof (UnityEngine.UI.Text) },{ "txt", nameof (UnityEngine.UI.Text) },
-            { "InputField", nameof (UnityEngine.UI.InputField) },
-            { "Slider", nameof (UnityEngine.UI.Slider) },
-            { "Mask", nameof (UnityEngine.UI.Mask) },
-            { "RectMask2D", nameof (UnityEngine.UI.RectMask2D) },
-            { "Toggle", nameof (UnityEngine.UI.Toggle) },
-            { "Scrollbar", nameof (UnityEngine.UI.Scrollbar) },
-            { "ScrollRect", nameof (UnityEngine.UI.ScrollRect) },
-            { "Dropdown", nameof (UnityEngine.UI.Dropdown) },
+            { "GameObject", typeof (UnityEngine.GameObject).ToString() },{ "go", typeof (UnityEngine.GameObject).ToString() },
+            { "Transform", typeof(UnityEngine.Transform).ToString() },{ "tf", typeof(UnityEngine.Transform).ToString() },
+            { "Animation", typeof(UnityEngine.Animation).ToString() },
+            { "Animator", typeof(UnityEngine.Animator).ToString() },
+            { "RectTransform", typeof(UnityEngine.RectTransform).ToString() },
+            { "Canvas", typeof(UnityEngine.Canvas).ToString() },
+            { "CanvasGroup", typeof(UnityEngine.CanvasGroup).ToString() },
+            { "SpriteRenderer", typeof(UnityEngine.SpriteRenderer).ToString() },{ "spr", typeof(UnityEngine.SpriteRenderer).ToString() },
+            { "VerticalLayoutGroup", typeof(UnityEngine.UI.VerticalLayoutGroup).ToString() },
+            { "HorizontalLayoutGroup", typeof(UnityEngine.UI.HorizontalLayoutGroup).ToString() },
+            { "GridLayoutGroup", typeof(UnityEngine.UI.GridLayoutGroup).ToString() },
+            { "ToggleGroup", typeof(UnityEngine.UI.ToggleGroup).ToString() },
+            { "Button", typeof(UnityEngine.UI.Button).ToString() },{ "btn", typeof(UnityEngine.UI.Button).ToString() },
+            { "Image", typeof(UnityEngine.UI.Image).ToString() },{ "img", typeof(UnityEngine.UI.Image).ToString() },
+            { "RawImage", typeof(UnityEngine.UI.RawImage).ToString() },{ "rimg", typeof(UnityEngine.UI.RawImage).ToString() },
+            { "Text (Legacy)", typeof(UnityEngine.UI.Text).ToString() },{ "txt", typeof(UnityEngine.UI.Text).ToString() },
+            { "InputField", typeof(UnityEngine.UI.InputField).ToString() },
+            { "Slider", typeof(UnityEngine.UI.Slider).ToString() },
+            { "Mask", typeof(UnityEngine.UI.Mask).ToString() },
+            { "RectMask2D", typeof(UnityEngine.UI.RectMask2D).ToString() },
+            { "Toggle", typeof(UnityEngine.UI.Toggle).ToString() },
+            { "Scrollbar", typeof(UnityEngine.UI.Scrollbar).ToString() },
+            { "ScrollRect", typeof(UnityEngine.UI.ScrollRect).ToString() },
+            { "Dropdown", typeof(UnityEngine.UI.Dropdown).ToString() },
             { "Text (TMP)", "TMPro.TMP_Text" },{ "tmp", "TMPro.TMP_Text" },
         };
     }
