@@ -223,7 +223,6 @@ namespace F8Framework.Core
 			ignoreCommands = false;
 			commandQueue.Clear();
 			head = null;
-			OnComplete = null;
 			Recycle = null;
 		}
 
