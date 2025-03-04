@@ -15,6 +15,7 @@ namespace F8Framework.Core
         
         private AssetBundleManifest manifest;
         private Dictionary<string, AssetBundleLoader> assetBundleLoaders = new Dictionary<string, AssetBundleLoader>();
+        private List<AssetBundleLoader> assetBundleLoadersList = new List<AssetBundleLoader>();
 
         /// <summary>
         /// 通过资产捆绑路径同步加载。
@@ -980,9 +981,15 @@ namespace F8Framework.Core
         
         public void OnUpdate()
         {
-            foreach (AssetBundleLoader loader in assetBundleLoaders.Values)
+            assetBundleLoadersList.Clear();
+            foreach (AssetBundleLoader abl in assetBundleLoaders.Values)
             {
-                loader.OnUpdate();
+                if (abl != null)
+                    assetBundleLoadersList.Add(abl);
+            }
+            for (int i = 0; i < assetBundleLoadersList.Count; i++)
+            {
+                assetBundleLoadersList[i].OnUpdate();
             }
         }
 

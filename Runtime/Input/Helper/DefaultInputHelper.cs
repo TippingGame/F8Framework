@@ -573,10 +573,10 @@ namespace F8Framework.Core
         {
             public string Name { get; private set; }
 
-            private int _pressedFrame = -5;
-            private int _releasedFrame = -5;
+            private long _pressedFrame = -5;
+            private long _releasedFrame = -5;
             private bool _pressed = false;
-
+            
             public event Action<string> Started;
             public event Action<string> Performed;
             public event Action<string> Canceled;
@@ -600,7 +600,7 @@ namespace F8Framework.Core
                     return;
 
                 _pressed = true;
-                _pressedFrame = Time.frameCount;
+                _pressedFrame = InputManager.Instance.FrameCount + 1;
                 Performed?.Invoke(Name);
             }
             
@@ -610,7 +610,7 @@ namespace F8Framework.Core
                     return;
 
                 _pressed = false;
-                _releasedFrame = Time.frameCount;
+                _releasedFrame = InputManager.Instance.FrameCount + 1;
                 Canceled?.Invoke(Name);
             }
 
@@ -626,7 +626,7 @@ namespace F8Framework.Core
             {
                 get
                 {
-                    return _pressedFrame == Time.frameCount;
+                    return _pressedFrame == InputManager.Instance.FrameCount;
                 }
             }
 
@@ -634,7 +634,7 @@ namespace F8Framework.Core
             {
                 get
                 {
-                    return _releasedFrame == Time.frameCount;
+                    return _releasedFrame == InputManager.Instance.FrameCount;
                 }
             }
             

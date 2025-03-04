@@ -10,6 +10,7 @@ namespace F8Framework.Core
     public sealed class InputManager : ModuleSingleton<InputManager>, IModule
     {
         private IInputHelper _helper;
+        public long FrameCount = 0;
         
         /// <summary>
         /// 是否启用输入设备
@@ -471,6 +472,7 @@ namespace F8Framework.Core
         public void OnUpdate()
         {
             _helper.OnUpdate();
+            FrameCount++;
         }
 
         public void OnLateUpdate()
@@ -488,6 +490,7 @@ namespace F8Framework.Core
             MessageManager.Instance.RemoveEventListener(MessageEvent.ApplicationFocus, ResetAll, this);
             MessageManager.Instance.RemoveEventListener(MessageEvent.NotApplicationFocus, ResetAll, this);
             _helper.OnTerminate();
+            FrameCount = 0;
             base.Destroy();
         }
     }
