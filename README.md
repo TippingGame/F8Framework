@@ -75,6 +75,8 @@ git clone https://github.com/TippingGame/F8Framework.git
 
 4. 输入 <https://github.com/TippingGame/F8Framework.git>，请确认导入成功
 
+更新版本号说明，如：1.0.0，第一位代表大版本，第二位代表框架的使用有修改，第三位代表修订版本。（注意：确保更新框架前工程没有报错，更新后点击F8即可）
+
 ## 新手指南
 
 * [游戏启动器：](https://github.com/TippingGame/F8Framework/blob/main/Launcher/GameLauncher.cs)游戏启动器示例（注意：使用框架前必须先启动框架）。[GameLauncher.cs](https://github.com/TippingGame/F8Framework/blob/main/Launcher/GameLauncher.cs)  
@@ -160,6 +162,8 @@ In the Unity Package Manager, add the F8Framework package using Git URL.
 3. Click on the **+** sign in the upper left corner and select **Add Package from git URL**
 
 4. Input <https://github.com/TippingGame/F8Framework.git>, Please confirm successful import
+
+Explanation of the updated version number. For example, in 1.0.0, the first digit represents the major version, the second digit indicates that there are modifications to the use of the framework, and the third digit represents the revision version. (Note: Make sure there are no errors in the project before updating the framework. After the update, simply click F8.)
 
 ## GUIDE
 

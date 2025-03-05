@@ -194,7 +194,7 @@ namespace F8Framework.Core.Editor
                     if (!AssetGetParentPath(ai.assetBundleName).Equals(AssetGetParentPath(bundleName)))
                     {
                         //打印出父路径
-                        Debug.LogError("资产名和ab包名不相等:"+ai.assetBundleName + " > " + bundleName);
+                        Debug.LogError("资产名和ab包名不相等:" + ai.assetBundleName + " > " + bundleName);
                     }
                     DiscrepantAssetPathMapping["/" + ai.assetBundleName] = "/" + bundleName.ToLower();
                 }

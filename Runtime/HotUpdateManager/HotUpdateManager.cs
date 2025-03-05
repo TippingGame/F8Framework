@@ -13,7 +13,6 @@ namespace F8Framework.Core
     {
         public static string Separator = "_";
         public static string PackageSplit = "Package" + Separator;
-        // public static string RemoteDirName = "/Remote";
         public static string RemoteDirName = "/Remote/" + URLSetting.GetPlatformName();
         public static string HotUpdateDirName = "/HotUpdate";
         public static string PackageDirName = "/Package";

@@ -40,40 +40,25 @@ namespace F8Framework.Core.Editor
         {
             ABBuildTool.ClearAllAssetNames();
         }
-        
-        [MenuItem("开发工具/1: F8Run _F8",false,200)]
+
+        [MenuItem("开发工具/1: F8Run _F8", false, 200)]
         public static void F8Run()
         {
             LoadAllExcelData();
             F8EditorPrefs.SetBool("compilationFinishedHotUpdateDll", true);
             F8EditorPrefs.SetBool("compilationFinishedBuildAB", true);
         }
-        
-        [MenuItem("开发工具/3: 生成并复制热更新Dll-F8",false,210)]
+
+        [MenuItem("开发工具/3: 生成并复制热更新Dll-F8", false, 210)]
         public static void GenerateCopyHotUpdateDll()
         {
             // F8EditorPrefs.SetBool("compilationFinishedHotUpdateDll", false);
             // HybridCLR.Editor.Commands.PrebuildCommand.GenerateAll();
-
-            // string outpath = Application.dataPath + "/AssetBundles/Code";
-            
-            // //临时目录空的话就创建
-            // if (Directory.Exists(outpath))
-            // {
-            //     //删除临时目录下的所有文件
-            //     foreach (string filePath in Directory.GetFiles(outpath))
-            //     {
-            //         File.Delete(filePath);
-            //     }
-            // }
-            // else
-            // {
-            //     //创建目录
-            //     Directory.CreateDirectory(outpath);
-            // }
-            
-            // FileTools.SafeClearDir(Application.dataPath + "/AssetBundles/Code");
-            // FileTools.CheckDirAndCreateWhenNeeded(Application.dataPath + "/AssetBundles/Code");
+            //
+            // string outpath = Application.dataPath + "/AssetBundles/Code/";
+            //
+            // FileTools.SafeClearDir(outpath);
+            // FileTools.CheckDirAndCreateWhenNeeded(outpath);
             // foreach (var dll in HybridCLR.Editor.SettingsUtil.HotUpdateAssemblyNamesExcludePreserved) // 获取HybridCLR设置面板的dll名称
             // {
             //     var path =
@@ -82,11 +67,11 @@ namespace F8Framework.Core.Editor
             //     Debug.Log("dll:"+path);
             //     FileTools.SafeCopyFile(
             //         HybridCLR.Editor.SettingsUtil.GetHotUpdateDllsOutputDirByTarget(EditorUserBuildSettings.activeBuildTarget) + "/" + dll + ".dll",
-            //         Application.dataPath + "/AssetBundles/Code/" + dll + ".bytes");
+            //         outpath + dll + ".bytes");
             //     LogF8.LogAsset("生成并复制热更新dll：" + dll);
             // }
-
-            // //补充元数据
+            //
+            // // 补充元数据
             // List<string> aotDllList = new List<string>
             // {
             //     "mscorlib.dll",
@@ -95,29 +80,29 @@ namespace F8Framework.Core.Editor
             //     // "Newtonsoft.Json.dll", 
             //     // "protobuf-net.dll",
             // };
-
+            //
             // foreach (var aotDllName in aotDllList)
             // {
             //     var mscorlibsouPath =
             //         HybridCLR.Editor.SettingsUtil.GetAssembliesPostIl2CppStripDir(EditorUserBuildSettings
             //             .activeBuildTarget) + "/" + aotDllName;
-                
+            //     
             //     FileTools.SafeCopyFile(
             //         mscorlibsouPath,
-            //         Application.dataPath + "/AssetBundles/Code/"+ aotDllName +"by.bytes");
-            //     LogF8.LogAsset("生成并复制源数据dll："+aotDllName);
+            //         outpath + aotDllName + "by.bytes");
+            //     LogF8.LogAsset("生成并复制源数据dll：" + aotDllName);
             // }
-
+            //
             // AssetDatabase.Refresh();
         }
-        
-        [MenuItem("开发工具/2: Excel导表-F8",false,205)]
+
+        [MenuItem("开发工具/2: Excel导表-F8", false, 205)]
         public static void LoadAllExcelData()
         {
             ExcelDataTool.LoadAllExcelData();
         }
-        
-        [MenuItem("开发工具/4: 打包AssetBundles目录资源-F8",false,215)]
+
+        [MenuItem("开发工具/4: 打包AssetBundles目录资源-F8", false, 215)]
         public static void BuildAssetBundles()
         {
             F8EditorPrefs.SetBool("compilationFinishedBuildAB", false);

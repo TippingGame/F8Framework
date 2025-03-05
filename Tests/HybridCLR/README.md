@@ -6,34 +6,65 @@
 
 ## 简介（希望自己点击F8，就能开始制作游戏，不想多余的事）
 接入HybridCLR热更新代码组件。
-1. 使用这个[官方教程](https://hybridclr.doc.code-philosophy.com/docs/beginner/quickstart)创建HotUpdate程序集后。  
-2. 找到代码[F8Helper.cs](https://github.com/TippingGame/F8Framework/blob/main/Editor/F8Helper/F8Helper.cs)  
-	* 解除注释状态  
+1. 使用这个[ 官方教程（快速上手） ](https://hybridclr.doc.code-philosophy.com/docs/beginner/quickstart)创建HotUpdate程序集后。  
+2. 找到代码[ F8Helper.cs ](https://github.com/TippingGame/F8Framework/blob/main/Editor/F8Helper/F8Helper.cs)  
+	* 解除注释状态，如下代码  
+3. 补充元数据（可选项），具体看[ 官方教程（使用泛型） ](https://hybridclr.doc.code-philosophy.com/docs/beginner/generic)  
 ```C#
-    [MenuItem("开发工具/生成并复制热更新Dll-F8")]
-    public static void GenerateCopyHotUpdateDll()
-    {
-        // F8EditorPrefs.SetBool("compilationFinishedHotUpdateDll", false);
-        // HybridCLR.Editor.Commands.PrebuildCommand.GenerateAll();
-        // FileTools.SafeClearDir(Application.dataPath + "/AssetBundles/Code");
-        // FileTools.CheckDirAndCreateWhenNeeded(Application.dataPath + "/AssetBundles/Code");
-        // foreach (var dll in HybridCLR.Editor.SettingsUtil.HotUpdateAssemblyNamesExcludePreserved) // 获取HybridCLR设置面板的dll名称
-        // {
-        //     FileTools.SafeCopyFile(
-        //         HybridCLR.Editor.SettingsUtil.GetHotUpdateDllsOutputDirByTarget(EditorUserBuildSettings.activeBuildTarget) + "/" + dll + ".dll",
-        //         Application.dataPath + "/AssetBundles/Code/" + dll + ".bytes");
-        //     LogF8.LogAsset("生成并复制热更新dll：" + dll);
-        // }
-        // AssetDatabase.Refresh();
-    }
+[MenuItem("开发工具/3: 生成并复制热更新Dll-F8",false,210)]
+public static void GenerateCopyHotUpdateDll()
+{
+    // F8EditorPrefs.SetBool("compilationFinishedHotUpdateDll", false);
+    // HybridCLR.Editor.Commands.PrebuildCommand.GenerateAll();
+    //
+    // string outpath = Application.dataPath + "/AssetBundles/Code/";
+    //
+    // FileTools.SafeClearDir(outpath);
+    // FileTools.CheckDirAndCreateWhenNeeded(outpath);
+    // foreach (var dll in HybridCLR.Editor.SettingsUtil.HotUpdateAssemblyNamesExcludePreserved) // 获取HybridCLR设置面板的dll名称
+    // {
+    //     var path =
+    //         HybridCLR.Editor.SettingsUtil.GetHotUpdateDllsOutputDirByTarget(EditorUserBuildSettings
+    //             .activeBuildTarget) + "/" + dll + ".dll";
+    //     Debug.Log("dll:"+path);
+    //     FileTools.SafeCopyFile(
+    //         HybridCLR.Editor.SettingsUtil.GetHotUpdateDllsOutputDirByTarget(EditorUserBuildSettings.activeBuildTarget) + "/" + dll + ".dll",
+    //         outpath + dll + ".bytes");
+    //     LogF8.LogAsset("生成并复制热更新dll：" + dll);
+    // }
+    //
+    // // 补充元数据
+    // List<string> aotDllList = new List<string>
+    // {
+    //     "mscorlib.dll",
+    //     "System.dll",
+    //     "System.Core.dll", // 如果使用了Linq，需要这个
+    //     // "Newtonsoft.Json.dll", 
+    //     // "protobuf-net.dll",
+    // };
+    //
+    // foreach (var aotDllName in aotDllList)
+    // {
+    //     var mscorlibsouPath =
+    //         HybridCLR.Editor.SettingsUtil.GetAssembliesPostIl2CppStripDir(EditorUserBuildSettings
+    //             .activeBuildTarget) + "/" + aotDllName;
+    //     
+    //     FileTools.SafeCopyFile(
+    //         mscorlibsouPath,
+    //         outpath + aotDllName + "by.bytes");
+    //     LogF8.LogAsset("生成并复制源数据dll：" + aotDllName);
+    // }
+    //
+    // AssetDatabase.Refresh();
+}
 ```
-3. 代码已拆分程序集  
-   * AOT程序集：（F8Framework.Core）  
-   * 热更新程序集：（F8Framework.F8ExcelDataClass、F8Framework.Launcher）  
+3. 代码已拆分程序集（注意：AOT代码不能引用热更代码）  
+   * AOT程序集：（F8Framework.Core）、（注意：散落在工程中的其他代码也会当作AOT打包）  
+   * 热更新程序集：（F8Framework.F8ExcelDataClass）、（F8Framework.Launcher）  
 4. 将这两个热更新程序集拖进 HybridCLR 设置面板中  
 ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/HybridCLR/ui_20241128235509.png)  
 5. 注意：主工程不能直接引用热更新代码，这里通过反射来调用热更新代码。  
-   * 在启动场景挂在一个加载dll脚本
+   * 在启动场景挂在一个加载dll脚本，先补充元数据（可选），加载热更新程序集
 ```C#
 using System;
 using System.Collections;
@@ -41,6 +72,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using F8Framework.Core;
+using HybridCLR;
 using UnityEngine;
 
 public class LoadDll : MonoBehaviour
@@ -71,6 +103,23 @@ public class LoadDll : MonoBehaviour
         HotUpdate.StartHotUpdate(hotUpdateAssetUrl, () =>
         {
             LogF8.Log("完成");
+            // 先补充元数据（可选）
+            List<string> aotDllList = new List<string>
+            {
+                "mscorlib.dll",
+                "System.dll",
+                "System.Core.dll", // 如果使用了Linq，需要这个
+                // "Newtonsoft.Json.dll", 
+                // "protobuf-net.dll",
+            };
+
+            foreach (var aotDllName in aotDllList)
+            {
+                byte[] dllBytes = AssetManager.Instance.Load<TextAsset>(aotDllName + "by").bytes;
+                LoadImageErrorCode err = HybridCLR.RuntimeApi.LoadMetadataForAOTAssembly(dllBytes, HomologousImageMode.SuperSet);
+                LogF8.Log($"LoadMetadataForAOTAssembly:{aotDllName}. ret:{err}");
+            }
+            
             // Editor环境下，HotUpdate.dll.bytes已经被自动加载，不需要加载，重复加载反而会出问题。
 #if !UNITY_EDITOR
             TextAsset asset1 = AssetManager.Instance.Load<TextAsset>("F8Framework.F8ExcelDataClass");
