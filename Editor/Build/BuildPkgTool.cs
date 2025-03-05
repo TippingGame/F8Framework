@@ -35,7 +35,7 @@ namespace F8Framework.Core.Editor
         private static bool _enableOptionalPackage = false;
         private static bool _enableNullPackage = false;
         private static string _optionalPackage = "0_1_2_3";
-        private static string _assetRemoteAddress = "http://127.0.0.1:6789" + HotUpdateManager.RemoteDirName;
+        private static string _assetRemoteAddress = ""; //"http://127.0.0.1:6789/"
         private static bool _enablePackage = false;
         
         private static BuildTarget _buildTarget = BuildTarget.NoTarget;
@@ -370,7 +370,11 @@ namespace F8Framework.Core.Editor
             
             GUILayout.Space(10);
             GUILayout.BeginHorizontal();
-            GUILayout.Label("资产远程地址/游戏远程版本：", GUILayout.Width(160));
+            GUILayout.Label("资产远程地址/游戏远程版本 例：http://127.0.0.1:6789/", GUILayout.Width(360));
+            GUILayout.EndHorizontal();
+            
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(10);
             string assetRemoteAddressValue = F8EditorPrefs.GetString(_assetRemoteAddressKey, "");
             if (string.IsNullOrEmpty(assetRemoteAddressValue))
             {
