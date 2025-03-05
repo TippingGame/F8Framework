@@ -17,7 +17,13 @@ namespace F8Framework.Core
             
             public static string GetAssetBundlesOutPath()
             {
-                    return Application.dataPath + "/StreamingAssets/" + AssetBundlesName + "/" + GetPlatformName();
+                    // return Application.dataPath + "/StreamingAssets/" + AssetBundlesName + "/" + GetPlatformName();
+                    return Application.dataPath + "/../Bundles/" + AssetBundlesName + "/" + GetPlatformName();
+            }
+            
+            public static string GetAssetBundlesStreamPath()
+            {
+                    return Application.dataPath + "/StreamingAssets/" + AssetBundlesName + "/" + GetPlatformName()+ "/";
             }
             
             public static string GetPlatformName()

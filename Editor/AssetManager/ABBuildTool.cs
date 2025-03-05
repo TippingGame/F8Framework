@@ -23,7 +23,7 @@ namespace F8Framework.Core.Editor
         {
             AssetDatabase.RemoveUnusedAssetBundleNames();
             
-            // 获取“StreamingAssets”文件夹路径（不一定这个文件夹，可自定义）            
+            // 获取“StreamingAssets”文件夹路径（不一定这个文件夹，可自定义）
             string strABOutPAthDir = URLSetting.GetAssetBundlesOutPath();
             
             GenerateAssetNames();
@@ -45,11 +45,17 @@ namespace F8Framework.Core.Editor
             // 清理多余文件夹和ab
             DeleteRemovedAssetBundles();
             
+            //复制AB到steam打包目录
+            string outpath = URLSetting.GetAssetBundlesStreamPath();
+            FileTools.SafeClearDir(outpath);
+            FileTools.CheckDirAndCreateWhenNeeded(outpath);
+            FileTools.SafeCopyDirectory(strABOutPAthDir, outpath, true);
+            
             // 等待AB打包完成，再写入数据
             GenerateAssetNames(true);
             GenerateResourceNames(true);
             LogF8.LogAsset("写入资产数据 生成：AssetBundleMap.json，生成：ResourceMap.json");
-            
+
             AssetDatabase.Refresh();
 
             LogF8.LogAsset("资产打包成功!");
@@ -173,7 +179,8 @@ namespace F8Framework.Core.Editor
             {
                 bundleName = Path.ChangeExtension(path, null).Replace(URLSetting.AssetBundlesPath, "");
             }
-            
+
+            bundleName = bundleName.ToLower();
             if (!ai.assetBundleName.Equals(bundleName))
             {
                 if (ai.assetBundleName.IsNullOrEmpty())
@@ -184,6 +191,11 @@ namespace F8Framework.Core.Editor
                 else if (DiscrepantAssetPathMapping != null) 
                 {
                     // 资产名和ab包名不相等
+                    if (!AssetGetParentPath(ai.assetBundleName).Equals(AssetGetParentPath(bundleName)))
+                    {
+                        //打印出父路径
+                        Debug.LogError("资产名和ab包名不相等:"+ai.assetBundleName + " > " + bundleName);
+                    }
                     DiscrepantAssetPathMapping["/" + ai.assetBundleName] = "/" + bundleName.ToLower();
                 }
 
@@ -191,11 +203,62 @@ namespace F8Framework.Core.Editor
             return ai.assetBundleName;
         }
         
+        //得到上级路径
+        private static string AssetGetParentPath(string path)
+        {
+            string parentPath = path.Substring(0, path.LastIndexOf('/'));
+            return parentPath;
+        }
+        
         private static bool AssetPathsContainsDiscrepantAssetBundle(List<string> assetPaths, string ab)
         {
             if (DiscrepantAssetPathMapping.TryGetValue(ab, out string disPath))
                 return assetPaths.Contains(disPath);
             return false;
+        }
+
+        //清除AssetBundleNames
+        public static void ClearAllAssetNames()
+        {
+            ClearAssetNames();
+        }
+
+        public static void ClearAssetNames()
+        {
+            FileTools.CheckDirAndCreateWhenNeeded(URLSetting.GetAssetBundlesFolder());
+            if (Directory.Exists(URLSetting.GetAssetBundlesFolder()))
+            {
+                // 获取文件夹的路径
+                string[] folderPaths = Directory.GetDirectories(URLSetting.GetAssetBundlesFolder(), "*", SearchOption.AllDirectories);
+                // 获取文件的路径
+                string[] filePaths = Directory.GetFiles(URLSetting.GetAssetBundlesFolder(), "*", SearchOption.AllDirectories);
+                // 合并文件夹和文件的路径，可以根据需要调整顺序
+                string[] allPaths = filePaths.Concat(folderPaths).ToArray();
+                
+                List<string> tempNames = new List<string>();
+
+                assetMapping = new Dictionary<string, AssetBundleMap.AssetMapping>();
+
+                foreach (string _filePath in allPaths)
+                {
+                    // 排除.meta文件 .DS_Store文件
+                    if (Path.GetExtension(_filePath) == ".meta" || Path.GetExtension(_filePath) == ".DS_Store")
+                    {
+                        continue;
+                    }
+                    string filePath = FileTools.FormatToUnityPath(_filePath);
+
+                    // 获取GetAssetPath
+                    string assetPath = GetAssetPath(filePath);
+                    
+                    if (File.Exists(filePath)) // 文件
+                    {
+                        AssetImporter ai = AssetImporter.GetAtPath(assetPath);
+                        ai.assetBundleName = "";
+                        EditorUtility.SetDirty(ai);
+                    }
+                }
+            }
         }
 
         public static void GenerateAssetNames(bool isWrite = false)

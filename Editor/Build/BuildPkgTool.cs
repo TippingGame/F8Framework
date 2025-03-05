@@ -649,7 +649,9 @@ namespace F8Framework.Core.Editor
             
             string toVersion = F8EditorPrefs.GetString(_toVersionKey, "");
             
-            string assetRemoteAddress = F8EditorPrefs.GetString(_assetRemoteAddressKey, "");
+            // string assetRemoteAddress = F8EditorPrefs.GetString(_assetRemoteAddressKey, "");
+            //http://192.168.11.69/sgyyweb/Remote//Windows //远程资源增加区分平台
+            string assetRemoteAddress = F8EditorPrefs.GetString(_assetRemoteAddressKey, "")  + "Remote/" + URLSetting.GetPlatformName();
             
             bool enableHotUpdate = F8EditorPrefs.GetBool(_enableHotUpdateKey, false);
             
