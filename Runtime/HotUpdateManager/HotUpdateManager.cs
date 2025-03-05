@@ -13,7 +13,8 @@ namespace F8Framework.Core
     {
         public static string Separator = "_";
         public static string PackageSplit = "Package" + Separator;
-        public static string RemoteDirName = "/Remote";
+        // public static string RemoteDirName = "/Remote";
+        public static string RemoteDirName = "/Remote/" + URLSetting.GetPlatformName();
         public static string HotUpdateDirName = "/HotUpdate";
         public static string PackageDirName = "/Package";
 
@@ -52,6 +53,9 @@ namespace F8Framework.Core
             }
             
             string path = GameConfig.LocalGameVersion.AssetRemoteAddress + "/" + nameof(GameVersion) + ".json";
+            LogF8.Log($"初始化远程版本：{path}");
+            
+            
             UnityWebRequest webRequest = UnityWebRequest.Get(path);
             yield return webRequest.SendWebRequest();
 #if UNITY_2020_2_OR_NEWER
@@ -81,6 +85,7 @@ namespace F8Framework.Core
             }
 
             string path = GameConfig.LocalGameVersion.AssetRemoteAddress + "/HotUpdate" + Separator + nameof(AssetBundleMap) + ".json";
+            LogF8.Log($"始化资源版本：{path}");
             UnityWebRequest webRequest = UnityWebRequest.Get(path);
             yield return webRequest.SendWebRequest();
 #if UNITY_2020_2_OR_NEWER
