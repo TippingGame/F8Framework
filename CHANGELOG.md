@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.3.111] - 2025-03-06
+1.#32 修复ResourcesLoader中的三目运算符使用错误，this.subAssetName赋值，优化代码  
+
 ## [1.3.110] - 2025-03-06
 1.#32 的优化  
 2.打包的AssetBundles复制到Assets外Bundles内，并且加上平台名进行区分  
