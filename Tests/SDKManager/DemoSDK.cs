@@ -37,7 +37,7 @@ namespace F8Framework.Tests
             // SDK退出游戏
             FF8.SDK.SDKExitGame();
 
-            // 播放视频广告
+            // 原生提示
             FF8.SDK.SDKToast("Native Toast");
         }
     }

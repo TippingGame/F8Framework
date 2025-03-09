@@ -76,7 +76,7 @@ namespace F8Framework.Core.Editor
 
             // 将内容写入.asmdef文件
             FileTools.SafeWriteAllText(asmrefPath, asmdefContent);
-            LogF8.LogConfig("创建.asmdef文件 " + Application.dataPath + DLLFolder + "/" + "/<color=#FF9E59>" + CODE_NAMESPACE + ".asmdef" + "</color>");
+            LogF8.LogConfig("创建.asmdef文件 " + Application.dataPath + DLLFolder + "/<color=#FF9E59>" + CODE_NAMESPACE + ".asmdef" + "</color>");
         }
         
         public static void LoadAllExcelData()

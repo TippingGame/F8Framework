@@ -42,7 +42,7 @@ Unity F8 SDKManager组件，与原生平台交互，接入多个平台或者渠�
     // SDK退出游戏
     FF8.SDK.SDKExitGame();
     
-    // 播放视频广告
+    // 原生提示
     FF8.SDK.SDKToast("Native Toast");
 ```
 

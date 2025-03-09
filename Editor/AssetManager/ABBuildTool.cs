@@ -50,6 +50,7 @@ namespace F8Framework.Core.Editor
             FileTools.SafeClearDir(outpath);
             FileTools.CheckDirAndCreateWhenNeeded(outpath);
             FileTools.SafeCopyDirectory(strABOutPAthDir, outpath, true);
+            AssetDatabase.Refresh();
             
             // 等待AB打包完成，再写入数据
             GenerateAssetNames(true);

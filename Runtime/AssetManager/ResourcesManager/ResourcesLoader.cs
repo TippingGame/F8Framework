@@ -89,10 +89,6 @@ namespace F8Framework.Core
                 }
                 else
                 {
-                    if (subAssetName.IsNullOrEmpty())
-                    {
-                        return this.ResouceObject as T;
-                    }
                     bool success = TryGetAsset(resourcePath + subAssetName, out Object obj);
                     if (success)
                     {
@@ -122,10 +118,6 @@ namespace F8Framework.Core
                 }
                 else
                 {
-                    if (subAssetName.IsNullOrEmpty())
-                    {
-                        return this.ResouceObject;
-                    }
                     bool success = TryGetAsset(resourcePath + subAssetName, out Object obj);
                     if (success)
                     {
@@ -362,6 +354,11 @@ namespace F8Framework.Core
         public virtual T LoadAll<T>(string subAssetName = null)
             where T : Object
         {
+            if (!subAssetName.IsNullOrEmpty())
+            {
+                this.subAssetName = subAssetName;
+            }
+            
             if (resourceLoadState == LoaderState.FINISHED)
             {
                 if (subAssetName.IsNullOrEmpty())
@@ -389,11 +386,16 @@ namespace F8Framework.Core
                 }
             }
             resourceLoadState = LoaderState.FINISHED;
-            return _resouceObject == null ? _resouceObject as T : resouceObject as T;
+            return _resouceObject != null ? _resouceObject as T : resouceObject as T;
         }
         
         public virtual Object LoadAll(System.Type assetType = default, string subAssetName = null)
         {
+            if (!subAssetName.IsNullOrEmpty())
+            {
+                this.subAssetName = subAssetName;
+            }
+            
             if (resourceLoadState == LoaderState.FINISHED)
             {
                 if (subAssetName.IsNullOrEmpty())
@@ -430,7 +432,7 @@ namespace F8Framework.Core
                 }
             }
             resourceLoadState = LoaderState.FINISHED;
-            return _resouceObject == null ? _resouceObject : resouceObject;
+            return _resouceObject != null ? _resouceObject : resouceObject;
         }
         
         /// <summary>
