@@ -2,7 +2,11 @@
   "name": "com.tippinggame.f8framework",
   "displayName": "F8Framework",
   "description": "Unity F8Framework Core",
+<<<<<<< HEAD
   "version": "1.3.112",
+=======
+  "version": "1.3.111",
+>>>>>>> d979be685c136e8ab1f0d0cf28d7a62b66ba5250
   "unity": "2021.3",
   "license": "MIT",
   "keywords": ["Unity", "Framework", "Core"],
