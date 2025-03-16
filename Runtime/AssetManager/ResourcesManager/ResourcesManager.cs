@@ -166,7 +166,7 @@ namespace F8Framework.Core
             return loader;
         }
 
-        public IEnumerator LoadAsyncCoroutine(string resourcePath, System.Type resourceType = default)
+        public IEnumerator LoadAsyncCoroutine(string resourcePath, System.Type resourceType = null)
         {
             ResourcesLoader loader;
             if (resourceLoaders.ContainsKey(resourcePath))
@@ -312,7 +312,8 @@ namespace F8Framework.Core
         public T LoadAll<T>(
             string resourcePath,
             string subAssetName,
-            out ResourcesLoader loader)
+            out ResourcesLoader loader,
+            bool isLoadAll = false)
             where T : Object
         {
             ResourcesLoader loader2;
@@ -327,8 +328,8 @@ namespace F8Framework.Core
                 resourceLoaders.Add(resourcePath, loader2);
             }
             loader = loader2;
-            T result = loader2.LoadAll<T>(subAssetName);
-            return result;
+            Object result = loader2.LoadAll(typeof(T), subAssetName, isLoadAll);
+            return result as T;
         }
 
         /// <summary>
@@ -343,7 +344,8 @@ namespace F8Framework.Core
             string resourcePath,
             System.Type assetType,
             string subAssetName,
-            out ResourcesLoader loader)
+            out ResourcesLoader loader,
+            bool isLoadAll = false)
         {
             ResourcesLoader loader2;
             if (resourceLoaders.ContainsKey(resourcePath))
@@ -357,7 +359,7 @@ namespace F8Framework.Core
                 resourceLoaders.Add(resourcePath, loader2);
             }
             loader = loader2;
-            Object result = loader2.LoadAll(assetType, subAssetName);
+            Object result = loader2.LoadAll(assetType, subAssetName, isLoadAll);
             return result;
         }
 
@@ -381,8 +383,7 @@ namespace F8Framework.Core
                     {
                         return loader2.ResouceObject as T;
                     }
-                    bool success = loader2.TryGetAsset(resourcePath + subAssetName, out Object obj);
-                    if (success)
+                    if (loader2.TryGetAsset(subAssetName, out Object obj))
                     {
                         return obj as T;
                     }
@@ -411,8 +412,7 @@ namespace F8Framework.Core
                     {
                         return loader2.ResouceObject;
                     }
-                    bool success = loader2.TryGetAsset(resourcePath + subAssetName, out Object obj);
-                    if (success)
+                    if (loader2.TryGetAsset(subAssetName, out Object obj))
                     {
                         return obj;
                     }
@@ -422,6 +422,24 @@ namespace F8Framework.Core
             return null;
         }
 
+        public Dictionary<string, TObject> GetAllAssetObject<TObject>(string resourcePath) where TObject : Object
+        {
+            if (resourceLoaders.TryGetValue(resourcePath, out ResourcesLoader loader))
+            {
+                return loader.GetAllAssetObject<TObject>();
+            }
+            return null;
+        }
+        
+        public Dictionary<string, Object> GetAllAssetObject(string resourcePath)
+        {
+            if (resourceLoaders.TryGetValue(resourcePath, out ResourcesLoader loader))
+            {
+                return loader.GetAllAssetObject();
+            }
+            return null;
+        }
+        
         /// <summary>
         /// 获取所有加载器的加载进度。
         /// 正常值范围从0到1。

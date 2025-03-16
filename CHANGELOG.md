@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.4.113] - 2025-03-16
+1.资产模块新增加载全部资产方法：LoadAll、LoadAllAsync，加载全部子资产方法：LoadSub、LoadSubAsync，获取全部资产方法：GetAllAssetObject  
+2.优化示例场景  
+3.优化文档  
+
 ## [1.3.112] - 2025-03-09
 1.小优化，完善文档  
 

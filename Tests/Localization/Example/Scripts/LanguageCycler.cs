@@ -8,6 +8,8 @@ namespace F8Framework.Tests
 {
 	public class LanguageCycler : MonoBehaviour
 	{
+		public GameObject StoryCanvas;
+		public GameObject UICanvas;
 		IEnumerator Start()
 		{
 			// 初始化模块中心
@@ -40,6 +42,9 @@ namespace F8Framework.Tests
 			FF8.SDK = ModuleCenter.CreateModule<SDKManager>();
 			FF8.Download = ModuleCenter.CreateModule<DownloadManager>();
 			FF8.LogWriter = ModuleCenter.CreateModule<F8LogWriter>();
+			
+			StoryCanvas.SetActive(true);
+			UICanvas.SetActive(true);
 			yield break;
 		}
 

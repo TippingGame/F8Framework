@@ -18,7 +18,7 @@
 F8 Framework是一个**优雅，轻量，符合直觉的**基于Unity引擎的游戏框架，组件围绕F8一键启动，**不用繁琐的启动配置**，**最低的心智负担**，框架整体遵循以**极少的使用成本**开发游戏。  
 
 ## 支持版本
-Unity 2021.3.15f1+  
+Unity 2021、2022、2023、6000  
 构建可支持：Win / Android / iOS / Mac / Linux / WebGL / 微信小游戏（[构建文档](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/README.md)）
 
 ## 文档快速预览 - 1分钟
@@ -89,7 +89,7 @@ git clone https://github.com/TippingGame/F8Framework.git
 
 ## 社区
 * qq开发交流群：[722647431](https://qm.qq.com/q/uTxdVIJykE)  
-* Discord聊天组：[https://discord.gg/dwWQ8EHz](https://discord.gg/dwWQ8EHz)  
+* Discord聊天组：[https://discord.gg/AHRb7Hwy9R](https://discord.gg/dwWQ8EHz)  
 
 ## 上架游戏
 | 脑光（[TapTap](https://www.taptap.cn/app/725455) / [WebGL](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/h5game/naoguang/index.html)）       | 待定                                              | 待定                                              | 待定                                             | 
@@ -100,6 +100,9 @@ git clone https://github.com/TippingGame/F8Framework.git
 ## 赞助
 ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/Sponsorship_icon_356.png)
 ###### 感谢赞助
+
+| <img src='https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/Sponsor/yemaozi.png' width="38"/> 夜猫子 ￥8.88 |  |  |  |
+| --- | --- | --- | --- |
 
 ---
 

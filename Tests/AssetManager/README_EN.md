@@ -49,12 +49,18 @@ IEnumerator Start()
     
     
     /*-------------------------------------同步加载-------------------------------------*/
+    // 加载单个资产
     GameObject go = FF8.Asset.Load<GameObject>("Cube");
 
     // assetName：资产名
     // subAssetName：子资产名，使用Multiple模式的Sprite图片则可使用
     // 指定加载模式REMOTE_ASSET_BUNDLE，加载远程AssetBundle资产，需要配置AssetRemoteAddress = "http://127.0.0.1:6789/remote"
     Sprite sprite = FF8.Asset.Load<Sprite>("PackForest01", "PackForest01_12", AssetManager.AssetAccessMode.REMOTE_ASSET_BUNDLE);
+    
+    // 加载此资源的全部资产
+    FF8.Asset.LoadAll("Cube");
+    // 加载此资源的全部子资产
+    FF8.Asset.LoadSub("Cube");
     
     
     /*-------------------------------------异步加载-------------------------------------*/
@@ -64,13 +70,27 @@ IEnumerator Start()
     });
 
     // async/await方式（无多线程，WebGL也可使用）
+    // await FF8.Asset.LoadAsync<GameObject>("Cube");
+    // 或者
     // BaseLoader load = FF8.Asset.LoadAsync<GameObject>("Cube");
     // await load;
     
     // 协程方式
+    yield return FF8.Asset.LoadAsync<GameObject>("Cube");
+    // 或者
     BaseLoader load2 = FF8.Asset.LoadAsync<GameObject>("Cube");
     yield return load2;
     GameObject go2 = load2.GetAssetObject<GameObject>();
+    
+    // 加载此资源的全部资产
+    BaseLoader loaderAll = FF8.Asset.LoadAllAsync("Cube");
+    yield return loaderAll;
+    Dictionary<string, Object> allAsset = loaderAll.GetAllAssetObject();
+    
+    // 加载此资源的全部子资产
+    BaseLoader loaderSub = FF8.Asset.LoadSubAsync("Atlas");
+    yield return loaderSub;
+    Dictionary<string, Sprite> allAsset2 = loaderSub.GetAllAssetObject<Sprite>();
     
     
     /*-------------------------------------加载文件夹内首层资产-------------------------------------*/
@@ -103,7 +123,13 @@ IEnumerator Start()
     
     
     /*-------------------------------------其他功能-------------------------------------*/
-    // 获取资产
+    // 获取此资源的全部资产
+    Dictionary<string, Object> allAsset3 = FF8.Asset.GetAllAssetObject("Cube");
+    
+    // 只获取指定类型
+    Dictionary<string, Sprite> allAsset4 = FF8.Asset.GetAllAssetObject<Sprite>("Atlas");
+    
+    // 获取单个资产
     GameObject go3 = FF8.Asset.GetAssetObject<GameObject>("Cube");
     
     // 获取加载进度

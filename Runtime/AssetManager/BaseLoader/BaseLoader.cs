@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Object = UnityEngine.Object;
@@ -25,6 +26,16 @@ namespace F8Framework.Core
         }
 
         public virtual Object GetAssetObject(string subAssetName = null)
+        {
+            return null;
+        }
+        
+        public virtual Dictionary<string, TObject> GetAllAssetObject<TObject>() where TObject : Object
+        {
+            return null;
+        }
+        
+        public virtual Dictionary<string, Object> GetAllAssetObject()
         {
             return null;
         }

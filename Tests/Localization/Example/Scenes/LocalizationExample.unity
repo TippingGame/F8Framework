@@ -385,6 +385,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c90b1bb20ffe0a349a0db1c4567bc559, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  StoryCanvas: {fileID: 1815975362}
+  UICanvas: {fileID: 1446331142}
 --- !u!4 &555505973
 Transform:
   m_ObjectHideFlags: 0
@@ -5716,7 +5718,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1446331143
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10741,7 +10743,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!95 &1815975363
 Animator:
   serializedVersion: 4
@@ -10989,6 +10991,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4584e88692a69a647b4310f01b583504, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  localizedTextID: 
   propertyName: _MainTex
   texture2Ds: []
   sprites:

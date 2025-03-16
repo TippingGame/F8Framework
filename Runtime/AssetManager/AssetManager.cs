@@ -8,8 +8,8 @@ using Object = UnityEngine.Object;
 namespace F8Framework.Core
 {
     //异步加载完成的回调
-    public delegate void OnAssetObject<T>(T obj)
-        where T : Object;
+    public delegate void OnAssetObject<T>(T obj) where T : Object;
+    public delegate void OnAllAssetObject<TObject>(Dictionary<string, TObject> objs) where TObject : Object;
     
     public class AssetManager : ModuleSingleton<AssetManager>, IModule
     {
@@ -323,7 +323,7 @@ namespace F8Framework.Core
                         assetPath = info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0];
                     }
 #endif
-                    Object o = ResourcesManager.Instance.GetAssetObject(assetPath, default, subAssetName, out ResourcesLoader loader);
+                    Object o = ResourcesManager.Instance.GetAssetObject(assetPath, null, subAssetName, out ResourcesLoader loader);
                     return o;
                 }
                 else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
@@ -334,14 +334,14 @@ namespace F8Framework.Core
                         return EditorLoadAsset<Object>(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], subAssetName, out EditorLoader editorLoader);
                     }
 #endif
-                    Object o = AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], default, subAssetName, out AssetBundleLoader loader);
+                    Object o = AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], null, subAssetName, out AssetBundleLoader loader);
                     if (o != null)
                     {
                         return o;
                     }
                     AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePath);
                     ab.Expand(info.AssetPath[0], default, subAssetName);
-                    o = AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], default, subAssetName, out AssetBundleLoader loader2);
+                    o = AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], null, subAssetName, out AssetBundleLoader loader2);
                     if (o != null)
                     {
                         return o;
@@ -349,6 +349,369 @@ namespace F8Framework.Core
                     LogF8.LogError("获取不到资产！");
                 }
 
+                return null;
+            }
+            
+            /// <summary>
+            /// 获取所有资产
+            /// </summary>
+            /// <param name="assetName"></param>
+            /// <param name="mode"></param>
+            /// <returns></returns>
+            public Dictionary<string, TObject> GetAllAssetObject<TObject>(string assetName, AssetAccessMode mode = AssetAccessMode.UNKNOWN) where TObject : Object
+            {
+                Dictionary<string, TObject> allAsset = new Dictionary<string, TObject>();
+                foreach (var item in GetAllAssetObject(assetName, mode))
+                {
+                    if (item.Value is TObject value)
+                    {
+                        allAsset[item.Key] = value;
+                    }
+                }
+                return allAsset;
+            }
+            
+            /// <summary>
+            /// 获取所有资产
+            /// </summary>
+            /// <param name="assetName"></param>
+            /// <param name="mode"></param>
+            /// <returns></returns>
+            public Dictionary<string, Object> GetAllAssetObject(string assetName, AssetAccessMode mode = AssetAccessMode.UNKNOWN)
+            {
+                AssetInfo info = GetAssetInfo(assetName, mode);
+                
+                if (info.AssetType == AssetTypeEnum.RESOURCE)
+                {
+                    string assetPath = info.AssetPath?[0];
+#if UNITY_EDITOR
+                    if (IsEditorMode)
+                    {
+                        assetPath = info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0];
+                    }
+#endif
+                    return ResourcesManager.Instance.GetAllAssetObject(assetPath);
+                }
+                else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
+                {
+#if UNITY_EDITOR
+                    if (IsEditorMode)
+                    {
+                        return EditorLoadAllAsset(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], out EditorLoader editorLoader);
+                    }
+#endif
+                    return AssetBundleManager.Instance.GetAllAssetObject(info.AssetBundlePath);
+                }
+
+                return null;
+            }
+            
+            /// <summary>
+            /// 加载所有资产
+            /// </summary>
+            /// <param name="assetName"></param>
+            /// <param name="mode"></param>
+            /// <returns></returns>
+            public Dictionary<string, TObject> LoadAll<TObject>(string assetName, AssetAccessMode mode = AssetAccessMode.UNKNOWN) where TObject : Object
+            {
+                Dictionary<string, TObject> allAsset = new Dictionary<string, TObject>();
+                foreach (var item in LoadAll(assetName, mode))
+                {
+                    if (item.Value is TObject value)
+                    {
+                        allAsset[item.Key] = value;
+                    }
+                }
+                return allAsset;
+            }
+            
+            /// <summary>
+            /// 加载所有资产
+            /// </summary>
+            /// <param name="assetName"></param>
+            /// <param name="mode"></param>
+            /// <returns></returns>
+            public Dictionary<string, Object> LoadAll(string assetName, AssetAccessMode mode = AssetAccessMode.UNKNOWN)
+            {
+                AssetInfo info = GetAssetInfo(assetName, mode);
+                
+                if (info.AssetType == AssetTypeEnum.RESOURCE)
+                {
+                    string assetPath = info.AssetPath?[0];
+#if UNITY_EDITOR
+                    if (IsEditorMode)
+                    {
+                        assetPath = info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0];
+                    }
+#endif
+                    ResourcesManager.Instance.LoadAll(assetPath, null, null, out ResourcesLoader loader);
+
+                    return ResourcesManager.Instance.GetAllAssetObject(assetPath);
+                }
+                else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
+                {
+#if UNITY_EDITOR
+                    if (IsEditorMode)
+                    {
+                        return EditorLoadAllAsset(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], out EditorLoader editorLoader);
+                    }
+#endif
+                    AssetBundleManager.Instance.Load(assetName, null, ref info, null, true);
+                    
+                    return AssetBundleManager.Instance.GetAllAssetObject(info.AssetBundlePath);
+                }
+
+                return null;
+            }
+
+            /// <summary>
+            /// 异步加载所有资产
+            /// </summary>
+            /// <param name="assetName"></param>
+            /// <param name="callback"></param>
+            /// <param name="mode"></param>
+            /// <returns></returns>
+            public BaseLoader LoadAllAsync<TObject>(string assetName, OnAllAssetObject<TObject> callback = null, AssetAccessMode mode = AssetAccessMode.UNKNOWN) where TObject : Object
+            {
+                void NonGenericCallback(Dictionary<string, Object> allAssets)
+                {
+                    if (allAssets != null)
+                    {
+                        Dictionary<string, TObject> filteredAssets = new Dictionary<string, TObject>();
+                        foreach (var kvp in allAssets)
+                        {
+                            if (kvp.Value is TObject typedObject)
+                            {
+                                filteredAssets[kvp.Key] = typedObject;
+                            }
+                        }
+
+                        callback?.Invoke(filteredAssets);
+                    }
+                    else
+                    {
+                        callback?.Invoke(null);
+                    }
+                }
+                
+                return LoadAllAsync(assetName, NonGenericCallback, mode);
+            }
+            
+            /// <summary>
+            /// 异步加载所有资产
+            /// </summary>
+            /// <param name="assetName"></param>
+            /// <param name="callback"></param>
+            /// <param name="mode"></param>
+            /// <returns></returns>
+            public BaseLoader LoadAllAsync(string assetName, OnAllAssetObject<Object> callback = null, AssetAccessMode mode = AssetAccessMode.UNKNOWN)
+            {
+                AssetInfo info = GetAssetInfo(assetName, mode);
+                if (!IsLegal(ref info))
+                {
+                    End();
+                    return new BaseLoader();
+                }
+                
+                if (info.AssetType == AssetTypeEnum.RESOURCE)
+                {
+                    string assetPath = info.AssetPath?[0];
+#if UNITY_EDITOR
+                    if (IsEditorMode)
+                    {
+                        assetPath = info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0];
+                    }
+#endif
+                    ResourcesManager.Instance.LoadAll(assetPath, null, null, out ResourcesLoader loader, true);
+                    End(ResourcesManager.Instance.GetAllAssetObject(assetPath));
+                    return loader;
+                }
+                else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
+                {
+#if UNITY_EDITOR
+                    if (IsEditorMode)
+                    {
+                        var allAsset = EditorLoadAllAsset(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], out EditorLoader editorLoader);
+                        End(allAsset);
+                        return editorLoader;
+                    }
+#endif
+                    AssetBundleLoader loader = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePath);
+                    
+                    if (loader == null || loader.AssetBundleContent == null || loader.GetDependentNamesLoadFinished() < loader.AddDependentNames())
+                    {
+                        loader = AssetBundleManager.Instance.LoadAsync(assetName, null, info, null, (b) => {
+                            End(AssetBundleManager.Instance.GetAllAssetObject(info.AssetBundlePath));
+                        }, true);
+                        return loader;
+                    }
+                    else
+                    {
+                        loader.Expand(info.AssetPath[0], null, null, true);
+                        End(AssetBundleManager.Instance.GetAllAssetObject(info.AssetBundlePath));
+                        return loader;
+                    }
+                }
+                void End(Dictionary<string, Object> allAsset = null)
+                {
+                    callback?.Invoke(allAsset);
+                }
+                
+                return null;
+            }
+            
+            /// <summary>
+            /// 加载子资产
+            /// </summary>
+            /// <param name="assetName"></param>
+            /// <param name="mode"></param>
+            /// <returns></returns>
+            public Dictionary<string, TObject> LoadSub<TObject>(string assetName, AssetAccessMode mode = AssetAccessMode.UNKNOWN) where TObject : Object
+            {
+                Dictionary<string, TObject> allAsset = new Dictionary<string, TObject>();
+                foreach (var item in LoadSub(assetName, mode))
+                {
+                    if (item.Value is TObject value)
+                    {
+                        allAsset[item.Key] = value;
+                    }
+                }
+
+                return allAsset;
+            }
+            
+            /// <summary>
+            /// 加载子资产
+            /// </summary>
+            /// <param name="assetName"></param>
+            /// <param name="mode"></param>
+            /// <returns></returns>
+            public Dictionary<string, Object> LoadSub(string assetName, AssetAccessMode mode = AssetAccessMode.UNKNOWN)
+            {
+                AssetInfo info = GetAssetInfo(assetName, mode);
+                
+                if (info.AssetType == AssetTypeEnum.RESOURCE)
+                {
+                    string assetPath = info.AssetPath?[0];
+#if UNITY_EDITOR
+                    if (IsEditorMode)
+                    {
+                        assetPath = info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0];
+                    }
+#endif
+                    ResourcesManager.Instance.LoadAll(assetPath, null, Guid.NewGuid().ToString(), out ResourcesLoader loader);
+                    
+                    return ResourcesManager.Instance.GetAllAssetObject(assetPath);
+                }
+                else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
+                {
+#if UNITY_EDITOR
+                    if (IsEditorMode)
+                    {
+                        return EditorLoadAllAsset(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], out EditorLoader editorLoader);
+                    }
+#endif
+                    AssetBundleManager.Instance.Load(assetName, null, ref info, Guid.NewGuid().ToString());
+                    
+                    return AssetBundleManager.Instance.GetAllAssetObject(info.AssetBundlePath);
+                }
+
+                return null;
+            }
+
+            /// <summary>
+            /// 异步加载子资产
+            /// </summary>
+            /// <param name="assetName"></param>
+            /// <param name="callback"></param>
+            /// <param name="mode"></param>
+            /// <returns></returns>
+            public BaseLoader LoadSubAsync<TObject>(string assetName, OnAllAssetObject<TObject> callback = null, AssetAccessMode mode = AssetAccessMode.UNKNOWN) where TObject : Object
+            {
+                void NonGenericCallback(Dictionary<string, Object> allAssets)
+                {
+                    if (allAssets != null)
+                    {
+                        Dictionary<string, TObject> filteredAssets = new Dictionary<string, TObject>();
+                        foreach (var kvp in allAssets)
+                        {
+                            if (kvp.Value is TObject typedObject)
+                            {
+                                filteredAssets[kvp.Key] = typedObject;
+                            }
+                        }
+
+                        callback?.Invoke(filteredAssets);
+                    }
+                    else
+                    {
+                        callback?.Invoke(null);
+                    }
+                }
+                
+                return LoadSubAsync(assetName, NonGenericCallback, mode);
+            }
+            
+            /// <summary>
+            /// 异步加载子资产
+            /// </summary>
+            /// <param name="assetName"></param>
+            /// <param name="callback"></param>
+            /// <param name="mode"></param>
+            /// <returns></returns>
+            public BaseLoader LoadSubAsync(string assetName, OnAllAssetObject<Object> callback = null, AssetAccessMode mode = AssetAccessMode.UNKNOWN)
+            {
+                AssetInfo info = GetAssetInfo(assetName, mode);
+                if (!IsLegal(ref info))
+                {
+                    End();
+                    return new BaseLoader();
+                }
+                
+                if (info.AssetType == AssetTypeEnum.RESOURCE)
+                {
+                    string assetPath = info.AssetPath?[0];
+#if UNITY_EDITOR
+                    if (IsEditorMode)
+                    {
+                        assetPath = info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0];
+                    }
+#endif
+                    ResourcesManager.Instance.LoadAll(assetPath, null, Guid.NewGuid().ToString(), out ResourcesLoader loader);
+                    End(ResourcesManager.Instance.GetAllAssetObject(assetPath));
+                    return loader;
+                }
+                else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
+                {
+#if UNITY_EDITOR
+                    if (IsEditorMode)
+                    {
+                        var allAsset = EditorLoadAllAsset(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], out EditorLoader editorLoader);
+                        End(allAsset);
+                        return editorLoader;
+                    }
+#endif
+                    AssetBundleLoader loader = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePath);
+                    
+                    if (loader == null || loader.AssetBundleContent == null || loader.GetDependentNamesLoadFinished() < loader.AddDependentNames())
+                    {
+                        loader = AssetBundleManager.Instance.LoadAsync(assetName, null, info, Guid.NewGuid().ToString(), (b) => {
+                            End(AssetBundleManager.Instance.GetAllAssetObject(info.AssetBundlePath));
+                        });
+                        return loader;
+                    }
+                    else
+                    {
+                        loader.Expand(info.AssetPath[0], null, Guid.NewGuid().ToString());
+                        End(AssetBundleManager.Instance.GetAllAssetObject(info.AssetBundlePath));
+                        return loader;
+                    }
+                }
+                void End(Dictionary<string, Object> allAsset = null)
+                {
+                    callback?.Invoke(allAsset);
+                }
+                
                 return null;
             }
             
@@ -366,7 +729,6 @@ namespace F8Framework.Core
                 AssetAccessMode mode = AssetAccessMode.UNKNOWN)
                 where T : Object
             {
-                
                 AssetInfo info = GetAssetInfo(assetName, mode);
                 if (!IsLegal(ref info))
                     return null;
@@ -458,7 +820,7 @@ namespace F8Framework.Core
                     {
                         AssetInfo subInfo = GetAssetInfo(subAssetName, mode);
                         string assetPath = subInfo.AssetPath?[0];
-                        Object o = ResourcesManager.Instance.GetAssetObject(assetPath, default, null, out ResourcesLoader loader);
+                        Object o = ResourcesManager.Instance.GetAssetObject(assetPath, null, null, out ResourcesLoader loader);
                     
                         if (o == null)
                         {
@@ -484,7 +846,7 @@ namespace F8Framework.Core
                         AssetBundleLoader ab = AssetBundleManager.Instance.GetAssetBundleLoader(subInfo.AssetBundlePath);
                         if (ab == null || ab.AssetBundleContent == null)
                         {
-                            AssetBundleManager.Instance.Load(subAssetName, default, ref subInfo, "");
+                            AssetBundleManager.Instance.Load(subAssetName, null, ref subInfo, null);
                         }
                     }
                 }
@@ -587,7 +949,7 @@ namespace F8Framework.Core
                         assetPath = info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0];
                     }
 #endif
-                    Object o = ResourcesManager.Instance.GetAssetObject(assetPath, default, subAssetName, out ResourcesLoader loader);
+                    Object o = ResourcesManager.Instance.GetAssetObject(assetPath, null, subAssetName, out ResourcesLoader loader);
                     if (o != null)
                     {
                         return o;
@@ -597,7 +959,7 @@ namespace F8Framework.Core
                     {
                         return ResourcesManager.Instance.Load(assetPath);
                     }
-                    return ResourcesManager.Instance.LoadAll(assetPath, default, subAssetName, out ResourcesLoader loader2);
+                    return ResourcesManager.Instance.LoadAll(assetPath, null, subAssetName, out ResourcesLoader loader2);
                 }
                 else if (info.AssetType == AssetTypeEnum.ASSET_BUNDLE)
                 {
@@ -607,7 +969,7 @@ namespace F8Framework.Core
                         return EditorLoadAsset<Object>(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], subAssetName, out EditorLoader editorLoader);
                     }
 #endif
-                    Object o2 = AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], default, subAssetName, out AssetBundleLoader loader);
+                    Object o2 = AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], null, subAssetName, out AssetBundleLoader loader);
                     if (o2 != null)
                     {
                         return o2;
@@ -619,14 +981,14 @@ namespace F8Framework.Core
                         loader = AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePath);
                     }
             
-                    Object o = AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], default, subAssetName, out AssetBundleLoader loader2);
+                    Object o = AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], null, subAssetName, out AssetBundleLoader loader2);
                     if (o != null)
                     {
                         return o;
                     }
                     
-                    loader.Expand(info.AssetPath[0], default, subAssetName);
-                    return AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], default, subAssetName, out AssetBundleLoader loader3);
+                    loader.Expand(info.AssetPath[0], null, subAssetName);
+                    return AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], null, subAssetName, out AssetBundleLoader loader3);
                 }
 
                 return null;
@@ -816,7 +1178,7 @@ namespace F8Framework.Core
             /// <param name="assetType">目标资产类型。</param>
             /// <param name="subAssetName">子资产名称。</param>
             /// <param name="mode">访问模式。</param>
-            public IEnumerator LoadAsyncCoroutine(string assetName, System.Type assetType = default, string subAssetName = null, AssetAccessMode mode = AssetAccessMode.UNKNOWN)
+            public IEnumerator LoadAsyncCoroutine(string assetName, System.Type assetType = null, string subAssetName = null, AssetAccessMode mode = AssetAccessMode.UNKNOWN)
             {
                 AssetInfo info = GetAssetInfo(assetName, mode);
                 if (!IsLegal(ref info))
@@ -929,7 +1291,7 @@ namespace F8Framework.Core
                     {
                         AssetInfo subInfo = GetAssetInfo(subAssetName, mode);
                         string assetPath = subInfo.AssetPath?[0];
-                        Object o = ResourcesManager.Instance.GetAssetObject(assetPath, default, null, out ResourcesLoader loader);
+                        Object o = ResourcesManager.Instance.GetAssetObject(assetPath, null, null, out ResourcesLoader loader);
                         if (o != null)
                         {
                             dirLoader.Loaders.Add(loader);
@@ -974,7 +1336,7 @@ namespace F8Framework.Core
                         AssetBundleLoader loader = AssetBundleManager.Instance.GetAssetBundleLoader(subInfo.AssetBundlePath);
                         if (loader == null || loader.AssetBundleContent == null || loader.GetDependentNamesLoadFinished() < loader.AddDependentNames())
                         {
-                            loader = AssetBundleManager.Instance.LoadAsync(subAssetName, default,
+                            loader = AssetBundleManager.Instance.LoadAsync(subAssetName, null,
                                 subInfo, "", (b) =>
                                 {
                                     if (++assetCount >= info.AssetPath.Length)
@@ -987,7 +1349,7 @@ namespace F8Framework.Core
                         }
                         else
                         {
-                            Object o = AssetBundleManager.Instance.GetAssetObject(subInfo.AssetBundlePath, subInfo.AssetPath[0], default, null, out AssetBundleLoader loader2);
+                            Object o = AssetBundleManager.Instance.GetAssetObject(subInfo.AssetBundlePath, subInfo.AssetPath[0], null, null, out AssetBundleLoader loader2);
                             if (o != null)
                             {
                                 dirLoader.Loaders.Add(loader2);
@@ -999,7 +1361,7 @@ namespace F8Framework.Core
                                 continue;
                             }
                             
-                            loader.Expand(subInfo.AssetPath[0], default, "");
+                            loader.Expand(subInfo.AssetPath[0], null, "");
                             dirLoader.Loaders.Add(loader);
                             if (++assetCount >= info.AssetPath.Length)
                             {
@@ -1051,7 +1413,7 @@ namespace F8Framework.Core
                     {
                         AssetInfo subInfo = GetAssetInfo(subAssetName, mode);
                         string assetPath = subInfo.AssetPath?[0];
-                        Object o = ResourcesManager.Instance.GetAssetObject(assetPath, default, null, out ResourcesLoader loader);
+                        Object o = ResourcesManager.Instance.GetAssetObject(assetPath, null, null, out ResourcesLoader loader);
                     
                         if (o != null)
                         {
@@ -1083,7 +1445,7 @@ namespace F8Framework.Core
                         AssetBundleLoader loader = AssetBundleManager.Instance.GetAssetBundleLoader(subInfo.AssetBundlePath);
                         if (loader == null || loader.AssetBundleContent == null || loader.GetDependentNamesLoadFinished() < loader.AddDependentNames())
                         {
-                            yield return AssetBundleManager.Instance.LoadAsyncCoroutine(subAssetName, default, subInfo, null);
+                            yield return AssetBundleManager.Instance.LoadAsyncCoroutine(subAssetName, null, subInfo, null);
                             if (++assetCount >= info.AssetPath.Length)
                             {
                                 yield break;
@@ -1091,7 +1453,7 @@ namespace F8Framework.Core
                         }
                         else
                         {
-                            Object o = AssetBundleManager.Instance.GetAssetObject(subInfo.AssetBundlePath, subInfo.AssetPath[0], default, null, out AssetBundleLoader loader2);
+                            Object o = AssetBundleManager.Instance.GetAssetObject(subInfo.AssetBundlePath, subInfo.AssetPath[0], null, null, out AssetBundleLoader loader2);
                             if (o != null)
                             {
                                 if (++assetCount >= info.AssetPath.Length)
@@ -1101,7 +1463,7 @@ namespace F8Framework.Core
                                 continue;
                             }
                             
-                            loader.Expand(subInfo.AssetPath[0], default, "");
+                            loader.Expand(subInfo.AssetPath[0], null, "");
                             if (++assetCount >= info.AssetPath.Length)
                             {
                                 yield break;
@@ -1240,7 +1602,7 @@ namespace F8Framework.Core
                         assetPath = info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0];
                     }
 #endif
-                    Object o = ResourcesManager.Instance.GetAssetObject(assetPath, default, subAssetName, out ResourcesLoader loader);
+                    Object o = ResourcesManager.Instance.GetAssetObject(assetPath, null, subAssetName, out ResourcesLoader loader);
                     if (o != null)
                     {
                         End(o);
@@ -1255,7 +1617,7 @@ namespace F8Framework.Core
                         }
                         else
                         {
-                            Object subAsset = ResourcesManager.Instance.LoadAll(assetPath, default, subAssetName, out ResourcesLoader loader2);
+                            Object subAsset = ResourcesManager.Instance.LoadAll(assetPath, null, subAssetName, out ResourcesLoader loader2);
                             End(subAsset);
                             return loader2;
                         }
@@ -1272,7 +1634,7 @@ namespace F8Framework.Core
                         return editorLoader;
                     }
 #endif
-                    Object o2 = AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], default, subAssetName, out AssetBundleLoader loader);
+                    Object o2 = AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], null, subAssetName, out AssetBundleLoader loader);
                     if (o2 != null)
                     {
                         End(o2);
@@ -1281,22 +1643,22 @@ namespace F8Framework.Core
                     
                     if (loader == null || loader.AssetBundleContent == null)
                     {
-                        loader = AssetBundleManager.Instance.LoadAsync(assetName, default, info, subAssetName, (b) => {
-                            End(AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], default, subAssetName, out AssetBundleLoader loader2));
+                        loader = AssetBundleManager.Instance.LoadAsync(assetName, null, info, subAssetName, (b) => {
+                            End(AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], null, subAssetName, out AssetBundleLoader loader2));
                         });
                         return loader;
                     }
                     else
                     {
-                        Object o = AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], default, subAssetName, out AssetBundleLoader loader3);
+                        Object o = AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], null, subAssetName, out AssetBundleLoader loader3);
                         if (o != null)
                         {
                             End(o);
                             return loader3;
                         }
             
-                        loader3.Expand(info.AssetPath[0], default, subAssetName);
-                        End(AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], default, subAssetName, out AssetBundleLoader loader4));
+                        loader3.Expand(info.AssetPath[0], null, subAssetName);
+                        End(AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], null, subAssetName, out AssetBundleLoader loader4));
                         return loader4;
                     }
                 }
@@ -1581,7 +1943,6 @@ namespace F8Framework.Core
                             assetBundlesFindAssetPaths[assetName] = assetPath;
                         }
                         
-                        LogF8.LogAsset(assetPath);
                         return assetPath;
                     }
                 }
@@ -1615,11 +1976,11 @@ namespace F8Framework.Core
                 return null;
             }
                 
-            private Object EditorLoadAsset(string assetPath, out EditorLoader loader, System.Type assetType = default, string subAssetName = null)
+            private Object EditorLoadAsset(string assetPath, out EditorLoader loader, System.Type assetType = null, string subAssetName = null)
             {
                 if (subAssetName.IsNullOrEmpty())
                 {
-                    if (assetType == default)
+                    if (assetType == null)
                     {
                         Object o = UnityEditor.AssetDatabase.LoadAssetAtPath<Object>(assetPath);
                         loader = new EditorLoader(o);
@@ -1644,6 +2005,18 @@ namespace F8Framework.Core
 
                 loader = null;
                 return null;
+            }
+            
+            private Dictionary<string, Object> EditorLoadAllAsset(string assetPath, out EditorLoader loader)
+            {
+                var allAsset = new Dictionary<string, Object>();
+                var objs = UnityEditor.AssetDatabase.LoadAllAssetsAtPath(assetPath);
+                foreach (var obj in objs)
+                {
+                    allAsset[obj.name] = obj;
+                }
+                loader = new EditorLoader(null, allAsset);
+                return allAsset;
             }
 #endif
         
