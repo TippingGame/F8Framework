@@ -93,7 +93,7 @@ namespace F8Framework.Core.Editor
 
             FileTools.CheckDirAndCreateWhenNeeded(hotUpdatePath);
             FileTools.SafeClearDir(hotUpdatePath);
-            CopyHotUpdateAb(URLSetting.GetAssetBundlesOutPath(), generateAssetBundleMappings,
+            CopyHotUpdateAb(URLSetting.GetAssetBundlesStreamPath(), generateAssetBundleMappings,
                 hotUpdatePath);
 
             GameVersion remoteGameVersion = Util.LitJson.ToObject<GameVersion>(FileTools.SafeReadAllText(gameVersionPath));
@@ -199,7 +199,7 @@ namespace F8Framework.Core.Editor
                     {
                         continue;
                     }
-                    CopyDeleteUnnecessaryAb(URLSetting.GetAssetBundlesOutPath(), mappings, toPath, packagePath, package);
+                    CopyDeleteUnnecessaryAb(URLSetting.GetAssetBundlesStreamPath(), mappings, toPath, packagePath, package);
                     
                     Util.ZipHelper.IZipCallback zipCb = new Util.ZipHelper.ZipResult();
                     string[] paths = { packagePath };
@@ -243,8 +243,8 @@ namespace F8Framework.Core.Editor
                 
                 string toPath = FileTools.TruncatePath(Application.dataPath, 1) + "/temp_NullPackage";
                 FileTools.SafeDeleteDir(toPath);
-                FileTools.SafeCopyDirectory(URLSetting.GetAssetBundlesOutPath(), toPath, true, new[] { URLSetting.GetPlatformName(), URLSetting.GetPlatformName() + ".manifest" });
-                FileTools.SafeDeleteDir(URLSetting.GetAssetBundlesOutPath(),
+                FileTools.SafeCopyDirectory(URLSetting.GetAssetBundlesStreamPath(), toPath, true, new[] { URLSetting.GetPlatformName(), URLSetting.GetPlatformName() + ".manifest" });
+                FileTools.SafeDeleteDir(URLSetting.GetAssetBundlesStreamPath(),
                     new[] { URLSetting.GetPlatformName(), URLSetting.GetPlatformName() + ".manifest" });
                 AssetDatabase.Refresh();
                 string locationPathName = buildPath + "/" + buildTarget.ToString() + "_Null_" + toVersion  + "/" + appName;
@@ -256,7 +256,7 @@ namespace F8Framework.Core.Editor
                 {
                     LogF8.LogError($"导出失败了，检查一下 Unity 内置的 Build Settings 导出的路径是否存在，Unity 没有给我清理缓存！: {buildReport.summary.result}");
                 }
-                FileTools.SafeCopyDirectory(toPath, URLSetting.GetAssetBundlesOutPath(), true, new[] { URLSetting.GetPlatformName(), URLSetting.GetPlatformName() + ".manifest" });
+                FileTools.SafeCopyDirectory(toPath, URLSetting.GetAssetBundlesStreamPath(), true, new[] { URLSetting.GetPlatformName(), URLSetting.GetPlatformName() + ".manifest" });
                 FileTools.SafeDeleteDir(toPath);
                 LogF8.LogVersion("游戏空包打包成功! " + locationPathName);
             }
