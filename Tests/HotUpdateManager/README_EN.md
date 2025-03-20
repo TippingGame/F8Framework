@@ -42,7 +42,7 @@ IEnumerator Start()
     yield return FF8.HotUpdate.InitAssetVersion();
     
     // 检查需要热更的资源，总大小
-    Tuple<List<string>, long> result  = FF8.HotUpdate.CheckHotUpdate();
+    Tuple<Dictionary<string, string>, long> result  = FF8.HotUpdate.CheckHotUpdate();
     var hotUpdateAssetUrl = result.Item1;
     var allSize = result.Item2;
     

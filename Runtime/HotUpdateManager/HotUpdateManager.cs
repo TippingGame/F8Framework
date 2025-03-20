@@ -242,14 +242,19 @@ namespace F8Framework.Core
                 
                 completed?.Invoke();
             };
-            
+
+            List<string> tempDownloadUrl = new List<string>(hotUpdateAssetUrl.Count);
             // 添加下载清单
             foreach (var assetUrl in hotUpdateAssetUrl.Values)
             {
-                int index = assetUrl.IndexOf('/');
-                string result = assetUrl.Substring(index + 1);
-                hotUpdateDownloader.AddDownload(GameConfig.LocalGameVersion.AssetRemoteAddress + HotUpdateDirName + Separator + assetUrl,
-                    Application.persistentDataPath + "/HotUpdate/" + result);
+                if (!tempDownloadUrl.Contains(assetUrl))
+                {
+                    int index = assetUrl.IndexOf('/');
+                    string result = assetUrl.Substring(index + 1);
+                    hotUpdateDownloader.AddDownload(GameConfig.LocalGameVersion.AssetRemoteAddress + HotUpdateDirName + Separator + assetUrl,
+                        Application.persistentDataPath + "/HotUpdate/" + result);
+                    tempDownloadUrl.Add(assetUrl);
+                }
             }
             
             // 下载器开始下载
@@ -259,7 +264,7 @@ namespace F8Framework.Core
         // 检查需要下载的分包
         public List<string> CheckPackageUpdate(List<string> subPackage)
         {
-            List<string> temp = new List<string>();
+            List<string> temp = new List<string>(subPackage.Count);
             foreach (var package in subPackage)
             {
                 if (GameConfig.LocalGameVersion.SubPackage.Contains(package))
@@ -291,7 +296,7 @@ namespace F8Framework.Core
                 return;
             }
             
-            List<string> downloadPaths = new List<string>();
+            List<string> downloadPaths = new List<string>(subPackages.Count);
             
             // 创建分包下载器
             packageDownloader = DownloadManager.Instance.CreateDownloader("packageDownloader", new Downloader());
