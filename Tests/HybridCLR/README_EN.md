@@ -11,7 +11,18 @@
    * 解除注释状态，如下代码
 3. 补充元数据（可选项），具体看[ 官方教程（使用泛型） ](https://hybridclr.doc.code-philosophy.com/docs/beginner/generic)
 ```C#
-[MenuItem("开发工具/3: 生成并复制热更新Dll-F8",false,210)]
+// 补充元数据，不会热更新此处的dll，一般在{project}/HybridCLRData/AssembliesPostIl2CppStrip/{target}目录下
+public static List<string> AOTDllList = new List<string>
+{
+    "mscorlib.dll",
+    "System.dll",
+    "System.Core.dll", // 如果使用了Linq，需要这个
+    // "Newtonsoft.Json.dll", 
+    // "protobuf-net.dll",
+    "F8Framework.Core.dll", // 为了能使用框架中的泛型
+};
+
+[MenuItem("开发工具/3: 生成并复制热更新Dll-F8", false, 210)]
 public static void GenerateCopyHotUpdateDll()
 {
     // F8EditorPrefs.SetBool("compilationFinishedHotUpdateDll", false);
@@ -26,24 +37,13 @@ public static void GenerateCopyHotUpdateDll()
     //     var path =
     //         HybridCLR.Editor.SettingsUtil.GetHotUpdateDllsOutputDirByTarget(EditorUserBuildSettings
     //             .activeBuildTarget) + "/" + dll + ".dll";
-    //     Debug.Log("dll:"+path);
     //     FileTools.SafeCopyFile(
     //         HybridCLR.Editor.SettingsUtil.GetHotUpdateDllsOutputDirByTarget(EditorUserBuildSettings.activeBuildTarget) + "/" + dll + ".dll",
     //         outpath + dll + ".bytes");
     //     LogF8.LogAsset("生成并复制热更新dll：" + dll);
     // }
     //
-    // // 补充元数据
-    // List<string> aotDllList = new List<string>
-    // {
-    //     "mscorlib.dll",
-    //     "System.dll",
-    //     "System.Core.dll", // 如果使用了Linq，需要这个
-    //     // "Newtonsoft.Json.dll", 
-    //     // "protobuf-net.dll",
-    // };
-    //
-    // foreach (var aotDllName in aotDllList)
+    // foreach (var aotDllName in F8Helper.AOTDllList)
     // {
     //     var mscorlibsouPath =
     //         HybridCLR.Editor.SettingsUtil.GetAssembliesPostIl2CppStripDir(EditorUserBuildSettings
@@ -52,7 +52,7 @@ public static void GenerateCopyHotUpdateDll()
     //     FileTools.SafeCopyFile(
     //         mscorlibsouPath,
     //         outpath + aotDllName + "by.bytes");
-    //     LogF8.LogAsset("生成并复制源数据dll：" + aotDllName);
+    //     LogF8.LogAsset("生成并复制补充元数据dll：" + aotDllName);
     // }
     //
     // AssetDatabase.Refresh();
@@ -111,6 +111,7 @@ public class LoadDll : MonoBehaviour
                 "System.Core.dll", // 如果使用了Linq，需要这个
                 // "Newtonsoft.Json.dll", 
                 // "protobuf-net.dll",
+                "F8Framework.Core.dll", // 为了能使用框架中的泛型
             };
 
             foreach (var aotDllName in aotDllList)

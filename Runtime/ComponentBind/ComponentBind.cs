@@ -96,9 +96,11 @@ namespace F8Framework.Core
                             continue;
                         componentNames.Add(componentType);
 
-                        if (componentType != typeof(UnityEngine.GameObject).ToString() && !child.GetComponent(componentType))
+                        string extension = System.IO.Path.GetExtension(componentType);
+                        string typeToCheck = string.IsNullOrEmpty(extension) ? componentType : extension[1..];
+                        if (componentType != typeof(UnityEngine.GameObject).ToString() && !child.GetComponent(typeToCheck))
                             continue;
-                            
+                        
                         string normalizeName = RemoveSpecialCharacters(child.gameObject.name);
 
                         string normalizeKey = RemoveSpecialCharacters(key);

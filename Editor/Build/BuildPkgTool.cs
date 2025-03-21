@@ -85,6 +85,10 @@ namespace F8Framework.Core.Editor
                 
                 if (assetMapping == null || resAssetMapping.Value.MD5 != assetMapping.MD5) // 新增资源，MD5不同则需更新
                 {
+                    if (F8Helper.AOTDllList.Contains(resAssetMapping.Key + "by")) // 忽略补充元数据Dll的更新
+                    {
+                        continue;
+                    }
                     generateAssetBundleMappings.TryAdd(resAssetMapping.Key, resAssetMapping.Value);
                     assetBundleMappings[resAssetMapping.Key] = resAssetMapping.Value;
                 }
