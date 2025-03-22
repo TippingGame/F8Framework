@@ -147,7 +147,8 @@ namespace F8Framework.Core
             {
                 assetBundleMappings.TryGetValue(resAssetMapping.Key, out AssetBundleMap.AssetMapping assetMapping);
                 
-                if (assetMapping == null || resAssetMapping.Value.MD5 != assetMapping.MD5) // 新增资源，MD5不同则需更新
+                if ((assetMapping == null || resAssetMapping.Value.MD5 != assetMapping.MD5) // 新增资源，MD5不同则需更新
+                    && !resAssetMapping.Value.AbName.IsNullOrEmpty() && !resAssetMapping.Value.MD5.IsNullOrEmpty())
                 {
                     string abPath = resAssetMapping.Value.Version + "/" + URLSetting.AssetBundlesName + "/" +
                                               URLSetting.GetPlatformName() + "/" + resAssetMapping.Value.AbName;
@@ -161,10 +162,6 @@ namespace F8Framework.Core
                     }
                     allSize += string.IsNullOrEmpty(resAssetMapping.Value.Size) ? 0 : long.Parse(resAssetMapping.Value.Size) ;
                     hotUpdateAssetUrl.TryAdd(resAssetMapping.Key, abPath);
-                }
-                else if(GameConfig.CompareVersions(assetMapping.Version, resAssetMapping.Value.Version) < 0) // 版本修正
-                {
-                    resAssetMapping.Value.Version = assetMapping.Version;
                 }
             }
             
