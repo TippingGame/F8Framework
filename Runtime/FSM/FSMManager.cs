@@ -6,6 +6,8 @@ namespace F8Framework.Core
 {
     // 有限状态机管理器类
     [UpdateRefresh]
+    [FixedUpdateRefresh]
+    [LateUpdateRefresh]
     public sealed class FSMManager : ModuleSingleton<FSMManager>, IModule
     {
         // 单个状态机字典
@@ -269,21 +271,26 @@ namespace F8Framework.Core
         // 在更新时调用
         public void OnUpdate()
         {
-            if (fsmDict.Count > 0)
-                foreach (var fsm in fsmDict)
-                {
-                    fsm.Value.OnRefresh();
-                }
+            foreach (var fsm in fsmDict)
+            {
+                fsm.Value.OnRefresh();
+            }
         }
 
         public void OnLateUpdate()
         {
-            
+            foreach (var fsm in fsmDict)
+            {
+                fsm.Value.OnLateRefresh();
+            }
         }
 
         public void OnFixedUpdate()
         {
-            
+            foreach (var fsm in fsmDict)
+            {
+                fsm.Value.OnFixedRefresh();
+            }
         }
 
         public void OnTermination()

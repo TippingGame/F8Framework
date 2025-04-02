@@ -46,6 +46,14 @@ namespace F8Framework.Tests
         {
         }
 
+        public override void OnStateLateUpdate(IFSM<Transform> fsm)
+        {
+        }
+
+        public override void OnStateFixedUpdate(IFSM<Transform> fsm)
+        {
+        }
+
         public override void OnStateExit(IFSM<Transform> fsm)
         {
         }
@@ -80,6 +88,14 @@ namespace F8Framework.Tests
         }
 
         public override void OnStateUpdate(IFSM<Transform> fsm)
+        {
+        }
+
+        public override void OnStateLateUpdate(IFSM<Transform> fsm)
+        {
+        }
+
+        public override void OnStateFixedUpdate(IFSM<Transform> fsm)
         {
         }
 

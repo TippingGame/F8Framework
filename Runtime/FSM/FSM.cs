@@ -129,6 +129,20 @@ namespace F8Framework.Core
             currentState?.OnStateUpdate(this);
         }
         
+        public override void OnLateRefresh()
+        {
+            if (Pause)
+                return;
+            currentState?.OnStateLateUpdate(this);
+        }
+        
+        public override void OnFixedRefresh()
+        {
+            if (Pause)
+                return;
+            currentState?.OnStateFixedUpdate(this);
+        }
+        
         // 关闭 FSM
         public override void Shutdown()
         {

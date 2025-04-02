@@ -25,6 +25,10 @@ namespace F8Framework.Core
         
         public abstract void OnRefresh();
         
+        public abstract void OnLateRefresh();
+        
+        public abstract void OnFixedRefresh();
+        
         public abstract void Shutdown();
     }
 }

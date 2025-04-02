@@ -50,6 +50,10 @@ namespace F8Framework.Core
         // 状态更新方法，由子类实现具体逻辑
         public abstract void OnStateUpdate(IFSM<T> fsm);
         
+        public abstract void OnStateLateUpdate(IFSM<T> fsm);
+        
+        public abstract void OnStateFixedUpdate(IFSM<T> fsm);
+        
         // 刷新状态转换，检查是否需要进行状态转换
         public virtual void RefreshSwitch(IFSM<T> fsm)
         {

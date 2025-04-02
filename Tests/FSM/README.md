@@ -58,6 +58,14 @@ public class EnterRangeState : FSMState<Transform>
     {
     }
     
+    public override void OnStateLateUpdate(IFSM<Transform> fsm)
+    {
+    }
+    
+    public override void OnStateFixedUpdate(IFSM<Transform> fsm)
+    {
+    }
+    
     public override void OnStateExit(IFSM<Transform> fsm)
     {
     }
@@ -91,6 +99,14 @@ public class ExitRangeState : FSMState<Transform>
     }
     
     public override void OnStateUpdate(IFSM<Transform> fsm)
+    {
+    }
+    
+    public override void OnStateLateUpdate(IFSM<Transform> fsm)
+    {
+    }
+    
+    public override void OnStateFixedUpdate(IFSM<Transform> fsm)
     {
     }
     
