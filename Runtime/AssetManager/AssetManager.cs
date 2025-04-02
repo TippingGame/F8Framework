@@ -2024,16 +2024,7 @@ namespace F8Framework.Core
             {
                 _assetBundleManager = ModuleCenter.CreateModule<AssetBundleManager>();
                 _resourcesManager = ModuleCenter.CreateModule<ResourcesManager>();
-                if (File.Exists(Application.persistentDataPath + "/" + nameof(AssetBundleMap) + ".json"))
-                {
-                    string json =
-                        FileTools.SafeReadAllText(Application.persistentDataPath + "/" + nameof(AssetBundleMap) + ".json");
-                    AssetBundleMap.Mappings = Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(json);
-                }
-                else
-                {
-                    AssetBundleMap.Mappings = Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(Resources.Load<TextAsset>(nameof(AssetBundleMap)).ToString());
-                }
+                AssetBundleMap.Mappings = Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(Resources.Load<TextAsset>(nameof(AssetBundleMap)).ToString());
                 ResourceMap.Mappings = Util.LitJson.ToObject<Dictionary<string, string[]>>(Resources.Load<TextAsset>(nameof(ResourceMap)).ToString());
             }
 

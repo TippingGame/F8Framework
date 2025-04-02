@@ -62,7 +62,7 @@ namespace F8Framework.Core.Editor
             
             string gameVersionPath = buildPath + HotUpdateManager.RemoteDirName + "/" + nameof(GameVersion) + ".json";
             string assetBundleMapPath = buildPath + HotUpdateManager.RemoteDirName + "/" + nameof(AssetBundleMap) + ".json";
-            string hotUpdateMapPath = buildPath + HotUpdateManager.RemoteDirName + "/HotUpdate" +
+            string hotUpdateMapPath = buildPath + HotUpdateManager.RemoteDirName + HotUpdateManager.HotUpdateDirName +
                                       HotUpdateManager.Separator + nameof(AssetBundleMap) + ".json";
             if (!File.Exists(gameVersionPath) || !File.Exists(assetBundleMapPath))
             {
@@ -91,6 +91,7 @@ namespace F8Framework.Core.Editor
                     }
                     generateAssetBundleMappings.TryAdd(resAssetMapping.Key, resAssetMapping.Value);
                     assetBundleMappings[resAssetMapping.Key] = resAssetMapping.Value;
+                    assetBundleMappings[resAssetMapping.Key].Updated = "1";
                 }
             }
             
@@ -648,7 +649,7 @@ namespace F8Framework.Core.Editor
             string assetBundleMapPath = Application.dataPath + "/F8Framework/AssetMap/Resources/" + nameof(AssetBundleMap) + ".json";
             FileTools.SafeCopyFile(assetBundleMapPath, buildPath + HotUpdateManager.RemoteDirName + "/" + nameof(AssetBundleMap) + ".json");
             
-            string hotUpdateMapPath = buildPath + HotUpdateManager.RemoteDirName + "/HotUpdate" + HotUpdateManager.Separator + nameof(AssetBundleMap) + ".json";
+            string hotUpdateMapPath = buildPath + HotUpdateManager.RemoteDirName + HotUpdateManager.HotUpdateDirName + HotUpdateManager.Separator + nameof(AssetBundleMap) + ".json";
             if (!File.Exists(hotUpdateMapPath))
             {
                 FileTools.SafeCopyFile(assetBundleMapPath, hotUpdateMapPath);

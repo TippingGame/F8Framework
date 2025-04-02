@@ -54,7 +54,6 @@ namespace F8Framework.Core
             string path = GameConfig.LocalGameVersion.AssetRemoteAddress + "/" + nameof(GameVersion) + ".json";
             LogF8.Log($"初始化远程版本：{path}");
             
-            
             UnityWebRequest webRequest = UnityWebRequest.Get(path);
             yield return webRequest.SendWebRequest();
 #if UNITY_2020_2_OR_NEWER
@@ -83,8 +82,9 @@ namespace F8Framework.Core
                 yield break;
             }
 
-            string path = GameConfig.LocalGameVersion.AssetRemoteAddress + "/HotUpdate" + Separator + nameof(AssetBundleMap) + ".json";
+            string path = GameConfig.LocalGameVersion.AssetRemoteAddress + HotUpdateDirName + Separator + nameof(AssetBundleMap) + ".json";
             LogF8.Log($"始化资源版本：{path}");
+            
             UnityWebRequest webRequest = UnityWebRequest.Get(path);
             yield return webRequest.SendWebRequest();
 #if UNITY_2020_2_OR_NEWER
@@ -103,6 +103,12 @@ namespace F8Framework.Core
             }
             webRequest.Dispose();
             webRequest = null;
+            
+            if (File.Exists(Application.persistentDataPath + "/" + nameof(AssetBundleMap) + ".json"))
+            {
+                string json = FileTools.SafeReadAllText(Application.persistentDataPath + "/" + nameof(AssetBundleMap) + ".json");
+                AssetBundleMap.Mappings = Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(json);
+            }
         }
         
         // 游戏修复，资源清理
@@ -179,12 +185,14 @@ namespace F8Framework.Core
         {
             if (!GameConfig.LocalGameVersion.EnableHotUpdate)
             {
+                WriteVersion();
                 completed?.Invoke();
                 return;
             }
             
             if (hotUpdateAssetUrl.Count <= 0)
             {
+                WriteVersion();
                 completed?.Invoke();
                 return;
             }
@@ -219,24 +227,7 @@ namespace F8Framework.Core
             hotUpdateDownloader.OnAllDownloadTaskCompleted += (eventArgs) =>
             {
                 LogF8.LogVersion($"所有热更资源获取完成！，用时：{eventArgs.TimeSpan}");
-                GameConfig.LocalGameVersion.Version = GameConfig.RemoteGameVersion.Version;
-                GameConfig.LocalGameVersion.HotUpdateVersion = new List<string>();
-                FileTools.SafeWriteAllText(Application.persistentDataPath + "/" + nameof(GameVersion) + ".json",
-                    Util.LitJson.ToJson(GameConfig.LocalGameVersion));
-                foreach (var asssetName in hotUpdateAssetUrl.Keys)
-                {
-                    if (GameConfig.RemoteAssetBundleMap.TryGetValue(asssetName, out AssetBundleMap.AssetMapping assetMapping))
-                    {
-                        if (assetMapping != null)
-                        {
-                            assetMapping.Updated = "1";
-                        }
-                    }
-                }
-                AssetBundleMap.Mappings = GameConfig.RemoteAssetBundleMap;
-                FileTools.SafeWriteAllText(Application.persistentDataPath + "/" + nameof(AssetBundleMap) + ".json",
-                    Util.LitJson.ToJson(AssetBundleMap.Mappings));
-                
+                WriteVersion();
                 completed?.Invoke();
             };
 
@@ -249,11 +240,21 @@ namespace F8Framework.Core
                     int index = assetUrl.IndexOf('/');
                     string result = assetUrl.Substring(index + 1);
                     hotUpdateDownloader.AddDownload(GameConfig.LocalGameVersion.AssetRemoteAddress + HotUpdateDirName + Separator + assetUrl,
-                        Application.persistentDataPath + "/HotUpdate/" + result);
+                        Application.persistentDataPath + HotUpdateDirName + "/" + result);
                     tempDownloadUrl.Add(assetUrl);
                 }
             }
-            
+            void WriteVersion()
+            {
+                GameConfig.LocalGameVersion.Version = GameConfig.RemoteGameVersion.Version;
+                GameConfig.LocalGameVersion.HotUpdateVersion = new List<string>();
+                FileTools.SafeWriteAllText(Application.persistentDataPath + "/" + nameof(GameVersion) + ".json",
+                    Util.LitJson.ToJson(GameConfig.LocalGameVersion));
+                
+                AssetBundleMap.Mappings = GameConfig.RemoteAssetBundleMap;
+                FileTools.SafeWriteAllText(Application.persistentDataPath + "/" + nameof(AssetBundleMap) + ".json",
+                    Util.LitJson.ToJson(AssetBundleMap.Mappings));
+            }
             // 下载器开始下载
             hotUpdateDownloader.LaunchDownload();
         }
