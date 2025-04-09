@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.5.121] - 2025-04-09
+1.优化FSM模块GetFSM方法，完善文档  
+
 ## [1.5.120] - 2025-04-02
 1.FSM模块新增OnLateUpdate和OnFixedUpdate轮询  
 

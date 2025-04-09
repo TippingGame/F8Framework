@@ -26,16 +26,16 @@ namespace F8Framework.Core
         public int FSMGroupCount { get { return fsmGroupDict.Count; } }
         
         // 根据类型获取 FSM
-        public FSMBase GetFSM<T>() where T : class
+        public FSMBase GetFSM<T>(string name = "") where T : class
         {
-            Type type = typeof(T).GetType();
-            return GetFSM(type);
+            Type type = typeof(T);
+            return GetFSM(type, name);
         }
         
         // 根据类型获取 FSM
-        public FSMBase GetFSM(Type type)
+        public FSMBase GetFSM(Type type, string name = "")
         {
-            fsmDict.TryGetValue(new TypeStringPair(type), out var fsm);
+            fsmDict.TryGetValue(new TypeStringPair(type, name), out var fsm);
             return fsm;
         }
         
@@ -46,13 +46,13 @@ namespace F8Framework.Core
         }
         
         // 检查是否存在指定名称的 FSM
-        public bool HasFSM<T>(string name) where T : class
+        public bool HasFSM<T>(string name = "") where T : class
         {
             return HasFSM(typeof(T), name);
         }
         
         // 检查是否存在指定名称的 FSM
-        public bool HasFSM(Type type, string name)
+        public bool HasFSM(Type type, string name = "")
         {
             return fsmDict.ContainsKey(new TypeStringPair(type, name));
         }
@@ -164,16 +164,16 @@ namespace F8Framework.Core
         }
         
         // 销毁 FSM
-        public void DestoryFSM<T>() where T : class
+        public void DestoryFSM<T>(string name = "") where T : class
         {
-            DestoryFSM(typeof(T));
+            DestoryFSM(typeof(T), name);
         }
         
         // 销毁 FSM
-        public void DestoryFSM(Type type)
+        public void DestoryFSM(Type type, string name = "")
         {
             FSMBase fsm = null;
-            var fsmKey = new TypeStringPair(type);
+            var fsmKey = new TypeStringPair(type, name);
             if (fsmDict.TryGetValue(fsmKey, out fsm))
             {
                 fsm.Shutdown();

@@ -15,30 +15,58 @@ Unity F8 FSM有限状态机组件。
 
 ### 代码使用方法
 ```C#
-/*------------------------------FSM使用------------------------------*/
-    public Transform Target;
-    public Transform objectA;
+public Transform Target;
+public Transform objectA;
 
-    private void Start()
-    {
-        // 创建两个状态
-        var enterState = new EnterRangeState();
-        var exitState = new ExitRangeState();
-        
-        // 创建两个状态切换的时机
-        var enterSwitch = new EnterSwitch();
-        var exitSwitch = new ExitSwitch();
-        exitState.AddSwitch(exitSwitch, typeof(EnterRangeState));
-        enterState.AddSwitch(enterSwitch, typeof(ExitRangeState));
+private void Start()
+{
+    /*-------------------------------------基础功能-------------------------------------*/
+    // 创建两个状态
+    var enterState = new EnterRangeState();
+    var exitState = new ExitRangeState();
 
-        // 创建有限状态机
-        IFSM<Transform> fsmA = FF8.FSM.CreateFSM("FSMTesterA", objectA, exitState, enterState);
-        fsmA.DefaultState = exitState;
-        fsmA.ChangeToDefaultState();
+    // 创建两个状态切换的时机（可选）
+    var enterSwitch = new EnterSwitch();
+    var exitSwitch = new ExitSwitch();
+    exitState.AddSwitch(exitSwitch, typeof(EnterRangeState));
+    enterState.AddSwitch(enterSwitch, typeof(ExitRangeState));
 
-        // 切换状态
-        fsmA.ChangeState<ExitRangeState>();
-    }
+    // 创建有限状态机
+    IFSM<Transform> fsmA = FF8.FSM.CreateFSM("FSMTesterA", objectA, "FSMGroupName", exitState, enterState);
+    fsmA.DefaultState = exitState;
+    fsmA.ChangeToDefaultState();
+
+    // 切换状态
+    fsmA.ChangeState<ExitRangeState>();
+
+    
+    /*-------------------------------------其他功能-------------------------------------*/
+    // 获取 FSM
+    FF8.FSM.GetFSM<Transform>("FSMTesterA");
+    
+    // 是否存在指定名称的 FSM
+    FF8.FSM.HasFSM<Transform>("FSMTesterA");
+    
+    // 设置 FSM 群组
+    FF8.FSM.SetFSMGroup<Transform>("FSMTesterA", "FSMGroupName");
+    
+    // 获取所有 FSM
+    IList<FSMBase> fsms = FF8.FSM.GetAllFSMs();
+    
+    // 是否存在 FSM 群组
+    bool hasFSMGroup1 = FF8.FSM.HasFSMGroup("FSMGroupName");
+    
+    // 获取 FSM 群组
+    bool hasFSMGroup2 = FF8.FSM.PeekFSMGroup("FSMGroupName", out var fsmGroup);
+    
+    // 移除 FSM 群组
+    FF8.FSM.RemoveFSMGroup("FSMGroupName");
+    
+    // 销毁 FSM
+    FF8.FSM.DestoryFSM<Transform>("FSMTesterA");
+    
+    // 销毁所有 FSM
+    FF8.FSM.DestoryAllFSM();
 }
 
 /*------------------------------继承FSMState/FSMSwitch使用------------------------------*/

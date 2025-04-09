@@ -11,12 +11,11 @@ namespace F8Framework.Core
         string _string;
         public Type Type { get { return type; } }
         public string String { get { return _string; } }
-        public TypeStringPair(Type type, string str)
+        public TypeStringPair(Type type, string str = "")
         {
             this.type = type;
             this._string = str;
         }
-        public TypeStringPair(Type type) : this(type, string.Empty) { }
         public void Clear()
         {
             type = default;
