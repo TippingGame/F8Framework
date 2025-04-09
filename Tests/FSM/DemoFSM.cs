@@ -24,7 +24,7 @@ namespace F8Framework.Tests
             enterState.AddSwitch(enterSwitch, typeof(ExitRangeState));
 
             // 创建有限状态机
-            IFSM<Transform> fsmA = FF8.FSM.CreateFSM("FSMTesterA", objectA, "FSMGroupName", exitState, enterState);
+            IFSM<Transform> fsmA = FF8.FSM.CreateFSM<Transform>("FSMTesterA", objectA, "FSMGroupName", exitState, enterState);
             fsmA.DefaultState = exitState;
             fsmA.ChangeToDefaultState();
 
