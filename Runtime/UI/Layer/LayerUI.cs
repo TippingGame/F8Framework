@@ -26,11 +26,11 @@ namespace F8Framework.Core
 
         public void Init(int sortOrder = 0, string sortingLayerName = "Default", RenderMode renderMode = RenderMode.ScreenSpaceOverlay, bool pixelPerfect = false, UnityEngine.Camera camera = null)
         {
+            _canvas.renderMode = renderMode;
+            _canvas.worldCamera = camera;
             _canvas.sortingOrder = sortOrder;
             _canvas.sortingLayerName = sortingLayerName;
-            _canvas.renderMode = renderMode;
             _canvas.pixelPerfect = pixelPerfect;
-            _canvas.worldCamera = camera;
         }
         
         public void SetCanvasScaler(CanvasScaler.ScaleMode scaleMode = CanvasScaler.ScaleMode.ConstantPixelSize,

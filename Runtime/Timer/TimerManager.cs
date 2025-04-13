@@ -80,6 +80,7 @@ namespace F8Framework.Core
                             timer.Field = field; // 更新计时器剩余字段值
                             timer.OnSecond?.Invoke();
                             OnTimerComplete(timer);
+                            break;
                         }
                         else
                         {

@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.5.122] - 2025-04-13
+1.修复UI模块SetCanvas方法设置sortingLayerName不生效的问题  
+2.修复Timer模块帧计时器结束会重复执行的问题  
+
 ## [1.5.121] - 2025-04-09
 1.优化FSM模块GetFSM方法，完善文档  
 
