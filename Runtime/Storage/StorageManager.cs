@@ -186,20 +186,29 @@ namespace F8Framework.Core
                 PlayerPrefs.SetInt(GetKeywords(key, user), value ? 1 : 0);
             }
         }
-        
+
         /// <summary>
         /// 从指定游戏配置项中读取对象。
         /// </summary>
         /// <typeparam name="T">要读取对象的类型。</typeparam>
         /// <param name="key">要获取游戏配置项的名称。</param>
+        /// <param name="user">是否用户独有数据</param>
         /// <returns>读取的对象。</returns>
-         public T GetObject<T>(string key, bool user = false)
+        public T GetObject<T>(string key, bool user = false)
          {
              string keywords = GetKeywords(key, user);
              if (PlayerPrefs.HasKey(keywords))
              {
                  string jsonString = GetString(key, "", user);
-                 return Util.LitJson.ToObject<T>(jsonString);
+                 try
+                 {
+                     return Util.LitJson.ToObject<T>(jsonString);
+                 }
+                 catch (System.Exception ex)
+                 {
+                     LogF8.LogException(ex);
+                     return default(T);
+                 }
              }
 
              return default(T);
@@ -209,8 +218,9 @@ namespace F8Framework.Core
         /// 向指定游戏配置项写入对象。
         /// </summary>
         /// <typeparam name="T">要写入对象的类型。</typeparam>
-        /// <param name="settingName">要写入游戏配置项的名称。</param>
+        /// <param name="key">要写入游戏配置项的名称。</param>
         /// <param name="obj">要写入的对象。</param>
+        /// <param name="user">是否用户独有数据</param>
         public void SetObject<T>(string key, T obj, bool user = false)
         {
             if (obj == null)
@@ -218,7 +228,15 @@ namespace F8Framework.Core
                 LogF8.LogError("本地数据存入对象不能为空");
                 return;
             }
-            SetString(key, Util.LitJson.ToJson(obj), user);
+            try
+            {
+                string json = Util.LitJson.ToJson(obj);
+                SetString(key, json, user);
+            }
+            catch (System.Exception ex)
+            {
+                LogF8.LogException(ex);
+            }
         }
         
         public void Remove(string key, bool user = false)

@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.5.123] - 2025-04-23
+1.优化UI模块Notify层级UI默认会Destroy  
+2.优化Storage模块获取和设置Object数据容错  
+
 ## [1.5.122] - 2025-04-13
 1.修复UI模块SetCanvas方法设置sortingLayerName不生效的问题  
 2.修复Timer模块帧计时器结束会重复执行的问题  
