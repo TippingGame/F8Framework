@@ -246,20 +246,14 @@ namespace F8Framework.Core
             }
             void WriteVersion()
             {
-                if (!GameConfig.RemoteGameVersion.Version.IsNullOrEmpty())
-                {
-                    GameConfig.LocalGameVersion.Version = GameConfig.RemoteGameVersion.Version;
-                    GameConfig.LocalGameVersion.HotUpdateVersion = new List<string>();
-                    FileTools.SafeWriteAllText(Application.persistentDataPath + "/" + nameof(GameVersion) + ".json",
-                        Util.LitJson.ToJson(GameConfig.LocalGameVersion));
-                }
+                GameConfig.LocalGameVersion.Version = GameConfig.RemoteGameVersion.Version;
+                GameConfig.LocalGameVersion.HotUpdateVersion = new List<string>();
+                FileTools.SafeWriteAllText(Application.persistentDataPath + "/" + nameof(GameVersion) + ".json",
+                    Util.LitJson.ToJson(GameConfig.LocalGameVersion));
                 
-                if (GameConfig.RemoteAssetBundleMap.Count > 0)
-                {
-                    AssetBundleMap.Mappings = GameConfig.RemoteAssetBundleMap;
-                    FileTools.SafeWriteAllText(Application.persistentDataPath + "/" + nameof(AssetBundleMap) + ".json",
-                        Util.LitJson.ToJson(AssetBundleMap.Mappings));
-                }
+                AssetBundleMap.Mappings = GameConfig.RemoteAssetBundleMap;
+                FileTools.SafeWriteAllText(Application.persistentDataPath + "/" + nameof(AssetBundleMap) + ".json",
+                    Util.LitJson.ToJson(AssetBundleMap.Mappings));
             }
             // 下载器开始下载
             hotUpdateDownloader.LaunchDownload();
