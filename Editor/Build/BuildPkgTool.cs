@@ -118,16 +118,16 @@ namespace F8Framework.Core.Editor
         // 运行导出的游戏
         public static void RunExportedGame()
         {
-            string path = F8EditorPrefs.GetString(_locationPathNameKey, "");
-            if (File.Exists(path))
-            {
-                System.Diagnostics.Process.Start(path);
-                LogF8.LogVersion("已运行导出的游戏：" + path);
-            }
-            else
-            {
-                LogF8.LogError("无法打开导出的游戏文件：" + path);
-            }
+            // string path = F8EditorPrefs.GetString(_locationPathNameKey, "");
+            // if (File.Exists(path))
+            // {
+            //     System.Diagnostics.Process.Start(path);
+            //     LogF8.LogVersion("已运行导出的游戏：" + path);
+            // }
+            // else
+            // {
+            //     LogF8.LogError("无法打开导出的游戏文件：" + path);
+            // }
         }
         
         /// <summary>
@@ -177,8 +177,15 @@ namespace F8Framework.Core.Editor
                 string locationPathName = buildPath + "/" + buildTarget.ToString() + "_Full_" + toVersion  + "/" + appName;
                 F8EditorPrefs.SetString(_locationPathNameKey, locationPathName);
                 FileTools.CheckFileAndCreateDirWhenNeeded(locationPathName);
-                BuildReport buildReport =
-                    BuildPipeline.BuildPlayer(GetBuildScenes(), locationPathName, buildTarget, BuildOptions.None);
+                
+                BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions
+                {
+                    scenes = GetBuildScenes(),
+                    locationPathName = locationPathName,
+                    target = buildTarget,
+                    options = F8EditorPrefs.GetBool("compilationFinishedBuildRun") ? BuildOptions.AutoRunPlayer : BuildOptions.ShowBuiltPlayer,
+                };
+                BuildReport buildReport = BuildPipeline.BuildPlayer(buildPlayerOptions);
                 if (buildReport.summary.result != BuildResult.Succeeded)
                 {
                     LogF8.LogError($"导出失败了，检查一下 Unity 内置的 Build Settings 导出的路径是否存在，Unity 没有给我清理缓存！: {buildReport.summary.result}");
@@ -219,8 +226,15 @@ namespace F8Framework.Core.Editor
                 string locationPathName = buildPath + "/" + buildTarget.ToString() + "_Optional_" + toVersion  + "/" + appName;
                 F8EditorPrefs.SetString(_locationPathNameKey, locationPathName);
                 FileTools.CheckFileAndCreateDirWhenNeeded(locationPathName);
-                BuildReport buildReport =
-                    BuildPipeline.BuildPlayer(GetBuildScenes(), locationPathName, buildTarget, BuildOptions.None);
+                
+                BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions
+                {
+                    scenes = GetBuildScenes(),
+                    locationPathName = locationPathName,
+                    target = buildTarget,
+                    options = F8EditorPrefs.GetBool("compilationFinishedBuildRun") ? BuildOptions.AutoRunPlayer : BuildOptions.ShowBuiltPlayer,
+                };
+                BuildReport buildReport = BuildPipeline.BuildPlayer(buildPlayerOptions);
                 if (buildReport.summary.result != BuildResult.Succeeded)
                 {
                     LogF8.LogError($"导出失败了，检查一下 Unity 内置的 Build Settings 导出的路径是否存在，Unity 没有给我清理缓存！: {buildReport.summary.result}");
@@ -255,8 +269,15 @@ namespace F8Framework.Core.Editor
                 string locationPathName = buildPath + "/" + buildTarget.ToString() + "_Null_" + toVersion  + "/" + appName;
                 F8EditorPrefs.SetString(_locationPathNameKey, locationPathName);
                 FileTools.CheckFileAndCreateDirWhenNeeded(locationPathName);
-                BuildReport buildReport =
-                    BuildPipeline.BuildPlayer(GetBuildScenes(), locationPathName, buildTarget, BuildOptions.None);
+                
+                BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions
+                {
+                    scenes = GetBuildScenes(),
+                    locationPathName = locationPathName,
+                    target = buildTarget,
+                    options = F8EditorPrefs.GetBool("compilationFinishedBuildRun") ? BuildOptions.AutoRunPlayer : BuildOptions.ShowBuiltPlayer,
+                };
+                BuildReport buildReport = BuildPipeline.BuildPlayer(buildPlayerOptions);
                 if (buildReport.summary.result != BuildResult.Succeeded)
                 {
                     LogF8.LogError($"导出失败了，检查一下 Unity 内置的 Build Settings 导出的路径是否存在，Unity 没有给我清理缓存！: {buildReport.summary.result}");
@@ -472,6 +493,7 @@ namespace F8Framework.Core.Editor
                     if (EditorUtility.DisplayDialog("打包游戏", countent, "确定", "取消"))
                     {
                         F8EditorPrefs.SetBool("compilationFinishedBuildPkg", true);
+                        F8EditorPrefs.SetBool("compilationFinishedBuildRun", false);
                         EditorApplication.delayCall += WriteGameVersion;
                         EditorApplication.delayCall += F8Helper.F8Run;
                     }
@@ -491,6 +513,7 @@ namespace F8Framework.Core.Editor
                     if (EditorUtility.DisplayDialog("构建热更新包", countent, "确定", "取消"))
                     {
                         F8EditorPrefs.SetBool("compilationFinishedBuildUpdate", true);
+                        F8EditorPrefs.SetBool("compilationFinishedBuildRun", false);
                         EditorApplication.delayCall += F8Helper.F8Run;
                     }
                 }
