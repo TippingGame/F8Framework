@@ -1004,7 +1004,7 @@ namespace F8Framework.Core
         public void OnInit(object createParam)
         {
 #if UNITY_WEBGL
-            LogF8.LogAsset("（提示）由于WebGL需要异步加载AssetBundleManifest，已在资产模块之后加上：yield return AssetBundleManager.Instance.LoadAssetBundleManifest();");
+            
 #else
             string manifestPath = GetAssetBundlePathByAbName(URLSetting.GetPlatformName());
             if (manifestPath == null)

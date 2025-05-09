@@ -74,7 +74,6 @@ namespace F8Framework.Core
             
             // 必须先加载本地化配置表
 #if UNITY_WEBGL
-            LogF8.LogConfig("（提示）由于WebGL需要异步加载本地化表，已在本地化模块之前加上：yield return F8DataManager.Instance.LoadLocalizedStringsIEnumerator();");
             LoadSuccess();
 #else
             try

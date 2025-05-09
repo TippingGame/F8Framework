@@ -40,7 +40,7 @@ namespace F8Framework.Core
 				LogF8.LogError("MonoBehaviour 为空。");
 			if (_behaviour != null)
 			{
-				LogF8.LogError($"{nameof(ModuleCenter)} 已初始化。");
+				LogF8.LogModule($"{nameof(ModuleCenter)} 已初始化。");
 				return;
 			}
 
@@ -61,9 +61,9 @@ namespace F8Framework.Core
 			// 说明：初始化之后，如果忘记更新ModuleCenter
 			if (_frame == 0)
 			{
-				LogF8.LogError($"暂未调用轮询方法：ModuleCenter.Update");
-				LogF8.LogError($"暂未调用轮询方法：ModuleCenter.LateUpdate");
-				LogF8.LogError($"暂未调用轮询方法：ModuleCenter.FixedUpdate");
+				LogF8.LogModule($"暂未调用轮询方法：ModuleCenter.Update");
+				LogF8.LogModule($"暂未调用轮询方法：ModuleCenter.LateUpdate");
+				LogF8.LogModule($"暂未调用轮询方法：ModuleCenter.FixedUpdate");
 			}
 		}
 
@@ -219,13 +219,13 @@ namespace F8Framework.Core
 		{
 			if (priority < 0)
 			{
-				LogF8.LogError("优先级不能为负");
+				LogF8.LogModule("模块优先级不能为负");
 				priority = 0;
 			}
 			
 			if (Contains(typeof(T)))
 			{
-				LogF8.LogError($"游戏模块 {typeof(T)} 已存在");
+				LogF8.LogModule($"游戏模块 {typeof(T)} 已存在");
 				return GetModule<T>();
 			}
 			
