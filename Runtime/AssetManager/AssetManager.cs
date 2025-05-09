@@ -1067,23 +1067,23 @@ namespace F8Framework.Core
                     if (loader == null || loader.AssetBundleContent == null || loader.GetDependentNamesLoadFinished() < loader.AddDependentNames())
                     {
                         loader = AssetBundleManager.Instance.LoadAsync(assetName, typeof(T), info, subAssetName, (b) => {
-                            End(AssetBundleManager.Instance.GetAssetObject<T>(info.AssetBundlePath, info.AssetPath[0], subAssetName, out AssetBundleLoader loader2));
+                            T loadedAsset = AssetBundleManager.Instance.GetAssetObject<T>(info.AssetBundlePath, info.AssetPath[0], subAssetName, out _);
+            
+                            if (loadedAsset == null)
+                            {
+                                loader?.Expand(info.AssetPath[0], typeof(T), subAssetName);
+                                loadedAsset = AssetBundleManager.Instance.GetAssetObject<T>(info.AssetBundlePath, info.AssetPath[0], subAssetName, out _);
+                            }
+            
+                            End(loadedAsset);
                         });
                         return loader;
                     }
-                    else
-                    {
-                        T o = AssetBundleManager.Instance.GetAssetObject<T>(info.AssetBundlePath, info.AssetPath[0], subAssetName, out AssetBundleLoader loader3);
-                        if (o != null)
-                        {
-                            End(o);
-                            return loader3;
-                        }
-                        
-                        loader.Expand(info.AssetPath[0], typeof(T), subAssetName);
-                        End(AssetBundleManager.Instance.GetAssetObject<T>(info.AssetBundlePath, info.AssetPath[0], subAssetName, out AssetBundleLoader loader4));
-                        return loader4;
-                    }
+                    // 扩展并获取资源
+                    loader.Expand(info.AssetPath[0], typeof(T), subAssetName);
+                    T expandedAsset = AssetBundleManager.Instance.GetAssetObject<T>(info.AssetBundlePath, info.AssetPath[0], subAssetName, out AssetBundleLoader finalLoader);
+                    End(expandedAsset);
+                    return finalLoader;
                 }
                 
                 void End(T o = null)
@@ -1546,23 +1546,23 @@ namespace F8Framework.Core
                     if (loader == null || loader.AssetBundleContent == null || loader.GetDependentNamesLoadFinished() < loader.AddDependentNames())
                     {
                         loader = AssetBundleManager.Instance.LoadAsync(assetName, assetType, info, subAssetName, (b) => {
-                            End(AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], assetType, subAssetName, out AssetBundleLoader loader2));
+                            Object loadedAsset = AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], assetType, subAssetName, out _);
+            
+                            if (loadedAsset == null)
+                            {
+                                loader?.Expand(info.AssetPath[0], assetType, subAssetName);
+                                loadedAsset = AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], assetType, subAssetName, out _);
+                            }
+            
+                            End(loadedAsset);
                         });
                         return loader;
                     }
-                    else
-                    {
-                        Object o = AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], assetType, subAssetName, out AssetBundleLoader loader3);
-                        if (o != null)
-                        {
-                            End(o);
-                            return loader3;
-                        }
-            
-                        loader3.Expand(info.AssetPath[0], assetType, subAssetName);
-                        End(AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], assetType, subAssetName, out AssetBundleLoader loader4));
-                        return loader4;
-                    }
+                    // 扩展并获取资源
+                    loader.Expand(info.AssetPath[0], assetType, subAssetName);
+                    Object expandedAsset = AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], assetType, subAssetName, out AssetBundleLoader finalLoader);
+                    End(expandedAsset);
+                    return finalLoader;
                 }
 
                 void End(Object o = null)
@@ -1641,26 +1641,26 @@ namespace F8Framework.Core
                         return loader;
                     }
                     
-                    if (loader == null || loader.AssetBundleContent == null)
+                    if (loader == null || loader.AssetBundleContent == null || loader.GetDependentNamesLoadFinished() < loader.AddDependentNames())
                     {
                         loader = AssetBundleManager.Instance.LoadAsync(assetName, null, info, subAssetName, (b) => {
-                            End(AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], null, subAssetName, out AssetBundleLoader loader2));
+                            Object loadedAsset = AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], null, subAssetName, out _);
+            
+                            if (loadedAsset == null)
+                            {
+                                loader?.Expand(info.AssetPath[0], null, subAssetName);
+                                loadedAsset = AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], null, subAssetName, out _);
+                            }
+            
+                            End(loadedAsset);
                         });
                         return loader;
                     }
-                    else
-                    {
-                        Object o = AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], null, subAssetName, out AssetBundleLoader loader3);
-                        if (o != null)
-                        {
-                            End(o);
-                            return loader3;
-                        }
-            
-                        loader3.Expand(info.AssetPath[0], null, subAssetName);
-                        End(AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], null, subAssetName, out AssetBundleLoader loader4));
-                        return loader4;
-                    }
+                    // 扩展并获取资源
+                    loader.Expand(info.AssetPath[0], null, subAssetName);
+                    Object expandedAsset = AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], null, subAssetName, out AssetBundleLoader finalLoader);
+                    End(expandedAsset);
+                    return finalLoader;
                 }
 
                 void End(Object o = null)
