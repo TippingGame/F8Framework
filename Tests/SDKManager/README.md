@@ -94,7 +94,8 @@ Unity F8 SDKManager组件，与原生平台交互，接入多个平台或者渠�
 * 修改这两个文件对接SDK [F8SDKInterfaceUnity.h](https://github.com/TippingGame/F8Framework/blob/main/Plugins/iOS/SDKManager/F8SDKInterfaceUnity.h) 和 [F8SDKInterfaceUnity.mm](https://github.com/TippingGame/F8Framework/blob/main/Plugins/iOS/SDKManager/F8SDKInterfaceUnity.mm)
 
 ---
-
+## WebGL游戏
+* 注意：WebGL不能使用同步加载 AB 资源，可同步加载 Resources 资源
 ## 微信小游戏接入方法
 * 浏览[WebGL转微信小游戏](https://github.com/wechat-miniprogram/minigame-unity-webgl-transform)插件的使用方法，下载[ unitypackage ](https://game.weixin.qq.com/cgi-bin/gamewxagwasmsplitwap/getunityplugininfo?download=1)并导入至游戏项目中
 ---
@@ -120,13 +121,7 @@ private static bool appendHashToAssetBundleName = false;
 public static bool DisableUnityCacheOnWebGL = false;
 ```
 ---
-* 注意：WebGL不能使用同步加载（会自动转换为异步）
-1. [GameLauncher.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/Launcher/GameLauncher.cs)
-```C#
-yield return AssetBundleManager.Instance.LoadAssetBundleManifest(); // WebGL专用
-...
-yield return F8DataManager.Instance.LoadLocalizedStringsIEnumerator(); // WebGL专用
-```
+
 * （注意）由于微信小游戏只能使用远程AB加载，请点击F5，配置好资产远程地址后构建一次游戏。  
   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20241203214539_2.png)  
 * 也可以在此处直接修改 [GameVersion.json](https://github.com/TippingGame/F8Framework/blob/main/AssetMap/Resources/GameVersion.json) 里的 "AssetRemoteAddress" 参数  
