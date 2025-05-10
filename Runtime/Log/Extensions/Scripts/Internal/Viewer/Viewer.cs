@@ -20,6 +20,7 @@ namespace F8Framework.Core
         private int screenWidth = 0;
         private int screenHeight = 0;
 
+        private bool keyCodeEnable = false;
         private bool gestureEnable = false;
         private bool isTouchBegin = false;
         private float touchTime = 0f;
@@ -82,12 +83,17 @@ namespace F8Framework.Core
 
             systemLogView.Refresh();
         }
-
+        
         public void SetGestureEnable(bool enable)
         {
             gestureEnable = enable;
         }
-
+        
+        public void SetKeyCodeEnable(bool enable)
+        {
+            keyCodeEnable = enable;
+        }
+        
         private void Update()
         {
             if (pannel.activeSelf == false && gestureEnable == true)
@@ -174,7 +180,7 @@ namespace F8Framework.Core
 
         private void CheckKey(bool show)
         {
-            if (Input.GetKeyDown(KeyCode.BackQuote) == true)
+            if (Input.GetKeyDown(KeyCode.BackQuote) == true && keyCodeEnable)
             {
                 Show(show);
             }
