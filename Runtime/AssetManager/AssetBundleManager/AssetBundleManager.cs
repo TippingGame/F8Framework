@@ -987,17 +987,34 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
             manifestPath = Path.IsPathRooted(manifestPath) ? "file://" + manifestPath : manifestPath;
 #endif
-            DownloadRequest assetBundleDownloadRequest = new DownloadRequest(manifestPath, default);
-            yield return assetBundleDownloadRequest.SendAssetBundleDownloadRequestCoroutine(manifestPath);
-            if (assetBundleDownloadRequest.DownloadedAssetBundle)
+            if (FileTools.IsLegalURI(manifestPath))
             {
-                manifest = assetBundleDownloadRequest.DownloadedAssetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
-                manifest.GetAllAssetBundles();
-                assetBundleDownloadRequest.DownloadedAssetBundle.Unload(false);
+                DownloadRequest assetBundleDownloadRequest = new DownloadRequest(manifestPath, default);
+                yield return assetBundleDownloadRequest.SendAssetBundleDownloadRequestCoroutine(manifestPath);
+                if (assetBundleDownloadRequest.DownloadedAssetBundle)
+                {
+                    manifest = assetBundleDownloadRequest.DownloadedAssetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
+                    manifest.GetAllAssetBundles();
+                    assetBundleDownloadRequest.DownloadedAssetBundle.Unload(false);
+                }
+                else
+                {
+                    LogF8.LogError("如果游戏中没有使用任何AB包加载资源，可以删除此方法的调用！");
+                }
             }
             else
             {
-                LogF8.LogError("如果游戏中没有使用任何AB包加载资源，可以删除此方法的调用！");
+                var assetBundle = AssetBundle.LoadFromFile(manifestPath);
+                if (assetBundle)
+                {
+                    manifest = assetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
+                    manifest.GetAllAssetBundles();
+                    assetBundle.Unload(false);
+                }
+                else
+                {
+                    LogF8.LogError("如果游戏中没有使用任何AB包加载资源，可以删除此方法的调用！");
+                }
             }
         }
         

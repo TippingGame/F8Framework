@@ -183,7 +183,7 @@ namespace F8Framework.Core.Editor
                     scenes = GetBuildScenes(),
                     locationPathName = locationPathName,
                     target = buildTarget,
-                    options = F8EditorPrefs.GetBool("compilationFinishedBuildRun") ? BuildOptions.AutoRunPlayer : BuildOptions.ShowBuiltPlayer,
+                    options = F8EditorPrefs.GetBool("compilationFinishedBuildRun") ? BuildOptions.AutoRunPlayer : BuildOptions.None,
                 };
                 BuildReport buildReport = BuildPipeline.BuildPlayer(buildPlayerOptions);
                 if (buildReport.summary.result != BuildResult.Succeeded)
@@ -232,7 +232,7 @@ namespace F8Framework.Core.Editor
                     scenes = GetBuildScenes(),
                     locationPathName = locationPathName,
                     target = buildTarget,
-                    options = F8EditorPrefs.GetBool("compilationFinishedBuildRun") ? BuildOptions.AutoRunPlayer : BuildOptions.ShowBuiltPlayer,
+                    options = F8EditorPrefs.GetBool("compilationFinishedBuildRun") ? BuildOptions.AutoRunPlayer : BuildOptions.None,
                 };
                 BuildReport buildReport = BuildPipeline.BuildPlayer(buildPlayerOptions);
                 if (buildReport.summary.result != BuildResult.Succeeded)
@@ -275,7 +275,7 @@ namespace F8Framework.Core.Editor
                     scenes = GetBuildScenes(),
                     locationPathName = locationPathName,
                     target = buildTarget,
-                    options = F8EditorPrefs.GetBool("compilationFinishedBuildRun") ? BuildOptions.AutoRunPlayer : BuildOptions.ShowBuiltPlayer,
+                    options = F8EditorPrefs.GetBool("compilationFinishedBuildRun") ? BuildOptions.AutoRunPlayer : BuildOptions.None,
                 };
                 BuildReport buildReport = BuildPipeline.BuildPlayer(buildPlayerOptions);
                 if (buildReport.summary.result != BuildResult.Succeeded)
@@ -673,10 +673,7 @@ namespace F8Framework.Core.Editor
             FileTools.SafeCopyFile(assetBundleMapPath, buildPath + HotUpdateManager.RemoteDirName + "/" + nameof(AssetBundleMap) + ".json");
             
             string hotUpdateMapPath = buildPath + HotUpdateManager.RemoteDirName + HotUpdateManager.HotUpdateDirName + HotUpdateManager.Separator + nameof(AssetBundleMap) + ".json";
-            if (!File.Exists(hotUpdateMapPath))
-            {
-                FileTools.SafeCopyFile(assetBundleMapPath, hotUpdateMapPath);
-            }
+            FileTools.SafeCopyFile(assetBundleMapPath, hotUpdateMapPath);
             UnityEditor.AssetDatabase.Refresh();
         }
 
