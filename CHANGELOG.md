@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.5.131] - 2025-05-12
+1.修复Excel模块读取UnityEngine类型时Type.GetType会返回Null的问题  
+2.完善文档  
+
 ## [1.5.130] - 2025-05-11
 1.优化LogViewer按键启用的提示  
 2.优化UI模块缺少EventSystem时自动生成  

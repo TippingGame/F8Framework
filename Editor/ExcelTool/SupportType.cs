@@ -281,14 +281,14 @@ namespace F8Framework.Core.Editor
             
             //异步加载所有配置表
             source.Append("\t\t[Preserve]\n");
-            source.Append("\t\tpublic void LoadAllAsyncCallback(Action onLoadComplete)\n");
+            source.Append("\t\tpublic void LoadAllAsyncCallback(Action onLoadComplete = null)\n");
             source.Append("\t\t{\n");
             source.Append("\t\t\tUtil.Unity.StartCoroutine(LoadAllAsyncIEnumerator(onLoadComplete));\n");
             source.Append("\t\t}\n\n");
             
             //异步加载所有配置表
             source.Append("\t\t[Preserve]\n");
-            source.Append("\t\tpublic IEnumerator LoadAllAsyncIEnumerator(Action onLoadComplete)\n");
+            source.Append("\t\tpublic IEnumerator LoadAllAsyncIEnumerator(Action onLoadComplete = null)\n");
             source.Append("\t\t{\n");
             foreach (string t in types)
             {

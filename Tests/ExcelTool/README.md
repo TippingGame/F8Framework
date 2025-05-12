@@ -63,14 +63,15 @@ Excel 示例：（id 是唯一索引，必须添加！）
 | 2   | 9935434343 | 1     | 2.725412 | 1.346655321 | 读取 Excel 工具 | \[1.23,1.35,1.45] | \[122,135,145,255] |
 
 * 2.容器类型支持（[] / [][] / [][][]，list<>，dict<,> / dictionary<,>）数组，交错数组，列表，字典（注意：key只能为byte，short，int，long，float，double，str / string 类型），容器内可以填写任意的类型  
-Excel 示例：（你可以任意拓展类型：[ReadExcel.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/ExcelTool/ReadExcel.cs)）
+Excel 示例：
 
-| int\[] | string\[]   | obj\[]      | obj\[]\[]              | list\<obj\>       | dict\<int,string\> | dict\<int,list\<float\>\> |
-| ------ |-------------|-------------|------------------------|-------------------|--------------------|---------------------------|
-| name1  | name2       | name3       | name4                  | name5             | name6              | name7                     |
-| \[1,5] | \[test,str] | \[123,"str"] | \[\[22,"str"],\[33,"obj"]] | 123,1.888,"列表"    | 1,"字典",2,"字典2"     | 1,\[1.11,2.22],2,\[3.33]  |
-| \[1,5] | \[test,str] | \[123,"str"] | \[\[22,"str"],\[33,"obj"]] | \[123,1.888,"列表"] | \[1,"字典",2,"字典2"]  | 1,\[1.11,2.22],2,\[3.33]  |
+| int\[] | string\[]   | vec2\[]            | obj\[]\[]              | list\<obj\>       | dict\<int,string\> | dict\<int,list\<float\>\> |
+| ------ |-------------|--------------------|------------------------|-------------------|--------------------|---------------------------|
+| name1  | name2       | name3              | name4                  | name5             | name6              | name7                     |
+| \[1,5] | \[test,str] | \[[12,66],[12,66]] | \[\[22,"str"],\[33,"obj"]] | 123,1.888,"列表"    | 1,"字典",2,"字典2"     | 1,\[1.11,2.22],2,\[3.33]  |
+| \[1,5] | \[test,str] | \[[12,66],[12,66]] | \[\[22,"str"],\[33,"obj"]] | \[123,1.888,"列表"] | \[1,"字典",2,"字典2"]  | 1,\[1.11,2.22],2,\[3.33]  |
 
+（你还可以拓展其他类型：[ReadExcel.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/ExcelTool/ReadExcel.cs)）
 ## 使用范例
 
 **在使用 Excel 数据前，需要执行**：
@@ -78,11 +79,16 @@ Excel 示例：（你可以任意拓展类型：[ReadExcel.cs](https://github.co
 加载二进制或者json配置方式：
 
 ```C#
-Sheet1 sheet1 = FF8.Config.Load<Sheet1>("Sheet1"); // 指定Sheet名字加载
+// 指定Sheet名字加载
+Sheet1 sheet1 = FF8.Config.Load<Sheet1>("Sheet1");
 
-FF8.Config.LoadAll(); // 同步加载全部配置
+// 同步加载全部配置
+FF8.Config.LoadAll();
 
-foreach(var item in FF8.Config.LoadAllAsync()) // 异步加载全部配置
+// 异步加载全部配置
+yield return FF8.Config.LoadAllAsyncIEnumerator();
+// 也可以这样
+foreach(var item in FF8.Config.LoadAllAsync())
 {
     yield return item;
 }

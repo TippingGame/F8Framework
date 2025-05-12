@@ -294,7 +294,7 @@ namespace F8Framework.Core
                     data = RemoveOuterBracketsIfPaired(data); // 移除最外层的 '[' 和 ']' '{' 和 '}'
                     var elements = ParseElements(data).ToArray();
                     int elementsLength = elements.Length;
-                    var array = (Array)Activator.CreateInstance(Type.GetType(GetTrueType(innerType) + "[]"), elementsLength);
+                    var array = (Array)Activator.CreateInstance(SystemGetType(GetTrueType(innerType) + "[]"), elementsLength);
                     for (int i = 0; i < elementsLength; i++)
                     {
                         // 递归解析内层元素
@@ -309,7 +309,7 @@ namespace F8Framework.Core
                     data = RemoveOuterBracketsIfPaired(data); // 移除最外层的 '[' 和 ']' '{' 和 '}'
                     var elements = ParseElements(data).ToArray();
                     int elementsLength = elements.Length;
-                    Type elementType = Type.GetType(GetTrueType(innerType, "", "", false));
+                    Type elementType = SystemGetType(GetTrueType(innerType, "", "", false));
                     var list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType), elementsLength);
                     for (int i = 0; i < elementsLength; i++)
                     {
@@ -338,8 +338,8 @@ namespace F8Framework.Core
                     string valueType = type.Substring(commaIndex + 1, type.Length - commaIndex - 2);
                     var elements = ParseElements(data).ToArray();
                     int elementsLength = elements.Length;
-                    Type keyElementType = Type.GetType(GetTrueType(keyType));
-                    Type valueElementType = Type.GetType(GetTrueType(valueType, "", "", false));
+                    Type keyElementType = SystemGetType(GetTrueType(keyType));
+                    Type valueElementType = SystemGetType(GetTrueType(valueType, "", "", false));
                     var dictionary = (IDictionary)Activator.CreateInstance(typeof(Dictionary<,>).MakeGenericType(keyElementType, valueElementType));
                     for (int i = 0; i < elementsLength; i += 2)
                     {
@@ -613,6 +613,30 @@ namespace F8Framework.Core
             }
 
             return o;
+        }
+
+        public static Type SystemGetType(string type)
+        {
+            if (type.StartsWith("UnityEngine.Vector2Int"))
+            {
+                return Type.GetType(type + ",UnityEngine.CoreModule");
+            }
+            else if (type.StartsWith("UnityEngine.Vector3Int"))
+            {
+                return Type.GetType(type + ",UnityEngine.CoreModule");
+            }
+            else if (type.StartsWith("UnityEngine."))
+            {
+                return Type.GetType(type + ",UnityEngine");
+            }
+            else if (type.StartsWith("System."))
+            {
+                return Type.GetType(type + ",mscorlib");
+            }
+            else
+            {
+                return Type.GetType(type);
+            }
         }
         
         public static string GetTrueType(string type, string className = "", string inputPath = "", bool writtenForm = true)

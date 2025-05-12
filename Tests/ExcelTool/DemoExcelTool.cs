@@ -12,12 +12,17 @@ namespace F8Framework.Tests
         // 方式一：读取二进制或者json
         IEnumerator Start()
         {
-            Sheet1 sheet1 = FF8.Config.Load<Sheet1>("Sheet1"); // 指定名字加载
+            // 指定名字加载
+            Sheet1 sheet1 = FF8.Config.Load<Sheet1>("Sheet1");
             LogF8.Log(sheet1.Dict[2].name);
             
-            FF8.Config.LoadAll(); // 同步加载全部配置
-        
-            foreach (var item in FF8.Config.LoadAllAsync()) // 异步加载全部配置
+            // 同步加载全部配置
+            FF8.Config.LoadAll();
+
+            // 异步加载全部配置
+            yield return FF8.Config.LoadAllAsyncIEnumerator();
+            // 也可以这样
+            foreach (var item in FF8.Config.LoadAllAsync())
             {
                 yield return item;
             }
