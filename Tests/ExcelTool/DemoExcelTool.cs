@@ -20,7 +20,7 @@ namespace F8Framework.Tests
             FF8.Config.LoadAll();
 
             // 异步加载全部配置
-            yield return FF8.Config.LoadAllAsyncIEnumerator();
+            // yield return FF8.Config.LoadAllAsyncIEnumerator();
             // 也可以这样
             foreach (var item in FF8.Config.LoadAllAsync())
             {

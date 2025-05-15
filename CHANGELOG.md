@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.5.132] - 2025-05-15
+1.完善文档  
+
 ## [1.5.131] - 2025-05-12
 1.修复Excel模块读取UnityEngine类型时Type.GetType会返回Null的问题  
 2.完善文档  
