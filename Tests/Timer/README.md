@@ -39,8 +39,10 @@ void Start()
     // 监听游戏程序获得或失去焦点，重新开始或暂停所有Timer
     FF8.Timer.AddListenerApplicationFocus();
     
-    // 手动重新开始或暂停所有Timer
+    // 手动重新开始或暂停所有Timer，或指定id
     FF8.Timer.Pause();
+    FF8.Timer.Resume();
+    // 重新启动所有Timer，或指定id
     FF8.Timer.Restart();
     
     FF8.Timer.SetServerTime(1702573904000); // 网络游戏，与服务器对表，单位ms

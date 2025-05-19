@@ -164,15 +164,52 @@ namespace F8Framework.Core
             return DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(); // 返回当前时间的毫秒数
         }
 
-        // 暂停所有计时器
-        public void Pause()
+        // 暂停所有计时器，或指定计时器
+        public void Pause(int id = 0)
         {
-            for (int i = 0; i < times.Count; i++)
+            if (id == 0)
             {
-                times[i].StartTime = GetTime();
+                for (int i = 0; i < times.Count; i++)
+                {
+                    times[i].IsPaused = true;
+                }
+            }
+            else
+            {
+                for (int i = 0; i < times.Count; i++)
+                {
+                    if (times[i].ID == id)
+                    {
+                        times[i].IsPaused = true;
+                        break;
+                    }
+                }
             }
         }
 
+        // 恢复所有计时器，或指定计时器
+        public void Resume(int id = 0)
+        {
+            if (id == 0)
+            {
+                for (int i = 0; i < times.Count; i++)
+                {
+                    times[i].IsPaused = false;
+                }
+            }
+            else
+            {
+                for (int i = 0; i < times.Count; i++)
+                {
+                    if (times[i].ID == id)
+                    {
+                        times[i].IsPaused = false;
+                        break;
+                    }
+                }
+            }
+        }
+        
         public void AddListenerApplicationFocus()
         {
             MessageManager.Instance.AddEventListener(MessageEvent.ApplicationFocus, OnApplicationFocus, this);
@@ -182,7 +219,6 @@ namespace F8Framework.Core
         // 当应用程序获得焦点时调用
         void OnApplicationFocus()
         {
-            Restart();
             isFocus = true;
         }
 
@@ -190,40 +226,26 @@ namespace F8Framework.Core
         void NotApplicationFocus()
         {
             isFocus = false;
-            Pause();
         }
 
-        // 重新启动所有计时器
-        public void Restart()
+        // 重新启动所有计时器，或指定计时器
+        public void Restart(int id = 0)
         {
-            long currentTime = GetTime();
-            for (int i = 0; i < times.Count; i++)
+            if (id == 0)
             {
-                Timer timer = times[i];
-                if (timer.StartTime != 0) // 如果计时器的开始时间不为0
+                for (int i = 0; i < times.Count; i++)
                 {
-                    long startTime = timer.StartTime; // 获取计时器的开始时间
-                    int interval = (int)((currentTime - startTime) / 1000); // 计算时间间隔（秒数）
-                    int field = timer.Field; // 获取计时器字段值
-                    timer.StartTime = 0; // 重置计时器的开始时间为0
-
-                    if (field < 0)
+                    times[i].Reset();
+                }
+            }
+            else
+            {
+                for (int i = 0; i < times.Count; i++)
+                {
+                    if (times[i].ID == id)
                     {
-                        // 处理循环计时器（若有需要）
-                    }
-                    else
-                    {
-                        field -= interval; // 减去时间间隔
-                        if (field < 0) // 如果字段值小于0，将其置为0，并执行OnTimerComplete
-                        {
-                            field = 0;
-                            timer.Field = field; // 更新计时器字段值
-                            OnTimerComplete(timer);
-                        }
-                        else
-                        {
-                            timer.Field = field; // 更新计时器字段值
-                        }
+                        times[i].Reset();
+                        break;
                     }
                 }
             }
