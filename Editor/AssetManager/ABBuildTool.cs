@@ -320,6 +320,11 @@ namespace F8Framework.Core.Editor
                         assetMapping.Add(fileNameWithoutExtension, new AssetBundleMap.AssetMapping(abName.ToLower(), assetPathsForAbName.ToArray(),
                             BuildPkgTool.ToVersion, FileTools.GetFileSize(AssetBundleHelper.GetAssetBundleFullName(abName.ToLower())).ToString(),
                             FileTools.CreateMd5ForFile(AssetBundleHelper.GetAssetBundleFullName(abName.ToLower())), GetPackage(filePath), ""));
+
+                        if (filePath.IsContainChinese())
+                        {
+                            LogF8.LogError("AssetBundle名中不推荐含有中文： " + filePath);
+                        }
                     }
                     else if (Directory.Exists(filePath)) // 文件夹
                     {
@@ -346,6 +351,11 @@ namespace F8Framework.Core.Editor
                         
                         assetMapping.Add(fileNameWithoutExtension, new AssetBundleMap.AssetMapping("", assetNameDir,
                             BuildPkgTool.ToVersion, "", "", "", ""));
+
+                        if (filePath.IsContainChinese())
+                        {
+                            LogF8.LogError("AssetBundle文件夹中不推荐含有中文： " + filePath);
+                        }
                     }
                 }
 
@@ -358,11 +368,13 @@ namespace F8Framework.Core.Editor
                     }
                     else
                     {
-                        assetMapping.Add(URLSetting.GetPlatformName(), new AssetBundleMap.AssetMapping(URLSetting.GetPlatformName(), new string[]{},
-                            BuildPkgTool.ToVersion, FileTools.GetFileSize(AssetBundleHelper.GetAssetBundleFullName(URLSetting.GetPlatformName())).ToString(),
-                            FileTools.CreateMd5ForFile(AssetBundleHelper.GetAssetBundleFullName(URLSetting.GetPlatformName())), "", ""));
+                        if (File.Exists(AssetBundleHelper.GetAssetBundleFullName(URLSetting.GetPlatformName())))
+                        {
+                            assetMapping.Add(URLSetting.GetPlatformName(), new AssetBundleMap.AssetMapping(URLSetting.GetPlatformName(), new string[]{},
+                                BuildPkgTool.ToVersion, FileTools.GetFileSize(AssetBundleHelper.GetAssetBundleFullName(URLSetting.GetPlatformName())).ToString(),
+                                FileTools.CreateMd5ForFile(AssetBundleHelper.GetAssetBundleFullName(URLSetting.GetPlatformName())), "", ""));
+                        }
                     }
-
 
                     WriteAssetNames();
                 }

@@ -35,7 +35,7 @@ namespace F8Framework.Core
             bool flag = false;
             foreach (var a in @this)
             {
-                if (a >= 0x4e00 && a <= 0x9fbb)
+                if (a >= 0x4e00 && a <= 0x9fff)
                 {
                     flag = true;
                     break;
