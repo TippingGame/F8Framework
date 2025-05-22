@@ -49,7 +49,7 @@ namespace F8Framework.Core
             }
 
             /// <summary>
-            /// MD5加密，返回16位加密后的大写16进制字符
+            /// MD5加密，返回16位加密后的小写16进制字符
             /// </summary>
             /// <param name="context">需要加密的字符</param>
             /// <returns>加密后的结果</returns>
@@ -61,14 +61,14 @@ namespace F8Framework.Core
                 stringBuilderCache.Clear();
                 for (int i = 4; i < 12; i++)
                 {
-                    stringBuilderCache.Append(cryptString[i].ToString("X2"));
+                    stringBuilderCache.Append(cryptString[i].ToString("x2"));
                 }
 
                 return stringBuilderCache.ToString();
             }
 
             /// <summary>
-            /// MD5加密，返回32位加密后的大写16进制字符
+            /// MD5加密，返回32位加密后的小写16进制字符
             /// </summary>
             /// <param name="context">需要加密的字符</param>
             /// <returns>加密后的结果</returns>
@@ -82,7 +82,7 @@ namespace F8Framework.Core
                 for (int i = 0; i < length; i++)
                 {
                     //X大写的16进制，x小写
-                    stringBuilderCache.Append(cryptString[i].ToString("X2"));
+                    stringBuilderCache.Append(cryptString[i].ToString("x2"));
                 }
 
                 return stringBuilderCache.ToString();
@@ -98,11 +98,12 @@ namespace F8Framework.Core
                 byte[] md5Bytes = Encoding.UTF8.GetBytes(context);
                 MD5 md5 = MD5.Create();
                 byte[] cryptBytes = md5.ComputeHash(md5Bytes);
+                stringBuilderCache.Clear();
                 int length = cryptBytes.Length;
                 for (int i = 0; i < length; i++)
                 {
                     //X大写的16进制，x小写
-                    stringBuilderCache.Append(cryptBytes[i].ToString("X2"));
+                    stringBuilderCache.Append(cryptBytes[i].ToString("x2"));
                 }
 
                 return stringBuilderCache.ToString();
@@ -178,7 +179,7 @@ namespace F8Framework.Core
                     stringBuilderCache.Clear();
                     for (int i = 0; i < length; i++)
                     {
-                        stringBuilderCache.Append(hashBytes[i].ToString("X2"));
+                        stringBuilderCache.Append(hashBytes[i].ToString("x2"));
                     }
 
                     encrpytedResult = stringBuilderCache.ToString();
@@ -235,7 +236,7 @@ namespace F8Framework.Core
                     stringBuilderCache.Clear();
                     for (int i = 0; i < length; i++)
                     {
-                        stringBuilderCache.Append(hashBytes[i].ToString("X2"));
+                        stringBuilderCache.Append(hashBytes[i].ToString("x2"));
                     }
 
                     encrpytedResult = stringBuilderCache.ToString();

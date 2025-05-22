@@ -307,9 +307,9 @@ namespace F8Framework.Core.Editor
 
                         if (tempNames.Contains(fileNameWithoutExtension.ToLower()))
                         {
-                            string id = Guid.NewGuid().ToString(); // 生成一个唯一的ID
+                            string id = Util.Encryption.MD5Encrypt(assetPath);
                             fileNameWithoutExtension += id;
-                            LogF8.Log("资源名称重复（大小写不敏感）：" + filePath + "，增加唯一识别ID后为：" + fileNameWithoutExtension);
+                            LogF8.Log("AB资源名称重复（大小写不敏感）：" + filePath + "，增加唯一识别ID后为：" + fileNameWithoutExtension);
                         }
                         tempNames.Add(fileNameWithoutExtension.ToLower());
 
@@ -343,9 +343,9 @@ namespace F8Framework.Core.Editor
                         
                         if (tempNames.Contains(fileNameWithoutExtension))
                         {
-                            string id = Guid.NewGuid().ToString(); // 生成一个唯一的ID
+                            string id = Util.Encryption.MD5Encrypt(assetPath);
                             fileNameWithoutExtension += id;
-                            LogF8.Log("文件夹名称重复（大小写不敏感）：" + filePath + "，增加唯一识别ID后为：" + fileNameWithoutExtension);
+                            LogF8.Log("AB文件夹名称重复（大小写不敏感）：" + filePath + "，增加唯一识别ID后为：" + fileNameWithoutExtension);
                         }
                         tempNames.Add(fileNameWithoutExtension);
                         
@@ -425,6 +425,8 @@ namespace F8Framework.Core.Editor
                         continue;
                     }
 
+                    string assetPath = GetAssetPath(filePath);
+                    
                     // 获取不带扩展名的文件名
                     string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
 
@@ -438,9 +440,9 @@ namespace F8Framework.Core.Editor
 
                         if (tempNames.Contains(fileNameWithoutExtension))
                         {
-                            string id = Guid.NewGuid().ToString(); // 生成一个唯一的ID
+                            string id = Util.Encryption.MD5Encrypt(assetPath);
                             fileNameWithoutExtension += id;
-                            LogF8.Log("资源名称重复（大小写不敏感）：" + filePath + "，增加唯一识别ID后为：" + fileNameWithoutExtension);
+                            LogF8.Log("Resources资源名称重复（大小写不敏感）：" + filePath + "，增加唯一识别ID后为：" + fileNameWithoutExtension);
                         }
 
                         tempNames.Add(fileNameWithoutExtension);
@@ -461,9 +463,9 @@ namespace F8Framework.Core.Editor
 
                         if (tempNames.Contains(fileNameWithoutExtension))
                         {
-                            string id = Guid.NewGuid().ToString(); // 生成一个唯一的ID
+                            string id = Util.Encryption.MD5Encrypt(assetPath);
                             fileNameWithoutExtension += id;
-                            LogF8.Log("文件夹名称重复（大小写不敏感）：" + filePath + "，增加唯一识别ID后为：" + fileNameWithoutExtension);
+                            LogF8.Log("Resources文件夹名称重复（大小写不敏感）：" + filePath + "，增加唯一识别ID后为：" + fileNameWithoutExtension);
                         }
 
                         tempNames.Add(fileNameWithoutExtension);
