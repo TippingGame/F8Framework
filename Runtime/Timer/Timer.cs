@@ -66,10 +66,12 @@ namespace F8Framework.Core
             }
 
             // 计算需要触发的次数
-            while (elapsedTime >= Step)
+            if (elapsedTime >= Step)
             {
-                elapsedTime -= Step;
-                triggerCount++;
+                float stepsFloat = elapsedTime / Step;
+                int steps = UnityEngine.Mathf.FloorToInt(stepsFloat);
+                triggerCount += steps;
+                elapsedTime -= steps * Step;
             }
 
             return triggerCount;
