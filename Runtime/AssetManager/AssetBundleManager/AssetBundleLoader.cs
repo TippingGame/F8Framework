@@ -15,7 +15,7 @@ namespace F8Framework.Core
         public string abName = "";
         private Hash128 hash128;
         private readonly string keyword = URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
-        private List<string> assetPaths = new List<string>();
+        public List<string> assetPaths = new List<string>();
         private AssetBundle assetBundleContent;
         private Object assetObject;
         private Dictionary<string, Object> assetObjects = new Dictionary<string, Object>();

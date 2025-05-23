@@ -312,6 +312,11 @@ namespace F8Framework.Core.Editor
                     }
 
                     loader.Load();
+
+                    for (int i = 0; i < loader.assetPaths.Count; i++)
+                    {
+                        loader.Expand(loader.assetPaths[i], null);
+                    }
                 }
 
                 if (loader.assetBundleLoadState == AssetBundleLoader.LoaderState.FINISHED &&
