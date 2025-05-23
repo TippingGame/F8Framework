@@ -169,6 +169,8 @@ IEnumerator Start()
 ```
 
 ### 编辑器拓展功能
+#### AB包检查器
+![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_20250523001.png)
 #### 你应该注意每次移出AssetBundles目录的文件，AB名都需要手动清空
 1. 编辑器功能
 * 1. 寻找资源是否被引用（将搜索全工程文件，输出Log信息）

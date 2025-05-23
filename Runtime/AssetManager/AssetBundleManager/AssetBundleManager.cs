@@ -17,6 +17,10 @@ namespace F8Framework.Core
         private Dictionary<string, AssetBundleLoader> assetBundleLoaders = new Dictionary<string, AssetBundleLoader>();
         private List<AssetBundleLoader> assetBundleLoadersList = new List<AssetBundleLoader>();
 
+        public Dictionary<string, AssetBundleLoader> GetAssetBundleLoaders()
+        {
+            return assetBundleLoaders;
+        }
         /// <summary>
         /// 通过资产捆绑路径同步加载。
         /// 如果重复加载资产，则将直接从资源池中提供。

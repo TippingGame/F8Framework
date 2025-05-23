@@ -52,5 +52,10 @@ namespace F8Framework.Core.Editor
         {
             EditorPrefs.SetFloat(Application.dataPath.GetHashCode() + key, value);
         }
+        
+        public static bool HasKey(string key)
+        {
+            return EditorPrefs.HasKey(Application.dataPath.GetHashCode() + key);
+        }
     }
 }
