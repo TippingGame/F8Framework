@@ -1,6 +1,6 @@
 ﻿namespace F8Framework.Core
 {
-    public enum CallbacksType
+    public enum CallbacksType : byte
     {
         None,
         Interfaces,

@@ -24,7 +24,7 @@ namespace F8Framework.Core
         /// <summary>
         /// 加载类型：同步或异步本地加载。
         /// </summary>
-        public enum LoaderType
+        public enum LoaderType : byte
         {
             NONE,
             SYNC,
@@ -34,7 +34,7 @@ namespace F8Framework.Core
         /// <summary>
         /// 加载器的状态枚举。
         /// </summary>
-        public enum LoaderState
+        public enum LoaderState : byte
         {
             NONE,
             WORKING,

@@ -55,7 +55,7 @@ namespace F8Framework.Core
         /// <summary>
         /// 源类型的枚举。
         /// </summary>
-        public enum SourceType
+        public enum SourceType : byte
         {
             NONE,
             STREAMING_ASSETS,

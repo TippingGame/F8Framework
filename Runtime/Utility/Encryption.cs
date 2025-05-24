@@ -24,7 +24,7 @@ namespace F8Framework.Core
         {
             static StringBuilder stringBuilderCache = new StringBuilder(1024);
             
-            public enum GUIDFormat
+            public enum GUIDFormat : byte
             {
                 N,
                 D,

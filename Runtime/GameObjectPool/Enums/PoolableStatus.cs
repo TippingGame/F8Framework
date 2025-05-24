@@ -1,6 +1,6 @@
 ﻿namespace F8Framework.Core
 {
-    public enum PoolableStatus
+    public enum PoolableStatus : byte
     {
         Spawned,
         Despawned,

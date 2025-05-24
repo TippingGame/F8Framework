@@ -61,14 +61,14 @@ namespace F8Framework.Core
         /// <summary>
         /// 加载程序的状态枚举。
         /// </summary>
-        public enum LoaderState
+        public enum LoaderState : byte
         {
             NONE,
             WORKING,
             FINISHED
         }
 
-        public enum LoaderType
+        public enum LoaderType : byte
         {
             NONE,
             LOCAL_SYNC,

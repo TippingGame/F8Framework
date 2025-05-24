@@ -2,7 +2,7 @@
 
 namespace F8Framework.Core
 {
-    public enum PivotPreset
+    public enum PivotPreset : byte
     {
         UpperLeft,
         UpperCenter,

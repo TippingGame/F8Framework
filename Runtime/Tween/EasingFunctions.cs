@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public enum Ease
+public enum Ease : byte
 {
     EaseInQuad = 0,
     EaseOutQuad,

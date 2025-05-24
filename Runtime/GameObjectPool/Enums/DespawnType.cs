@@ -1,6 +1,6 @@
 ﻿namespace F8Framework.Core
 {
-    public enum DespawnType
+    public enum DespawnType : byte
     {
         OnlyDeactivate,
         DeactivateAndSetNullParent,

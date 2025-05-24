@@ -9,7 +9,7 @@ namespace F8Framework.Core
     {
         public static class Xml
         {
-            public enum ResponseCode
+            public enum ResponseCode : byte
             {
                 SUCCESS,
                 FILE_NOT_FOUND_ERROR,

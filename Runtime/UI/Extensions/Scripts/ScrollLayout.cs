@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace F8Framework.Core
 {
-    public enum ScrollAxis
+    public enum ScrollAxis : byte
     {
         DEFAULT = 0,
         VERTICAL_TOP,
@@ -21,7 +21,7 @@ namespace F8Framework.Core
         [Serializable]
         public class LayoutValue
         {
-            public enum ValueType
+            public enum ValueType : byte
             {
                 DEFAULT,
                 RATE,

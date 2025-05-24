@@ -7,7 +7,7 @@ using System.ComponentModel;
 
 namespace F8Framework.Core
 {
-    public enum UpdateMode
+    public enum UpdateMode : byte
     {
         Update,
         LateUpdate,

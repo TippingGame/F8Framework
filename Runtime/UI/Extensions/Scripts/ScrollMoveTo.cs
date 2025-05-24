@@ -17,7 +17,7 @@ namespace F8Framework.Core
     [DisallowMultipleComponent]
     public class ScrollMoveTo : MonoBehaviour
     {
-        public enum ScrollType
+        public enum ScrollType : byte
         {
             INDEX,
             RATE

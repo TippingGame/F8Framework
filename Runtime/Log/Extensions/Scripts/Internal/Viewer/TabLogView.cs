@@ -6,7 +6,7 @@ namespace F8Framework.Core
 {
     public class TabLogView : LogViewBase
     {
-        public enum TabIndex
+        public enum TabIndex : byte
         {
             CONSOLE = 0,
             FUNCTION,

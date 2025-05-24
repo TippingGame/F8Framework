@@ -56,17 +56,17 @@ namespace F8Framework.Core
         }
              //资产访问标志
             [System.Flags]
-            public enum AssetAccessMode
+            public enum AssetAccessMode : byte
             {
-                NONE = 0b1,
-                UNKNOWN = 0b10,
-                RESOURCE = 0b100,
-                ASSET_BUNDLE = 0b1000,
-                REMOTE_ASSET_BUNDLE = 0b10000
+                NONE = 0,
+                UNKNOWN = 0b00000001,
+                RESOURCE = 0b00000010,
+                ASSET_BUNDLE = 0b00000100,
+                REMOTE_ASSET_BUNDLE = 0b00001000
             }
 
             //资产类型
-            public enum AssetTypeEnum
+            public enum AssetTypeEnum : byte
             {
                 NONE,
                 RESOURCE,

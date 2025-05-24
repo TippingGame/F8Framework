@@ -5,7 +5,7 @@ using System.ComponentModel;
 
 namespace F8Framework.Core
 {
-	public enum PlayMode
+	public enum PlayMode : byte
 	{
 		Append,
 		Join

@@ -1,6 +1,6 @@
 ﻿namespace F8Framework.Core
 {
-    public enum BehaviourOnCapacityReached
+    public enum BehaviourOnCapacityReached : byte
     {
         ReturnNullableClone,
         Instantiate,

@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace F8Framework.Core
 {
-    public enum LayerType
+    public enum LayerType : byte
     {
         Game,
         UI,

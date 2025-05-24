@@ -7,7 +7,7 @@ namespace F8Framework.Core
 {
     public partial class InfiniteScroll : IMoveScroll
     {
-       public enum MoveToType
+       public enum MoveToType : byte
         {
             MOVE_TO_TOP = 0,
             MOVE_TO_CENTER,

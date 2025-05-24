@@ -19,7 +19,7 @@ namespace F8Framework.Core
         private DownloadType type;
         private UnityWebRequest uwr;
         
-        private enum DownloadType
+        private enum DownloadType : byte
         {
             NONE,
             FILE,
