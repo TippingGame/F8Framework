@@ -1,14 +1,12 @@
-﻿
+﻿using UnityEngine;
+
 namespace F8Framework.Core
 {
     public class ValueTween : BaseTween
     {
-        #region PRIVATE
         private float from = 0.0f;
         private float to = 0.0f;
-        #endregion
-
-        #region PUBLIC
+        
         public ValueTween(float from, float to, float t, int id)
         {
             this.id = id;
@@ -24,14 +22,14 @@ namespace F8Framework.Core
         }
 
         /// <summary>
-        /// called every frame
+        /// 每帧执行的更新逻辑
         /// </summary>
         public override void Update(float deltaTime)
         {
             if(isPause || IsComplete || IsRecycle)
                 return;
 
-            //wait a delay
+            // 处理启动延迟
             if (delay > 0.0f)
             {
                 delay -= deltaTime;
@@ -40,27 +38,28 @@ namespace F8Framework.Core
 
             base.Update(deltaTime);
 
-            //start counting time
-            currentTime += deltaTime;
+            // 进度时间计算（限制在总时长内）
+            currentTime = Mathf.Min(currentTime + deltaTime, duration);
+            float normalizedProgress = currentTime / duration;
 
-            //if time ends
-            if (currentTime >= duration)
-            {
-                if (onUpdateFloat != null)
-                    onUpdateFloat(to);
-
-                onComplete();
-                return;
-            }
-
-            //get new value
-            float value = EasingFunctions.ChangeFloat(from, to, currentTime / duration, ease);
-
-            //call update if we have it
+            // 通过曲线函数计算缓动进度
+            float curveProgress = GetCurveProgress(normalizedProgress);
+            
+            // 基于缓动算法计算当前值
+            float value = EasingFunctions.ChangeFloat(from, to, curveProgress, ease);
+            
+            // 触发值更新回调
             if (onUpdateFloat != null)
                 onUpdateFloat(value);
+            
+            // 检查是否完成当前周期
+            if (currentTime >= duration)
+            {
+                bool shouldComplete = !HandleLoop();
+                if (shouldComplete)
+                    onComplete();
+            }
         }
-        #endregion
 
         public override void Reset()
         {
@@ -74,7 +73,52 @@ namespace F8Framework.Core
             base.ReplayReset();
             Init(from, to, duration);
         }
+        
+        private float GetCurveProgress(float normalizedProgress)
+        {
+            switch (loopType)
+            {
+                case LoopType.Yoyo:
+                    // 使用平滑的往返曲线 (0→1→0)
+                    return Mathf.PingPong(normalizedProgress * 2, 1);
+                default:
+                    return normalizedProgress;
+            }
+        }
+        
+        private bool HandleLoop()
+        {
+            if (this.loopType == LoopType.None || this.tempLoopCount == 0)
+            {
+                return false;
+            }
+            else
+            {
+                if (this.tempLoopCount > 0)
+                {
+                    this.tempLoopCount -= 1;
+                }
+                switch (this.loopType)
+                {
+                    case LoopType.Restart:
+                        break;
+                    case LoopType.Flip:
+                        (from, to) = (to, from);
+                        break;
+                    case LoopType.Incremental:
+                    {
+                        var delta = to - from;
+                        from = to;
+                        to += delta;
+                        break;
+                    }
+                    case LoopType.Yoyo:
+                        break;
+                }
+                this.ReplayReset();
+                return this.tempLoopCount > 0;
+            }
+        }
     }
-
 }
 

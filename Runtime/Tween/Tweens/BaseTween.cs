@@ -14,10 +14,22 @@ namespace F8Framework.Core
         FixedUpdate
     }
     
+    public enum LoopType : byte
+    {
+        None = 0,
+        // 到达结束值后，回到起始值并重新播放
+        Restart = 1,
+        // 到达结束值后，起始值和结束值互换并重新播放
+        Flip = 2,
+        // 到达结束值后，给结束值增加(结束值-起始值)后继续播放
+        Incremental = 4,
+        // 到达结束值后，将反向播放以返回起始值并重新播放（往返一次是完整的动画周期）
+        Yoyo = 3
+    }
+    
     /// <summary>
     /// Base tween class
     /// </summary>
-    
     public abstract class BaseTween : IEnumerator
     {
         #region PROTECTED
@@ -31,6 +43,9 @@ namespace F8Framework.Core
         protected UpdateMode updateMode = UpdateMode.Update;
         protected GameObject owner = null;
         private float timeSinceStart = 0.0f;
+        protected LoopType loopType = LoopType.None;
+        protected int loopCount = 0;
+        protected int tempLoopCount = 0;
         #endregion
 
         public int ID
@@ -77,6 +92,7 @@ namespace F8Framework.Core
             }
             else
             {
+                this.tempLoopCount = this.loopCount;
                 onCompleteSequence?.Invoke();
             }
         }
@@ -98,7 +114,7 @@ namespace F8Framework.Core
                 onUpdate();
         }
 
-        public virtual BaseTween SetIsPause(bool value)
+        public BaseTween SetIsPause(bool value)
         {
             if (isPause && !value)
             {
@@ -115,14 +131,18 @@ namespace F8Framework.Core
             IsComplete = false;
             isPause = false;
             currentTime = 0.0f;
-            onCompleteSequence = null;
         }
 
+        public void ClearOnCompleteSequence()
+        {
+            onCompleteSequence = null;
+        }
+        
         /// <summary>
         /// Set ease type
         /// </summary>
         /// <param name="ease"></param>
-        public virtual BaseTween SetEase(Ease ease)
+        public BaseTween SetEase(Ease ease)
         {
             this.ease = ease;
             return this;
@@ -145,13 +165,13 @@ namespace F8Framework.Core
         /// </summary>
         /// <param name="action"></param>
         /// <returns></returns>
-        public virtual BaseTween SetOnComplete(Action action)
+        public BaseTween SetOnComplete(Action action)
         {
             onComplete += action;
             return this;
         }
 
-        public virtual BaseTween SetOnCompleteSequence(Action action)
+        public BaseTween SetOnCompleteSequence(Action action)
         {
             onCompleteSequence += action;
             return this;
@@ -162,19 +182,19 @@ namespace F8Framework.Core
         /// </summary>
         /// <param name="t">delay in seconds </param>
         /// <returns></returns>
-        public virtual BaseTween SetDelay(float t)
+        public BaseTween SetDelay(float t)
         {
             delay = t;
             return this;
         }
 
-        public virtual BaseTween SetOnUpdate(Action action)
+        public BaseTween SetOnUpdate(Action action)
         {
             onUpdate += action;
             return this;
         }
 
-        public virtual BaseTween SetOnUpdateVector2(Action<Vector2> action)
+        public BaseTween SetOnUpdateVector2(Action<Vector2> action)
         {
             onUpdateVector2 += action;
             return this;
@@ -185,13 +205,13 @@ namespace F8Framework.Core
         /// </summary>
         /// <param name="action"></param>
         /// <returns></returns>
-        public virtual BaseTween SetOnUpdateVector3(Action<Vector3> action)
+        public BaseTween SetOnUpdateVector3(Action<Vector3> action)
         {
             onUpdateVector3 += action;
             return this;
         }
 
-        public virtual BaseTween SetOnUpdateColor(Action<Color> action)
+        public BaseTween SetOnUpdateColor(Action<Color> action)
         {
             onUpdateColor += action;
             return this;
@@ -202,7 +222,7 @@ namespace F8Framework.Core
         /// </summary>
         /// <param name="action"></param>
         /// <returns></returns>
-        public virtual BaseTween SetOnUpdateFloat(Action<float> action)
+        public BaseTween SetOnUpdateFloat(Action<float> action)
         {
             onUpdateFloat += action;
             return this;
@@ -213,25 +233,34 @@ namespace F8Framework.Core
         /// </summary>
         /// <param name="action"></param>
         /// <returns></returns>
-        public virtual BaseTween SetOnUpdateQuaternion(Action<Quaternion> action)
+        public BaseTween SetOnUpdateQuaternion(Action<Quaternion> action)
         {
             onUpdateQuaternion += action;
             return this;
         }
 
-        public virtual BaseTween SetOwner(GameObject owner)
+        public BaseTween SetOwner(GameObject owner)
         {
             this.owner = owner;
             Tween.Instance.ProcessConnection(this);
             return this;
         }
 
-        public virtual BaseTween SetUpdateMode(UpdateMode updateMode)
+        public BaseTween SetUpdateMode(UpdateMode updateMode)
         {
             this.updateMode = updateMode;
             return this;
         }
 
+        public BaseTween SetLoopType(LoopType loopType, int loopCount = -1)
+        {
+            this.loopType = loopType;
+            this.loopCount = loopCount;
+            this.tempLoopCount = loopCount;
+            CanRecycle = false;
+            return this;
+        }
+        
         /// <summary>
         /// Restore all fields to default
         /// </summary>
@@ -245,6 +274,9 @@ namespace F8Framework.Core
             updateMode = UpdateMode.Update;
             owner = null;
             timeSinceStart = 0.0f;
+            loopType = LoopType.None;
+            loopCount = 0;
+            tempLoopCount = 0;
             IsComplete = false;
             isPause = false;
             CanRecycle = true;

@@ -35,6 +35,8 @@ void Start()
     gameObject.MoveAtSpeed(Vector3.one, 2f);
     gameObject.LocalMove(Vector3.one, 1f);
     gameObject.LocalMoveAtSpeed(Vector3.one, 1f);
+    // 缩放
+    gameObject.ScaleTween(Vector3.one * 2f, 1f);
     // 渐变
     gameObject.GetComponent<CanvasGroup>().Fade(0f, 1f);
     gameObject.GetComponent<Image>().ColorTween(Color.green, 1f);
@@ -47,10 +49,16 @@ void Start()
     gameObject.ShakePositionAtSpeed(Vector3.one, shakeCount: 8, speed: 5f, fadeOut: false);
 
     // 设置Delay
-    gameObject.Move(Vector3.one, 1.0f).SetDelay(2.0f);
+    gameObject.Move(Vector3.one, 1f).SetDelay(2f);
     
     // 设置Event，在动画的某一时间调用
-    gameObject.Move(Vector3.one, 5.0f).SetEvent(OnViewOpen, 2.5f);
+    gameObject.Move(Vector3.one, 5f).SetEvent(OnViewOpen, 2.5f);
+    
+    // 设置循环类型，循环次数
+    gameObject.Move(Vector3.one, 1f).SetLoopType(LoopType.Yoyo, 3);
+    
+    // 设置是否暂停
+    gameObject.Move(Vector3.one, 1f).SetIsPause(true);
     
     // 你也可以这样使用，设置OnUpdate
     // 数字缓动变化
@@ -68,10 +76,6 @@ void Start()
     {
         LogF8.Log(v);
     });
-
-    // 重播动画，先设置动画为不可回收，记得手动回收
-    gameObjectTween.CanRecycle = false;
-    gameObjectTween.ReplayReset();
         
     // 设置动画拥有者后，可使用此取消方式
     gameObjectTween.SetOwner(gameObject);

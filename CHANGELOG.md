@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.6.140] - 2025-05-25
+1.新增Tween模块的SetLoopType设置循环方法，循环类型包括Restart，Flip，Incremental，Yoyo  
+2.完善文档  
+
 ## [1.5.139] - 2025-05-24
 1.优化所有的enum  
 
