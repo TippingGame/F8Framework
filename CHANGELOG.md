@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.6.141] - 2025-05-25
+1.优化Tween模块确保最终值能到达  
+
 ## [1.6.140] - 2025-05-25
 1.新增Tween模块的SetLoopType设置循环方法，循环类型包括Restart，Flip，Incremental，Yoyo  
 2.完善文档  

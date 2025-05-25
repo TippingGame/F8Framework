@@ -41,8 +41,19 @@ namespace F8Framework.Core
 
             // 进度时间计算（限制在总时长内）
             currentTime = Mathf.Min(currentTime + deltaTime, duration);
+            
+            // 检查是否完成当前周期
+            if (currentTime >= duration)
+            {
+                if(onUpdateVector2 != null)
+                    onUpdateVector2(to);
+                
+                bool shouldComplete = !HandleLoop();
+                if (shouldComplete)
+                    onComplete();
+            }
+            
             float normalizedProgress = currentTime / duration;
-
             // 通过曲线函数计算缓动进度
             float curveProgress = GetCurveProgress(normalizedProgress);
             
@@ -52,14 +63,6 @@ namespace F8Framework.Core
             // 触发值更新回调
             if(onUpdateVector2 != null)
                 onUpdateVector2(tempValue);
-            
-            // 检查是否完成当前周期
-            if (currentTime >= duration)
-            {
-                bool shouldComplete = !HandleLoop();
-                if (shouldComplete)
-                    onComplete();
-            }
         }
 
         public override void Reset()
