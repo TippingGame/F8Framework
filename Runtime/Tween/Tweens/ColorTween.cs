@@ -40,8 +40,7 @@ namespace F8Framework.Core
 
             base.Update(deltaTime);
 
-            // 进度时间计算（限制在总时长内）
-            currentTime = Mathf.Min(currentTime + deltaTime, duration);
+            currentTime += deltaTime;
             
             // 检查是否完成当前周期
             if (currentTime >= duration)
