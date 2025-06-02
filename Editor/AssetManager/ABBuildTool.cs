@@ -189,13 +189,12 @@ namespace F8Framework.Core.Editor
                     ai.assetBundleName = bundleName;
                     EditorUtility.SetDirty(ai);
                 }
-                else if (DiscrepantAssetPathMapping != null) 
+                else if (DiscrepantAssetPathMapping != null)
                 {
                     // 资产名和ab包名不相等
                     if (!AssetGetParentPath(ai.assetBundleName).Equals(AssetGetParentPath(bundleName)))
                     {
-                        //打印出父路径
-                        Debug.LogError("资产名和ab包名不相等:" + ai.assetBundleName + " > " + bundleName);
+                        LogF8.LogError("资产父路径和AB名不相等，检查是否迁移过文件路径，并清理AB名：" + ai.assetBundleName + " -> " + bundleName + "，资产路径：" + path);
                     }
                     DiscrepantAssetPathMapping["/" + ai.assetBundleName] = "/" + bundleName.ToLower();
                 }

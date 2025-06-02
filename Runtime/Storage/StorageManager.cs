@@ -44,17 +44,17 @@ namespace F8Framework.Core
             }
             catch (FormatException)
             {
-                Debug.LogError($"Invalid Base64 format for key: {key}");
+                LogF8.LogError($"Invalid Base64 format for key: {key}");
                 return null;
             }
             catch (CryptographicException)
             {
-                Debug.LogError($"Cryptographic error occurred while decrypting key: {key}");
+                LogF8.LogError($"Cryptographic error occurred while decrypting key: {key}");
                 return null;
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Unexpected error occurred while getting raw bytes for key: {key}. Error: {ex.Message}");
+                LogF8.LogError($"Unexpected error occurred while getting raw bytes for key: {key}. Error: {ex.Message}");
                 return null;
             }
         }

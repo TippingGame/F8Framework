@@ -280,7 +280,7 @@ namespace F8Framework.Core.Editor
                 BuildReport buildReport = BuildPipeline.BuildPlayer(buildPlayerOptions);
                 if (buildReport.summary.result != BuildResult.Succeeded)
                 {
-                    LogF8.LogError($"导出失败了，检查一下 Unity 内置的 Build Settings 导出的路径是否存在，Unity 没有给我清理缓存！: {buildReport.summary.result}");
+                    LogF8.LogError($"导出失败了，检查一下 Unity 内置的 Build Settings 导出的路径是否存在，并使用 Unity 内置打包工具打包一次，或 Unity 没有给我清理缓存，尝试使用 Clean 打包模式！: {buildReport.summary.result}");
                 }
                 FileTools.SafeCopyDirectory(toPath, URLSetting.GetAssetBundlesStreamPath(), true, new[] { URLSetting.GetPlatformName(), URLSetting.GetPlatformName() + ".manifest" });
                 FileTools.SafeDeleteDir(toPath);

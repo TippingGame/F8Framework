@@ -40,7 +40,7 @@ namespace F8Framework.Core
             }
             catch (Exception ex)
             {
-                LogF8.LogError(ex);
+                LogF8.LogError("文件不存在或生成MD5失败：" + ex);
                 return "";
             }
         }
