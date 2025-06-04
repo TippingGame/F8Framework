@@ -57,8 +57,8 @@ Unity F8 SDKManager组件，与原生平台交互，接入多个平台或者渠�
   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20241120134325.png)
 * unity2023各个版本（2023.1：Gradle7.6）  
   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20241121004145.png)
-* unity6000各个版本  
-  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20241120134329.png)
+* unity6000各个版本（怀疑8.7.2写错，目前8.11最高支持8.4.2）  
+  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20241120134329_2.png)
 ------------------------------
 * 根据你版本，选择正确的目录，复制下面这两个文件到工程 Assets/Plugins/Android 目录
 * 给文件 [AndroidManifest.xml](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/Gradle6.1.1/AndroidManifest) 添加上后缀.xml
@@ -71,10 +71,11 @@ Unity F8 SDKManager组件，与原生平台交互，接入多个平台或者渠�
 * （可选）使用安卓工程打包aar [UnityAndroidDemo2021.3.15f1.zip](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/UnityAndroidDemo2021.3.15f1.zip)，用作导出 [UnityAndroidDemo-release.aar](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/Gradle6.1.1/UnityAndroidDemo-release) 和 [AndroidManifest.xml](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/Gradle6.1.1/AndroidManifest)
   1. 下载 [Android Studio](https://developer.android.google.cn/studio/archive/) （网页右上角语言改为英文）
   2. 选择版本：unity2022 / 2023：android-studio-2022.2.1.20-windows，unity2023 / 6000：2023.3.1.20-windows
-  3. 解压工程打开后，修改 SDK JDK 为unity安装自带的
-  4. 上方菜单栏 Build -> Rebuild Project 导出后会生成aar文件
-  5. 使用可以读取zip的压缩软件，删除aar里 libs/classes.jar 文件
-  6. 再打开根目录的 classes.jar ，删除里面的 UnityPlayerActivity.java 文件（unity2023 / 6000不需要此步骤）
+  3. 解压工程打开后，在 Settings -> Build -> Build Tool -> Gradle -> Gradle JDK，修改 JDK 为unity安装路径自带的（如：C:\Program Files\Unity\Hub\Editor\6000.1.5f1\Editor\Data\PlaybackEngines\AndroidPlayer\OpenJDK）
+  4. 在 Project Structure -> Project / SDK Location，修改 Gradle 版本，修改 SDK 为unity安装路径自带的（如：C:\Program Files\Unity\Hub\Editor\6000.1.5f1\Editor\Data\PlaybackEngines\AndroidPlayer\SDK）
+  5. 上方菜单栏 Build -> Rebuild Project 导出后会生成aar文件
+  6. 使用可以读取zip的压缩软件，删除aar里 libs/classes.jar 文件
+  7. 再打开根目录的 classes.jar ，删除里面的 UnityPlayerActivity.java 文件（unity2023 / 6000不需要此步骤）
 ------------------------------
 
 * 提供四个unity版本的安卓工程
