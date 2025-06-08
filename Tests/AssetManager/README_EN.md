@@ -169,6 +169,9 @@ IEnumerator Start()
 ```
 
 ### 编辑器拓展功能
+#### [如何使用多进程加速构建AB包](https://docs.unity3d.com/6000.1/Documentation/Manual/Build-MultiProcess.html)
+升级到 Unity6000 版本  
+Project Settings -> Editor -> Build Pipeline -> Multi-Process AssetBundle Building（勾选）
 #### AB包检查器
 ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_20250523001.png)
 #### 你应该注意每次移出AssetBundles目录的文件，AB名都需要手动清空
