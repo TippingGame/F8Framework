@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.7.148] - 2025-06-10
+1.修复加载AssetBundleManifest时被错误返回的问题  
+
 ## [1.7.147] - 2025-06-10
 1.新增编辑器模式下可加载场景资源  
 2.优化资产状态检查器编辑器界面，拓展为3个页签（Resources，AssetBundle，AssetDatabase）  

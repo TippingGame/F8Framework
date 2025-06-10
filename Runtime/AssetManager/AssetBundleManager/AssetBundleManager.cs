@@ -988,8 +988,6 @@ namespace F8Framework.Core
             string manifestPath = GetAssetBundlePathByAbName(URLSetting.GetPlatformName());
             if (manifestPath == null)
                 yield break;
-            if (AssetBundleMap.Mappings.Count == 0)
-                yield break;
 #if UNITY_EDITOR
             manifestPath = Path.IsPathRooted(manifestPath) ? "file://" + manifestPath : manifestPath;
             if (AssetManager.Instance.IsEditorMode)
@@ -1037,8 +1035,6 @@ namespace F8Framework.Core
 #endif
             string manifestPath = GetAssetBundlePathByAbName(URLSetting.GetPlatformName());
             if (manifestPath == null)
-                return;
-            if (AssetBundleMap.Mappings.Count == 0)
                 return;
             if (!File.Exists(manifestPath))
                 return;
