@@ -150,7 +150,7 @@ IEnumerator Start()
     
     /*-------------------------------------其他类型加载示例-------------------------------------*/
     // 加载场景，别忘了加载天空盒材质，不然会变紫色，
-    // 并且这种方式不能加载 Resources 目录中的场景，编辑器模式下的 AB 场景也不行（不过可以手动放入Build Setting处）
+    // 并且这种方式不能加载 Resources 目录中的场景。
     FF8.Asset.Load("Scene");
     SceneManager.LoadScene("Scene");
     
@@ -172,8 +172,8 @@ IEnumerator Start()
 #### [如何使用多进程加速构建AB包](https://docs.unity3d.com/6000.1/Documentation/Manual/Build-MultiProcess.html)
 升级到 Unity6000 版本  
 Project Settings -> Editor -> Build Pipeline -> Multi-Process AssetBundle Building（勾选）  
-#### AB包检查器
-![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_20250523001.png)
+#### 资产状态检查器
+![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_20250523001_2.png)
 #### 你应该注意每次移出AssetBundles目录的文件，AB名都需要手动清空
 1. 编辑器功能
 * 1. 寻找资源是否被引用（将搜索全工程文件，输出Log信息）

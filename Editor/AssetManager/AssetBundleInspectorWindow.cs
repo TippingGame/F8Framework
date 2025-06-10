@@ -17,17 +17,29 @@ namespace F8Framework.Core.Editor
         private HashSet<string> expandedItems = new HashSet<string>();
         private double lastUpdateTime;
         [SerializeField] private double updateInterval = 0.5;
-
-        [MenuItem("开发工具/AB包检查器", false, 105)]
+        
+        private enum TabType
+        {
+            Resources,
+            AssetBundle,
+            AssetDatabase
+        }
+        private TabType currentTab = TabType.AssetBundle;
+        
+        private Dictionary<string, ResourcesLoader> resourceLoaders;
+        
+        private Dictionary<string, EditorLoader> editorLoaders;
+        
+        [MenuItem("开发工具/资产状态检查器", false, 105)]
         public static void ShowWindow()
         {
             if (HasOpenInstances<AssetBundleInspectorWindow>())
             {
-                GetWindow<AssetBundleInspectorWindow>("AB包检查器").Close();
+                GetWindow<AssetBundleInspectorWindow>("资产状态检查器").Close();
             }
             else
             {
-                var window = GetWindow<AssetBundleInspectorWindow>("AB包检查器");
+                var window = GetWindow<AssetBundleInspectorWindow>("资产状态检查器");
                 // 加载保存的设置
                 if (F8EditorPrefs.HasKey("AssetBundleInspector_UpdateInterval"))
                 {
@@ -69,10 +81,42 @@ namespace F8Framework.Core.Editor
                 return;
             }
 
+            DrawTabs(); // 绘制页签
             DrawToolbar();
-            DrawAssetBundleList();
+            
+            // 根据当前页签绘制不同内容
+            switch (currentTab)
+            {
+                case TabType.Resources:
+                    DrawResourcesList();
+                    break;
+                case TabType.AssetBundle:
+                    DrawAssetBundleList();
+                    break;
+                case TabType.AssetDatabase:
+                    DrawAssetDatabaseList();
+                    break;
+            }
         }
 
+        // 新增方法：绘制页签
+        private void DrawTabs()
+        {
+            GUILayout.BeginHorizontal();
+            {
+                if (GUILayout.Toggle(currentTab == TabType.Resources, "Resources检查器", EditorStyles.toolbarButton))
+                    currentTab = TabType.Resources;
+                
+                if (GUILayout.Toggle(currentTab == TabType.AssetBundle, "AssetBundle检查器", EditorStyles.toolbarButton))
+                    currentTab = TabType.AssetBundle;
+                
+                if (GUILayout.Toggle(currentTab == TabType.AssetDatabase, "AssetDatabase检查器（编辑器模式）", EditorStyles.toolbarButton))
+                    currentTab = TabType.AssetDatabase;
+            }
+            GUILayout.EndHorizontal();
+            GUILayout.Space(8);
+        }
+        
         private void DrawToolbar()
         {
             GUILayout.BeginHorizontal(EditorStyles.toolbar);
@@ -101,6 +145,378 @@ namespace F8Framework.Core.Editor
             GUILayout.EndHorizontal();
         }
 
+        // 新增方法：绘制Resources列表
+        private void DrawResourcesList()
+        {
+            // 获取Resources加载器数据
+            resourceLoaders = ResourcesManager.Instance.GetResourceLoaders();
+            if (resourceLoaders == null || resourceLoaders.Count == 0)
+            {
+                EditorGUILayout.HelpBox("没有通过Resources加载的资源", MessageType.Info);
+                return;
+            }
+            
+            scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
+            {
+                var sortedLoaders = resourceLoaders.OrderBy(pair => pair.Key).ToList();
+                int itemIndex = 0;
+
+                foreach (var pair in sortedLoaders)
+                {
+                    string resourcePath = pair.Key;
+                    ResourcesLoader loader = pair.Value;
+
+                    if (!string.IsNullOrEmpty(searchFilter) && !resourcePath.ToLower().Contains(searchFilter.ToLower()))
+                        continue;
+
+                    bool isUnloaded = loader.loadType == ResourcesLoader.LoaderType.NONE &&
+                                      loader.resourceLoadState == ResourcesLoader.LoaderState.NONE;
+                    bool isLoaded = loader.IsLoadFinished && !isUnloaded;
+
+                    // 根据筛选条件过滤
+                    if ((isLoaded && !showLoaded) || (isUnloaded && !showUnloaded))
+                        continue;
+                    
+                    DrawResourceItem(resourcePath, loader, itemIndex);
+                    itemIndex++;
+                }
+            }
+            EditorGUILayout.EndScrollView();
+        }
+
+        private void DrawResourceItem(string resourcePath, ResourcesLoader loader, int index)
+        {
+            bool isUnloaded = loader.loadType == ResourcesLoader.LoaderType.NONE &&
+                              loader.resourceLoadState == ResourcesLoader.LoaderState.NONE;
+            bool isLoaded = loader.IsLoadFinished && !isUnloaded;
+            bool isLoading = loader.resourceLoadState == ResourcesLoader.LoaderState.WORKING;
+
+            // 获取整行矩形
+            Rect rowRect = EditorGUILayout.BeginHorizontal();
+            {
+                // 绘制背景
+                Color bgColor = index % 2 == 0 ? new Color(0.3f, 0.3f, 0.3f, 0.2f) : new Color(0.4f, 0.4f, 0.4f, 0.2f);
+                EditorGUI.DrawRect(rowRect, bgColor);
+
+                // 1. 折叠箭头
+                bool isExpanded = expandedItems.Contains(resourcePath);
+                Rect foldoutRect = new Rect(rowRect.x + 4, rowRect.y + (rowRect.height - 16) / 2, 16, 16);
+                isExpanded = EditorGUI.Foldout(foldoutRect, isExpanded, GUIContent.none);
+                GUILayout.Space(20);
+
+                // 2. 资源路径
+                EditorGUILayout.LabelField(resourcePath, GUILayout.MinWidth(100), GUILayout.ExpandWidth(true));
+
+                // 3. 加载状态
+                string stateText = isUnloaded ? "已卸载" :
+                    isLoaded ? "已加载" :
+                    isLoading ? "加载中..." : "未知状态";
+
+                Color originalColor = GUI.color;
+                if (isUnloaded) GUI.color = Color.red;
+                else if (isLoading) GUI.color = Color.yellow;
+                else if (isLoaded) GUI.color = Color.green;
+
+                EditorGUILayout.LabelField(stateText, GUILayout.Width(80));
+                GUI.color = originalColor;
+
+                // 4. 内存占用
+                if (isLoaded)
+                {
+                    long memorySize = 0;
+
+                    // 计算主资源内存
+                    if (loader.ResouceObject != null)
+                    {
+                        memorySize += Profiler.GetRuntimeMemorySizeLong(loader.ResouceObject);
+                    }
+
+                    // 计算子资源内存（如果有）
+                    if (loader.GetAllAssetObject() != null && loader.GetAllAssetObject().Count > 0)
+                    {
+                        foreach (var obj in loader.GetAllAssetObject().Values)
+                        {
+                            if (obj != null)
+                            {
+                                memorySize += Profiler.GetRuntimeMemorySizeLong(obj);
+                            }
+                        }
+                    }
+
+                    EditorGUILayout.LabelField(EditorUtility.FormatBytes(memorySize), EditorStyles.miniLabel,
+                        GUILayout.Width(80));
+                }
+                else
+                {
+                    GUILayout.Space(80); // 保持布局一致
+                }
+
+                // 整行点击检测
+                if (Event.current.type == EventType.MouseDown && rowRect.Contains(Event.current.mousePosition))
+                {
+                    if (expandedItems.Contains(resourcePath))
+                        expandedItems.Remove(resourcePath);
+                    else
+                        expandedItems.Add(resourcePath);
+                    Event.current.Use();
+                    Repaint();
+                }
+            }
+            EditorGUILayout.EndHorizontal();
+
+            // 展开内容
+            if (expandedItems.Contains(resourcePath))
+            {
+                EditorGUI.indentLevel++;
+                DrawResourceDetails(loader);
+                EditorGUI.indentLevel--;
+            }
+        }
+
+        private void DrawResourceDetails(ResourcesLoader loader)
+        {
+            EditorGUILayout.Space(2);
+
+            // 基本信息
+            EditorGUILayout.LabelField($"加载状态: {loader.resourceLoadState}");
+            EditorGUILayout.LabelField($"加载类型: {loader.loadType}");
+
+            // 主资源显示
+            if (loader.ResouceObject != null)
+            {
+                EditorGUILayout.LabelField("主资源:", EditorStyles.boldLabel);
+                EditorGUI.indentLevel++;
+                EditorGUILayout.ObjectField(loader.ResouceObject, typeof(Object), false);
+                EditorGUI.indentLevel--;
+
+                // 显示主资源内存占用
+                long mainMemory = Profiler.GetRuntimeMemorySizeLong(loader.ResouceObject);
+                EditorGUILayout.LabelField($"主资源内存: {EditorUtility.FormatBytes(mainMemory)}");
+            }
+
+            // 所有资源显示
+            if (loader.GetAllAssetObject() != null && loader.GetAllAssetObject().Count > 0)
+            {
+                EditorGUILayout.LabelField("所有子资源:", EditorStyles.boldLabel);
+                EditorGUI.indentLevel++;
+
+                long totalSubMemory = 0;
+                foreach (var assetPair in loader.GetAllAssetObject())
+                {
+                    EditorGUILayout.BeginHorizontal();
+                    EditorGUILayout.LabelField(assetPair.Key);
+
+                    if (assetPair.Value != null)
+                    {
+                        EditorGUILayout.ObjectField(assetPair.Value, typeof(Object), false, GUILayout.Width(200));
+                        long subMemory = Profiler.GetRuntimeMemorySizeLong(assetPair.Value);
+                        EditorGUILayout.LabelField(EditorUtility.FormatBytes(subMemory), GUILayout.Width(80));
+                        totalSubMemory += subMemory;
+                    }
+                    else
+                    {
+                        EditorGUILayout.LabelField("(null)");
+                    }
+
+                    EditorGUILayout.EndHorizontal();
+                }
+
+                EditorGUILayout.LabelField($"子资源总内存: {EditorUtility.FormatBytes(totalSubMemory)}");
+                EditorGUI.indentLevel--;
+            }
+
+            // 操作按钮
+            EditorGUILayout.BeginHorizontal();
+            {
+                if (loader.IsLoadFinished && GUILayout.Button("卸载", EditorStyles.miniButton))
+                {
+                    LogF8.Log($"卸载Resources资源 {loader.resourcePath}");
+                    loader.Clear();
+                }
+
+                if (!loader.IsLoadFinished && GUILayout.Button("重新加载", EditorStyles.miniButton))
+                {
+                    LogF8.Log($"加载Resources资源 {loader.resourcePath}");
+                    loader.Load();
+                }
+            }
+            EditorGUILayout.EndHorizontal();
+        }
+        
+        private void DrawAssetDatabaseList()
+        {
+            // 获取AssetDatabase加载器数据
+            editorLoaders = AssetDatabaseManager.Instance.GetEditorLoaders();
+            if (editorLoaders == null || editorLoaders.Count == 0)
+            {
+                EditorGUILayout.HelpBox("没有通过AssetDatabase加载的资源", MessageType.Info);
+                return;
+            }
+            
+            scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
+            {
+                var sortedLoaders = editorLoaders.OrderBy(pair => pair.Key).ToList();
+                int itemIndex = 0;
+            
+                foreach (var pair in sortedLoaders)
+                {
+                    string assetPath = pair.Key;
+                    EditorLoader loader = pair.Value;
+            
+                    if (!string.IsNullOrEmpty(searchFilter) && !assetPath.ToLower().Contains(searchFilter.ToLower()))
+                        continue;
+            
+                    bool isUnloaded = !loader.LoaderSuccess;
+                    bool isLoaded = loader.LoaderSuccess;
+
+                    // 根据筛选条件过滤
+                    if ((isLoaded && !showLoaded) || (isUnloaded && !showUnloaded))
+                        continue;
+                    
+                    DrawAssetDatabaseItem(assetPath, loader, itemIndex);
+                    itemIndex++;
+                }
+            }
+            EditorGUILayout.EndScrollView();
+        }
+        
+        private void DrawAssetDatabaseItem(string assetPath, EditorLoader loader, int index)
+        {
+            bool isUnloaded = !loader.LoaderSuccess;
+            bool isLoaded = loader.LoaderSuccess;
+
+            // 获取整行矩形
+            Rect rowRect = EditorGUILayout.BeginHorizontal();
+            {
+                // 绘制背景
+                Color bgColor = index % 2 == 0 ? new Color(0.3f, 0.3f, 0.3f, 0.2f) : new Color(0.4f, 0.4f, 0.4f, 0.2f);
+                EditorGUI.DrawRect(rowRect, bgColor);
+
+                // 1. 折叠箭头
+                bool isExpanded = expandedItems.Contains(assetPath);
+                Rect foldoutRect = new Rect(rowRect.x + 4, rowRect.y + (rowRect.height - 16) / 2, 16, 16);
+                isExpanded = EditorGUI.Foldout(foldoutRect, isExpanded, GUIContent.none);
+                GUILayout.Space(20);
+
+                // 2. 资源路径
+                EditorGUILayout.LabelField(assetPath, GUILayout.MinWidth(100), GUILayout.ExpandWidth(true));
+
+                // 3. 加载状态
+                string stateText = isUnloaded ? "已卸载" :
+                    isLoaded ? "已加载" : "未知状态";
+
+                Color originalColor = GUI.color;
+                if (isUnloaded) GUI.color = Color.red;
+                else if (isLoaded) GUI.color = Color.green;
+
+                EditorGUILayout.LabelField(stateText, GUILayout.Width(80));
+                GUI.color = originalColor;
+
+                // 4. 内存占用
+                if (isLoaded)
+                {
+                    long memorySize = 0;
+
+                    // 计算主资源内存
+                    if (loader.Asset != null)
+                    {
+                        memorySize += Profiler.GetRuntimeMemorySizeLong(loader.Asset);
+                    }
+
+                    // 计算子资源内存（如果有）
+                    if (loader.GetAllAssetObject() != null && loader.GetAllAssetObject().Count > 0)
+                    {
+                        foreach (var obj in loader.GetAllAssetObject().Values)
+                        {
+                            if (obj != null)
+                            {
+                                memorySize += Profiler.GetRuntimeMemorySizeLong(obj);
+                            }
+                        }
+                    }
+
+                    EditorGUILayout.LabelField(EditorUtility.FormatBytes(memorySize), EditorStyles.miniLabel,
+                        GUILayout.Width(80));
+                }
+                else
+                {
+                    GUILayout.Space(80); // 保持布局一致
+                }
+
+                // 整行点击检测
+                if (Event.current.type == EventType.MouseDown && rowRect.Contains(Event.current.mousePosition))
+                {
+                    if (expandedItems.Contains(assetPath))
+                        expandedItems.Remove(assetPath);
+                    else
+                        expandedItems.Add(assetPath);
+                    Event.current.Use();
+                    Repaint();
+                }
+            }
+            EditorGUILayout.EndHorizontal();
+
+            // 展开内容
+            if (expandedItems.Contains(assetPath))
+            {
+                EditorGUI.indentLevel++;
+                DrawAssetDatabaseDetails(loader);
+                EditorGUI.indentLevel--;
+            }
+        }
+        
+        private void DrawAssetDatabaseDetails(EditorLoader loader)
+        {
+            EditorGUILayout.Space(2);
+
+            // 基本信息
+            EditorGUILayout.LabelField($"加载状态: {loader.LoaderSuccess}");
+
+            // 主资源显示
+            if (loader.Asset != null)
+            {
+                EditorGUILayout.LabelField("主资源:", EditorStyles.boldLabel);
+                EditorGUI.indentLevel++;
+                EditorGUILayout.ObjectField(loader.Asset, typeof(Object), false);
+                EditorGUI.indentLevel--;
+
+                // 显示主资源内存占用
+                long mainMemory = Profiler.GetRuntimeMemorySizeLong(loader.Asset);
+                EditorGUILayout.LabelField($"主资源内存: {EditorUtility.FormatBytes(mainMemory)}");
+            }
+
+            // 所有资源显示
+            if (loader.GetAllAssetObject() != null && loader.GetAllAssetObject().Count > 0)
+            {
+                EditorGUILayout.LabelField("所有子资源:", EditorStyles.boldLabel);
+                EditorGUI.indentLevel++;
+
+                long totalSubMemory = 0;
+                foreach (var assetPair in loader.GetAllAssetObject())
+                {
+                    EditorGUILayout.BeginHorizontal();
+                    EditorGUILayout.LabelField(assetPair.Key);
+
+                    if (assetPair.Value != null)
+                    {
+                        EditorGUILayout.ObjectField(assetPair.Value, typeof(Object), false, GUILayout.Width(200));
+                        long subMemory = Profiler.GetRuntimeMemorySizeLong(assetPair.Value);
+                        EditorGUILayout.LabelField(EditorUtility.FormatBytes(subMemory), GUILayout.Width(80));
+                        totalSubMemory += subMemory;
+                    }
+                    else
+                    {
+                        EditorGUILayout.LabelField("(null)");
+                    }
+
+                    EditorGUILayout.EndHorizontal();
+                }
+
+                EditorGUILayout.LabelField($"子资源总内存: {EditorUtility.FormatBytes(totalSubMemory)}");
+                EditorGUI.indentLevel--;
+            }
+        }
+        
         private void DrawAssetBundleList()
         {
             assetBundleLoaders = AssetBundleManager.Instance.GetAssetBundleLoaders();
@@ -132,10 +548,8 @@ namespace F8Framework.Core.Editor
                     bool isUnloaded = loader.assetBundleUnloadState == AssetBundleLoader.LoaderState.FINISHED ||
                                       (loader.assetBundleLoadState == AssetBundleLoader.LoaderState.NONE &&
                                        loader.assetBundleUnloadState != AssetBundleLoader.LoaderState.WORKING);
-                    bool isUnloading = loader.assetBundleUnloadState == AssetBundleLoader.LoaderState.WORKING;
                     bool isLoaded = loader.assetBundleLoadState == AssetBundleLoader.LoaderState.FINISHED &&
                                     !isUnloaded;
-                    bool isLoading = loader.assetBundleLoadState == AssetBundleLoader.LoaderState.WORKING;
 
                     // 根据筛选条件过滤
                     if ((isLoaded && !showLoaded) || (isUnloaded && !showUnloaded))

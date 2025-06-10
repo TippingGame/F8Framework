@@ -5,7 +5,7 @@ namespace F8Framework.Core
 {
     public class EditorLoader : BaseLoader
     {
-        private bool isLoadSuccess = false;
+        public bool isLoadSuccess = false;
         public override bool LoaderSuccess => isLoadSuccess == true;
 
         public Object Asset = null;

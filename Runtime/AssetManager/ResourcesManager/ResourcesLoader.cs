@@ -11,12 +11,12 @@ namespace F8Framework.Core
     /// </summary>
     public class ResourcesLoader : BaseLoader
     {
-        private string resourcePath = "";
+        public string resourcePath = "";
         private Object resouceObject;
         private Dictionary<string, Object> resouceObjects = new Dictionary<string, Object>();
         
-        private LoaderType loadType;
-        private LoaderState resourceLoadState;
+        public LoaderType loadType;
+        public LoaderState resourceLoadState;
         private ResourceRequest resourceLoadRequest;
         
         public override bool LoaderSuccess => resourceLoadState == LoaderState.FINISHED;
@@ -439,18 +439,15 @@ namespace F8Framework.Core
         /// </summary>
         public void Clear()
         {
-            resourcePath = "";
-            if(resouceObject != null &&
-               !(resouceObject is GameObject))
+            if(resouceObject != null && !(resouceObject is GameObject))
                 Resources.UnloadAsset(resouceObject);
-
+            resouceObject = null;
             foreach (var re in resouceObjects.Values)
             {
-                if(re != null &&
-                   !(re is GameObject))
+                if(re != null && !(re is GameObject))
                     Resources.UnloadAsset(re);
             }
-            
+            resouceObjects.Clear();
             loadType = LoaderType.NONE;
             resourceLoadState = LoaderState.NONE;
             resourceLoadRequest = null;

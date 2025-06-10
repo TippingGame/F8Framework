@@ -225,7 +225,8 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                     if (IsEditorMode)
                     {
-                        return EditorLoadAsset<T>(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], subAssetName, out EditorLoader editorLoader);
+                        return AssetDatabaseManager.Instance.EditorLoadAsset<T>(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0],
+                            subAssetName, out EditorLoader editorLoader);
                     }
 #endif
                     T o = AssetBundleManager.Instance.GetAssetObject<T>(info.AssetBundlePath, info.AssetPath[0], subAssetName, out AssetBundleLoader loader);
@@ -279,7 +280,8 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                     if (IsEditorMode)
                     {
-                        return EditorLoadAsset(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], out EditorLoader editorLoader, assetType, subAssetName);
+                        return AssetDatabaseManager.Instance.EditorLoadAsset(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0],
+                            out EditorLoader editorLoader, assetType, subAssetName);
                     }
 #endif
                     Object o = AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], assetType, subAssetName, out AssetBundleLoader loader);
@@ -331,7 +333,8 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                     if (IsEditorMode)
                     {
-                        return EditorLoadAsset<Object>(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], subAssetName, out EditorLoader editorLoader);
+                        return AssetDatabaseManager.Instance.EditorLoadAsset<Object>(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0],
+                            subAssetName, out EditorLoader editorLoader);
                     }
 #endif
                     Object o = AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], null, subAssetName, out AssetBundleLoader loader);
@@ -397,7 +400,8 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                     if (IsEditorMode)
                     {
-                        return EditorLoadAllAsset(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], out EditorLoader editorLoader);
+                        return AssetDatabaseManager.Instance.EditorLoadAllAsset(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0],
+                            out EditorLoader editorLoader);
                     }
 #endif
                     return AssetBundleManager.Instance.GetAllAssetObject(info.AssetBundlePath);
@@ -453,7 +457,8 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                     if (IsEditorMode)
                     {
-                        return EditorLoadAllAsset(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], out EditorLoader editorLoader);
+                        return AssetDatabaseManager.Instance.EditorLoadAllAsset(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0],
+                            out EditorLoader editorLoader);
                     }
 #endif
                     AssetBundleManager.Instance.Load(assetName, null, ref info, null, true);
@@ -531,7 +536,8 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                     if (IsEditorMode)
                     {
-                        var allAsset = EditorLoadAllAsset(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], out EditorLoader editorLoader);
+                        var allAsset = AssetDatabaseManager.Instance.EditorLoadAllAsset(
+                            info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], out EditorLoader editorLoader);
                         End(allAsset);
                         return editorLoader;
                     }
@@ -608,7 +614,8 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                     if (IsEditorMode)
                     {
-                        return EditorLoadAllAsset(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], out EditorLoader editorLoader);
+                        return AssetDatabaseManager.Instance.EditorLoadAllAsset(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0],
+                            out EditorLoader editorLoader);
                     }
 #endif
                     AssetBundleManager.Instance.Load(assetName, null, ref info, Guid.NewGuid().ToString());
@@ -686,7 +693,8 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                     if (IsEditorMode)
                     {
-                        var allAsset = EditorLoadAllAsset(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], out EditorLoader editorLoader);
+                        var allAsset = AssetDatabaseManager.Instance.EditorLoadAllAsset(
+                            info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], out EditorLoader editorLoader);
                         End(allAsset);
                         return editorLoader;
                     }
@@ -759,7 +767,8 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                     if (IsEditorMode)
                     {
-                        return EditorLoadAsset<T>(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], subAssetName, out EditorLoader editorLoader);
+                        return AssetDatabaseManager.Instance.EditorLoadAsset<T>(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0],
+                            subAssetName, out EditorLoader editorLoader);
                     }
 #endif
                     T o2 = AssetBundleManager.Instance.GetAssetObject<T>(info.AssetBundlePath, info.AssetPath[0], subAssetName, out AssetBundleLoader loader);
@@ -896,7 +905,8 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                     if (IsEditorMode)
                     {
-                        return EditorLoadAsset(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], out EditorLoader editorLoader, assetType, subAssetName);
+                        return AssetDatabaseManager.Instance.EditorLoadAsset(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0],
+                            out EditorLoader editorLoader, assetType, subAssetName);
                     }
 #endif
                     Object o2 = AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], assetType, subAssetName, out AssetBundleLoader loader);
@@ -966,7 +976,8 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                     if (IsEditorMode)
                     {
-                        return EditorLoadAsset<Object>(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], subAssetName, out EditorLoader editorLoader);
+                        return AssetDatabaseManager.Instance.EditorLoadAsset<Object>(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0],
+                            subAssetName, out EditorLoader editorLoader);
                     }
 #endif
                     Object o2 = AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], null, subAssetName, out AssetBundleLoader loader);
@@ -1052,7 +1063,8 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                     if (IsEditorMode)
                     {
-                        T o = EditorLoadAsset<T>(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], subAssetName, out EditorLoader editorLoader);
+                        T o = AssetDatabaseManager.Instance.EditorLoadAsset<T>(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0],
+                            subAssetName, out EditorLoader editorLoader);
                         End(o);
                         return editorLoader;
                     }
@@ -1140,7 +1152,8 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                     if (IsEditorMode)
                     {
-                        T o = EditorLoadAsset<T>(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], subAssetName, out EditorLoader editorLoader);
+                        T o = AssetDatabaseManager.Instance.EditorLoadAsset<T>(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0],
+                            subAssetName, out EditorLoader editorLoader);
                         yield return o;
                         yield break;
                     }
@@ -1218,7 +1231,8 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                     if (IsEditorMode)
                     {
-                        var o = EditorLoadAsset(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], out EditorLoader editorLoader, assetType, subAssetName);
+                        var o = AssetDatabaseManager.Instance.EditorLoadAsset(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0],
+                            out EditorLoader editorLoader, assetType, subAssetName);
                         yield return o;
                         yield break;
                     }
@@ -1531,7 +1545,8 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                     if (IsEditorMode)
                     {
-                        Object o = EditorLoadAsset(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], out EditorLoader editorLoader, assetType, subAssetName);
+                        Object o = AssetDatabaseManager.Instance.EditorLoadAsset(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0],
+                            out EditorLoader editorLoader, assetType, subAssetName);
                         End(o);
                         return editorLoader;
                     }
@@ -1629,7 +1644,8 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                     if (IsEditorMode)
                     {
-                        Object o = EditorLoadAsset<Object>(info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], subAssetName, out EditorLoader editorLoader);
+                        Object o = AssetDatabaseManager.Instance.EditorLoadAsset<Object>(
+                            info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0], subAssetName, out EditorLoader editorLoader);
                         End(o);
                         return editorLoader;
                     }
@@ -1717,6 +1733,13 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                 if (IsEditorMode)
                 {
+                    AssetDatabaseManager.Instance.Unload(SearchAsset(assetName));
+                    
+                    AssetInfo editorRes = GetAssetInfoFromResource(assetName);
+                    if (IsLegal(ref editorRes))
+                    {
+                        ResourcesManager.Instance.Unload(editorRes.AssetPath[0]);
+                    }
                     return;
                 }
 #endif
@@ -1733,7 +1756,7 @@ namespace F8Framework.Core
                 AssetInfo res = GetAssetInfoFromResource(assetName);
                 if (IsLegal(ref res))
                 {
-                    ResourcesManager.Instance.Unload(res.AssetPath[0], unloadAllLoadedObjects);
+                    ResourcesManager.Instance.Unload(res.AssetPath[0]);
                 }
             }
             
@@ -1750,6 +1773,14 @@ namespace F8Framework.Core
 #if UNITY_EDITOR
                 if (IsEditorMode)
                 {
+                    AssetDatabaseManager.Instance.Unload(SearchAsset(assetName));
+                    
+                    AssetInfo editorRes = GetAssetInfoFromResource(assetName);
+                    if (IsLegal(ref editorRes))
+                    {
+                        ResourcesManager.Instance.Unload(editorRes.AssetPath[0]);
+                    }
+                    callback?.Invoke();
                     return;
                 }
 #endif
@@ -1762,6 +1793,12 @@ namespace F8Framework.Core
                 if (IsLegal(ref abRemote))
                 {
                     AssetBundleManager.Instance.UnloadAsync(abRemote.AssetBundlePath, unloadAllLoadedObjects, callback);
+                }
+                AssetInfo res = GetAssetInfoFromResource(assetName);
+                if (IsLegal(ref res))
+                {
+                    ResourcesManager.Instance.Unload(res.AssetPath[0]);
+                    callback?.Invoke();
                 }
             }
             
@@ -1930,6 +1967,7 @@ namespace F8Framework.Core
     
                     if (Path.GetFileNameWithoutExtension(assetPath) == assetName)
                     {
+                        assetPath = assetPath.ToLower();
                         if (accessMode == AssetAccessMode.UNKNOWN)
                         {
                             findAssetPaths[assetName] = assetPath;
@@ -1947,76 +1985,6 @@ namespace F8Framework.Core
                     }
                 }
                 return null;
-            }
-#endif
-
-#if UNITY_EDITOR
-            // 编辑器下加载资源
-            private T EditorLoadAsset<T>(string assetPath, string subAssetName, out EditorLoader loader) where T : Object
-            {
-                if (subAssetName.IsNullOrEmpty())
-                {
-                    T o = UnityEditor.AssetDatabase.LoadAssetAtPath<T>(assetPath);
-                    loader = new EditorLoader(o);
-                    return o;
-                }
-                else
-                {
-                    var objs = UnityEditor.AssetDatabase.LoadAllAssetsAtPath(assetPath);
-                    foreach (var obj in objs)
-                    {
-                        if (obj.name == subAssetName)
-                        {
-                            loader = new EditorLoader(obj);
-                            return obj as T;
-                        }
-                    }
-                }
-                loader = null;
-                return null;
-            }
-                
-            private Object EditorLoadAsset(string assetPath, out EditorLoader loader, System.Type assetType = null, string subAssetName = null)
-            {
-                if (subAssetName.IsNullOrEmpty())
-                {
-                    if (assetType == null)
-                    {
-                        Object o = UnityEditor.AssetDatabase.LoadAssetAtPath<Object>(assetPath);
-                        loader = new EditorLoader(o);
-                        return o;
-                    }
-                    Object o2 =  UnityEditor.AssetDatabase.LoadAssetAtPath(assetPath, assetType);
-                    loader = new EditorLoader(o2);
-                    return o2;
-                }
-                else
-                {
-                    var objs = UnityEditor.AssetDatabase.LoadAllAssetsAtPath(assetPath);
-                    foreach (var obj in objs)
-                    {
-                        if (obj.name == subAssetName)
-                        {
-                            loader = new EditorLoader(obj);
-                            return obj;
-                        }
-                    }
-                }
-
-                loader = null;
-                return null;
-            }
-            
-            private Dictionary<string, Object> EditorLoadAllAsset(string assetPath, out EditorLoader loader)
-            {
-                var allAsset = new Dictionary<string, Object>();
-                var objs = UnityEditor.AssetDatabase.LoadAllAssetsAtPath(assetPath);
-                foreach (var obj in objs)
-                {
-                    allAsset[obj.name] = obj;
-                }
-                loader = new EditorLoader(null, allAsset);
-                return allAsset;
             }
 #endif
         
