@@ -136,12 +136,8 @@ namespace F8Framework.Core
 
             // 请求完成后检查是否有错误
             yield return uwr.SendWebRequest();
-
-#if UNITY_2020_2_OR_NEWER
+            
             if (uwr.result != UnityWebRequest.Result.Success)
-#else
-            if (uwr.isNetworkError || uwr.isHttpError)
-#endif
             {
                 LogF8.LogError($"无法对 URI：{uri} 发起资源包下载请求。错误：{uwr.error}");
                 LoadFail();

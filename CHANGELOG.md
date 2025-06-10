@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.7.146] - 2025-06-10
+1.优化UnityWebReques已弃用属性  
+2.优化是否需要加载AssetBundleManifest  
+
 ## [1.7.145] - 2025-06-08
 1.修复打包后AB名加上哈希值不会变化的问题  
 2.优化AB打包速度，打包后清理所有.manifest文件  

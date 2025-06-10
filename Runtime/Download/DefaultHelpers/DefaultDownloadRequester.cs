@@ -49,12 +49,8 @@ namespace F8Framework.Core
             using (UnityWebRequest request = UnityWebRequest.Head(uri))
             {
                 yield return request.SendWebRequest();
-#if UNITY_2020_1_OR_NEWER
                 if (request.result != UnityWebRequest.Result.ConnectionError &&
                     request.result != UnityWebRequest.Result.ProtocolError)
-#elif UNITY_2018_1_OR_NEWER
-                if (!request.isNetworkError && !request.isHttpError)
-#endif
                 {
                     string contentLengthHeader = request.GetResponseHeader("Content-Length");
                     if (!string.IsNullOrEmpty(contentLengthHeader) && long.TryParse(contentLengthHeader, out long fileLength))

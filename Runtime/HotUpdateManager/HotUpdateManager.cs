@@ -56,11 +56,7 @@ namespace F8Framework.Core
             
             UnityWebRequest webRequest = UnityWebRequest.Get(path);
             yield return webRequest.SendWebRequest();
-#if UNITY_2020_2_OR_NEWER
             if (webRequest.result != UnityWebRequest.Result.Success)
-#else
-            if (webRequest.isNetworkError || webRequest.isHttpError)
-#endif
             {
                 LogF8.LogError($"获取游戏远程版本失败：{path} ，错误：{webRequest.error}");
             }
@@ -87,11 +83,7 @@ namespace F8Framework.Core
             
             UnityWebRequest webRequest = UnityWebRequest.Get(path);
             yield return webRequest.SendWebRequest();
-#if UNITY_2020_2_OR_NEWER
             if (webRequest.result != UnityWebRequest.Result.Success)
-#else
-            if (webRequest.isNetworkError || webRequest.isHttpError)
-#endif
             {
                 LogF8.LogError($"获取游戏资源版本失败：{path} ，错误：{webRequest.error}");
             }

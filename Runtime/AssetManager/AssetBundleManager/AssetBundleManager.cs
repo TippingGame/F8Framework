@@ -988,8 +988,12 @@ namespace F8Framework.Core
             string manifestPath = GetAssetBundlePathByAbName(URLSetting.GetPlatformName());
             if (manifestPath == null)
                 yield break;
+            if (AssetBundleMap.Mappings.Count == 0)
+                yield break;
 #if UNITY_EDITOR
             manifestPath = Path.IsPathRooted(manifestPath) ? "file://" + manifestPath : manifestPath;
+            if (AssetManager.Instance.IsEditorMode)
+                yield break;
 #endif
             if (FileTools.IsLegalURI(manifestPath))
             {
@@ -1003,11 +1007,13 @@ namespace F8Framework.Core
                 }
                 else
                 {
-                    LogF8.LogError("如果游戏中没有使用任何AB包加载资源，可以删除此方法的调用！");
+                    LogF8.LogError("AssetBundle清单加载失败：" + manifestPath);
                 }
             }
             else
             {
+                if (!File.Exists(manifestPath))
+                    yield break;
                 var assetBundle = AssetBundle.LoadFromFile(manifestPath);
                 if (assetBundle)
                 {
@@ -1017,18 +1023,24 @@ namespace F8Framework.Core
                 }
                 else
                 {
-                    LogF8.LogError("如果游戏中没有使用任何AB包加载资源，可以删除此方法的调用！");
+                    LogF8.LogError("AssetBundle清单加载失败：" + manifestPath);
                 }
             }
         }
         
         public void OnInit(object createParam)
         {
-#if UNITY_WEBGL
-            
-#else
+#if !UNITY_WEBGL
+#if UNITY_EDITOR
+            if (AssetManager.Instance.IsEditorMode)
+                return;
+#endif
             string manifestPath = GetAssetBundlePathByAbName(URLSetting.GetPlatformName());
             if (manifestPath == null)
+                return;
+            if (AssetBundleMap.Mappings.Count == 0)
+                return;
+            if (!File.Exists(manifestPath))
                 return;
             var assetBundle = AssetBundle.LoadFromFile(manifestPath);
             if (assetBundle)
@@ -1039,7 +1051,7 @@ namespace F8Framework.Core
             }
             else
             {
-                LogF8.LogError("如果游戏中没有使用任何AB包加载资源，可以删除此方法的调用！");
+                LogF8.LogError("AssetBundle清单加载失败：" + manifestPath);
             }
 #endif
         }

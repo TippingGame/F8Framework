@@ -99,11 +99,7 @@ namespace F8Framework.Core
             Action<TranslationCompletedEventArgs> onCompleted,
             Action<TranslationErrorEventArgs> onError)
         {
-#if UNITY_2020_2_OR_NEWER
             if (www.result != UnityWebRequest.Result.Success)
-#else
-            if (www.isNetworkError || www.isHttpError)
-#endif
             {
                 if (onError != null)
                 {

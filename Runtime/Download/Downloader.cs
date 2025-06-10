@@ -327,12 +327,8 @@ namespace F8Framework.Core
                     OnFileDownloading(downloadInfo);
                     yield return null;
                 }
-#if UNITY_2020_1_OR_NEWER
                 if (request.result != UnityWebRequest.Result.ConnectionError &&
                     request.result != UnityWebRequest.Result.ProtocolError && canDownload)
-#elif UNITY_2018_1_OR_NEWER
-                if (!request.isNetworkError && !request.isHttpError && canDownload)
-#endif
                 {
                     if (request.isDone)
                     {
@@ -378,12 +374,8 @@ namespace F8Framework.Core
                 request.timeout = downloadTimeout;
                 request.redirectLimit = DownloadDataProxy.RedirectLimit;
                 yield return request.SendWebRequest();
-#if UNITY_2020_1_OR_NEWER
                 if (request.result != UnityWebRequest.Result.ConnectionError &&
                     request.result != UnityWebRequest.Result.ProtocolError && canDownload)
-#elif UNITY_2018_1_OR_NEWER
-                if (!request.isNetworkError && !request.isHttpError)
-#endif
                 {
                     var fileLength = long.Parse(request.GetRequestHeader("Content-Length"));
                     //totalRequiredDownloadLength += fileLength;
