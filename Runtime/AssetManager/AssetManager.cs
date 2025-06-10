@@ -1990,10 +1990,10 @@ namespace F8Framework.Core
         
             public void OnInit(object createParam)
             {
-                _assetBundleManager = ModuleCenter.CreateModule<AssetBundleManager>();
-                _resourcesManager = ModuleCenter.CreateModule<ResourcesManager>();
                 AssetBundleMap.Mappings = Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(Resources.Load<TextAsset>(nameof(AssetBundleMap)).ToString());
                 ResourceMap.Mappings = Util.LitJson.ToObject<Dictionary<string, string[]>>(Resources.Load<TextAsset>(nameof(ResourceMap)).ToString());
+                _assetBundleManager = ModuleCenter.CreateModule<AssetBundleManager>();
+                _resourcesManager = ModuleCenter.CreateModule<ResourcesManager>();
             }
 
             public void OnUpdate()

@@ -985,6 +985,8 @@ namespace F8Framework.Core
         // WebGL专用异步加载AssetBundleManifest
         public IEnumerator LoadAssetBundleManifest()
         {
+            if (AssetBundleMap.Mappings.Count == 0)
+                yield break;
             string manifestPath = GetAssetBundlePathByAbName(URLSetting.GetPlatformName());
             if (manifestPath == null)
                 yield break;
@@ -1026,9 +1028,11 @@ namespace F8Framework.Core
             }
         }
         
-        public void OnInit(object createParam)
+        public void LoadAssetBundleManifestSync()
         {
 #if !UNITY_WEBGL
+            if (AssetBundleMap.Mappings.Count == 0)
+                return;
 #if UNITY_EDITOR
             if (AssetManager.Instance.IsEditorMode)
                 return;
@@ -1050,6 +1054,11 @@ namespace F8Framework.Core
                 LogF8.LogError("AssetBundle清单加载失败：" + manifestPath);
             }
 #endif
+        }
+        
+        public void OnInit(object createParam)
+        {
+            LoadAssetBundleManifestSync();
         }
         
         public void OnUpdate()

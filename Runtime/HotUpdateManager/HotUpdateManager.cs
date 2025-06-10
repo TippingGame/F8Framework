@@ -252,6 +252,8 @@ namespace F8Framework.Core
                     FileTools.SafeWriteAllText(Application.persistentDataPath + "/" + nameof(AssetBundleMap) + ".json",
                         Util.LitJson.ToJson(AssetBundleMap.Mappings));
                 }
+                
+                AssetBundleManager.Instance.LoadAssetBundleManifestSync();
             }
             // 下载器开始下载
             hotUpdateDownloader.LaunchDownload();

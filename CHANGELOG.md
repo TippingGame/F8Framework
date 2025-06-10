@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.7.149] - 2025-06-10
+1.修复热更新后没重新加载AssetBundleManifest的问题  
+
 ## [1.7.148] - 2025-06-10
 1.修复加载AssetBundleManifest时被错误返回的问题  
 
