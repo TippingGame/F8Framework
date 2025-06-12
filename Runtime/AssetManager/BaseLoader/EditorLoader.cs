@@ -13,11 +13,16 @@ namespace F8Framework.Core
         
         public EditorLoader(Object asset = null, Dictionary<string, Object> allAsset = null)
         {
-            isLoadSuccess = true;
             Asset = asset;
             AllAsset = allAsset;
         }
-
+        
+        public void AssetDatabaseLoadSuccess()
+        {
+            isLoadSuccess = true;
+            base.OnComplete();
+        }
+        
         public override T GetAssetObject<T>(string subAssetName = null)
         {
             return Asset as T;

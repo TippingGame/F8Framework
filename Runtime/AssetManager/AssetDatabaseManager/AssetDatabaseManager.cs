@@ -35,6 +35,7 @@ namespace F8Framework.Core
             {
                 T o = UnityEditor.AssetDatabase.LoadAssetAtPath<T>(assetPath);
                 loader.Asset = o;
+                loader.AssetDatabaseLoadSuccess();
                 if (loader.Asset is SceneAsset)
                 {
                     var loadSceneParams = new UnityEngine.SceneManagement.LoadSceneParameters(UnityEngine.SceneManagement.LoadSceneMode.Single, UnityEngine.SceneManagement.LocalPhysicsMode.None);
@@ -54,6 +55,7 @@ namespace F8Framework.Core
                         loader.Asset = obj;
                     }
                 }
+                loader.AssetDatabaseLoadSuccess();
                 return loader.Asset == null ? null : loader.Asset as T;
             }
         }
@@ -68,6 +70,7 @@ namespace F8Framework.Core
                 {
                     Object o = UnityEditor.AssetDatabase.LoadAssetAtPath<Object>(assetPath);
                     loader.Asset = o;
+                    loader.AssetDatabaseLoadSuccess();
                     if (loader.Asset is SceneAsset)
                     {
                         var loadSceneParams = new UnityEngine.SceneManagement.LoadSceneParameters(UnityEngine.SceneManagement.LoadSceneMode.Single, UnityEngine.SceneManagement.LocalPhysicsMode.None);
@@ -92,6 +95,7 @@ namespace F8Framework.Core
                         loader.Asset = obj;
                     }
                 }
+                loader.AssetDatabaseLoadSuccess();
                 return loader.Asset == null ? null : loader.Asset;
             }
         }
@@ -105,7 +109,7 @@ namespace F8Framework.Core
             {
                 loader.AllAsset.TryAdd(obj.name, obj);
             }
-            
+            loader.AssetDatabaseLoadSuccess();
             return loader.AllAsset;
         }
 

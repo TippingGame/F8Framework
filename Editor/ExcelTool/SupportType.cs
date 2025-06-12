@@ -276,7 +276,12 @@ namespace F8Framework.Core.Editor
             {
                 source.Append("\t\t\tyield return LoadAsync<" + t + ">("+ '"' + t + '"' + ", result => " +  "p_" + t + " = result" + " as " + t + ");\n");
             }
-
+            source.Append("#if UNITY_EDITOR\n");
+            source.Append("\t\t\tif (AssetManager.Instance.IsEditorMode)\n");
+            source.Append("\t\t\t{\n");
+            source.Append("\t\t\t\tReadExcel.Instance.LoadAllExcelData();\n");
+            source.Append("\t\t\t}\n");
+            source.Append("#endif\n");
             source.Append("\t\t}\n\n");
             
             //异步加载所有配置表
@@ -294,6 +299,12 @@ namespace F8Framework.Core.Editor
             {
                 source.Append("\t\t\tyield return LoadAsync<" + t + ">("+ '"' + t + '"' + ", result => " +  "p_" + t + " = result" + " as " + t + ");\n");
             }
+            source.Append("#if UNITY_EDITOR\n");
+            source.Append("\t\t\tif (AssetManager.Instance.IsEditorMode)\n");
+            source.Append("\t\t\t{\n");
+            source.Append("\t\t\t\tReadExcel.Instance.LoadAllExcelData();\n");
+            source.Append("\t\t\t}\n");
+            source.Append("#endif\n");
             source.Append("\t\t\tonLoadComplete?.Invoke();\n");
             source.Append("\t\t}\n\n");
             

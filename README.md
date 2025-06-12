@@ -98,11 +98,12 @@ git clone https://github.com/TippingGame/F8Framework.git
 
 
 ## 赞助
+###### (可备注留言你的主页链接)
 ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/Sponsorship_icon_356.png)
 ###### 感谢赞助
 
-| <img src='https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/Sponsor/yemaozi.png' width="38"/> 夜猫子 ￥8.88 | <img src='https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/Sponsor/fumeng.png' width="38"/> 浮梦 ￥6.6 |  |  |
-| --- |-----------------------------------------------------------------------------------------------------------------------------| --- | --- |
+| <img src='https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/Sponsor/yemaozi.png' width="38"/> 夜猫子 ￥8.88 | <img src='https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/Sponsor/fumeng.png' width="38"/> 浮梦 ￥6.6 | <img src='https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/Sponsor/WXanonymous.png' width="38"/> C*r ￥20 |  |
+| --- |-----------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------| --- |
 
 ---
 
