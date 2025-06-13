@@ -53,6 +53,69 @@ namespace F8Framework.Core.Editor
         public static string BuildPath => F8EditorPrefs.GetString(_prefBuildPathKey, null) ?? _buildPath;
         public static string ToVersion => F8EditorPrefs.GetString(_toVersionKey, null) ?? _toVersion;
         
+        // Jenkins打包专用
+        public static void JenkinsBuild()
+        {
+            string[] args = Environment.GetCommandLineArgs();
+            
+            string platformStr = GetArgValue(args, "Platform-");
+            BuildTarget platform = BuildTarget.NoTarget;
+            if (Enum.TryParse<BuildTarget>(platformStr, out platform))
+            {
+                LogF8.Log($"转换成功: {platform}");
+            }
+            string buildPath = GetArgValue(args, "BuildPath-");
+            string version = GetArgValue(args, "Version-");
+            string codeVersion = GetArgValue(args, "CodeVersion-");
+            string assetRemoteAddress = GetArgValue(args, "AssetRemoteAddress-");
+            bool enableHotUpdate = GetArgValue(args, "EnableHotUpdate-").Equals("true", StringComparison.OrdinalIgnoreCase);
+            bool enablePackage = GetArgValue(args, "EnablePackage-").Equals("true", StringComparison.OrdinalIgnoreCase);
+            bool enableFullPackage = GetArgValue(args, "EnableFullPackage-").Equals("true", StringComparison.OrdinalIgnoreCase);
+            bool enableOptionalPackage = GetArgValue(args, "EnableOptionalPackage-").Equals("true", StringComparison.OrdinalIgnoreCase);
+            string optionalPackage = GetArgValue(args, "OptionalPackage-");
+            bool enableNullPackage = GetArgValue(args, "EnableNullPackage-").Equals("true", StringComparison.OrdinalIgnoreCase);
+
+            F8EditorPrefs.SetBool(_exportCurrentPlatformKey, false);
+            F8EditorPrefs.SetString(_exportPlatformKey, platformStr);
+            _buildTarget = platform;
+            F8EditorPrefs.SetString(_prefBuildPathKey, buildPath);
+            _buildPath = buildPath;
+            F8EditorPrefs.SetString(_toVersionKey, version);
+            _toVersion = version;
+            F8EditorPrefs.SetString(_codeVersionKey, codeVersion);
+            _codeVersion = codeVersion;
+            F8EditorPrefs.SetBool(_enableHotUpdateKey, enableHotUpdate);
+            _enableHotUpdate = enableHotUpdate;
+            F8EditorPrefs.SetBool(_enableFullPackageKey, enableFullPackage);
+            _enableFullPackage = enableFullPackage;
+            F8EditorPrefs.SetBool(_enableOptionalPackageKey, enableOptionalPackage);
+            _enableOptionalPackage = enableOptionalPackage;
+            F8EditorPrefs.SetBool(_enableNullPackageKey, enableNullPackage);
+            _enableNullPackage = enableNullPackage;
+            F8EditorPrefs.SetString(_optionalPackageKey, optionalPackage);
+            _optionalPackage = optionalPackage;
+            F8EditorPrefs.SetBool(_enablePackageKey, enablePackage);
+            _enablePackage = enablePackage;
+            F8EditorPrefs.SetString(_assetRemoteAddressKey, assetRemoteAddress);
+            _assetRemoteAddress = assetRemoteAddress;
+            
+            WriteGameVersion();
+            Build();
+            WriteAssetVersion();
+        }
+        
+        public static string GetArgValue(string[] args, string argName)
+        {
+            for (int i = 0; i < args.Length; i++)
+            {
+                if (args[i] == argName && i + 1 < args.Length)
+                {
+                    return args[i + 1];
+                }
+            }
+            return null;
+        }
+        
         // 构建热更版本
         public static void BuildUpdate()
         {
@@ -188,7 +251,7 @@ namespace F8Framework.Core.Editor
                 BuildReport buildReport = BuildPipeline.BuildPlayer(buildPlayerOptions);
                 if (buildReport.summary.result != BuildResult.Succeeded)
                 {
-                    LogF8.LogError($"导出失败了，检查一下 Unity 内置的 Build Settings 导出的路径是否存在，Unity 没有给我清理缓存！: {buildReport.summary.result}");
+                    LogF8.LogError($"导出失败了，检查一下 Unity 内置的 Build Settings 导出的路径是否存在，并使用 Unity 内置打包工具打包一次，或 Unity 没有给我清理缓存，尝试使用 Clean 打包模式！: {buildReport.summary.result}");
                 }
 
                 LogF8.LogVersion("游戏全量包打包成功! " + locationPathName);
@@ -237,7 +300,7 @@ namespace F8Framework.Core.Editor
                 BuildReport buildReport = BuildPipeline.BuildPlayer(buildPlayerOptions);
                 if (buildReport.summary.result != BuildResult.Succeeded)
                 {
-                    LogF8.LogError($"导出失败了，检查一下 Unity 内置的 Build Settings 导出的路径是否存在，Unity 没有给我清理缓存！: {buildReport.summary.result}");
+                    LogF8.LogError($"导出失败了，检查一下 Unity 内置的 Build Settings 导出的路径是否存在，并使用 Unity 内置打包工具打包一次，或 Unity 没有给我清理缓存，尝试使用 Clean 打包模式！: {buildReport.summary.result}");
                 }
 
                 if (Directory.Exists(toPath))

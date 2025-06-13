@@ -78,6 +78,15 @@ namespace F8Framework.Core.Editor
             FileTools.SafeWriteAllText(asmrefPath, asmdefContent);
             LogF8.LogConfig("创建.asmdef文件 " + Application.dataPath + DLLFolder + "/<color=#FF9E59>" + CODE_NAMESPACE + ".asmdef" + "</color>");
         }
+
+        // Jenkins导表专用
+        public static void JenkinsLoadAllExcelData()
+        {
+            string[] args = Environment.GetCommandLineArgs();
+            string ExcelPath = BuildPkgTool.GetArgValue(args, "ExcelPath-");
+            F8EditorPrefs.SetString("ExcelPath", ExcelPath);
+            LoadAllExcelData();
+        }
         
         public static void LoadAllExcelData()
         {
@@ -180,7 +189,17 @@ namespace F8Framework.Core.Editor
                 F8EditorPrefs.SetBool("compilationFinished", true);
             };
         }
-        
+
+        // Jenkins导表专用
+        public static void JenkinsAllScriptsReloaded()
+        {
+            string[] args = Environment.GetCommandLineArgs();
+            string ExcelPath = BuildPkgTool.GetArgValue(args, "ExcelPath-");
+            F8EditorPrefs.SetString("ExcelPath", ExcelPath);
+            F8EditorPrefs.SetBool("compilationFinished", true);
+            AllScriptsReloaded();
+        }
+
         // 等待脚本编译完成
         [UnityEditor.Callbacks.DidReloadScripts]
         private static void AllScriptsReloaded()

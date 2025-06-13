@@ -39,6 +39,7 @@ namespace F8Framework.Core.Editor
             options |= BuildAssetBundleOptions.DisableLoadAssetByFileName;
             options |= BuildAssetBundleOptions.DisableLoadAssetByFileNameWithExtension;
             options |= BuildAssetBundleOptions.ChunkBasedCompression;
+            options |= BuildAssetBundleOptions.StrictMode;
             if (appendHashToAssetBundleName)
             {
                 options |= BuildAssetBundleOptions.AppendHashToAssetBundleName;

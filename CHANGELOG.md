@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.7.151] - 2025-06-13
+1.#35 新增Jenkins构建支持，使用接口JenkinsLoadAllExcelData，JenkinsAllScriptsReloaded，JenkinsBuild  
+
 ## [1.7.150] - 2025-06-12
 1.修复编辑器模式下加载资产await状态没重置的问题  
 2.优化编辑器模式下修改配置表后无需手动导表  

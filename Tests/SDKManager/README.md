@@ -131,3 +131,24 @@ public static bool DisableUnityCacheOnWebGL = false;
   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20240329230924.png)  
 
 ### 如构建失败：请尝试使用Unity自带的Build一次后再尝试
+
+## 使用Jenkins进行远程打包
+
+1. [下载Java SDK，演示用的 21.0.7 版本](https://www.oracle.com/cn/java/technologies/downloads/)
+2. [下载Jenkins，演示用的 2.504.2 LTS 版本](https://www.jenkins.io/download/)
+3. 按顺序安装完成后，启动jenkins
+4. 创建一个job，配置如下
+   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1749788881032.png)  
+   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1749788919208.png)  
+5. Plugins界面安装Unity3d plugin
+   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1749787027911.png)  
+6. Tools界面添加Unity版本
+   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1749787076031.png)  
+7. 复制 [config.xml](https://github.com/TippingGame/F8Framework/blob/main/Editor/Build/Jenkins/config.xml) 到Jenkins数据目录对应的job目录下
+   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1749789384733.png)  
+8. 重启Jenkins服务
+   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1749790107926.png)  
+9. 修改配置下的Build Steps的Unity版本
+    ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1749789502754.png)  
+10. 最后调整参数（与编辑器的打包界面一致），进行打包
+    ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1749789318664.png)  
