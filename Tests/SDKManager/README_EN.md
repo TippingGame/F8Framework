@@ -69,20 +69,20 @@ Unity F8 SDKManager组件，与原生平台交互，接入多个平台或者渠�
 * 注意：每个unity版本略有差异，更换unity版本后请手动删除这两个文件
 ------------------------------
 * （可选）使用安卓工程打包aar [UnityAndroidDemo2021.3.15f1.zip](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/UnityAndroidDemo2021.3.15f1.zip)，用作导出 [UnityAndroidDemo-release.aar](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/Gradle6.1.1/UnityAndroidDemo-release) 和 [AndroidManifest.xml](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/Gradle6.1.1/AndroidManifest)
-  1. 下载 [Android Studio](https://developer.android.google.cn/studio/archive/) （网页右上角语言改为英文）
-  2. 选择版本：unity2022 / 2023：android-studio-2022.2.1.20-windows，unity2023 / 6000：2023.3.1.20-windows
-  3. 解压工程打开后，在 Settings -> Build -> Build Tool -> Gradle -> Gradle JDK，修改 JDK 为unity安装路径自带的（如：C:\Program Files\Unity\Hub\Editor\6000.1.5f1\Editor\Data\PlaybackEngines\AndroidPlayer\OpenJDK）
-  4. 在 Project Structure -> Project / SDK Location，修改 Gradle 版本，修改 SDK 为unity安装路径自带的（如：C:\Program Files\Unity\Hub\Editor\6000.1.5f1\Editor\Data\PlaybackEngines\AndroidPlayer\SDK）
-  5. 上方菜单栏 Build -> Rebuild Project 导出后会生成aar文件
-  6. 使用可以读取zip的压缩软件，删除aar里 libs/classes.jar 文件
-  7. 再打开根目录的 classes.jar ，删除里面的 UnityPlayerActivity.java 文件（unity2023 / 6000不需要此步骤）
+    1. 下载 [Android Studio](https://developer.android.google.cn/studio/archive/) （网页右上角语言改为英文）
+    2. 选择版本：unity2022 / 2023：android-studio-2022.2.1.20-windows，unity2023 / 6000：2023.3.1.20-windows
+    3. 解压工程打开后，在 Settings -> Build -> Build Tool -> Gradle -> Gradle JDK，修改 JDK 为unity安装路径自带的（如：C:\Program Files\Unity\Hub\Editor\6000.1.5f1\Editor\Data\PlaybackEngines\AndroidPlayer\OpenJDK）
+    4. 在 Project Structure -> Project / SDK Location，修改 Gradle 版本，修改 SDK 为unity安装路径自带的（如：C:\Program Files\Unity\Hub\Editor\6000.1.5f1\Editor\Data\PlaybackEngines\AndroidPlayer\SDK）
+    5. 上方菜单栏 Build -> Rebuild Project 导出后会生成aar文件
+    6. 使用可以读取zip的压缩软件，删除aar里 libs/classes.jar 文件
+    7. 再打开根目录的 classes.jar ，删除里面的 UnityPlayerActivity.java 文件（unity2023 / 6000不需要此步骤）
 ------------------------------
 
 * 提供四个unity版本的安卓工程
-  1. unity2021.3.15f1：[UnityAndroidDemo2021.3.15f1.zip](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/UnityAndroidDemo2021.3.15f1.zip)
-  2. unity2022.3.52f1：[UnityAndroidDemo2022.3.52f1.zip](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2022/UnityAndroidDemo2022.3.52f1.zip)
-  3. unity2023.2.20f1（2023已被unity弃用）：[UnityAndroidDemo2023.2.20f1.zip](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2023/UnityAndroidDemo2023.2.20f1.zip)
-  4. unity6000.0.24f1：[UnityAndroidDemo6000.0.24f1.zip](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ6000/UnityAndroidDemo6000.0.24f1.zip)
+    1. unity2021.3.15f1：[UnityAndroidDemo2021.3.15f1.zip](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/UnityAndroidDemo2021.3.15f1.zip)
+    2. unity2022.3.52f1：[UnityAndroidDemo2022.3.52f1.zip](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2022/UnityAndroidDemo2022.3.52f1.zip)
+    3. unity2023.2.20f1（2023已被unity弃用）：[UnityAndroidDemo2023.2.20f1.zip](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2023/UnityAndroidDemo2023.2.20f1.zip)
+    4. unity6000.0.24f1：[UnityAndroidDemo6000.0.24f1.zip](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ6000/UnityAndroidDemo6000.0.24f1.zip)
 ------------------------------
 * 打包成功后运行可以看到这个界面  
   1.如果你不想显示这个界面  
@@ -97,6 +97,7 @@ Unity F8 SDKManager组件，与原生平台交互，接入多个平台或者渠�
 ---
 ## WebGL游戏
 * 注意：WebGL不能使用同步加载 AB 资源，可同步加载 Resources 资源
+---
 ## 微信小游戏接入方法
 * 浏览[WebGL转微信小游戏](https://github.com/wechat-miniprogram/minigame-unity-webgl-transform)插件的使用方法，下载[ unitypackage ](https://game.weixin.qq.com/cgi-bin/gamewxagwasmsplitwap/getunityplugininfo?download=1)并导入至游戏项目中
 ---
@@ -132,23 +133,26 @@ public static bool DisableUnityCacheOnWebGL = false;
 
 ### 如构建失败：请尝试使用Unity自带的Build一次后再尝试
 
+---
+
 ## 使用Jenkins进行远程打包
 
 1. [下载Java SDK，演示用的 21.0.7 版本](https://www.oracle.com/cn/java/technologies/downloads/)
-2. [下载Jenkins，演示用的 2.504.2 LTS 版本](https://www.jenkins.io/download/)
-3. 按顺序安装完成后，启动jenkins
-4. 创建一个job，配置如下
+2. [下载Jenkins，演示用的 2.504.2 LTS 版本](https://www.jenkins.io/download/)，安装需使用本机管理员账号（否则打包可能失败）
+   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1749999206518.png)
+3. 按顺序安装完成后，启动 jenkins
+4. 创建一个 job，配置如下
    ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1749788881032.png)  
    ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1749788919208.png)
-5. Plugins界面安装Unity3d plugin
+5. Plugins 界面安装 Unity3d plugin
    ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1749787027911.png)
-6. Tools界面添加Unity版本
+6. Tools 界面添加 Unity 版本
    ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1749787076031.png)
-7. 复制 [config.xml](https://github.com/TippingGame/F8Framework/blob/main/Editor/Build/Jenkins/config.xml) 到Jenkins数据目录对应的job目录下
+7. 复制 [config.xml](https://github.com/TippingGame/F8Framework/blob/main/Editor/Build/Jenkins/config.xml) 到 Jenkins 数据目录对应的 job 目录下
    ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1749789384733.png)
-8. 重启Jenkins服务
+8. 重启 Jenkins 服务
    ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1749790107926.png)
-9. 修改配置下的Build Steps的Unity版本
+9. （如需要修改 Unity 版本，名称根据上方 Tools 界面的为准）修改配置界面里的 Build Steps 的 Unity 版本
    ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1749789502754.png)
 10. 最后调整参数（与编辑器的打包界面一致），进行打包
     ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1749789318664.png)  

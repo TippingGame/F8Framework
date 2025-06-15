@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.7.152] - 2025-06-15
+1.新增更多的可构建平台
+2.新增构建时可修改Android平台下的签名信息，构建aab包选项  
+
 ## [1.7.151] - 2025-06-13
 1.#35 新增Jenkins构建支持，使用接口JenkinsLoadAllExcelData，JenkinsAllScriptsReloaded，JenkinsBuild  
 

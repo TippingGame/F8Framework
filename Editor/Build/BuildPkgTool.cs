@@ -26,6 +26,12 @@ namespace F8Framework.Core.Editor
         private static string _assetRemoteAddressKey = "AssetRemoteAddressKey";
         private static string _enablePackageKey = "EnablePackageKey";
         private static string _locationPathNameKey = "LocationPathNameKey";
+        private static string _androidBuildAppBundleKey = "AndroidBuildAppBundleKey";
+        private static string _androidUseKeystoreKey = "AndroidUseKeystoreKey";
+        private static string _androidKeystoreNameKey = "AndroidKeystoreNameKey";
+        private static string _androidKeystorePassKey = "AndroidKeystorePassKey";
+        private static string _androidKeyAliasNameKey = "AndroidKeyAliasNameKey";
+        private static string _androidKeyAliasPassKey = "AndroidKeyAliasPassKey";
         
         private static string _buildPath = "";
         private static string _toVersion = "1.0.0";
@@ -48,7 +54,12 @@ namespace F8Framework.Core.Editor
         private static string[] _optionNames = Array.ConvertAll(_options, option => option.ToString());
         
         private static bool _exportCurrentPlatform = true;
-
+        private static bool _androidBuildAppBundle = false;
+        private static bool _androidUseKeystore = false;
+        private static string _androidKeystoreName = "";
+        private static string _androidKeystorePass = "";
+        private static string _androidKeyAliasName = "";
+        private static string _androidKeyAliasPass = "";
 
         public static string BuildPath => F8EditorPrefs.GetString(_prefBuildPathKey, null) ?? _buildPath;
         public static string ToVersion => F8EditorPrefs.GetString(_toVersionKey, null) ?? _toVersion;
@@ -74,6 +85,12 @@ namespace F8Framework.Core.Editor
             bool enableOptionalPackage = GetArgValue(args, "EnableOptionalPackage-").Equals("true", StringComparison.OrdinalIgnoreCase);
             string optionalPackage = GetArgValue(args, "OptionalPackage-");
             bool enableNullPackage = GetArgValue(args, "EnableNullPackage-").Equals("true", StringComparison.OrdinalIgnoreCase);
+            bool androidBuildAppBundle = GetArgValue(args, "AndroidBuildAppBundle-").Equals("true", StringComparison.OrdinalIgnoreCase);
+            bool androidUseKeystore = GetArgValue(args, "AndroidUseKeystore-").Equals("true", StringComparison.OrdinalIgnoreCase);
+            string androidKeystoreName = GetArgValue(args, "AndroidKeystoreName-");
+            string androidKeystorePass = GetArgValue(args, "AndroidKeystorePass-");
+            string androidKeyAliasName = GetArgValue(args, "AndroidKeyAliasName-");
+            string androidKeyAliasPass  = GetArgValue(args, "AndroidKeyAliasPass-");
 
             F8EditorPrefs.SetBool(_exportCurrentPlatformKey, false);
             F8EditorPrefs.SetString(_exportPlatformKey, platformStr);
@@ -98,6 +115,19 @@ namespace F8Framework.Core.Editor
             _enablePackage = enablePackage;
             F8EditorPrefs.SetString(_assetRemoteAddressKey, assetRemoteAddress);
             _assetRemoteAddress = assetRemoteAddress;
+            
+            F8EditorPrefs.SetBool(_androidBuildAppBundleKey, androidBuildAppBundle);
+            _androidBuildAppBundle = androidBuildAppBundle;
+            F8EditorPrefs.SetBool(_androidUseKeystoreKey, androidUseKeystore);
+            _androidUseKeystore = androidUseKeystore;
+            F8EditorPrefs.SetString(_androidKeystoreNameKey, androidKeystoreName);
+            _androidKeystoreName = androidKeystoreName;
+            F8EditorPrefs.SetString(_androidKeystorePassKey, androidKeystorePass);
+            _androidKeystorePass = androidKeystorePass;
+            F8EditorPrefs.SetString(_androidKeyAliasNameKey, androidKeyAliasName);
+            _androidKeyAliasName = androidKeyAliasName;
+            F8EditorPrefs.SetString(_androidKeyAliasPassKey, androidKeyAliasPass);
+            _androidKeyAliasPass = androidKeyAliasPass;
             
             WriteGameVersion();
             Build();
@@ -181,16 +211,6 @@ namespace F8Framework.Core.Editor
         // 运行导出的游戏
         public static void RunExportedGame()
         {
-            // string path = F8EditorPrefs.GetString(_locationPathNameKey, "");
-            // if (File.Exists(path))
-            // {
-            //     System.Diagnostics.Process.Start(path);
-            //     LogF8.LogVersion("已运行导出的游戏：" + path);
-            // }
-            // else
-            // {
-            //     LogF8.LogError("无法打开导出的游戏文件：" + path);
-            // }
         }
         
         /// <summary>
@@ -222,7 +242,13 @@ namespace F8Framework.Core.Editor
                     appName += ".exe";
                     break;
                 case BuildTarget.Android:
-                    appName += ".apk";
+                    appName += F8EditorPrefs.GetBool(_androidBuildAppBundleKey, false) ? ".aab" : ".apk";
+                    EditorUserBuildSettings.buildAppBundle = F8EditorPrefs.GetBool(_androidBuildAppBundleKey, false);
+                    PlayerSettings.Android.useCustomKeystore = F8EditorPrefs.GetBool(_androidUseKeystoreKey, false);
+                    PlayerSettings.Android.keystoreName = F8EditorPrefs.GetString(_androidKeystoreNameKey, "");
+                    PlayerSettings.Android.keystorePass = F8EditorPrefs.GetString(_androidKeystorePassKey, "");
+                    PlayerSettings.Android.keyaliasName = F8EditorPrefs.GetString(_androidKeyAliasNameKey, "");
+                    PlayerSettings.Android.keyaliasPass = F8EditorPrefs.GetString(_androidKeyAliasPassKey, "");
                     break;
             }
             
@@ -238,6 +264,7 @@ namespace F8Framework.Core.Editor
             if (enableFullPackage)
             {
                 string locationPathName = buildPath + "/" + buildTarget.ToString() + "_Full_" + toVersion  + "/" + appName;
+                locationPathName = FileTools.FormatToUnityPath(locationPathName);
                 F8EditorPrefs.SetString(_locationPathNameKey, locationPathName);
                 FileTools.CheckFileAndCreateDirWhenNeeded(locationPathName);
                 
@@ -287,6 +314,7 @@ namespace F8Framework.Core.Editor
                
                 AssetDatabase.Refresh();
                 string locationPathName = buildPath + "/" + buildTarget.ToString() + "_Optional_" + toVersion  + "/" + appName;
+                locationPathName = FileTools.FormatToUnityPath(locationPathName);
                 F8EditorPrefs.SetString(_locationPathNameKey, locationPathName);
                 FileTools.CheckFileAndCreateDirWhenNeeded(locationPathName);
                 
@@ -330,6 +358,7 @@ namespace F8Framework.Core.Editor
                     new[] { URLSetting.GetPlatformName(), URLSetting.GetPlatformName() + ".manifest" });
                 AssetDatabase.Refresh();
                 string locationPathName = buildPath + "/" + buildTarget.ToString() + "_Null_" + toVersion  + "/" + appName;
+                locationPathName = FileTools.FormatToUnityPath(locationPathName);
                 F8EditorPrefs.SetString(_locationPathNameKey, locationPathName);
                 FileTools.CheckFileAndCreateDirWhenNeeded(locationPathName);
                 
@@ -384,9 +413,106 @@ namespace F8Framework.Core.Editor
                 }
                 _buildTarget = _options[_index];
             }
+            
+            DrawPublishingSettings();
+            
             GUILayout.Space(5);
             GUILayout.Label("-----------------------------------------------------------------------");
             GUILayout.Space(5);
+        }
+        
+        // 写入对应平台的Publishing Settings
+        private static void DrawPublishingSettings()
+        {
+            if (_buildTarget == BuildTarget.Android)
+            {
+                GUILayout.Space(15);
+                GUILayout.Label("【Android签名设置】",
+                    new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, fontSize = 16 });
+                GUILayout.Space(10);
+
+                // 安卓.aab格式选项
+                GUILayout.BeginHorizontal();
+                _androidBuildAppBundle = EditorGUILayout.Toggle("构建aab包（Google Play）", F8EditorPrefs.GetBool(_androidBuildAppBundleKey, false));
+                if (F8EditorPrefs.GetBool(_androidBuildAppBundleKey, false) != _androidBuildAppBundle)
+                {
+                    F8EditorPrefs.SetBool(_androidBuildAppBundleKey, _androidBuildAppBundle);
+                }
+
+                if (_androidBuildAppBundle)
+                {
+                    Rect linkRect = GUILayoutUtility.GetRect(new GUIContent("aab包资源超过 150 MB 后的解决方案"), 
+                        new GUIStyle(GUI.skin.label) { normal = { textColor = Color.white } });
+
+                    if (GUI.Button(linkRect, "aab包资源超过 150 MB 后的解决方案", new GUIStyle(GUI.skin.label) 
+                        {
+                            normal = { textColor = Color.white },
+                            hover = { textColor = Color.green },
+                            alignment = TextAnchor.MiddleLeft,
+                            fontSize = 11,
+                            wordWrap = false,
+                            richText = true
+                        }))
+                    {
+                        if (EditorUtility.DisplayDialog("aab包资源超过 150 MB 后的解决方案",
+                                "1. 下载插件 play-appbundle-unity，导入Unity。\n\n" +
+                                "2. 通过菜单 Google -> Android App Bundle -> Asset Delivery Settings... 打开配置界面。\n\n" +
+                                "3. 勾选 Separate Base APK Asset。\n\n" +
+                                "4. 通过菜单 Google -> Build Android App Bundle... 即可打出aab包。",
+                                "下载链接"))
+                        {
+                            Application.OpenURL("https://github.com/google/play-appbundle-unity/releases");
+                        }
+                    }
+                
+                    Rect underlineRect = new Rect(
+                        linkRect.x, 
+                        linkRect.y + linkRect.height - 1, 
+                        linkRect.width - 50, 
+                        1
+                    );
+                    GUI.DrawTexture(underlineRect, Texture2D.whiteTexture, ScaleMode.StretchToFill, false, 0, Color.white, 0, 0);
+                }
+                GUILayout.EndHorizontal();
+                
+                _androidUseKeystore = EditorGUILayout.Toggle("使用自定义签名", F8EditorPrefs.GetBool(_androidUseKeystoreKey, false));
+                if (F8EditorPrefs.GetBool(_androidUseKeystoreKey, false) != _androidUseKeystore)
+                {
+                    F8EditorPrefs.SetBool(_androidUseKeystoreKey, _androidUseKeystore);
+                }
+
+                if (_androidUseKeystore)
+                {
+                    EditorGUILayout.LabelField("Keystore路径:");
+                    EditorGUI.indentLevel++;
+                    _androidKeystoreName = EditorGUILayout.TextField(F8EditorPrefs.GetString(_androidKeystoreNameKey, ""));
+                    if (GUILayout.Button("浏览..."))
+                    {
+                        string path = EditorUtility.OpenFilePanel(
+                            "选择Keystore文件", "", "keystore");
+                        if (!string.IsNullOrEmpty(path))
+                        {
+                            EditorGUILayout.TextField(path);
+                            F8EditorPrefs.SetString(_androidKeystoreNameKey, path);
+                        }
+                    }
+
+                    EditorGUI.indentLevel--;
+
+                    _androidKeystorePass = EditorGUILayout.PasswordField("Keystore密码", F8EditorPrefs.GetString(_androidKeystorePassKey, ""));
+                    F8EditorPrefs.SetString(_androidKeystorePassKey, _androidKeystorePass);
+                    
+                    _androidKeyAliasName = EditorGUILayout.TextField("密钥别名", F8EditorPrefs.GetString(_androidKeyAliasNameKey, ""));
+                    F8EditorPrefs.SetString(_androidKeyAliasNameKey, _androidKeyAliasName);
+                    
+                    _androidKeyAliasPass = EditorGUILayout.PasswordField("别名密码", F8EditorPrefs.GetString(_androidKeyAliasPassKey, ""));
+                    F8EditorPrefs.SetString(_androidKeyAliasPassKey, _androidKeyAliasPass);
+                }
+                else
+                {
+                    EditorGUILayout.HelpBox("未使用自定义签名，将使用默认签名（仅测试用，打包报错请自定义并重试）", MessageType.Warning);
+                }
+            }
         }
         
         // 打包输出目录

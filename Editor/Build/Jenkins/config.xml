@@ -30,6 +30,20 @@
               <string>WebGL</string>
               <string>StandaloneOSX</string>
               <string>StandaloneLinux64</string>
+              <string>WSAPlayer</string>
+              <string>tvOS</string>
+              <string>VisionOS</string>
+              <string>PS4</string>
+              <string>PS5</string>
+              <string>Switch</string>
+              <string>XboxOne</string>
+              <string>GameCoreXboxSeries</string>
+              <string>GameCoreXboxOne</string>
+              <string>LinuxHeadlessSimulation</string>
+              <string>EmbeddedLinux</string>
+              <string>QNX</string>
+              <string>ReservedCFE</string>
+              <string>Kepler</string>
             </a>
           </choices>
         </hudson.model.ChoiceParameterDefinition>
@@ -88,6 +102,36 @@
           <description>打空包游戏</description>
           <defaultValue>false</defaultValue>
         </hudson.model.BooleanParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>AndroidBuildAppBundle</name>
+          <description>构建aab包（Google Play），安卓专用，aab包资源超过 150 MB 后的解决方案：https://github.com/google/play-appbundle-unity/releases</description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>AndroidUseKeystore</name>
+          <description>使用自定义签名，安卓专用</description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>AndroidKeystoreName</name>
+          <description>选择Keystore文件路径（包含后缀），安卓专用</description>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.PasswordParameterDefinition>
+          <name>AndroidKeystorePass</name>
+          <description>Keystore密码，安卓专用</description>
+          <defaultValue>{AQAAABAAAAAQdWcY7wvJYc/TpCP0Djwpaj2C2MPd+aFPrD+WfYLQTZ4=}</defaultValue>
+        </hudson.model.PasswordParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>AndroidKeyAliasName</name>
+          <description>密钥别名，安卓专用</description>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.PasswordParameterDefinition>
+          <name>AndroidKeyAliasPass</name>
+          <description>别名密码，安卓专用</description>
+          <defaultValue>{AQAAABAAAAAQIKxsjqQZxQVDxVmIXnm5IUHnek7NTCb1nykMT2aooA4=}</defaultValue>
+        </hudson.model.PasswordParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -101,27 +145,27 @@
   <builders>
     <org.jenkinsci.plugins.unity3d.Unity3dBuilder plugin="unity3d-plugin@1.3">
       <unity3dName>unity2021.3.15</unity3dName>
-      <argLine>-quit -nographics -batchmode -projectPath $ProjectPath -executeMethod F8Framework.Core.Editor.ExcelDataTool.JenkinsLoadAllExcelData -logFile $BuildPath\JenkinsBuildUnity.log ExcelPath- $ExcelPath</argLine>
+      <argLine>-quit -nographics -batchmode -projectPath $ProjectPath -executeMethod F8Framework.Core.Editor.ExcelDataTool.JenkinsLoadAllExcelData -logFile $BuildPath\JenkinsBuildUnity.log -buildTarget $Platform ExcelPath- $ExcelPath</argLine>
       <unstableReturnCodes></unstableReturnCodes>
     </org.jenkinsci.plugins.unity3d.Unity3dBuilder>
     <org.jenkinsci.plugins.unity3d.Unity3dBuilder plugin="unity3d-plugin@1.3">
       <unity3dName>unity2021.3.15</unity3dName>
-      <argLine>-quit -nographics -batchmode -projectPath $ProjectPath -executeMethod F8Framework.Core.Editor.ExcelDataTool.JenkinsAllScriptsReloaded -logFile $BuildPath\JenkinsBuildUnity.log ExcelPath- $ExcelPath</argLine>
+      <argLine>-quit -nographics -batchmode -projectPath $ProjectPath -executeMethod F8Framework.Core.Editor.ExcelDataTool.JenkinsAllScriptsReloaded -logFile $BuildPath\JenkinsBuildUnity.log -buildTarget $Platform ExcelPath- $ExcelPath</argLine>
       <unstableReturnCodes></unstableReturnCodes>
     </org.jenkinsci.plugins.unity3d.Unity3dBuilder>
     <org.jenkinsci.plugins.unity3d.Unity3dBuilder plugin="unity3d-plugin@1.3">
       <unity3dName>unity2021.3.15</unity3dName>
-      <argLine>-quit -nographics -batchmode -projectPath $ProjectPath -executeMethod F8Framework.Core.Editor.F8Helper.GenerateCopyHotUpdateDll -logFile $BuildPath\JenkinsBuildUnity.log</argLine>
+      <argLine>-quit -nographics -batchmode -projectPath $ProjectPath -executeMethod F8Framework.Core.Editor.F8Helper.GenerateCopyHotUpdateDll -logFile $BuildPath\JenkinsBuildUnity.log -buildTarget $Platform</argLine>
       <unstableReturnCodes></unstableReturnCodes>
     </org.jenkinsci.plugins.unity3d.Unity3dBuilder>
     <org.jenkinsci.plugins.unity3d.Unity3dBuilder plugin="unity3d-plugin@1.3">
       <unity3dName>unity2021.3.15</unity3dName>
-      <argLine>-quit -nographics -batchmode -projectPath $ProjectPath -executeMethod F8Framework.Core.Editor.F8Helper.BuildAssetBundles -logFile $BuildPath\JenkinsBuildUnity.log</argLine>
+      <argLine>-quit -nographics -batchmode -projectPath $ProjectPath -executeMethod F8Framework.Core.Editor.F8Helper.BuildAssetBundles -logFile $BuildPath\JenkinsBuildUnity.log -buildTarget $Platform</argLine>
       <unstableReturnCodes></unstableReturnCodes>
     </org.jenkinsci.plugins.unity3d.Unity3dBuilder>
     <org.jenkinsci.plugins.unity3d.Unity3dBuilder plugin="unity3d-plugin@1.3">
       <unity3dName>unity2021.3.15</unity3dName>
-      <argLine>-quit -nographics -batchmode -projectPath $ProjectPath -executeMethod F8Framework.Core.Editor.BuildPkgTool.JenkinsBuild -logFile $BuildPath\JenkinsBuildUnity.log Platform- $Platform BuildPath- $BuildPath Version- $Version CodeVersion- $CodeVersion AssetRemoteAddress- $AssetRemoteAddress EnableHotUpdate- $EnableHotUpdate EnablePackage- $EnablePackage EnableFullPackage- $EnableFullPackage EnableOptionalPackage- $EnableOptionalPackage OptionalPackage- $OptionalPackage EnableNullPackage- $EnableNullPackage</argLine>
+      <argLine>-quit -nographics -batchmode -projectPath $ProjectPath -executeMethod F8Framework.Core.Editor.BuildPkgTool.JenkinsBuild -logFile $BuildPath\JenkinsBuildUnity.log -buildTarget $Platform Platform- $Platform BuildPath- $BuildPath Version- $Version CodeVersion- $CodeVersion AssetRemoteAddress- $AssetRemoteAddress EnableHotUpdate- $EnableHotUpdate EnablePackage- $EnablePackage EnableFullPackage- $EnableFullPackage EnableOptionalPackage- $EnableOptionalPackage OptionalPackage- $OptionalPackage EnableNullPackage- $EnableNullPackage AndroidBuildAppBundle- $AndroidBuildAppBundle AndroidUseKeystore- $AndroidUseKeystore AndroidKeystoreName- $AndroidKeystoreName AndroidKeystorePass- $AndroidKeystorePass AndroidKeyAliasName- $AndroidKeyAliasName AndroidKeyAliasPass- $AndroidKeyAliasPass</argLine>
       <unstableReturnCodes></unstableReturnCodes>
     </org.jenkinsci.plugins.unity3d.Unity3dBuilder>
   </builders>
