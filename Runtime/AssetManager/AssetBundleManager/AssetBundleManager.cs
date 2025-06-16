@@ -1012,8 +1012,6 @@ namespace F8Framework.Core
             }
             else
             {
-                if (!File.Exists(manifestPath))
-                    yield break;
                 var assetBundle = AssetBundle.LoadFromFile(manifestPath);
                 if (assetBundle)
                 {
@@ -1039,8 +1037,6 @@ namespace F8Framework.Core
 #endif
             string manifestPath = GetAssetBundlePathByAbName(URLSetting.GetPlatformName());
             if (manifestPath == null)
-                return;
-            if (!File.Exists(manifestPath))
                 return;
             var assetBundle = AssetBundle.LoadFromFile(manifestPath);
             if (assetBundle)
