@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.154] - 2025-06-19
+1.新增配置表类型DateTime  
+2.新增音频模块Pause，Resume，Stop功能  
+3.优化音频模块的完成回调，过度动画的暂停重播  
+4.增加动画模块SetIsPause方法  
+5.修复LitJson序列化DateTime精度丢失的问题  
+
 ## [1.7.153] - 2025-06-16
 1.修复加载AssetBundleManifest时被错误返回的问题  
 

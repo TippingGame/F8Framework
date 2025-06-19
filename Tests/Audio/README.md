@@ -75,6 +75,13 @@ void Start()
 
     FF8.Audio.UnloadAll(true); // 卸载所有音频和音效。（true:完全卸载，包括正在使用的）
 
+    /*----------单独控制----------*/
+    FF8.Audio.AudioMusic.Pause();
+    FF8.Audio.AudioMusicVoice.Resume();
+    FF8.Audio.AudioMusicBtnClick.Stop();
+    FF8.Audio.AudioMusicUISound.UnloadAll();
+    FF8.Audio.AudioMusicAudioEffect.UnloadAll(true);
+    
     void CallBack()
     {
 

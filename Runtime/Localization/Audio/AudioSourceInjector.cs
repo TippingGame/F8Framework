@@ -14,7 +14,9 @@ namespace F8Framework.Core
 		public void Inject<T1, T2>(T1 localizedData, T2 localizer) where T2 : LocalizerBase
 		{
 			var isPlaying = audio.isPlaying;
-			var time = audio.time;
+#if !UNITY_WEBGL
+            var time = audio.time;
+#endif
 			if (isPlaying) audio.Stop();
 			var playFromSamePosition = (localizer as AudioLocalizer)?.playFromSamePositionWhenInject;
 
@@ -33,6 +35,7 @@ namespace F8Framework.Core
 				if (isPlaying)
 				{
 					audio.Play();
+#if !UNITY_WEBGL
 					if (playFromSamePosition.HasValue && playFromSamePosition.Value)
 					{
 						audio.time = time;
@@ -41,6 +44,7 @@ namespace F8Framework.Core
 					{
 						audio.time = 0f;
 					}
+#endif
 				}
 			}
 		}

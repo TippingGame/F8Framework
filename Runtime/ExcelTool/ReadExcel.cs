@@ -40,6 +40,7 @@ namespace F8Framework.Core
         public const string QUATERNION = "quat";
         public const string QUATERNIONFULL = "quaternion";
         public const string COLOR = "color";
+        public const string DATETIME = "datetime";
         
         // 容器类型
         public const string ARRAY = "[]";
@@ -457,25 +458,24 @@ namespace F8Framework.Core
                             // 使用正则表达式检查是否为浮点数字符串
                             else if (Regex.IsMatch(data, @"[.\eE]"))
                             {
-                                if (float.TryParse(data, NumberStyles.Float, CultureInfo.InvariantCulture, out float floatValue))
+                                // 尝试解析为 float，检查是否存在精度丢失
+                                if (float.TryParse(data, NumberStyles.Float, CultureInfo.InvariantCulture, out float floatValue) 
+                                    && floatValue.ToString(NumberFormatInfo.InvariantInfo) == data)
                                 {
-                                    // 检查是否存在精度丢失
-                                    if (floatValue.ToString(NumberFormatInfo.InvariantInfo) == data)
-                                    {
-                                        o = floatValue;
-                                    }
-                                    else
-                                    {
-                                        if (double.TryParse(data, NumberStyles.Float, CultureInfo.InvariantCulture, out double doubleValue))
-                                        {
-                                            o = doubleValue;
-                                        }
-                                        else
-                                        {
-                                            o = data;
-                                        }
-                                    }
+                                    o = floatValue;
                                 }
+                                // 尝试解析为 double
+                                else if (double.TryParse(data, NumberStyles.Float, CultureInfo.InvariantCulture, out double doubleValue) 
+                                         && doubleValue.ToString(NumberFormatInfo.InvariantInfo) == data)
+                                {
+                                    o = doubleValue;
+                                }
+                                // 尝试解析为 decimal
+                                else if (decimal.TryParse(data, NumberStyles.Float, CultureInfo.InvariantCulture, out decimal decimalValue))
+                                {
+                                    o = decimalValue;
+                                }
+                                // 无法解析，保留原始字符串
                                 else
                                 {
                                     o = data;
@@ -490,6 +490,10 @@ namespace F8Framework.Core
                             else if (long.TryParse(data, out long longValue))
                             {
                                 o = longValue;
+                            }
+                            else if (DateTime.TryParse(data, out DateTime dateTimeValue))
+                            {
+                                o = dateTimeValue;
                             }
                             else
                             {
@@ -603,6 +607,51 @@ namespace F8Framework.Core
                             color1.a = (float)ParseValue(SupportType.FLOAT, color.Length >= 4 ? color[3] : "0",
                                 classname);
                             o = color1;
+                            break;
+                        case SupportType.DATETIME:
+                            data = RemoveOuterBracketsIfPaired(data); // 移除最外层的 '[' 和 ']' '{' 和 '}'
+                            if (string.IsNullOrEmpty(data))
+                            {
+                                o = DateTime.MinValue;
+                                break;
+                            }
+                            
+                            if (long.TryParse(data, out long timestamp))
+                            {
+                                int length = data.Length;
+                                
+                                if (length >= 19) // 19位纳秒级时间戳
+                                {
+                                    var epoch = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
+                                    o = epoch.AddTicks(timestamp / 100).DateTime;
+                                    break;
+                                }
+                                else if (length >= 16) // 16位微秒级时间戳
+                                {
+                                    var epoch = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
+                                    o = epoch.AddTicks(timestamp * 10).DateTime;
+                                    break;
+                                }
+                                else if (length >= 13) // 13位毫秒级时间戳
+                                {
+                                    o = DateTimeOffset.FromUnixTimeMilliseconds(timestamp).DateTime;
+                                    break;
+                                }
+                                else if (length >= 10) // 10位秒级时间戳
+                                {
+                                    o = DateTimeOffset.FromUnixTimeSeconds(timestamp).DateTime;
+                                    break;
+                                }
+                            }
+                            
+                            if (DateTime.TryParse(data, out DateTime defaultResult))
+                            {
+                                o = defaultResult;
+                                break;
+                            }
+                            
+                            LogF8.LogError($"无法解析时间字符串: {data}");
+                            o = DateTime.MinValue;
                             break;
                     }
                 }
@@ -744,6 +793,9 @@ namespace F8Framework.Core
                     break;
                 case SupportType.COLOR:
                     type = "UnityEngine.Color";
+                    break;
+                case SupportType.DATETIME:
+                    type = "System.DateTime";
                     break;
                 default:
                     throw new Exception("输入了错误的数据类型:  " + type + ", 类名:  " + className + ", 位于:  " + inputPath);

@@ -9,26 +9,30 @@ namespace F8Framework.Core
         // 背景音乐播放完成回调
         public System.Action OnComplete;
         private float _progress = 0;
-        private bool _isPlay = false;
         public int Priority;
         public AudioSource MusicSource;
         public int AudioTween;
+        private int _timerId = 0;
 
         // 获取音乐播放进度
         public float Progress
         {
             get
             {
+#if !UNITY_WEBGL
                 if (MusicSource.clip && MusicSource.clip.length > 0)
                 {
                     _progress = MusicSource.time / MusicSource.clip.length;
                 }
+#endif
                 return _progress;
             }
             set
             {
                 _progress = value;
+#if !UNITY_WEBGL
                 MusicSource.time = value * MusicSource.clip.length;
+#endif
             }
         }
 
@@ -57,17 +61,25 @@ namespace F8Framework.Core
         {
             if (MusicSource.isPlaying)
             {
-                _isPlay = false;
-                MusicSource.Stop();
-                OnComplete?.Invoke();
+                StopCurrentPlayback();
             }
 
             MusicSource.clip = audioClip;
 
             OnComplete = callback;
 
-            MusicSource.Play();
-
+            if (audioClip != null)
+            {
+                MusicSource.Play();
+                
+                _timerId = TimerManager.Instance.AddTimer(this, 1f, audioClip.length, 1, null,
+                    () =>
+                    {
+                        OnComplete?.Invoke();
+                    }
+                );
+            }
+            
             if (fadeDuration > 0f)
             {
                 float tempVolume = MusicSource.volume;
@@ -76,23 +88,47 @@ namespace F8Framework.Core
                     .SetOnUpdateFloat((float v) => { MusicSource.volume = v; }).ID;
             }
         }
-            
-        public void Tick()
+        
+        private void StopCurrentPlayback()
         {
-            if (MusicSource.clip && MusicSource.time > 0)
+            TimerManager.Instance.RemoveTimer(_timerId);
+            Tween.Instance.CancelTween(AudioTween);
+            MusicSource.Stop();
+            OnComplete?.Invoke();
+        }
+        
+        public void Pause()
+        {
+            if (MusicSource.isPlaying)
             {
-                _isPlay = true;
-            }
-            if (_isPlay && !MusicSource.isPlaying)
-            {
-                _isPlay = false;
-                OnComplete?.Invoke();
+                MusicSource.Pause();
+                TimerManager.Instance.Pause(_timerId);
+                Tween.Instance.SetIsPause(AudioTween, true);
             }
         }
 
+        public void Resume()
+        {
+            if (!MusicSource.isPlaying && MusicSource.clip != null)
+            {
+                MusicSource.Play();
+                TimerManager.Instance.Resume(_timerId);
+                Tween.Instance.SetIsPause(AudioTween, false);
+            }
+        }
+        
+        public void Stop()
+        {
+            if (MusicSource.isPlaying)
+            {
+                StopCurrentPlayback();
+            }
+        }
+        
         // 释放所有音乐资源
         public void UnloadAll(bool unloadAllLoadedObjects = true)
         {
+            StopCurrentPlayback();
             foreach (var item in _audios)
             {
                 AssetManager.Instance.Unload(item.Key, unloadAllLoadedObjects);

@@ -581,8 +581,7 @@ namespace LitJson
 
             base_exporters_table[typeof (DateTime)] =
                 delegate (object obj, JsonWriter writer) {
-                    writer.Write (Convert.ToString ((DateTime) obj,
-                                                    datetime_format));
+                    writer.Write (((DateTime) obj).ToString("yyyy-MM-ddTHH:mm:ss.fffffffzzz", datetime_format));
                 };
 
             base_exporters_table[typeof (decimal)] =

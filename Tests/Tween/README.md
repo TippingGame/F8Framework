@@ -59,6 +59,7 @@ void Start()
     
     // 设置是否暂停
     gameObject.Move(Vector3.one, 1f).SetIsPause(true);
+    FF8.Tween.SetIsPause(id, true);
     
     // 你也可以这样使用，设置OnUpdate
     // 数字缓动变化

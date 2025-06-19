@@ -112,7 +112,19 @@ namespace F8Framework.Core
                 tweenConnections[tween.Owner] = new List<int>() { tween.ID };
             }
         }
-
+        
+        public void SetIsPause(int id, bool isPause)
+        {
+            for (int n = 0; n < tweens.Count; n++)
+            {
+                if (tweens[n].ID == id)
+                {
+                    tweens[n].SetIsPause(isPause);
+                    break;
+                }
+            }
+        }
+        
         public void CancelTween(int id)
         {
             for (int n = 0; n < tweens.Count; n++)
