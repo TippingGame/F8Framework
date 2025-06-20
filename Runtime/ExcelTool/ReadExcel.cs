@@ -47,6 +47,9 @@ namespace F8Framework.Core
         public const string LIST = "list<";
         public const string DICTIONARY = "dict<";
         public const string DICTIONARYFULL = "dictionary<";
+        
+        // 特殊类型
+        public const string ENUM = "enum<";
     }
 
     public class ReadExcel : Singleton<ReadExcel>
@@ -357,6 +360,58 @@ namespace F8Framework.Core
                     }
                     
                     o = dictionary;
+                }
+                else if (type.StartsWith(SupportType.ENUM))
+                {
+                    data = RemoveOuterBracketsIfPaired(data); // 移除最外层的 '[' 和 ']' '{' 和 '}'
+                    
+                    string innerContent = type
+                        .Split('<', '>')[1]  // 取 <...> 之间的部分
+                        .Split(',')[0]       // 取第一个参数
+                        .Trim();             // 移除前后空格
+                    
+                    string fullEnumTypeName;
+                    if (innerContent.Contains('.'))
+                    {
+                        string[] parts = innerContent.Split('.');
+                        fullEnumTypeName = $"{CODE_NAMESPACE}.{parts[0]}+{parts[1]},{CODE_NAMESPACE}";
+                    }
+                    else
+                    {
+                        fullEnumTypeName = $"{CODE_NAMESPACE}.{classname.Substring(0, classname.Length - 4)}+{innerContent},{CODE_NAMESPACE}";
+                    }
+                    
+                    Type enumType = Type.GetType(fullEnumTypeName);
+                    
+                    if (enumType == null || !enumType.IsEnum)
+                    {
+                        throw new Exception($"枚举类型不存在，请检查定义！尝试加载的类型名: {fullEnumTypeName}");
+                    }
+
+                    try
+                    {
+                        o = Enum.Parse(enumType, data);
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            if (int.TryParse(data, out int enumValue))
+                            {
+                                o = Enum.ToObject(enumType, enumValue);
+                            }
+                            else
+                            {
+                                DebugError(type, data, classname);
+                                o = Activator.CreateInstance(enumType);
+                            }
+                        }
+                        catch
+                        {
+                            DebugError(type, data, classname);
+                            o = Activator.CreateInstance(enumType);
+                        }
+                    }
                 }
                 else
                 {
@@ -732,6 +787,18 @@ namespace F8Framework.Core
                 {
                     return "System.Collections.Generic.Dictionary`2[" + GetTrueType(keyType) + "," + GetTrueType(valueType) + "]";
                 }
+            }
+            else if (type.StartsWith(SupportType.ENUM))
+            {
+                string innerContent = type
+                    .Split('<', '>')[1]  // 取 <...> 之间的部分
+                    .Split(',')[0]       // 取第一个参数
+                    .Trim();             // 移除前后空格
+                if (!innerContent.Contains('.'))
+                {
+                    innerContent = $"{className}.{innerContent}";
+                }
+                return innerContent;
             }
             else
             {

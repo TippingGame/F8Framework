@@ -51,7 +51,7 @@ Unity 读取 Excel 的工具
 
 ## Excel 示例
 
-#### 类型可分为 1. 基础类型 2. 容器类型
+#### 类型可分为 1. 基础类型 2. 容器类型 3. 特殊类型
 * 1.基础类型支持（bool，byte，short，int，long，float，double，decimal，str / string，obj / object，datetime）  
 Unity基础类型支持（vec2 / vector2，vec3 / vector3，vec4 / vector4，vec2int / vector2int，vec3int / vector3int，quat / quaternion，color）  
 Excel 示例：（id 是唯一索引，必须添加！）  
@@ -71,6 +71,16 @@ Excel 示例：
 | \[1,5] | \[test,str] | \[[12,66],[12,66]] | \[\[22,"str"],\[33,"obj"]] | 123,1.888,"列表"    | 1,"字典",2,"字典2"     | 1,\[1.11,2.22],2,\[3.33]  |
 | \[1,5] | \[test,str] | \[[12,66],[12,66]] | \[\[22,"str"],\[33,"obj"]] | \[123,1.888,"列表"] | \[1,"字典",2,"字典2"]  | 1,\[1.11,2.22],2,\[3.33]  |
 
+* 3.特殊类型支持（enum<name,int,Flags>{}）枚举，默认在当前表生成枚举类，可跨表访问枚举，支持自定义名称，类型，Flags特性  
+  Excel 示例：（可选参数：int类型(默认)，Flags特性，标志枚举：Value1, Value2，跨表访问：Sheet1.name）
+
+| enum<name,int,Flags>{Value1 = 1,Value2 = 2,Value3 = 4,Value4 = 8,} | enum<Sheet1.name> | enum<Status,long>{OK = 200,Success = 200,Created = 201,Accepted = 202,} |
+|--------------------------------------------------------------------|-------------------|-------------------------------------------------------------------------|
+| name1                                                              | name2             | name3                                                                   |
+| Value1                                                             | Value1            | 200                                                                     |
+| Value2                                                             | Value2            | Success                                                                 |
+| Value1, Value2                                                     | Value3            | 201                                                                     |
+| Value4                                                             | Value4            | 202                                                                     |
 （你还可以拓展其他类型：[ReadExcel.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/ExcelTool/ReadExcel.cs)）
 ## 使用范例
 

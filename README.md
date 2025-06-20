@@ -79,6 +79,7 @@ git clone https://github.com/TippingGame/F8Framework.git
 
 ## 新手指南
 
+* 首次导入插件后，需要点击一次 F8
 * [游戏启动器：](https://github.com/TippingGame/F8Framework/blob/main/Launcher/GameLauncher.cs)游戏启动器示例（注意：使用框架前必须先启动框架）。[GameLauncher.cs](https://github.com/TippingGame/F8Framework/blob/main/Launcher/GameLauncher.cs)  
 * [模块自定义改名：](https://github.com/TippingGame/F8Framework/blob/main/Launcher/FF8.cs)模块自定义改名。[FF8.cs](https://github.com/TippingGame/F8Framework/blob/main/Launcher/FF8.cs)  
 

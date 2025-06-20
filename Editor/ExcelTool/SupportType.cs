@@ -16,6 +16,7 @@ namespace F8Framework.Core.Editor
         private string[] Types;
         private string ClassName;
         private string InputPath;
+        private StringBuilder enumSource = new StringBuilder();
 
         public ScriptGenerator(string inputPath, string className, string[] fileds, string[] types)
         {
@@ -79,6 +80,7 @@ namespace F8Framework.Core.Editor
             classSource.Append("\t[Serializable]\n");
             classSource.Append("\tpublic class " + ClassName + "Item\n"); //表里每一条数据的类型名为表类型名加Item
             classSource.Append("\t{\n");
+            enumSource.Clear();
             //设置成员
             for (int i = 0; i < fields.Length; ++i)
             {
@@ -102,8 +104,13 @@ namespace F8Framework.Core.Editor
                 }
             }
 
+            classSource.Append("\t\t[Preserve]\n");
             classSource.Append("\t\tpublic " + "Dictionary<" + idType + ", " + ClassName + "Item" + "> " + "Dict" +
                                " = new Dictionary<" + idType + ", " + ClassName + "Item" + ">();\n");
+            if (enumSource.Length > 0)
+            {
+                classSource.Append(enumSource.ToString());
+            }
             classSource.Append("\t}\n");
             classSource.Append("}\n");
             return classSource.ToString();
@@ -135,21 +142,16 @@ namespace F8Framework.Core.Editor
             if (string.IsNullOrEmpty(type) || string.IsNullOrEmpty(propertyName))
                 return null;
 
+            enumSource.Append(PropertyEnum(type, ClassName, InputPath));
+            
             type = ReadExcel.GetTrueType(type, ClassName, InputPath);
             if (!string.IsNullOrEmpty(type))
             {
                 StringBuilder sbProperty = new StringBuilder();
-                if (type.EndsWith("[]"))
-                {
-                    sbProperty.Append("\t\t[Preserve]\n");
-                    sbProperty.Append("\t\tpublic " + type + " " + propertyName + ";\n");
-                }
-                else
-                {
-                    sbProperty.Append("\t\t[Preserve]\n");
-                    sbProperty.Append("\t\tpublic " + type + " " + propertyName + ";\n");
-                }
-
+                
+                sbProperty.Append("\t\t[Preserve]\n");
+                sbProperty.Append("\t\tpublic " + type + " " + propertyName + ";\n");
+                
                 return sbProperty.ToString();
             }
             else
@@ -158,6 +160,106 @@ namespace F8Framework.Core.Editor
             }
         }
 
+        private string PropertyEnum(string type, string className = "", string inputPath = "", bool writtenForm = true)
+        {
+            if (!type.StartsWith(SupportType.ENUM))
+                return "";
+
+            // 1. 检查是否有大括号（完整定义）或只有尖括号（简化定义）
+            bool hasBraces = type.Contains('{') && type.Contains('}');
+            string enumDefinition;
+            string enumValues = "";
+
+            if (hasBraces)
+            {
+                // 完整定义：enum<...>{...}
+                int startBrace = type.IndexOf('{');
+                int endBrace = type.LastIndexOf('}');
+
+                if (startBrace == -1 || endBrace == -1)
+                {
+                    throw new Exception("枚举定义缺少大括号");
+                }
+
+                enumDefinition = type.Substring(SupportType.ENUM.Length, startBrace - SupportType.ENUM.Length)
+                    .Trim('<', '>', ' ');
+                enumValues = type.Substring(startBrace + 1, endBrace - startBrace - 1).Trim();
+            }
+            else
+            {
+                // 简化定义：enum<...>
+                int startAngle = type.IndexOf('<');
+                int endAngle = type.LastIndexOf('>');
+
+                if (startAngle == -1 || endAngle == -1)
+                {
+                    throw new Exception("枚举定义缺少尖括号");
+                }
+
+                enumDefinition = type.Substring(startAngle + 1, endAngle - startAngle - 1).Trim();
+            }
+
+            // 2. 分割参数
+            string[] enumParams = enumDefinition.Split(',');
+            if (enumParams.Length < 1)
+            {
+                throw new Exception("枚举定义至少需要包含枚举名称");
+            }
+
+            string enumName = enumParams[0].Trim();
+
+            // 3. 检查类名前缀（如果包含点）
+            if (enumName.Contains('.'))
+            {
+                string[] parts = enumName.Split('.');
+                if (parts[0] != className)
+                {
+                    return "";
+                }
+            }
+
+            // 4. 设置默认值
+            string underlyingType = enumParams.Length > 1 ? enumParams[1].Trim() : "int"; // 默认为int
+            bool isFlags = enumParams.Length > 2 &&
+                           enumParams[2].Trim().Equals("Flags", StringComparison.OrdinalIgnoreCase);
+
+            // 5. 生成C#枚举代码
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+
+            if (isFlags)
+            {
+                sb.AppendLine("\t\t[System.Flags]");
+            }
+
+            sb.AppendLine("\t\t[Preserve]");
+
+            sb.Append("\t\tpublic enum ").Append(enumName).Append(" : ").Append(ReadExcel.GetTrueType(underlyingType)) .AppendLine();
+            sb.AppendLine("\t\t{");
+
+            // 6. 处理枚举值（如果有）
+            if (hasBraces && !string.IsNullOrEmpty(enumValues))
+            {
+                string[] valuePairs = enumValues.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (string pair in valuePairs)
+                {
+                    string trimmedPair = pair.Trim();
+                    if (!string.IsNullOrEmpty(trimmedPair))
+                    {
+                        sb.AppendLine("\t\t\t" + trimmedPair + ",");
+                    }
+                }
+            }
+            else
+            {
+                // 简化定义时添加一个默认值
+                sb.AppendLine("\t\t\tNone = 0,");
+            }
+
+            sb.AppendLine("\t\t}");
+
+            return sb.ToString();
+        }
+        
         //创建数据管理器脚本
         public static void CreateDataManager(Dictionary<string, ScriptGenerator> codeList)
         {
