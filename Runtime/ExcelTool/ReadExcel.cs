@@ -303,7 +303,7 @@ namespace F8Framework.Core
                     data = RemoveOuterBracketsIfPaired(data); // 移除最外层的 '[' 和 ']' '{' 和 '}'
                     var elements = ParseElements(data).ToArray();
                     int elementsLength = elements.Length;
-                    var array = (Array)Activator.CreateInstance(SystemGetType(GetTrueType(innerType) + "[]"), elementsLength);
+                    var array = (Array)Activator.CreateInstance(SystemGetType(GetTrueType(innerType, classname) + "[]"), elementsLength);
                     for (int i = 0; i < elementsLength; i++)
                     {
                         // 递归解析内层元素
@@ -318,7 +318,7 @@ namespace F8Framework.Core
                     data = RemoveOuterBracketsIfPaired(data); // 移除最外层的 '[' 和 ']' '{' 和 '}'
                     var elements = ParseElements(data).ToArray();
                     int elementsLength = elements.Length;
-                    Type elementType = SystemGetType(GetTrueType(innerType, "", "", false));
+                    Type elementType = SystemGetType(GetTrueType(innerType, classname, "", false));
                     var list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType), elementsLength);
                     for (int i = 0; i < elementsLength; i++)
                     {
@@ -347,8 +347,8 @@ namespace F8Framework.Core
                     string valueType = type.Substring(commaIndex + 1, type.Length - commaIndex - 2);
                     var elements = ParseElements(data).ToArray();
                     int elementsLength = elements.Length;
-                    Type keyElementType = SystemGetType(GetTrueType(keyType));
-                    Type valueElementType = SystemGetType(GetTrueType(valueType, "", "", false));
+                    Type keyElementType = SystemGetType(GetTrueType(keyType, classname));
+                    Type valueElementType = SystemGetType(GetTrueType(valueType, classname, "", false));
                     var dictionary = (IDictionary)Activator.CreateInstance(typeof(Dictionary<,>).MakeGenericType(keyElementType, valueElementType));
                     for (int i = 0; i < elementsLength; i += 2)
                     {
@@ -432,7 +432,7 @@ namespace F8Framework.Core
                     
                     var elements = ParseElements(data).ToArray();
                     
-                    Type[] genericTypes = typeArgs.Select(t => SystemGetType(GetTrueType(t))).ToArray();
+                    Type[] genericTypes = typeArgs.Select(t => SystemGetType(GetTrueType(t, classname))).ToArray();
                     object[] values = new object[typeArgs.Length];
                     
                     for (int i = 0; i < typeArgs.Length; i++)
@@ -826,18 +826,18 @@ namespace F8Framework.Core
             if (type.EndsWith(SupportType.ARRAY))
             {
                 string innerType = type.Substring(0, type.Length - 2);
-                return GetTrueType(innerType) + "[]";
+                return GetTrueType(innerType, className, inputPath, writtenForm) + "[]";
             }
             else if (type.StartsWith(SupportType.LIST) && type.EndsWith(">"))
             {
                 string innerType = type.Substring(5, type.Length - 6);
                 if (writtenForm)
                 {
-                    return "System.Collections.Generic.List<" + GetTrueType(innerType) + ">";
+                    return "System.Collections.Generic.List<" + GetTrueType(innerType, className, inputPath, writtenForm) + ">";
                 }
                 else
                 {
-                    return "System.Collections.Generic.List`1[" + GetTrueType(innerType) + "]";
+                    return "System.Collections.Generic.List`1[" + GetTrueType(innerType, className, inputPath, writtenForm) + "]";
                 }
             }
             else if ((type.StartsWith(SupportType.DICTIONARY) || type.StartsWith(SupportType.DICTIONARYFULL)) && type.EndsWith(">"))
@@ -859,11 +859,11 @@ namespace F8Framework.Core
                 string valueType = type.Substring(commaIndex + 1, type.Length - commaIndex - 2);
                 if (writtenForm)
                 {
-                    return "System.Collections.Generic.Dictionary<" + GetTrueType(keyType) + "," + GetTrueType(valueType) + ">";
+                    return "System.Collections.Generic.Dictionary<" + GetTrueType(keyType, className, inputPath, writtenForm) + "," + GetTrueType(valueType, className, inputPath, writtenForm) + ">";
                 }
                 else
                 {
-                    return "System.Collections.Generic.Dictionary`2[" + GetTrueType(keyType) + "," + GetTrueType(valueType) + "]";
+                    return "System.Collections.Generic.Dictionary`2[" + GetTrueType(keyType, className, inputPath, writtenForm) + "," + GetTrueType(valueType, className, inputPath, writtenForm) + "]";
                 }
             }
             else if (type.StartsWith(SupportType.ENUM))
@@ -872,9 +872,24 @@ namespace F8Framework.Core
                     .Split('<', '>')[1]  // 取 <...> 之间的部分
                     .Split(',')[0]       // 取第一个参数
                     .Trim();             // 移除前后空格
-                if (!innerContent.Contains('.'))
+                if (writtenForm)
                 {
-                    innerContent = $"{className}.{innerContent}";
+                    if (!innerContent.Contains('.'))
+                    {
+                        innerContent = $"{className}.{innerContent}";
+                    }
+                }
+                else
+                {
+                    if (innerContent.Contains('.'))
+                    {
+                        string[] parts = innerContent.Split('.');
+                        innerContent = $"{CODE_NAMESPACE}.{parts[0]}+{parts[1]},{CODE_NAMESPACE}";
+                    }
+                    else
+                    {
+                        innerContent = $"{CODE_NAMESPACE}.{className.Substring(0, className.Length - 4)}+{innerContent},{CODE_NAMESPACE}";
+                    }
                 }
                 return innerContent;
             }
@@ -883,7 +898,7 @@ namespace F8Framework.Core
                 string innerTypes = type.Substring(SupportType.VALUETUPLE.Length, type.Length - SupportType.VALUETUPLE.Length - 1);
                 string[] typeArgs = innerTypes.Split(',').Select(t => t.Trim()).ToArray();
         
-                string processedTypeArgs = string.Join(",", typeArgs.Select(t => GetTrueType(t)));
+                string processedTypeArgs = string.Join(",", typeArgs.Select(t => GetTrueType(t, className, inputPath, writtenForm)));
         
                 if (writtenForm)
                 {

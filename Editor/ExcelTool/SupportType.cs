@@ -233,7 +233,7 @@ namespace F8Framework.Core.Editor
 
             sb.AppendLine("\t\t[Preserve]");
 
-            sb.Append("\t\tpublic enum ").Append(enumName).Append(" : ").Append(ReadExcel.GetTrueType(underlyingType)) .AppendLine();
+            sb.Append("\t\tpublic enum ").Append(enumName).Append(" : ").Append(ReadExcel.GetTrueType(underlyingType, className, inputPath, writtenForm)) .AppendLine();
             sb.AppendLine("\t\t{");
 
             // 6. 处理枚举值（如果有）
