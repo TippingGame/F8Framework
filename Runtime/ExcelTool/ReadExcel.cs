@@ -41,12 +41,17 @@ namespace F8Framework.Core
         public const string QUATERNIONFULL = "quaternion";
         public const string COLOR = "color";
         public const string DATETIME = "datetime";
+        public const string SBYTE = "sbyte";
+        public const string USHORT = "ushort";
+        public const string UINT = "uint";
+        public const string ULONG = "ulong";
         
         // 容器类型
         public const string ARRAY = "[]";
         public const string LIST = "list<";
         public const string DICTIONARY = "dict<";
         public const string DICTIONARYFULL = "dictionary<";
+        public const string VALUETUPLE = "valuetuple<";
         
         // 特殊类型
         public const string ENUM = "enum<";
@@ -413,6 +418,35 @@ namespace F8Framework.Core
                         }
                     }
                 }
+                else if (type.StartsWith(SupportType.VALUETUPLE) && type.EndsWith(">"))
+                {
+                    data = RemoveOuterBracketsIfPaired(data);
+                    
+                    string[] typeArgs = type.Split('<', '>')[1]
+                        .Split(',')
+                        .Select(t => t.Trim())
+                        .ToArray();
+    
+                    if (typeArgs.Length < 1 || typeArgs.Length > 7)
+                        throw new NotSupportedException($"限制值元组长度最大为7: {typeArgs.Length}");
+                    
+                    var elements = ParseElements(data).ToArray();
+                    
+                    Type[] genericTypes = typeArgs.Select(t => SystemGetType(GetTrueType(t))).ToArray();
+                    object[] values = new object[typeArgs.Length];
+                    
+                    for (int i = 0; i < typeArgs.Length; i++)
+                    {
+                        values[i] = ParseValue(typeArgs[i], elements.Length > i ? elements[i] : "", classname);
+                    }
+                    
+                    Type tupleType = Type.GetType($"System.ValueTuple`{typeArgs.Length}")?.MakeGenericType(genericTypes);
+    
+                    if (tupleType == null)
+                        throw new InvalidOperationException("无法创建值元组类型");
+                    
+                    o = Activator.CreateInstance(tupleType, values);
+                }
                 else
                 {
                     switch (type)
@@ -708,6 +742,50 @@ namespace F8Framework.Core
                             LogF8.LogError($"无法解析时间字符串: {data}");
                             o = DateTime.MinValue;
                             break;
+                        case SupportType.SBYTE:
+                            sbyte SBYTE_sbyte;
+                            if (sbyte.TryParse(data, out SBYTE_sbyte) == false)
+                            {
+                                DebugError(type, data, classname);
+                                o = 0f;
+                                break;
+                            }
+
+                            o = SBYTE_sbyte;
+                            break;
+                        case SupportType.USHORT:
+                            ushort USHORT_ushort;
+                            if (ushort.TryParse(data, out USHORT_ushort) == false)
+                            {
+                                DebugError(type, data, classname);
+                                o = 0f;
+                                break;
+                            }
+
+                            o = USHORT_ushort;
+                            break;
+                        case SupportType.UINT:
+                            uint UINT_uint;
+                            if (uint.TryParse(data, out UINT_uint) == false)
+                            {
+                                DebugError(type, data, classname);
+                                o = 0f;
+                                break;
+                            }
+
+                            o = UINT_uint;
+                            break;
+                        case SupportType.ULONG:
+                            ulong ULONG_ulong;
+                            if (ulong.TryParse(data, out ULONG_ulong) == false)
+                            {
+                                DebugError(type, data, classname);
+                                o = 0f;
+                                break;
+                            }
+
+                            o = ULONG_ulong;
+                            break;
                     }
                 }
             }
@@ -800,6 +878,22 @@ namespace F8Framework.Core
                 }
                 return innerContent;
             }
+            else if (type.StartsWith(SupportType.VALUETUPLE) && type.EndsWith(">"))
+            {
+                string innerTypes = type.Substring(SupportType.VALUETUPLE.Length, type.Length - SupportType.VALUETUPLE.Length - 1);
+                string[] typeArgs = innerTypes.Split(',').Select(t => t.Trim()).ToArray();
+        
+                string processedTypeArgs = string.Join(",", typeArgs.Select(t => GetTrueType(t)));
+        
+                if (writtenForm)
+                {
+                    return $"System.ValueTuple<{processedTypeArgs}>";
+                }
+                else
+                {
+                    return $"System.ValueTuple`{typeArgs.Length}[{processedTypeArgs}]";
+                }
+            }
             else
             {
                 return ParseType(type, className, inputPath);
@@ -863,6 +957,18 @@ namespace F8Framework.Core
                     break;
                 case SupportType.DATETIME:
                     type = "System.DateTime";
+                    break;
+                case SupportType.SBYTE:
+                    type = "System.SByte";
+                    break;
+                case SupportType.USHORT:
+                    type = "System.UInt16";
+                    break;
+                case SupportType.UINT:
+                    type = "System.UInt32";
+                    break;
+                case SupportType.ULONG:
+                    type = "System.UInt64";
                     break;
                 default:
                     throw new Exception("输入了错误的数据类型:  " + type + ", 类名:  " + className + ", 位于:  " + inputPath);

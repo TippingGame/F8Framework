@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.7.156] - 2025-06-21
+1.新增配置表基础类型sbyte，ushort，uint，ulong，容器类型valuetuple<,>  
+
 ## [1.7.155] - 2025-06-20
 1.新增配置表特殊类型enum  
 
