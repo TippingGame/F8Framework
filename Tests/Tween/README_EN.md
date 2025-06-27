@@ -1,89 +1,89 @@
 # F8 Tween
 
 [![license](http://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)
-[![Unity Version](https://img.shields.io/badge/unity-2021.3.15f1-blue)](https://unity.com)
+[![Unity Version](https://img.shields.io/badge/unity-2021|2022|2023|6000-blue)](https://unity.com)
 [![Platform](https://img.shields.io/badge/platform-Win%20%7C%20Android%20%7C%20iOS%20%7C%20Mac%20%7C%20Linux%20%7C%20WebGL-orange)]()
 
-## 简介（希望自己点击F8，就能开始制作游戏，不想多余的事）
-Unity F8 Tween组件，补间动画，播放/终止动画，有旋转/位移/缩放/渐变/填充动画，为UI设计的相对布局位移动画
+## Introduction (Simply press F8 to start game development without distractions)
+**Unity F8 Tween Component**  
+Play/Pause/Cancel Animations, Freely Combine animations including rotation/position/scale/fade/fill/shake effects, with layout-relative motion animations for UI.
 
-## 导入插件（需要首先导入核心）
-注意！内置在->F8Framework核心：https://github.com/TippingGame/F8Framework.git  
-方式一：直接下载文件，放入Unity  
-方式二：Unity->点击菜单栏->Window->Package Manager->点击+号->Add Package from git URL->输入：https://github.com/TippingGame/F8Framework.git
+## Plugin Installation (Requires Core Framework First)
+Note! Built into → F8Framework Core: https://github.com/TippingGame/F8Framework.git  
+Method 1: Download files directly and import to Unity  
+Method 2: Unity → Menu Bar → Window → Package Manager → "+" → Add Package from git URL → Enter: https://github.com/TippingGame/F8Framework.git
 
-### 代码使用方法
+### Code Examples
 ```C#
-// 画布的RectTransform
+// Reference to Canvas RectTransform
 public RectTransform canvasRect;
 
 void Start()
 {
-    /*-----------------------------------------普通用法-----------------------------------------*/
-    // 播放动画，设置Ease动画，设置OnComplete完成回调
+    /*-------------------------------------Basic Animations-------------------------------------*/
+    // Play animation with easing and completion callback
     int id = gameObject.ScaleTween(Vector3.one, 1f).SetEase(Ease.Linear).SetOnComplete(OnViewOpen).ID;
 
     void OnViewOpen()
     {
-
+        // Animation complete handler
     }
 
-    // 旋转
+    // Rotation
     gameObject.RotateTween(Vector3.one, 1f);
-    // 位移
+    // Position
     gameObject.Move(Vector3.one, 1f);
     gameObject.MoveAtSpeed(Vector3.one, 2f);
     gameObject.LocalMove(Vector3.one, 1f);
     gameObject.LocalMoveAtSpeed(Vector3.one, 1f);
-    // 缩放
+    // Scale
     gameObject.ScaleTween(Vector3.one * 2f, 1f);
-    // 渐变
+    // Fade
     gameObject.GetComponent<CanvasGroup>().Fade(0f, 1f);
     gameObject.GetComponent<Image>().ColorTween(Color.green, 1f);
-    // 填充
+    // Fill
     gameObject.GetComponent<Image>().FillAmountTween(1f, 1f);
-    // 震动
+    // Shake
     gameObject.ShakePosition(Vector3.one, shakeCount: 8, t: 0.05f, fadeOut: false);
     gameObject.ShakeRotation(Vector3.one);
     gameObject.ShakeScale(Vector3.one);
     gameObject.ShakePositionAtSpeed(Vector3.one, shakeCount: 8, speed: 5f, fadeOut: false);
 
-    // 设置Delay
+    // Set delay
     gameObject.Move(Vector3.one, 1f).SetDelay(2f);
     
-    // 设置Event，在动画的某一时间调用
+    // Set event at specific time
     gameObject.Move(Vector3.one, 5f).SetEvent(OnViewOpen, 2.5f);
     
-    // 设置循环类型，循环次数
+    // Set loop type and count
     gameObject.Move(Vector3.one, 1f).SetLoopType(LoopType.Yoyo, 3);
     
-    // 设置是否暂停
+    // Pause control
     gameObject.Move(Vector3.one, 1f).SetIsPause(true);
     FF8.Tween.SetIsPause(id, true);
     
-    // 你也可以这样使用，设置OnUpdate
-    // 数字缓动变化
+    // Value tween with update callback
     BaseTween valueTween = FF8.Tween.ValueTween(0f, 100f, 3f).SetOnUpdateFloat((float v) =>
     {
         LogF8.Log(v);
     });
     
-    // 取消动画，只允许使用ID取消动画，动画基类会回收再利用，但ID唯一递增
+    // Cancel animation by ID
     int id2 = valueTween.ID;
     FF8.Tween.CancelTween(id2);
     
-    // 物体移动
+    // Object movement with update
     BaseTween gameObjectTween = FF8.Tween.Move(gameObject, Vector3.one, 3f).SetOnUpdateVector3((Vector3 v) =>
     {
         LogF8.Log(v);
     });
         
-    // 设置动画拥有者后，可使用此取消方式
+    // Cancel by owner object
     gameObjectTween.SetOwner(gameObject);
     FF8.Tween.CancelTween(gameObject);
     gameObject.CancelAllTweens();
     
-    // 根据相对坐标移动UI
+    // UI relative position animation
     // (0.0 , 1.0) _______________________(1.0 , 1.0)
     //            |                      |
     //            |                      |                  
@@ -94,28 +94,28 @@ void Start()
         .SetEase(Ease.EaseOutBounce);
     
     
-    /*-----------------------------------------动画组合-----------------------------------------*/
-    // 初始化，依次执行动画/并行执行动画，回调
+    /*-------------------------------------Animation Sequences-------------------------------------*/
+    // Create animation sequence
     var sequence = SequenceManager.GetSequence();
     
-    sequence.Append(valueTween); // 第一个动画
-    sequence.Join(gameObjectTween);   // 与第一个动画同时执行
-    sequence.Append(valueTween); // 第二个动画完成后执行
-    sequence.Append(() => LogF8.Log("完成了！")); // 动画序列结束后的回调
-    sequence.SetOnComplete(() => LogF8.Log("Sequence 完成"));
+    sequence.Append(valueTween); // First animation
+    sequence.Join(gameObjectTween);   // Parallel animation
+    sequence.Append(valueTween); // Runs after first completes
+    sequence.Append(() => LogF8.Log("Complete!")); // Final callback
+    sequence.SetOnComplete(() => LogF8.Log("Sequence complete"));
     
-    // 设置循环次数，-1代表无限循环
+    // Set loop count (-1 for infinite)
     sequence.SetLoops(3);
     
-    // 设置特定时间运行事件或动画
-    sequence.RunAtTime(() => LogF8.Log("半途事件"), 1.5f); // 在1.5秒时执行回调
-    sequence.RunAtTime(gameObjectTween, 2.0f); // 在2秒时开始执行特定动画
+    // Timed events in sequence
+    sequence.RunAtTime(() => LogF8.Log("Mid-event"), 1.5f); // Callback at 1.5s
+    sequence.RunAtTime(gameObjectTween, 2.0f); // Start animation at 2s
     
-    // 回收Sequence，并停止所有动画
+    // Cleanup sequence
     SequenceManager.KillSequence(sequence);
 }
 
-/*-----------------------------------------使用协程等待动画和动画组-----------------------------------------*/
+/*-------------------------------------Coroutine Animation Control-------------------------------------*/
 IEnumerator Coroutine() {
     yield return gameObject.Move(Vector3.one, 1f);
     
@@ -125,7 +125,7 @@ IEnumerator Coroutine() {
     yield return sequence;
 }
 
-/*-----------------------------------------使用async/await等待动画和动画组-----------------------------------------*/
+/*-------------------------------------Async Animation Control-------------------------------------*/
 async void Async() {
     await gameObject.Move(Vector3.one, 1f);
     

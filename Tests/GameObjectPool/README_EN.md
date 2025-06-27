@@ -1,160 +1,156 @@
 # F8 GameObjectPool
 
 [![license](http://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)
-[![Unity Version](https://img.shields.io/badge/unity-2021.3.15f1-blue)](https://unity.com)
+[![Unity Version](https://img.shields.io/badge/unity-2021|2022|2023|6000-blue)](https://unity.com)
 [![Platform](https://img.shields.io/badge/platform-Win%20%7C%20Android%20%7C%20iOS%20%7C%20Mac%20%7C%20Linux%20%7C%20WebGL-orange)]()
 
-## 简介（希望自己点击F8，就能开始制作游戏，不想多余的事）
-Unity F8 GameObjectPool组件，对象池管理，预加载池化，生成/销毁/延迟销毁，生命周期事件监听
+## Introduction (Simply press F8 to start game development without distractions)
+**Unity F8 GameObjectPool Component**  
+1. Preload Pooling - Initialize objects in advance for instant access
+2. Core Operations:
+   * Spawn - Get objects from pool
+   * Despawn - Return objects to pool
+   * DespawnDelay - Return objects after delay
+3. Lifecycle Event Listening - Monitor object state changes
 
-## 导入插件（需要首先导入核心）
-注意！内置在->F8Framework核心：https://github.com/TippingGame/F8Framework.git  
-方式一：直接下载文件，放入Unity  
-方式二：Unity->点击菜单栏->Window->Package Manager->点击+号->Add Package from git URL->输入：https://github.com/TippingGame/F8Framework.git
+## Plugin Installation (Requires Core Framework First)
+Note! Built into → F8Framework Core: https://github.com/TippingGame/F8Framework.git  
+Method 1: Download files directly and import to Unity  
+Method 2: Unity → Menu Bar → Window → Package Manager → "+" → Add Package from git URL → Enter: https://github.com/TippingGame/F8Framework.git
 
-### 代码使用方法
+### Code Examples
 ```C#
-    // 预制体或者组件
-    private GameObject _gameObjectPrefab;
-    private DemoGameObjectPool _componentPrefab;
-    // 粒子特效
-    private ParticleSystem _particleSystemPrefab;
-    // 预设对象池ScriptableObject
-    private PoolsPreset _poolsPreset;
-    void Start()
-    {
-        /*------------------------------使用GameObjectPool对象池------------------------------*/
-        
-        // 使用名称或GameObject或者Component创建对象
-        GameObject spawnedClone = FF8.GameObjectPool.Spawn("name");
-        GameObject spawnedClone = FF8.GameObjectPool.Spawn(_gameObjectPrefab);
-        DemoGameObjectPool component = FF8.GameObjectPool.Spawn(_componentPrefab, Vector3.zero, Quaternion.identity, this.transform);
-        
-        // 销毁
-        FF8.GameObjectPool.Despawn(gameObject, delay: 0.5f);
-        
-        // 粒子特效播放完成后立即销毁
-        FF8.GameObjectPool
-            .Spawn(_particleSystemPrefab)
-            .DespawnOnComplete();
-        
-        // 如何获取对象池
-        F8GameObjectPool _pool = FF8.GameObjectPool.GetPoolByPrefab(_gameObjectPrefab);
-        F8GameObjectPool _pool = FF8.GameObjectPool.GetPoolByPrefabName(_gameObjectPrefab.name);
-        
-        // 对每个池执行操作。
-        FF8.GameObjectPool.ForEachPool(LogF8.Log);
+// Prefab or component
+private GameObject _gameObjectPrefab;
+private DemoGameObjectPool _componentPrefab;
+// Particle effect
+private ParticleSystem _particleSystemPrefab;
+// Pool preset ScriptableObject
+private PoolsPreset _poolsPreset;
 
-        // 对每个克隆执行操作。
-        FF8.GameObjectPool.ForEachClone(LogF8.Log);
-
-        // 尝试获取克隆的状态（已生成 / 已回收 / 已生成超过容量）。
-        PoolableStatus cloneStatus = FF8.GameObjectPool.GetCloneStatus(spawnedClone);
-
-        // 游戏对象是否是克隆（使用 GameObjectPool 生成）？
-        bool isClone = FF8.GameObjectPool.IsClone(spawnedClone);
-        
-        // 如果要销毁克隆但不回收克隆，请使用此方法以避免错误！
-        FF8.GameObjectPool.DestroyClone(spawnedClone);
-        
-        // 销毁所有池。
-        FF8.GameObjectPool.DestroyAllPools(immediately: false);
-        
-        
-        
-        /*------------------------------GameObjectPool对象池内功能------------------------------*/
-        
-        // 手动初始化池。如果您通过 Awake 方法访问池，而该方法在池初始化之前被调用，则可能需要这样做。
-        _pool.Init();
-        
-        _pool.Init(_gameObjectPrefab);
-
-        // 填充池。
-        _pool.PopulatePool(16);
-        
-        // 设置池的容量。
-        _pool.SetCapacity(32);
-        
-        // 设置池的溢出行为。
-        _pool.SetBehaviourOnCapacityReached(BehaviourOnCapacityReached.Recycle);
-        
-        // 设置池中游戏对象的回收类型。
-        _pool.SetDespawnType(DespawnType.DeactivateAndHide);
-        
-        // 设置池的回调类型，用于游戏对象的生成或回收。
-        _pool.SetCallbacksType(CallbacksType.Interfaces);
-        
-        // 设置池的警告是否激活。
-        _pool.SetWarningsActive(true);
-        
-        // 对池中的每个克隆执行操作。
-        _pool.ForEachClone(LogF8.Log);
-        
-        // 对池中的每个已生成的克隆执行操作。
-        _pool.ForEachSpawnedClone(LogF8.Log);
-        
-        // 对池中的每个已回收的克隆执行操作。
-        _pool.ForEachDespawnedClone(LogF8.Log);
-        
-        // 销毁已生成的克隆。
-        _pool.DestroySpawnedClones();
-        
-        // 销毁已回收的克隆。
-        _pool.DestroyDespawnedClones();
-
-        // 销毁池中的所有克隆。
-        _pool.DestroyAllClones();
-
-        // 立即销毁已生成的克隆。
-        _pool.DestroySpawnedClonesImmediate();
-        
-        // 立即销毁已回收的克隆。
-        _pool.DestroyDespawnedClonesImmediate();
-
-        // 立即销毁池中的所有克隆。
-        _pool.DestroyAllClonesImmediate();
-        
-        // 销毁池。
-        _pool.DestroyPool();
-        
-        // 立即销毁池。
-        _pool.DestroyPoolImmediate();
-        
-        // 回收池中的所有克隆。
-        _pool.DespawnAllClones();
-
-        // 清除池。
-        _pool.Clear();
-        
-        // 对象池事件
-        void DoSomething(GameObject go)
-        {
-            
-        }
-        // 监听
-        _pool.GameObjectInstantiated.AddListener(DoSomething);
-        _pool.GameObjectSpawned.AddListener(DoSomething);
-        _pool.GameObjectDespawned.AddListener(DoSomething);
-        // 移除
-        _pool.GameObjectInstantiated.RemoveListener(DoSomething);
-        _pool.GameObjectSpawned.RemoveListener(DoSomething);
-        _pool.GameObjectDespawned.RemoveListener(DoSomething);
-    }
+void Start()
+{
+    /*------------------------------Using GameObjectPool------------------------------*/
     
-    /*------------------------------继承IPoolable的物体拥有回调------------------------------*/
-    public class DemoPoolCallBack : MonoBehaviour, IPoolable
-    {
-        public void OnSpawn()
-        {
-            // Do something on spawn.
-        }
+    // Create objects using name, GameObject or Component
+    GameObject spawnedClone = FF8.GameObjectPool.Spawn("name");
+    GameObject spawnedClone = FF8.GameObjectPool.Spawn(_gameObjectPrefab);
+    DemoGameObjectPool component = FF8.GameObjectPool.Spawn(_componentPrefab, Vector3.zero, Quaternion.identity, this.transform);
     
-        public void OnDespawn()
-        {
-            // Do something on despawn.
-        }
+    // Destroy with delay
+    FF8.GameObjectPool.Despawn(gameObject, delay: 0.5f);
+    
+    // Auto-despawn particle system after complete
+    FF8.GameObjectPool
+        .Spawn(_particleSystemPrefab)
+        .DespawnOnComplete();
+    
+    // Get pool reference
+    F8GameObjectPool _pool = FF8.GameObjectPool.GetPoolByPrefab(_gameObjectPrefab);
+    F8GameObjectPool _pool = FF8.GameObjectPool.GetPoolByPrefabName(_gameObjectPrefab.name);
+    
+    // Execute action for each pool
+    FF8.GameObjectPool.ForEachPool(LogF8.Log);
+
+    // Execute action for each clone
+    FF8.GameObjectPool.ForEachClone(LogF8.Log);
+
+    // Get clone status (Spawned/Despawned/OverCapacity)
+    PoolableStatus cloneStatus = FF8.GameObjectPool.GetCloneStatus(spawnedClone);
+
+    // Check if object is pool clone
+    bool isClone = FF8.GameObjectPool.IsClone(spawnedClone);
+    
+    // Destroy clone without recycling (use to avoid errors)
+    FF8.GameObjectPool.DestroyClone(spawnedClone);
+    
+    // Destroy all pools
+    FF8.GameObjectPool.DestroyAllPools(immediately: false);
+    
+    
+    
+    /*------------------------------Pool Management Functions------------------------------*/
+    
+    // Manual pool initialization (needed if accessing pool before Awake)
+    _pool.Init();
+    _pool.Init(_gameObjectPrefab);
+
+    // Prepopulate pool
+    _pool.PopulatePool(16);
+    
+    // Set pool capacity
+    _pool.SetCapacity(32);
+    
+    // Set overflow behavior
+    _pool.SetBehaviourOnCapacityReached(BehaviourOnCapacityReached.Recycle);
+    
+    // Set despawn behavior
+    _pool.SetDespawnType(DespawnType.DeactivateAndHide);
+    
+    // Set callback type
+    _pool.SetCallbacksType(CallbacksType.Interfaces);
+    
+    // Toggle warnings
+    _pool.SetWarningsActive(true);
+    
+    // Execute action for each clone
+    _pool.ForEachClone(LogF8.Log);
+    
+    // Execute action for spawned clones
+    _pool.ForEachSpawnedClone(LogF8.Log);
+    
+    // Execute action for despawned clones
+    _pool.ForEachDespawnedClone(LogF8.Log);
+    
+    // Destroy spawned clones
+    _pool.DestroySpawnedClones();
+    _pool.DestroyDespawnedClones();
+    _pool.DestroyAllClones();
+
+    // Immediate destruction
+    _pool.DestroySpawnedClonesImmediate();
+    _pool.DestroyDespawnedClonesImmediate();
+    _pool.DestroyAllClonesImmediate();
+    
+    // Pool destruction
+    _pool.DestroyPool();
+    _pool.DestroyPoolImmediate();
+    
+    // Despawn all clones
+    _pool.DespawnAllClones();
+
+    // Clear pool
+    _pool.Clear();
+    
+    // Pool events
+    void DoSomething(GameObject go)
+    {
+        
     }
+    // Event listeners
+    _pool.GameObjectInstantiated.AddListener(DoSomething);
+    _pool.GameObjectSpawned.AddListener(DoSomething);
+    _pool.GameObjectDespawned.AddListener(DoSomething);
+    // Remove listeners
+    _pool.GameObjectInstantiated.RemoveListener(DoSomething);
+    _pool.GameObjectSpawned.RemoveListener(DoSomething);
+    _pool.GameObjectDespawned.RemoveListener(DoSomething);
+}
+
+/*------------------------------IPoolable Callbacks------------------------------*/
+public class DemoPoolCallBack : MonoBehaviour, IPoolable
+{
+    public void OnSpawn()
+    {
+        // Called when object is spawned
+    }
+
+    public void OnDespawn()
+    {
+        // Called when object is despawned
+    }
+}
 ```
-## 拓展功能
-1. 使用预加载池
+## Extended Features
+1. Using Preloaded Pools
    ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/GameObjectPool/ui_20240302154233.png)

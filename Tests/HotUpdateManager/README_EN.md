@@ -1,76 +1,88 @@
 # F8 HotUpdate
 
 [![license](http://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)
-[![Unity Version](https://img.shields.io/badge/unity-2021.3.15f1-blue)](https://unity.com)
+[![Unity Version](https://img.shields.io/badge/unity-2021|2022|2023|6000-blue)](https://unity.com)
 [![Platform](https://img.shields.io/badge/platform-Win%20%7C%20Android%20%7C%20iOS%20%7C%20Mac%20%7C%20Linux%20%7C%20WebGL-orange)]()
 
-## 简介（希望自己点击F8，就能开始制作游戏，不想多余的事）
-Unity F8 HotUpdate 热更新版本管理，负责打包，分包，热更新资源。
+## Introduction (Simply press F8 to start game development without distractions)
+**Unity F8 HotUpdate**  
+Version Management System for Hot Updates
+* Asset Bundling - Package game resources efficiently
+* Subpackage Management - Split content into downloadable chunks
+* Hot Update Resources - Deploy patches without requiring full app updates
 
-## 导入插件（需要首先导入核心）
-注意！内置在->F8Framework核心：https://github.com/TippingGame/F8Framework.git  
-方式一：直接下载文件，放入Unity  
-方式二：Unity->点击菜单栏->Window->Package Manager->点击+号->Add Package from git URL->输入：https://github.com/TippingGame/F8Framework.git
+## Plugin Installation (Requires Core Framework First)
+Note! Built into → F8Framework Core: https://github.com/TippingGame/F8Framework.git  
+Method 1: Download files directly and import to Unity  
+Method 2: Unity → Menu Bar → Window → Package Manager → "+" → Add Package from git URL → Enter: https://github.com/TippingGame/F8Framework.git
 
-### 编辑器界面使用
+### Editor Interface Usage
 
-* 如何设置分包资源  
+* How to Set Up Subpackage Resources  
   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/HotUpdateManager/ui_20240323173756.png)
 --------------------------
-* 选择打包平台，输出路径，版本号，远程资产加载地址，启用热更新，全量打包，分包，空包。  
-  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/HotUpdateManager/ui_20240317214323_2.png)
---------------------------
-* 如需本地测试热更新，注意清理沙盒目录中的临时文件
---------------------------
-### 如构建失败：请尝试使用Unity自带的Build一次后再尝试
+* Configuration Options:
+  * Select build platform
+  * Set output path
+  * Specify version number
+  * Configure remote asset loading URL
+  * Enable hot updates
+  * Full build / Subpackage build / Empty build  
+
+![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/HotUpdateManager/ui_20240317214323_2.png)  
 
 --------------------------
-* 构建后将文件放入CDN服务器  
+* For Local Hot Update Testing: Clear temporary files in the sandbox directory before testing.
+--------------------------
+### If Build Fails: Try running Unity's native Build once before retrying.
+
+--------------------------
+* After Building: Upload files to CDN server  
   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/HotUpdateManager/ui_20240323173827_2.png)
 --------------------------
-### 代码使用方法
+### Code Examples
 ```C#
 IEnumerator Start()
 {
-    // 初始化本地版本
+    // Initialize local version
     FF8.HotUpdate.InitLocalVersion();
 
-    // 初始化远程版本
+    // Initialize remote version 
     yield return FF8.HotUpdate.InitRemoteVersion();
     
-    // 初始化资源版本
+    // Initialize asset version
     yield return FF8.HotUpdate.InitAssetVersion();
     
-    // 检查需要热更的资源，总大小
-    Tuple<Dictionary<string, string>, long> result  = FF8.HotUpdate.CheckHotUpdate();
+    // Check resources needing hot updates (returns file list + total size)
+    Tuple<Dictionary<string, string>, long> result = FF8.HotUpdate.CheckHotUpdate();
     var hotUpdateAssetUrl = result.Item1;
     var allSize = result.Item2;
     
-    // 资源热更新
+    // Execute hot update
     FF8.HotUpdate.StartHotUpdate(hotUpdateAssetUrl, () =>
     {
-        LogF8.Log("完成");
+        LogF8.Log("Completed");
     }, () =>
     {
-        LogF8.Log("失败");
+        LogF8.Log("Failed"); 
     }, progress =>
     {
-        LogF8.Log("进度：" + progress);
+        LogF8.Log("Progress: " + progress);
     });
 
-    // 检查未加载的分包
+    // Check unloaded subpackages  
     List<string> subPackage = FF8.HotUpdate.CheckPackageUpdate(GameConfig.LocalGameVersion.SubPackage);
     
-    // 分包加载
+    // Load subpackages
     FF8.HotUpdate.StartPackageUpdate(subPackage, () =>
     {
-        LogF8.Log("完成");
+        LogF8.Log("Completed");
     }, () =>
     {
-        LogF8.Log("失败");
+        LogF8.Log("Failed");
     }, progress =>
     {
-        LogF8.Log("进度：" + progress);
+        LogF8.Log("Progress: " + progress);
     });
 }
 ```

@@ -1,7 +1,7 @@
 # F8 ExcelTool
 
 [![license](http://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT) 
-[![Unity Version](https://img.shields.io/badge/unity-2021.3.15f1-blue)](https://unity.com) 
+[![Unity Version](https://img.shields.io/badge/unity-2021|2022|2023|6000-blue)](https://unity.com) 
 [![Platform](https://img.shields.io/badge/platform-Win%20%7C%20Android%20%7C%20iOS%20%7C%20Mac%20%7C%20Linux%20%7C%20WebGL-orange)]()
 
 > F8 框架初衷：希望自己点击 F8，就能开始制作游戏，不想多余的事。
@@ -27,20 +27,20 @@ Unity 读取 Excel 的工具
 
 ## 初始化
 
-1. 在 Assets 下，创建 StreamingAssets/config 目录，按照下面 "Excel 示例" 创建你的 Excel[（Excel例子）](https://github.com/TippingGame/F8Framework/blob/main/Runtime/ExcelTool/StreamingAssets_config/DemoWorkSheet.xlsx)（首次F8后自动创建Excel）
+1. 在 `Assets` 下，创建 `StreamingAssets/config` 目录，按照下面 "Excel 示例" 创建你的 Excel[（Excel例子）](https://github.com/TippingGame/F8Framework/blob/main/Runtime/ExcelTool/StreamingAssets_config/DemoWorkSheet.xlsx)（首次F8后自动创建Excel）
 
 
-2. 点击菜单的**开发工具**项 -> **导入配置表**\_F8（快捷键），在 Assets/AssetBundles/Config/BinConfigData 下生成 **bytes** 文件（WebGL下生成 **Json** 文件）  
+2. 点击菜单的**开发工具**项 -> **导入配置表**\_F8（快捷键），在 `Assets/AssetBundles/Config/BinConfigData` 下生成 **bytes** 文件（WebGL下生成 **Json** 文件）  
 
 
-3. **注意**：如果你不想生成在AssetBundles目录下，在代码 [ExcelDataTool.cs](https://github.com/TippingGame/F8Framework/blob/main/Editor/ExcelTool/ExcelDataTool.cs) 中修改 "BinDataFolder" 的值
+3. **注意**：如果你不想生成在`AssetBundles`目录下，在代码 [ExcelDataTool.cs](https://github.com/TippingGame/F8Framework/blob/main/Editor/ExcelTool/ExcelDataTool.cs) 中修改 "BinDataFolder" 的值
     ```C#
     // 序列化的数据文件都会放在此文件夹内,此文件夹位于AssetBundles或Resources文件夹下用于读取数据
     public const string BinDataFolder = "/AssetBundles/Config/BinConfigData";
     ```
 
 
-4. 如无意外，根目录下会生成 **Assets/F8Framework/ConfigData/** 目录和相关文件，（注意：F8后会清除框架自带的，并重新生成，一切报错均来自这些代码的冲突）  
+4. 如无意外，根目录下会生成 `Assets/F8Framework/ConfigData/` 目录和相关文件，（注意：F8后会清除框架自带的，并重新生成，一切报错均来自这些代码的冲突）  
    ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/ExcelTool/ui_20241112212632.png)
 
 5. （可选项）更改Excel存放目录，**开发工具**项 -> **设置Excel存放目录**  
@@ -54,6 +54,7 @@ Unity 读取 Excel 的工具
 #### 类型可分为 1. 基础类型 2. 容器类型 3. 特殊类型
 * 1.[C# 基础类型支持](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/built-in-types)（bool，byte，short，int，long，float，double，decimal，str / string，obj / object，[datetime](https://learn.microsoft.com/en-us/dotnet/api/system.datetime.-ctor?view=net-9.0)，sbyte，ushort，uint，ulong）  
 Unity基础类型支持（[vec2 / vector2](https://docs.unity3d.com/ScriptReference/Vector2-ctor.html)，[vec3 / vector3](https://docs.unity3d.com/ScriptReference/Vector3-ctor.html)，[vec4 / vector4](https://docs.unity3d.com/ScriptReference/Vector4-ctor.html)，[vec2int / vector2int](https://docs.unity3d.com/ScriptReference/Vector2Int-ctor.html)，[vec3int / vector3int](https://docs.unity3d.com/ScriptReference/Vector3Int.html)，[quat / quaternion](https://docs.unity3d.com/ScriptReference/Quaternion-ctor.html)，[color](https://docs.unity3d.com/ScriptReference/Color.html)）  
+
 Excel 示例：（id 是唯一索引，必须添加！）  
 
 | int | long       | bool  | float    | double      | str         | vector3           | color              | datetime                          |
@@ -62,8 +63,14 @@ Excel 示例：（id 是唯一索引，必须添加！）
 | 1   | 9935434343 | true  | 2.725412 | 1.346655321 | 读取 Excel 工具 | 1.23,1.35,1.45    | 122,135,145,255    | 1750316265001                     |
 | 2   | 9935434343 | 1     | 2.725412 | 1.346655321 | 读取 Excel 工具 | \[1.23,1.35,1.45] | \[122,135,145,255] | 2025-06-19T14:30:00.1234567+08:00 |
 
-* 2.容器类型支持（[[]](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/arrays) / [[][]](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/arrays#jagged-arrays) / [[][][]](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/arrays#jagged-arrays)，[list<>](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1.-ctor?view=net-9.0)，[dict<,> / dictionary<,>](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2.-ctor?view=net-9.0)，[valuetuple<,>](https://learn.microsoft.com/en-us/dotnet/api/system.valuetuple?view=net-9.0)）数组，交错数组，列表，字典（注意：key只能为byte，short，int，long，float，double，str / string 类型），值元组（最高支持7个类型），容器内可以填写任意的类型  
-Excel 示例：
+* 2.容器类型支持
+  * 数组，交错数组（[[]](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/arrays) / [[][]](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/arrays#jagged-arrays) / [[][][]](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/arrays#jagged-arrays)）
+  * 列表（[list<>](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1.-ctor?view=net-9.0)）
+  * 字典（[dict<,> / dictionary<,>](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2.-ctor?view=net-9.0)，注意：key只能为byte，short，int，long，float，double，str / string 类型）
+  * 值元组（[valuetuple<,>](https://learn.microsoft.com/en-us/dotnet/api/system.valuetuple?view=net-9.0)，最高支持7个类型）  
+  * 容器内可以填写任意的类型  
+
+Excel 示例：  
 
 | int\[] | string\[]   | vec2\[]            | obj\[]\[]              | list\<obj\>       | dict\<int,string\> | dict\<int,list\<float\>\> |
 | ------ |-------------|--------------------|------------------------|-------------------|--------------------|---------------------------|
@@ -71,8 +78,13 @@ Excel 示例：
 | \[1,5] | \[test,str] | \[[12,66],[12,66]] | \[\[22,"str"],\[33,"obj"]] | 123,1.888,"列表"    | 1,"字典",2,"字典2"     | 1,\[1.11,2.22],2,\[3.33]  |
 | \[1,5] | \[test,str] | \[[12,66],[12,66]] | \[\[22,"str"],\[33,"obj"]] | \[123,1.888,"列表"] | \[1,"字典",2,"字典2"]  | 1,\[1.11,2.22],2,\[3.33]  |
 
-* 3.特殊类型支持（[enum](https://learn.microsoft.com/en-us/dotnet/api/system.enum?view=net-9.0)<name,int,Flags>{}）枚举，默认在当前表生成枚举类，可跨表访问枚举，支持自定义名称，类型，Flags特性  
-  Excel 示例：（可选参数：int类型(默认)，Flags特性，标志枚举：Value1, Value2，跨表访问：Sheet1.name）
+* 3.特殊类型支持
+  * 枚举（[enum](https://learn.microsoft.com/en-us/dotnet/api/system.enum?view=net-9.0)<name,int,Flags>{}）
+    * 默认在当前表生成枚举类
+    * 可跨表访问枚举，支持自定义名称，类型，Flags特性  
+
+Excel 示例：  
+（可选参数：int类型(默认)，Flags特性，标志枚举：Value1, Value2，跨表访问：Sheet1.name）  
 
 | enum<name,int,Flags>{Value1 = 1,Value2 = 2,Value3 = 4,Value4 = 8,} | enum<Sheet1.name> | enum<Status,long>{OK = 200,Success = 200,Created = 201,Accepted = 202,} |
 |--------------------------------------------------------------------|-------------------|-------------------------------------------------------------------------|
@@ -141,7 +153,7 @@ I18N.Other.dll\
 I18N.Rare.dll\
 I18N.West.dll\
 [ICSharpCode.SharpZipLib.dll](https://github.com/icsharpcode/SharpZipLib)  
-[LitJson.dll](https://github.com/LitJSON/litjson)（已修改字典Key支持更多非string的C#基础类型，增加Unity常用类型：Type，Vector2，Vector3，Vector4，Quaternion，GameObject，Transform，Color，Color32，Bounds，Rect，RectOffset，LayerMask，Vector2Int，Vector3Int，RangeInt，BoundsInt）
+[LitJson.dll](https://github.com/LitJSON/litjson)（已修改字典Key支持byte，short，int，long，float，double，string 类型，增加Unity常用类型：Type，Vector2，Vector3，Vector4，Quaternion，GameObject，Transform，Color，Color32，Bounds，Rect，RectOffset，LayerMask，Vector2Int，Vector3Int，RangeInt，BoundsInt，修复DateTime精度丢失的问题）
 
 ## 你可能需要写入Excel
 使用 [EPPlus.dll（已内置）](https://github.com/TippingGame/F8Framework/blob/main/Plugins/EPPlus.dll)但未启用，请手动选择编译的平台  

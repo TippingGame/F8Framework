@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.7.158] - 2025-06-27
+1.Improve English documentation  
+
 ## [1.7.157] - 2025-06-21
 1.修复配置表容器类使用enum作为参数时报错的问题  
 

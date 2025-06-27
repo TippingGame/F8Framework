@@ -1,41 +1,52 @@
 # F8 Module
 
 [![license](http://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)
-[![Unity Version](https://img.shields.io/badge/unity-2021.3.15f1-blue)](https://unity.com)
+[![Unity Version](https://img.shields.io/badge/unity-2021|2022|2023|6000-blue)](https://unity.com)
 [![Platform](https://img.shields.io/badge/platform-Win%20%7C%20Android%20%7C%20iOS%20%7C%20Mac%20%7C%20Linux%20%7C%20WebGL-orange)]()
 
-## 简介（希望自己点击F8，就能开始制作游戏，不想多余的事）
-Unity F8 Module模块中心组件。提供三种模块可使用。
-1. 游戏模块 Module / ModuleMono，延时加载，可控顺序，控制所有模块的，获取/初始化/轮询/销毁。
-2. 静态模块 StaticModule ，随着游戏一同初始化，无顺序，提供 OnEnterGame / OnQuitGame 方法。
+## Introduction (Simply press F8 to start game development without distractions)
+**Unity F8 Module Center Component**  
+A modular architecture system that provides three distinct module types for game development:
+* Lazy Loading: Modules load only when needed
+* Execution Order Control: Precise initialization sequence management
+* Lifecycle Management: Full control over:
+  * Acquisition
+  * Initialization
+  * Update cycles
+  * Destruction
 
-## 导入插件（需要首先导入核心）
-注意！内置在->F8Framework核心：https://github.com/TippingGame/F8Framework.git  
-方式一：直接下载文件，放入Unity  
-方式二：Unity->点击菜单栏->Window->Package Manager->点击+号->Add Package from git URL->输入：https://github.com/TippingGame/F8Framework.git
+## Plugin Installation (Requires Core Framework First)
+Note! Built into → F8Framework Core: https://github.com/TippingGame/F8Framework.git  
+Method 1: Download files directly and import to Unity  
+Method 2: Unity → Menu Bar → Window → Package Manager → "+" → Add Package from git URL → Enter: https://github.com/TippingGame/F8Framework.git
 
-### 创建模板
+### Module Creation Templates
 
-1. 右键资源文件夹，看到（F8模块中心功能），创建模板 Module / ModuleMono / StaticModule  
-   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/Module/ui_20240302154204.png)
-### 代码使用方法
+1. Right-click in the Assets folder and select (F8 Module Center Functions) to create templates for:  
+    * Module
+    * ModuleMono
+    * StaticModule
+
+![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/Module/ui_20240302154204.png)  
+
+### Code Examples
 ```C#
-/*----------------------------模块中心功能----------------------------*/
+/*----------------------------Module Center Functions----------------------------*/
 
-// 初始化模块中心
+// Initialize module center
 ModuleCenter.Initialize(this);
 
-// 创建模块，（参数可选，优先级越小越早轮询）
+// Create module (priority parameter optional - lower values update earlier)
 int priority = 100;
 ModuleCenter.CreateModule<TimerManager>(priority);
 
-// 通过ModuleCenter调用模块方法
+// Access module methods through ModuleCenter
 ModuleCenter.GetModule<TimerManager>().GetServerTime();
 
-// 通过获取实例调用模块方法
+// Alternative access via singleton instance
 TimerManager.Instance.GetServerTime();
 
-// 继承ModuleSingletonMono创建模块，按需添加Update特性
+// Creating a module by inheriting ModuleSingletonMono
 [UpdateRefresh]
 [LateUpdateRefresh]
 [FixedUpdateRefresh]
@@ -43,63 +54,63 @@ public class DemoModuleCenterClass : ModuleSingleton<DemoModuleCenterClass>, IMo
 {
     public void OnInit(object createParam)
     {
-        // 模块创建初始化
+        // Module initialization
     }
 
     public void OnUpdate()
     {
-        // 模块Update
+        // Module Update
     }
 
     public void OnLateUpdate()
     {
-        // 模块LateUpdate
+        // Module LateUpdate
     }
 
     public void OnFixedUpdate()
     {
-        // 模块FixedUpdate
+        // Module FixedUpdate
     }
 
     public void OnTermination()
     {
-        // 模块销毁
+        // Module cleanup
         Destroy(gameObject);
     }
 }
 
-/*----------------------------自定义静态模块功能----------------------------*/
+/*----------------------------Custom Static Module Functions----------------------------*/
 
-// 获取所有静态模块，并调用进入游戏
+// Get all static modules and trigger game entry
 foreach (var center in StaticModule.GetStaticModule())
 {
     center.Value.OnEnterGame();
 }
 
-// 获取指定静态模块
+// Get specific static module
 StaticModule demo = StaticModule.GetStaticModuleByType(typeof(StaticModuleClass));
 
-// 使用静态模块
+// Using static module
 StaticModuleClass.Instance.OnEnterGame();
 
-// 继承StaticModule的自定义模块
+// Custom static module implementation
 public class StaticModuleClass : StaticModule
 {
     public static StaticModuleClass Instance => GetInstance<StaticModuleClass>();
     
     protected override void Init()
     {
-        // 初始化StaticModule
+        // StaticModule initialization
     }
         
     public override void OnEnterGame()
     {
-        // 进入游戏
+        // Game entry logic
     }
 
     public override void OnQuitGame()
     {
-        // 退出游戏
+        // Game exit logic
     }
 }
 ```

@@ -1,7 +1,7 @@
 # F8 AudioManager
 
 [![license](http://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT) 
-[![Unity Version](https://img.shields.io/badge/unity-2021.3.15f1-blue)](https://unity.com) 
+[![Unity Version](https://img.shields.io/badge/unity-2021|2022|2023|6000-blue)](https://unity.com) 
 [![Platform](https://img.shields.io/badge/platform-Win%20%7C%20Android%20%7C%20iOS%20%7C%20Mac%20%7C%20Linux%20%7C%20WebGL-orange)]() 
 
 ## 简介（希望自己点击F8，就能开始制作游戏，不想多余的事）
@@ -21,11 +21,11 @@ Audio分为三大类：
 void Start()
 {
     /*----------背景音乐----------*/
-    //assetName资产名
-    //callback播放完成回调
-    //loop是否循环
-    //priority优先级，高的覆盖低的
-    //fadeDuration淡入持续时间
+    // assetName资产名
+    // callback播放完成回调
+    // loop是否循环
+    // priority优先级，高的覆盖低的
+    // fadeDuration淡入持续时间
     FF8.Audio.PlayMusic("assetName", CallBack, loop: true, priority: 1, fadeDuration: 3f); // 背景音乐
     float progress = FF8.Audio.ProgressMusic; // 获取进度
     FF8.Audio.SetProgressMusic = 0.5f; // 设置进度
@@ -52,20 +52,20 @@ void Start()
     FF8.Audio.SetAudioEffectComplete(CallBack); // 设置完成回调
     
     /*----------一次性3D音效----------*/
-    //assetName资产名
-    //isRandom是否随机音量音高
-    //audioPosition音频播放位置
-    //volume音量
-    //spatialBlend2d到3d的比例
-    //maxNum最大同时播放个数
-    //callback播放完成回调
+    // assetName资产名
+    // isRandom是否随机音量音高
+    // audioPosition音频播放位置
+    // volume音量
+    // spatialBlend2d到3d的比例
+    // maxNum最大同时播放个数
+    // callback播放完成回调
     FF8.Audio.PlayAudioEffect3D("assetName", isRandom: true, transform.position, volume: 1f, spatialBlend: 1f, maxNum: 5, CallBack);
     FF8.Audio.VolumeAudioEffect = 0.5f; // 设置音量，自动保存至PlayerPrefs
     FF8.Audio.SwitchAudioEffect = false; // 设置开关，自动保存至PlayerPrefs
     
     /*----------其他功能----------*/
     
-    //可选，设置混音组F8AudioMixer，需手动放到可加载目录
+    // 可选，设置混音组F8AudioMixer，需手动放到可加载目录
     FF8.Audio.SetAudioMixer(FF8.Asset.Load<AudioMixer>("F8AudioMixer"));
 
     /*----------全局控制----------*/

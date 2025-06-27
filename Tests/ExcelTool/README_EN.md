@@ -1,78 +1,87 @@
 # F8 ExcelTool
 
 [![license](http://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)
-[![Unity Version](https://img.shields.io/badge/unity-2021.3.15f1-blue)](https://unity.com)
+[![Unity Version](https://img.shields.io/badge/unity-2021|2022|2023|6000-blue)](https://unity.com)
 [![Platform](https://img.shields.io/badge/platform-Win%20%7C%20Android%20%7C%20iOS%20%7C%20Mac%20%7C%20Linux%20%7C%20WebGL-orange)]()
 
-> F8 框架初衷：希望自己点击 F8，就能开始制作游戏，不想多余的事。
->
-> F8 Framework original intention: Just click F8 and start making the game, don't want to be redundant.
+## Introduction (Simply press F8 to start game development without distractions)
 
-## 简介
+Unity Excel Tool
 
-Unity 读取 Excel 的工具
+- **Load Cached Data**: High performance, loads manually generated Excel binary cache.
 
-- **加载缓存**：高性能，加载手动生成的 Excel 二进制缓存
+- **Load Files**: High adaptability, automatically reads the latest Excel files at runtime without manual intervention.
 
-- **加载文件**：高适应性，运行时自动读取最新 Excel，无需人工干预
+    - **Prerequisite**: Complete the [Initialization](#Initialization) section of this guide first (reason: runtime cannot refresh C# code for structural or type changes).
 
-    - **必须**先完成本指南的[初始化](#初始化)部分（因：对于结构、类型等变动，运行时无法刷新 C# 代码）。
+## Plugin Installation (Requires Core Framework First)
+Note! Built into → F8Framework Core: https://github.com/TippingGame/F8Framework.git  
+Method 1: Download files directly and import to Unity  
+Method 2: Unity → Menu Bar → Window → Package Manager → "+" → Add Package from git URL → Enter: https://github.com/TippingGame/F8Framework.git
 
-系统支持：Win/Android/iOS/Mac/Linux/WebGL
+## Initialization
 
-## 导入插件（需要首先导入核心）
-注意！内置在->F8Framework核心：https://github.com/TippingGame/F8Framework.git  
-方式一：直接下载文件，放入Unity  
-方式二：Unity->点击菜单栏->Window->Package Manager->点击+号->Add Package from git URL->输入：https://github.com/TippingGame/F8Framework.git
+1. Under `Assets`, create the `StreamingAssets/config` directory. Follow the Excel Example below to create your Excel file [(Excel Example)](https://github.com/TippingGame/F8Framework/blob/main/Runtime/ExcelTool/StreamingAssets_config/DemoWorkSheet.xlsx) (Excel will be auto-generated after the first F8 execution).
 
-## 初始化
+2. Click the **Development Tools** menu → **Import Config Tables**_F8 (shortcut). This generates **.bytes** files under `Assets/AssetBundles/Config/BinConfigData` (or **.json** files for WebGL).
 
-1. 在 Assets 下，创建 StreamingAssets/config 目录，按照下面 "Excel 示例" 创建你的 Excel[（Excel例子）](https://github.com/TippingGame/F8Framework/blob/main/Runtime/ExcelTool/StreamingAssets_config/DemoWorkSheet.xlsx)（首次F8后自动创建Excel）
-
-
-2. 点击菜单的**开发工具**项 -> **导入配置表**\_F8（快捷键），在 Assets/AssetBundles/Config/BinConfigData 下生成 **bytes** 文件（WebGL下生成 **Json** 文件）
-
-
-3. **注意**：如果你不想生成在AssetBundles目录下，在代码 [ExcelDataTool.cs](https://github.com/TippingGame/F8Framework/blob/main/Editor/ExcelTool/ExcelDataTool.cs) 中修改 "BinDataFolder" 的值
+3. **Note**: If you don’t want to generate files in the `AssetBundles` directory, modify the BinDataFolder value in [ExcelDataTool.cs](https://github.com/TippingGame/F8Framework/blob/main/Editor/ExcelTool/ExcelDataTool.cs):
     ```C#
-    // 序列化的数据文件都会放在此文件夹内,此文件夹位于AssetBundles或Resources文件夹下用于读取数据
+    // Serialized data files will be placed in this folder, located under AssetBundles or Resources for data reading.
     public const string BinDataFolder = "/AssetBundles/Config/BinConfigData";
     ```
 
 
-4. 如无意外，根目录下会生成 **Assets/F8Framework/ConfigData/** 目录和相关文件，（注意：F8后会清除框架自带的，并重新生成，一切报错均来自这些代码的冲突）  
+4. If successful, the `Assets/F8Framework/ConfigData/` directory and related files will be generated in the root directory. (**Note**: F8 execution will clear the framework's default files and regenerate them. Any errors will stem from conflicts in this code.)
    ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/ExcelTool/ui_20241112212632.png)
 
-5. （可选项）更改Excel存放目录，**开发工具**项 -> **设置Excel存放目录**
+5. **(Optional)** Change the Excel storage directory: Development Tools → Set Excel Storage Directory.
 
 
-6. （可选项）通过 Editor，可在运行时读取 Excel 数据：点击菜单的**开发工具**项 -> **运行时读取 Excel**\_F7（快捷键）
+6. **(Optional)** Use the Editor to read Excel data at runtime: Development Tools → Read Excel at Runtime_F7 (shortcut).
 
 
-## Excel 示例
+## Excel Example
 
-#### 类型可分为 1. 基础类型 2. 容器类型 3. 特殊类型
-* 1.[C# 基础类型支持](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/built-in-types)（bool，byte，short，int，long，float，double，decimal，str / string，obj / object，[datetime](https://learn.microsoft.com/en-us/dotnet/api/system.datetime.-ctor?view=net-9.0)，sbyte，ushort，uint，ulong）  
-  Unity基础类型支持（[vec2 / vector2](https://docs.unity3d.com/ScriptReference/Vector2-ctor.html)，[vec3 / vector3](https://docs.unity3d.com/ScriptReference/Vector3-ctor.html)，[vec4 / vector4](https://docs.unity3d.com/ScriptReference/Vector4-ctor.html)，[vec2int / vector2int](https://docs.unity3d.com/ScriptReference/Vector2Int-ctor.html)，[vec3int / vector3int](https://docs.unity3d.com/ScriptReference/Vector3Int.html)，[quat / quaternion](https://docs.unity3d.com/ScriptReference/Quaternion-ctor.html)，[color](https://docs.unity3d.com/ScriptReference/Color.html)）  
-  Excel 示例：（id 是唯一索引，必须添加！）
+#### Types are divided into: 
+1. Basic Types
+2. Container Types
+3. Special Types
 
-| int | long       | bool  | float    | double      | str         | vector3           | color              | datetime                          |
-| --- | ---------- |-------|----------|-------------|-------------|-------------------|--------------------|-----------------------------------|
-| id  | name1      | name2 | name3    | name4       | name5       | name6             | name7              | name8                             |
-| 1   | 9935434343 | true  | 2.725412 | 1.346655321 | 读取 Excel 工具 | 1.23,1.35,1.45    | 122,135,145,255    | 1750316265001                     |
-| 2   | 9935434343 | 1     | 2.725412 | 1.346655321 | 读取 Excel 工具 | \[1.23,1.35,1.45] | \[122,135,145,255] | 2025-06-19T14:30:00.1234567+08:00 |
+* 1.[C# Basic Types](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/built-in-types)（bool，byte，short，int，long，float，double，decimal，str / string，obj / object，[datetime](https://learn.microsoft.com/en-us/dotnet/api/system.datetime.-ctor?view=net-9.0)，sbyte，ushort，uint，ulong）  
+  UnityBasic Types（[vec2 / vector2](https://docs.unity3d.com/ScriptReference/Vector2-ctor.html)，[vec3 / vector3](https://docs.unity3d.com/ScriptReference/Vector3-ctor.html)，[vec4 / vector4](https://docs.unity3d.com/ScriptReference/Vector4-ctor.html)，[vec2int / vector2int](https://docs.unity3d.com/ScriptReference/Vector2Int-ctor.html)，[vec3int / vector3int](https://docs.unity3d.com/ScriptReference/Vector3Int.html)，[quat / quaternion](https://docs.unity3d.com/ScriptReference/Quaternion-ctor.html)，[color](https://docs.unity3d.com/ScriptReference/Color.html)）  
 
-* 2.容器类型支持（[[]](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/arrays) / [[][]](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/arrays#jagged-arrays) / [[][][]](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/arrays#jagged-arrays)，[list<>](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1.-ctor?view=net-9.0)，[dict<,> / dictionary<,>](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2.-ctor?view=net-9.0)，[valuetuple<,>](https://learn.microsoft.com/en-us/dotnet/api/system.valuetuple?view=net-9.0)）数组，交错数组，列表，字典（注意：key只能为byte，short，int，long，float，double，str / string 类型），值元组（最高支持7个类型），容器内可以填写任意的类型  
-  Excel 示例：
+Excel Example (**id** is the unique index and must be included!):  
+
+| int | long       | bool  | float    | double      | str        | vector3           | color              | datetime                          |
+| --- | ---------- |-------|----------|-------------|------------|-------------------|--------------------|-----------------------------------|
+| id  | name1      | name2 | name3    | name4       | name5      | name6             | name7              | name8                             |
+| 1   | 9935434343 | true  | 2.725412 | 1.346655321 | Excel Tool | 1.23,1.35,1.45    | 122,135,145,255    | 1750316265001                     |
+| 2   | 9935434343 | 1     | 2.725412 | 1.346655321 | Excel Tool | \[1.23,1.35,1.45] | \[122,135,145,255] | 2025-06-19T14:30:00.1234567+08:00 |
+
+* 2.Container Types
+  * Supported:
+    * Arrays, Jagged Arrays ([[]](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/arrays), [[][]](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/arrays#jagged-arrays), [[][][]](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/arrays#jagged-arrays))
+    * List ([list<>](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1.-ctor?view=net-9.0))
+    * Dictionary ([dict<,> / dictionary<,>](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2.-ctor?view=net-9.0), Note: Keys can only be byte, short, int, long, float, double, str/string.)
+    * ValueTuple ([valuetuple<,>](https://learn.microsoft.com/en-us/dotnet/api/system.valuetuple?view=net-9.0), Supports up to 7 types).
+    * Containers can hold any type.
+
+Excel Example:  
 
 | int\[] | string\[]   | vec2\[]            | obj\[]\[]              | list\<obj\>       | dict\<int,string\> | dict\<int,list\<float\>\> |
 | ------ |-------------|--------------------|------------------------|-------------------|--------------------|---------------------------|
 | name1  | name2       | name3              | name4                  | name5             | name6              | name7                     |
-| \[1,5] | \[test,str] | \[[12,66],[12,66]] | \[\[22,"str"],\[33,"obj"]] | 123,1.888,"列表"    | 1,"字典",2,"字典2"     | 1,\[1.11,2.22],2,\[3.33]  |
-| \[1,5] | \[test,str] | \[[12,66],[12,66]] | \[\[22,"str"],\[33,"obj"]] | \[123,1.888,"列表"] | \[1,"字典",2,"字典2"]  | 1,\[1.11,2.22],2,\[3.33]  |
+| \[1,5] | \[test,str] | \[[12,66],[12,66]] | \[\[22,"str"],\[33,"obj"]] | 123,1.888,"列表"    | 1,"Dict",2,"Dict"     | 1,\[1.11,2.22],2,\[3.33]  |
+| \[1,5] | \[test,str] | \[[12,66],[12,66]] | \[\[22,"str"],\[33,"obj"]] | \[123,1.888,"列表"] | \[1,"Dict",2,"Dict"]  | 1,\[1.11,2.22],2,\[3.33]  |
 
-* 3.特殊类型支持（[enum](https://learn.microsoft.com/en-us/dotnet/api/system.enum?view=net-9.0)<name,int,Flags>{}）枚举，默认在当前表生成枚举类，可跨表访问枚举，支持自定义名称，类型，Flags特性  
-  Excel 示例：（可选参数：int类型(默认)，Flags特性，标志枚举：Value1, Value2，跨表访问：Sheet1.name）
+* 3.Special Types
+  * Enum: [enum](https://learn.microsoft.com/en-us/dotnet/api/system.enum?view=net-9.0)<name,int,Flags>{}
+    * Default: Generates an enum class in the current sheet.
+    * Supports cross-sheet enum access, custom names, types, and Flags attribute.
+
+Excel Example:  
+(Optional parameters: int type (default), Flags attribute, cross-sheet access: Sheet1.name)
 
 | enum<name,int,Flags>{Value1 = 1,Value2 = 2,Value3 = 4,Value4 = 8,} | enum<Sheet1.name> | enum<Status,long>{OK = 200,Success = 200,Created = 201,Accepted = 202,} |
 |--------------------------------------------------------------------|-------------------|-------------------------------------------------------------------------|
@@ -82,58 +91,60 @@ Unity 读取 Excel 的工具
 | Value1, Value2                                                     | Value3            | 201                                                                     |
 | Value4                                                             | Value4            | 202                                                                     |
 
-（你还可以拓展其他类型：[ReadExcel.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/ExcelTool/ReadExcel.cs)）
-## 使用范例
+(You can extend other types: [ReadExcel.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/ExcelTool/ReadExcel.cs))
 
-**在使用 Excel 数据前，需要执行**：
+## Usage Examples
 
-加载二进制或者json配置方式：
+**Before using Excel data, execute the following:**：
 
-```C#
-// 指定Sheet名字加载
-Sheet1 sheet1 = FF8.Config.Load<Sheet1>("Sheet1");
-
-// 同步加载全部配置
-FF8.Config.LoadAll();
-
-// 异步加载全部配置
-yield return FF8.Config.LoadAllAsyncIEnumerator();
-// 也可以这样
-foreach(var item in FF8.Config.LoadAllAsync())
-{
-    yield return item;
-}
-```
-
-运行时读取Excel的方式（如没有需求请谨慎使用）：
+Load Binary or JSON Configurations:
 
 ```C#
-ReadExcel.Instance.LoadAllExcelData(); // 运行时加载 Excel 最新文件
+// Load by sheet name  
+Sheet1 sheet1 = FF8.Config.Load<Sheet1>("Sheet1");  
+
+// Synchronously load all configurations  
+FF8.Config.LoadAll();  
+
+// Asynchronously load all configurations  
+yield return FF8.Config.LoadAllAsyncIEnumerator();  
+// Or:  
+foreach(var item in FF8.Config.LoadAllAsync())  
+{  
+    yield return item;  
+}  
 ```
 
-**打印数据**：
-
-基础类型，譬如 `int/float/string`，请参考[C# 类型系统 - Microsoft Document](https://learn.microsoft.com/zh-cn/dotnet/csharp/fundamentals/types/#value-types)：
+Read Excel at Runtime (Use with Caution):
 
 ```C#
-        // 注意：GetSheet1ByID 方法为自动生成的。
-        // 注意：Sheet1 需替换为实际 Sheet 名
-        // 注意：name 需替换为实际表头
-        // 注意：2 代表您设置的 ID 2 的行
-        // 单个表单个数据
-        LogF8.Log(FF8.Config.GetSheet1ByID(2).name);
-        
-        // 单个表全部数据
-        foreach (var item in FF8.Config.GetSheet1())
-        {
-            LogF8.Log(item.Key);
-            LogF8.Log(item.Value.name);
-        }
+ReadExcel.Instance.LoadAllExcelData(); // Load the latest Excel files at runtime  
 ```
 
-## 使用到的库
+**Print Data:**：
 
-Excel.dll（已修改缓存地址为Application.persistentDataPath）  
+For basic types like `int, float, string`, refer to [C# Type System - Microsoft Document](https://learn.microsoft.com/zh-cn/dotnet/csharp/fundamentals/types/#value-types)：
+
+```C#
+// Note: GetSheet1ByID is auto-generated.  
+// Replace Sheet1 with the actual sheet name.  
+// Replace name with the actual header.  
+// Replace 2 with the row ID you set.  
+
+// Single cell data  
+LogF8.Log(FF8.Config.GetSheet1ByID(2).name);  
+
+// Entire sheet data  
+foreach (var item in FF8.Config.GetSheet1())  
+{  
+    LogF8.Log(item.Key);  
+    LogF8.Log(item.Value.name);  
+}  
+```
+
+## Libraries Used
+
+Excel.dll (cache path modified to **Application.persistentDataPath**)  
 I18N.CJK.dll\
 I18N.dll\
 I18N.MidEast.dll\
@@ -141,92 +152,89 @@ I18N.Other.dll\
 I18N.Rare.dll\
 I18N.West.dll\
 [ICSharpCode.SharpZipLib.dll](https://github.com/icsharpcode/SharpZipLib)  
-[LitJson.dll](https://github.com/LitJSON/litjson)（已修改字典Key支持更多非string的C#基础类型，增加Unity常用类型：Type，Vector2，Vector3，Vector4，Quaternion，GameObject，Transform，Color，Color32，Bounds，Rect，RectOffset，LayerMask，Vector2Int，Vector3Int，RangeInt，BoundsInt）
+[LitJson.dll](https://github.com/LitJSON/litjson) (modified to support dictionary keys of byte, short, int, long, float, double, and string types; added support for commonly used Unity types: Type, Vector2, Vector3, Vector4, Quaternion, GameObject, Transform, Color, Color32, Bounds, Rect, RectOffset, LayerMask, Vector2Int, Vector3Int, RangeInt, BoundsInt; fixed the DateTime precision loss issue)
 
-## 你可能需要写入Excel
-使用 [EPPlus.dll（已内置）](https://github.com/TippingGame/F8Framework/blob/main/Plugins/EPPlus.dll)但未启用，请手动选择编译的平台
+## Writing to Excel (Optional)
+Use [EPPlus.dll (built-in) ](https://github.com/TippingGame/F8Framework/blob/main/Plugins/EPPlus.dll)(disabled by default; manually select the compilation platform):
 ```C#
-    public static void WriteExcel(string str, int row, int col, string value)
-    {
-        string filePath = Application.streamingAssetsPath + "/"+ str + ".xlsx";
+public static void WriteExcel(string str, int row, int col, string value)  
+{  
+    string filePath = Application.streamingAssetsPath + "/" + str + ".xlsx";  
+    FileInfo excelName = new FileInfo(filePath);  
 
-        FileInfo excelName = new FileInfo(filePath);
-
-        using (OfficeOpenXml.ExcelPackage package = new OfficeOpenXml.ExcelPackage(excelName))
-        {
-            // 获取第1个sheet
-            OfficeOpenXml.ExcelWorksheet worksheet = package.Workbook.Worksheets[1];
-            // 修改某一行，列的数据
-            worksheet.Cells[row, col].Value = value;
-            // 保存excel
-            package.Save();
-        }
-    }
+    using (OfficeOpenXml.ExcelPackage package = new OfficeOpenXml.ExcelPackage(excelName))  
+    {  
+        // Get the first sheet  
+        OfficeOpenXml.ExcelWorksheet worksheet = package.Workbook.Worksheets[1];  
+        // Modify a cell  
+        worksheet.Cells[row, col].Value = value;  
+        // Save  
+        package.Save();  
+    }  
+}  
 ```
 
-## 注意
+## Important Notes
 
-**由于 Android 资源都在包内，在 Android 上使用实时读取Excel功能，需要先复制到可读写文件夹中再进行读取**
+**On Android, resources are inside the APK. To use runtime Excel reading, copy files to a writable folder first:**
 
 ```C#
-    // 方式二：运行时读取Excel
-    IEnumerator Start()
-    {
-        // 由于安卓资源都在包内，需要先复制到可读写文件夹1
-        string assetPath = URLSetting.STREAMINGASSETS_URL + "config";
-        string[] paths = null;
-        WWW www = new WWW(assetPath + "/fileindex.txt");
-        yield return www;
-        if (www.error != null)
-        {
-            LogF8.Log(www.error);
-            yield return null;
-        }
-        else
-        {
-            string ss = www.text;
-            // 去除夹杂的空行
-            string[] lines = ss.Split('\n');
-            List<string> nonEmptyLines = new List<string>();
-    
-            foreach (string line in lines)
-            {
-                string trimmedLine = line.Trim();
-    
-                if (!string.IsNullOrEmpty(trimmedLine))
-                {
-                    nonEmptyLines.Add(trimmedLine);
-                }
-            }
-    
-            paths = nonEmptyLines.ToArray();
-        }
-    
-        for (int i = 0; i < paths.Length; i++)
-        {
-            yield return CopyAssets(paths[i].Replace("\r", ""));
-        }
-        // 读取Excel文件
-        ReadExcel.Instance.LoadAllExcelData();
-        LogF8.Log(FF8.Config.GetSheet1ByID(1).name);
-        LogF8.Log(FF8.Config.GetSheet1());
-    }
-    
-    // 由于安卓资源都在包内，需要先复制到可读写文件夹2
-    IEnumerator CopyAssets(string paths)
-    {
-        string assetPath = URLSetting.STREAMINGASSETS_URL + "config";
-        string sdCardPath = Application.persistentDataPath + "/config";
-        WWW www = new WWW(assetPath + "/" + paths);
-        yield return www;
-        if(www.error != null)
-        {
-            LogF8.Log(www.error);
-            yield return null;
-        }
-        else
-        {
-            FileTools.SafeWriteAllBytes(sdCardPath + "/" + paths, www.bytes);
-        }
-    }
+IEnumerator Start()  
+{  
+    // Method 2: Read Excel at runtime  
+    // Copy files to a writable folder on Android  
+    string assetPath = URLSetting.STREAMINGASSETS_URL + "config";  
+    string[] paths = null;  
+    WWW www = new WWW(assetPath + "/fileindex.txt");  
+    yield return www;  
+    if (www.error != null)  
+    {  
+        LogF8.Log(www.error);  
+        yield return null;  
+    }  
+    else  
+    {  
+        string ss = www.text;  
+        // Remove empty lines  
+        string[] lines = ss.Split('\n');  
+        List<string> nonEmptyLines = new List<string>();  
+
+        foreach (string line in lines)  
+        {  
+            string trimmedLine = line.Trim();  
+            if (!string.IsNullOrEmpty(trimmedLine))  
+            {  
+                nonEmptyLines.Add(trimmedLine);  
+            }  
+        }  
+        paths = nonEmptyLines.ToArray();  
+    }  
+
+    for (int i = 0; i < paths.Length; i++)  
+    {  
+        yield return CopyAssets(paths[i].Replace("\r", ""));  
+    }  
+
+    // Read Excel files  
+    ReadExcel.Instance.LoadAllExcelData();  
+    LogF8.Log(FF8.Config.GetSheet1ByID(1).name);  
+    LogF8.Log(FF8.Config.GetSheet1());  
+}  
+
+IEnumerator CopyAssets(string paths)  
+{  
+    string assetPath = URLSetting.STREAMINGASSETS_URL + "config";  
+    string sdCardPath = Application.persistentDataPath + "/config";  
+    WWW www = new WWW(assetPath + "/" + paths);  
+    yield return www;  
+    if (www.error != null)  
+    {  
+        LogF8.Log(www.error);  
+        yield return null;  
+    }  
+    else  
+    {  
+        FileTools.SafeWriteAllBytes(sdCardPath + "/" + paths, www.bytes);  
+    }  
+}  
 ```

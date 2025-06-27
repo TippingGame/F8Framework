@@ -7,7 +7,7 @@
 [![license](https://img.shields.io/github/stars/TippingGame/F8Framework.svg)](https://github.com/TippingGame/F8Framework/stargazers) 
 [![license](https://img.shields.io/github/forks/TippingGame/F8Framework?color=eb6ea5)](https://github.com/TippingGame/F8Framework/fork) 
 [![license](http://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT) 
-[![Unity Version](https://img.shields.io/badge/unity-2021.3.15f1-blue)](https://unity.com) 
+[![Unity Version](https://img.shields.io/badge/unity-2021|2022|2023|6000-blue)](https://unity.com) 
 [![Platform](https://img.shields.io/badge/platform-Win%20%7C%20Android%20%7C%20iOS%20%7C%20Mac%20%7C%20Linux%20%7C%20WebGL-orange)]() 
 
 > F8 框架初衷：希望自己点击 F8，就能开始制作游戏，不想多余的事。
@@ -52,7 +52,7 @@ Unity 2021、2022、2023、6000
 * [Mirror(内置):KCP](https://github.com/MirrorNetworking/kcp2k)：Reliable UDP
 * [Mirror(内置):Telepathy](https://github.com/MirrorNetworking/Telepathy)：TCP
 * [Mirror(内置):Websockets](https://github.com/MirrorNetworking/SimpleWebTransport)：Websockets
-* [LitJson](https://github.com/LitJSON/litjson)：序列化/反序列化 JSON（已修改字典Key支持更多非string的C#基础类型，增加Unity常用类型：Type，Vector2，Vector3，Vector4，Quaternion，GameObject，Transform，Color，Color32，Bounds，Rect，RectOffset，LayerMask，Vector2Int，Vector3Int，RangeInt，BoundsInt）
+* [LitJson](https://github.com/LitJSON/litjson)：序列化/反序列化 JSON（已修改字典Key支持byte，short，int，long，float，double，string 类型，增加Unity常用类型：Type，Vector2，Vector3，Vector4，Quaternion，GameObject，Transform，Color，Color32，Bounds，Rect，RectOffset，LayerMask，Vector2Int，Vector3Int，RangeInt，BoundsInt，修复DateTime精度丢失的问题）
 
 ## 使用步骤
 
@@ -108,70 +108,77 @@ git clone https://github.com/TippingGame/F8Framework.git
 
 ---
 
-## INTRODUCTION
-F8 Framework is an **elegant, lightweight, and intuitive** Game Framework based on the Unity engine. The components revolve around F8 one click startup, **without the need for cumbersome startup configurations**, with minimal mental burden. The overall framework follows the principle of developing games with **minimal usage costs**.  
+## Introduction
+The **F8 Framework** is an **elegant, lightweight, and intuitive** game framework based on the Unity engine. Centered around the F8 one-click startup, it eliminates **tedious configuration** and **minimizes cognitive load**, adhering to the principle of **minimal development overhead** for game creation.  
 
-## SUPPORTED
-Unity 2021.3.15f1+  
-Support for building：Win / Android / iOS / Mac / Linux / WebGL / WeChat mini game（[Building Documents](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/README_EN.md)）
+## Supported Versions
+Unity 2021, 2022, 2023, 6000  
+Build targets: Win / Android / iOS / Mac / Linux / WebGL / WeChat Mini Games（[Build Documentation, Jenkins Integration](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/README_EN.md)）
 
-## Quick preview of document - 1 minute
+## Quick Overview – 1 Minute
 ### ----------Optional Features----------
-* [1. Hot update version manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/HotUpdateManager/README_EN.md) - Select packaging platform, output path, version number, remote asset loading address, enable hot update, full packaging, subcontracting, and empty packaging.
-* [2. Code Hot Update (Import HybridCLR)](https://github.com/TippingGame/F8Framework/blob/main/Tests/HybridCLR/README_EN.md) - [HybridCLR](https://github.com/focus-creative-games/hybridclr) HybridCLR is a full-platform native c# hot update solution for Unity with complete features, zero cost, high performance, and low memory.
+* [1. Hot update version manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/HotUpdateManager/README_EN.md) - Select build platform, output path, version number, remote asset URL, enable hot updates, full build, subpackage, or empty build.
+* [2. Code Hot Update (Import HybridCLR)](https://github.com/TippingGame/F8Framework/blob/main/Tests/HybridCLR/README_EN.md) - [HybridCLR](https://github.com/focus-creative-games/hybridclr) is a feature-complete, zero-cost, high-performance, low-memory near-perfect Unity cross-platform native C# hot update solution.
 ### ----------Core Features----------
-* [1. Config table (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/ExcelTool/README_EN.md) - Use Excel as the configuration table, taking into account both **high performance and high adaptability**. The field types are divided into: **basic types and container types**, and these types can be **freely combined**. Click F8 to generate Excel binary files and C# classes. Click F7 to read Excel data in real time and replace the data. There is no need to frequently import the tables, and it enables reading and writing of Excel files during runtime on multiple platforms.
-* [2. Asset Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/AssetManager/README_EN.md) - **At editor**: Click F8 to automatically generate asset index/AB name, automatically distinguish different platforms, and clean up excess AB and folders, Reduce development cycle in Editor mode. **At runtime**: load a single asset synchronously/asynchronously, expand a folder or all assets under the same AB, automatically determine whether it is a Resources/AssetBundle asset, load remote assets, obtain loading progress, and synchronously interrupt asynchronous loading. You can load AssetBundle in this way: **a single asset with a single AB, specify a folder name (AB on the first layer of the folder), set multiple assets to the same AB name (specify any asset name)**.
-* [3. Module Center (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Module/README_EN.md) - The module center can obtain instances of all modules, implement delayed loading strategies, and freely control the lifecycle.
-* [4. Log Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Log/README_EN.md) - Print logs, write files, and report errors.
-* [5. Sound Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Audio/README_EN.md) - Play/pause/stop/progress control of sound, volume control/save, global pause/resume. Audio is divided into three categories: **background music, vocals, and special effects sound**.
-* [6. Event Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Event/README_EN.md) - Send message events, monitor events, **prevent message loops**, and automatically release events.
-* [7. Time Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Timer/README_EN.md) - Provide Timer/FrameTimer has two types of timers, pause/resume, and automatically release the timer.
-* [8. Tween Animation (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Tween/README_EN.md) - Play/stop animations. Animations can be **freely combined**. There are rotation/displacement/scale/fade/fill/shake animations. Animations can be moved according to the **relative layout** of the UI.
-* [9. Reference Pool Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/ReferencePool/README_EN.md) - Reference Pool Manager, C # object, pooling/retrieving/recycling/emptying.
-* [10. GameObject Pool (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/GameObjectPool/README_EN.md) - GameObject Pool Manager, GameObject preload pooling, generation/destruction/delayed destruction, lifecycle event monitoring.
-* [11. Localization Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Localization/README_EN.md) - Localize components such as Text/TextMeshPro/Image/RawImage/SpriteRenderer/Renderer/Audio/Timeline, and use **Excel** as a multilingual translation table.
-* [12. Finite state machine (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/FSM/README_EN.md) - Customize finite state machine FSMState/FSMSwitch, create/switch states/poll/destroy.
-* [13. Download Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Download/README_EN.md) - Supports downloading of files from both local host and HTTP addresses, **allowing for local writing, monitoring of download progress, and recovery of downloads**. It also supports dynamic addition, removal, pause, and recovery of downloads.
-* [14. UI interface manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/UI/README_EN.md) - Handle interface loading, opening, closing, querying, hierarchical control, custom animation, and automatic retrieval of component indexes. UI interfaces are divided into three categories: **regular UI, modal pop ups, and non modal pop ups**, it has various commonly used components built-in..
-* [15. Input System Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Input/README_EN.md) - Using the same set of code, customize input devices, adapt to multiple platforms, hot switch input devices, or enable multiple sets of input devices simultaneously.
-* [16. Game Procedure Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Procedure/README_EN.md) - Customize the process node ProcedureNode to control the game process, add/run/poll/remove.
-* [17. Local data storage (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Storage/README_EN.md) - Local data storage/reading.
-* [18. SDK Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/README_EN.md) - Interacting with **native platforms**, accessing multiple platform or channel SDKs, logging in/out/switching/payment/video advertising/exiting games/native Toast.
-* [19. Network Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Network/README_EN.md) - Establish long connection channels using KCP/TCP/WebSocket network communication protocols, supporting both client and server ends.
-### ----------Third Party Libraries (note conflicts)----------
-* Excel.dll：Read/Write Excel (cache address has been changed to Application. persistentDataPath)
+* [1. Config table (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/ExcelTool/README_EN.md) - Uses Excel for configuration tables, balancing **high performance and adaptability**. Field types include **basic types and container types**, with **free combination** support. Press F8 to generate Excel binary files and C# classes, or F7 to hot-reload Excel data without frequent exports. Supports runtime read/write across platforms.
+* [2. Asset Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/AssetManager/README_EN.md) - **Editor Mode:** Press F8 to auto-generate asset indices/AB names, auto-detect platforms, and clean redundant ABs/folders, reducing iteration time. **Runtime:** Sync/async loading for single assets, folder contents, or shared AB assets. Supports Resources/AssetBundle detection, remote asset loading, progress tracking, and async interruption. AB strategies: **per-asset AB, folder-based AB, or custom AB grouping**.
+* [3. Module Center (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Module/README_EN.md) - Centralized module access with lazy-loading and lifecycle control.
+* [4. Log Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Log/README_EN.md) - Logging, file writing, and error reporting.
+* [5. Sound Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Audio/README_EN.md) - Play/pause/stop/seek controls, volume settings/saving, global pause/resume. Three audio types: **BGM, Voice, SFX**.
+* [6. Event Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Event/README_EN.md) - Event dispatch/listening, **dead-loop prevention**, and auto-cleanup.
+* [7. Time Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Timer/README_EN.md) - Offers Timer and FrameTimer with pause/resume and auto-release.
+* [8. Tween Animation (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Tween/README_EN.md) - Play/stop tweens, **composite animations**, including rotation/translation/scale/fade/fill/shake, and **UI-relative** motion.
+* [9. Reference Pool Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/ReferencePool/README_EN.md) - C# object pooling: get/release/clear.
+* [10. GameObject Pool (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/GameObjectPool/README_EN.md) - GameObject pooling with preloading, spawn/destroy/delayed-destroy, and lifecycle events.
+* [11. Localization Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Localization/README_EN.md) - Localizes Text/TextMeshPro/Image/RawImage/SpriteRenderer/Renderer/Audio/Timeline using **Excel** for translations.
+* [12. Finite state machine (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/FSM/README_EN.md) - Custom FSMState/FSMSwitch for state creation/switching/polling/destruction.
+* [13. Download Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Download/README_EN.md) - Supports localhost/HTTP downloads with **local write, progress tracking, and resumable transfers**. Dynamic add/remove/pause/resume.
+* [14. UI interface manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/UI/README_EN.md) - Handles loading/opening/closing/querying/layering/custom animations/auto-component indexing. UI types: **Standard UI, Modal Popup, Non-Modal Popup**, with built-in common components.
+* [15. Input System Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Input/README_EN.md) - Unified multi-platform input via customizable devices, with hot-swapping or multi-device support.
+* [16. Game Procedure Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Procedure/README_EN.md) - Custom ProcedureNode for flow control: add/run/poll/remove.
+* [17. Local data storage (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Storage/README_EN.md) - Local data save/load.
+* [18. SDK Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/README_EN.md) - **Native platform interoperability**: Supports integration with multiple platform/channel SDKs for login/logout/account switching/payments/video ads/game exit/native toast notifications.
+* [19. Network Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Network/README_EN.md) - Long connections via KCP/TCP/WebSocket for Client/Server.
+### ----------Third-Party Libraries (Watch for Conflicts)----------
+* Excel.dll：Read/write Excel (cache path modified to **Application.persistentDataPath**).
 * I18N.CJK.dll，I18N.dll，I18N.MidEast.dll，I18N.Other.dll，I18N.Rare.dll，I18N.West.dll：Only for Read/Write Excel
 * [ICSharpCode.SharpZipLib](https://github.com/icsharpcode/SharpZipLib)：Compression/Decompression
 * [Mirror(built in):KCP](https://github.com/MirrorNetworking/kcp2k)：Reliable UDP
 * [Mirror(built in):Telepathy](https://github.com/MirrorNetworking/Telepathy)：TCP
 * [Mirror(built in):Websockets](https://github.com/MirrorNetworking/SimpleWebTransport)：Websockets
-* [LitJson](https://github.com/LitJSON/litjson)：Serialize/Deserialize JSON (modified dictionary key to support more non string C # base types, added Unity common types: Type，Vector2，Vector3，Vector4，Quaternion，GameObject，Transform，Color，Color32，Bounds，Rect，RectOffset，LayerMask，Vector2Int，Vector3Int，RangeInt，BoundsInt)
+* [LitJson](https://github.com/LitJSON/litjson)：JSON serialization/deserialization (modified to support dictionary keys of byte, short, int, long, float, double, and string types; added support for commonly used Unity types: Type, Vector2, Vector3, Vector4, Quaternion, GameObject, Transform, Color, Color32, Bounds, Rect, RectOffset, LayerMask, Vector2Int, Vector3Int, RangeInt, BoundsInt; fixed the DateTime precision loss issue)
 
-## IMPORT
-### Recommend (source code can be modified or updated)
-[Install Git](https://git-scm.com/) use git command to pull：
+## Setup
+### Recommended (Editable Source/Updates)
+[Install Git](https://git-scm.com/), then clone:
 ```text
 git clone https://github.com/TippingGame/F8Framework.git
 ```
-Or [download the complete package](https://codeload.github.com/TippingGame/F8Framework/zip/refs/heads/main), Put it into the project。
+Or [download the package](https://codeload.github.com/TippingGame/F8Framework/zip/refs/heads/main) manually.
 
-### also
+### Alternative
 
-In the Unity Package Manager, add the F8Framework package using Git URL.
+Add via Unity Package Manager:
 
-1. Open Unity Editor
+1. Open **Unity Editor** → **Window** → **Package Manager**
 
-2. Click on the **Window** item in the menu, then click on the **Package Manager** sub item
+2. Click **+** → **Add Package from git URL**
 
-3. Click on the **+** sign in the upper left corner and select **Add Package from git URL**
+3. Enter: <https://github.com/TippingGame/F8Framework.git>
 
-4. Input <https://github.com/TippingGame/F8Framework.git>, Please confirm successful import
+Versioning: MAJOR.MINOR.PATCH (e.g., 1.0.0). Ensure no errors before updating, then press F8.
 
-Explanation of the updated version number. For example, in 1.0.0, the first digit represents the major version, the second digit indicates that there are modifications to the use of the framework, and the third digit represents the revision version. (Note: Make sure there are no errors in the project before updating the framework. After the update, simply click F8.)
+## Beginner’s Guide
 
-## GUIDE
+* Press F8 after first import.
+* [GameLauncher: ](https://github.com/TippingGame/F8Framework/blob/main/Launcher/GameLauncher.cs)Game Launcher Example (Note: The framework must be initialized before any usage).[GameLauncher.cs](https://github.com/TippingGame/F8Framework/blob/main/Launcher/GameLauncher.cs)
+* [Module renaming: ](https://github.com/TippingGame/F8Framework/blob/main/Launcher/FF8.cs)Customize module names.[FF8.cs](https://github.com/TippingGame/F8Framework/blob/main/Launcher/FF8.cs)  
 
-* [GameLauncher：](https://github.com/TippingGame/F8Framework/blob/main/Launcher/GameLauncher.cs)Game Launcher Example.[GameLauncher.cs](https://github.com/TippingGame/F8Framework/blob/main/Launcher/GameLauncher.cs)
-* [Module renaming：](https://github.com/TippingGame/F8Framework/blob/main/Launcher/FF8.cs)Module customization renaming.[FF8.cs](https://github.com/TippingGame/F8Framework/blob/main/Launcher/FF8.cs)  
+## Tutorials
 
+* Video: [【Unity Framework】F8Framework Introduction.](https://www.bilibili.com/video/BV16i42117nx/?share_source=copy_web&vd_source=2fde88c46cd96d06f86859724813e355)
+* Demo Project: [https://github.com/TippingGame/F8FrameworkDemo.](https://github.com/TippingGame/F8FrameworkDemo)
+
+## Community
+* QQ Group: [722647431](https://qm.qq.com/q/uTxdVIJykE)
+* Discord: [https://discord.gg/AHRb7Hwy9R](https://discord.gg/dwWQ8EHz)  

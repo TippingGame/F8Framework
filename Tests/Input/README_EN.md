@@ -1,93 +1,100 @@
 # F8 Input
 
 [![license](http://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)
-[![Unity Version](https://img.shields.io/badge/unity-2021.3.15f1-blue)](https://unity.com)
+[![Unity Version](https://img.shields.io/badge/unity-2021|2022|2023|6000-blue)](https://unity.com)
 [![Platform](https://img.shields.io/badge/platform-Win%20%7C%20Android%20%7C%20iOS%20%7C%20Mac%20%7C%20Linux%20%7C%20WebGL-orange)]()
 
-## 简介（希望自己点击F8，就能开始制作游戏，不想多余的事）
-Unity F8 Input输入管理组件。
-1. 使用同一套代码，通过自定义输入设备，适配多平台，可热切换输入设备。
+## Introduction (Simply press F8 to start game development without distractions)
+**Unity F8 InputManager Component**  
+Cross-platform Input System with Hot-Switching Capability
+* Unified Codebase - Single implementation works across all platforms
+* Custom Input Devices - Define and manage custom control schemes
+* Runtime Device Switching - Seamlessly change input methods without restarting
+* Platform Adaptation - Auto-adapts to different hardware configurations
 
-## 导入插件（需要首先导入核心）
-注意！内置在->F8Framework核心：https://github.com/TippingGame/F8Framework.git  
-方式一：直接下载文件，放入Unity  
-方式二：Unity->点击菜单栏->Window->Package Manager->点击+号->Add Package from git URL->输入：https://github.com/TippingGame/F8Framework.git
+## Plugin Installation (Requires Core Framework First)
+Note! Built into → F8Framework Core: https://github.com/TippingGame/F8Framework.git  
+Method 1: Download files directly and import to Unity  
+Method 2: Unity → Menu Bar → Window → Package Manager → "+" → Add Package from git URL → Enter: https://github.com/TippingGame/F8Framework.git
 
-### 代码使用方法
+### Code Examples
 ```C#
-/*------------------------------输入管理方法------------------------------*/
+/*------------------------------Input Management Methods------------------------------*/
 void Start()
 {
-    // 切换输入设备（不会清理回调，方便热切换输入设备）
+    // Switch input device (doesn't clear callbacks, enables hot-switching)
     FF8.Input.SwitchDevice(new StandardInputDevice());
 
-    // 启用或暂停输入
+    // Enable/disable input
     FF8.Input.IsEnableInputDevice = false;
     
-    // 设置按钮回调，Started开始按按钮，Performed按下按钮，Canceled结束按钮
+    // Set button callbacks:
+    // Started - when button begins pressing
+    // Performed - when button is pressed  
+    // Canceled - when button is released
     FF8.Input.AddButtonStarted(InputButtonType.MouseLeft, MouseLeft);
     FF8.Input.AddButtonPerformed(InputButtonType.MouseLeft, MouseLeft);
     FF8.Input.AddButtonCanceled(InputButtonType.MouseLeft, MouseLeft);
     
     FF8.Input.AddAxisValueChanged(InputAxisType.MouseX, MouseX);
     
-    // 移除按钮回调
+    // Remove button callbacks
     FF8.Input.RemoveButtonStarted(InputButtonType.MouseLeft, MouseLeft);
     FF8.Input.RemoveButtonPerformed(InputButtonType.MouseLeft, MouseLeft);
     FF8.Input.RemoveButtonCanceled(InputButtonType.MouseLeft, MouseLeft);
 
     FF8.Input.RemoveAxisValueChanged(InputAxisType.MouseX, MouseX);
     
-    // 移除所有输入回调
+    // Clear all input callbacks
     FF8.Input.ClearAllAction();
     
-    // 移除所有输入状态
+    // Reset all input states
     FF8.Input.ResetAll();
 }
 
-// 鼠标左键回调
+// Mouse left button callback
 void MouseLeft(string name)
 {
     
 }
 
-// 鼠标X轴移动
+// Mouse X-axis movement
 void MouseX(float value)
 {
 
 }
 
 
-/*------------------------------按键监听使用------------------------------*/
+/*------------------------------Key Listening Usage------------------------------*/
 void Update()
 {
-    // 任意键按下
+    // Any key pressed
     if (FF8.Input.AnyKeyDown)
     {
         
     }
     
-    // 按下组合键
+    // Key combination pressed
     if (FF8.Input.GetKeyDown(KeyCode.LeftControl, KeyCode.LeftAlt, KeyCode.M))
     {
         
     }
     
-    // 鼠标右键按住
+    // Mouse right button held
     if (FF8.Input.GetButton(InputButtonType.MouseRight))
     {
         
     }
     
-    // 鼠标左键双击
+    // Mouse left button double click
     if (FF8.Input.GetButtonDown(InputButtonType.MouseLeftDoubleClick))
     {
         
     }
     
-    LogF8.Log("滚轮：" + FF8.Input.GetAxis(InputAxisType.MouseScrollWheel));
-    LogF8.Log("水平轴线值：" + FF8.Input.GetAxis(InputAxisType.Horizontal));
-    LogF8.Log("垂直轴线值：" + FF8.Input.GetAxis(InputAxisType.Vertical));
+    LogF8.Log("Mouse wheel: " + FF8.Input.GetAxis(InputAxisType.MouseScrollWheel));
+    LogF8.Log("Horizontal axis: " + FF8.Input.GetAxis(InputAxisType.Horizontal));
+    LogF8.Log("Vertical axis: " + FF8.Input.GetAxis(InputAxisType.Vertical));
 }
 ```
 

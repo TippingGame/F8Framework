@@ -1,55 +1,63 @@
 # F8 Timer
 
 [![license](http://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)
-[![Unity Version](https://img.shields.io/badge/unity-2021.3.15f1-blue)](https://unity.com)
+[![Unity Version](https://img.shields.io/badge/unity-2021|2022|2023|6000-blue)](https://unity.com)
 [![Platform](https://img.shields.io/badge/platform-Win%20%7C%20Android%20%7C%20iOS%20%7C%20Mac%20%7C%20Linux%20%7C%20WebGL-orange)]()
 
-## 简介（希望自己点击F8，就能开始制作游戏，不想多余的事）
-Unity F8 Timer组件，提供Timer、FrameTimer两种计时器，暂停/恢复，自动释放Timer
+## Introduction (Simply press F8 to start game development without distractions)
+**Unity F8 Timer Component**  
+Timing system providing both time-based and frame-based counters with full lifecycle management.
+* Timer Types:
+    * Timer: Real-time seconds counter
+    * FrameTimer: Frame-based counter
 
-## 导入插件（需要首先导入核心）
-注意！内置在->F8Framework核心：https://github.com/TippingGame/F8Framework.git  
-方式一：直接下载文件，放入Unity  
-方式二：Unity->点击菜单栏->Window->Package Manager->点击+号->Add Package from git URL->输入：https://github.com/TippingGame/F8Framework.git
+## Plugin Installation (Requires Core Framework First)
+Note! Built into → F8Framework Core: https://github.com/TippingGame/F8Framework.git  
+Method 1: Download files directly and import to Unity  
+Method 2: Unity → Menu Bar → Window → Package Manager → "+" → Add Package from git URL → Enter: https://github.com/TippingGame/F8Framework.git
 
-### 代码使用方法
+### Code Examples
 ```C#
 void Start()
 {
-    // 普通Timer,传入自身this，每1秒执行一次，延迟0秒后开始，执行3次(-1表示循环)
+    // Standard Timer - Attached to this object
+    // Triggers every 1 second, starts immediately (0 delay), executes 3 times (-1 would loop infinitely)
     int timeid = FF8.Timer.AddTimer(this, 1f, 0f, 3, () =>
     {
-        LogF8.Log("tick");
+        LogF8.Log("tick"); // Tick callback
     }, () =>
     {
-        LogF8.Log("完成");
+        LogF8.Log("Timer completed"); // Completion callback
     });
     
-    // FrameTimer,传入自身this，每1帧执行一次，延迟0帧后开始，循环执行(-1表示循环)
+    // FrameTimer - Attached to this object
+    // Triggers every frame, starts immediately (0 frame delay), loops infinitely (-1)
     timeid = FF8.Timer.AddTimerFrame(this, 1f, 0f, -1, () =>
     {
-        LogF8.Log("tick");
+        LogF8.Log("frame tick"); // Per-frame callback
     }, () =>
     {
-        LogF8.Log("完成");
+        LogF8.Log("This won't execute for infinite timers"); // Won't execute for infinite timers
     });
     
-    FF8.Timer.RemoveTimer(timeid); // 停止名为timeid的Timer
+    // Stop a specific timer by its ID
+    FF8.Timer.RemoveTimer(timeid);
     
-    // 监听游戏程序获得或失去焦点，重新开始或暂停所有Timer
+    // Automatically pause/resume timers when application loses/gains focus
     FF8.Timer.AddListenerApplicationFocus();
     
-    // 手动重新开始或暂停所有Timer，或指定id
-    FF8.Timer.Pause();
-    FF8.Timer.Resume();
-    // 重新启动所有Timer，或指定id
-    FF8.Timer.Restart();
+    // Manual timer control
+    FF8.Timer.Pause();    // Pause all timers
+    FF8.Timer.Resume();   // Resume all paused timers
+    FF8.Timer.Restart();  // Restart all timers
     
-    FF8.Timer.SetServerTime(1702573904000); // 网络游戏，与服务器对表，单位ms
-    FF8.Timer.GetServerTime();
+    // Server time synchronization (for online games)
+    FF8.Timer.SetServerTime(1702573904000); // Synchronize with server time (milliseconds)
+    long serverTime = FF8.Timer.GetServerTime(); // Get synchronized server time
     
-    FF8.Timer.GetTime(); // 获取游戏中的总时长
+    // Get total elapsed game time
+    float totalGameTime = FF8.Timer.GetTime();
 }
 ```
 
-## 自动OnApplicationFocus监听窗口焦点，暂停所有Timer
+## Automatic Window Focus Handling with OnApplicationFocus, Pause all timers

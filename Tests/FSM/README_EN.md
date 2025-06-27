@@ -1,77 +1,77 @@
 # F8 FSM
 
 [![license](http://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)
-[![Unity Version](https://img.shields.io/badge/unity-2021.3.15f1-blue)](https://unity.com)
+[![Unity Version](https://img.shields.io/badge/unity-2021|2022|2023|6000-blue)](https://unity.com)
 [![Platform](https://img.shields.io/badge/platform-Win%20%7C%20Android%20%7C%20iOS%20%7C%20Mac%20%7C%20Linux%20%7C%20WebGL-orange)]()
 
-## 简介（希望自己点击F8，就能开始制作游戏，不想多余的事）
-Unity F8 FSM有限状态机组件。
-1. 通过继承有限状态机状态 FSMState 和状态切换 FSMSwitch，控制状态机，添加/切换/轮询/销毁。
+## Introduction (Simply press F8 to start game development without distractions)
+**Unity F8 FSM Component**  
+1. By inheriting from the finite state machine state **FSMState** and state transition **FSMSwitch**, you can control the state machine to add/switch/poll/destroy states.
 
-## 导入插件（需要首先导入核心）
-注意！内置在->F8Framework核心：https://github.com/TippingGame/F8Framework.git  
-方式一：直接下载文件，放入Unity  
-方式二：Unity->点击菜单栏->Window->Package Manager->点击+号->Add Package from git URL->输入：https://github.com/TippingGame/F8Framework.git
+## Plugin Installation (Requires Core Framework First)
+Note! Built into → F8Framework Core: https://github.com/TippingGame/F8Framework.git  
+Method 1: Download files directly and import to Unity  
+Method 2: Unity → Menu Bar → Window → Package Manager → "+" → Add Package from git URL → Enter: https://github.com/TippingGame/F8Framework.git
 
-### 代码使用方法
+### Code Examples
 ```C#
 public Transform Target;
 public Transform objectA;
 
 private void Start()
 {
-    /*-------------------------------------基础功能-------------------------------------*/
-    // 创建两个状态
+    /*-------------------------------------Basic Functions-------------------------------------*/
+    // Create two states
     var enterState = new EnterRangeState();
     var exitState = new ExitRangeState();
 
-    // 创建两个状态切换的时机（可选）
+    // Create two state transition conditions (optional)
     var enterSwitch = new EnterSwitch();
     var exitSwitch = new ExitSwitch();
     exitState.AddSwitch(exitSwitch, typeof(EnterRangeState));
     enterState.AddSwitch(enterSwitch, typeof(ExitRangeState));
 
-    // 创建有限状态机
+    // Create finite state machine
     IFSM<Transform> fsmA = FF8.FSM.CreateFSM<Transform>("FSMTesterA", objectA, "FSMGroupName", exitState, enterState);
     fsmA.DefaultState = exitState;
     fsmA.ChangeToDefaultState();
 
-    // 切换状态
+    // Switch state
     fsmA.ChangeState<ExitRangeState>();
 
     
-    /*-------------------------------------其他功能-------------------------------------*/
-    // 获取 FSM
+    /*-------------------------------------Additional Functions-------------------------------------*/
+    // Get FSM
     FF8.FSM.GetFSM<Transform>("FSMTesterA");
     
-    // 是否存在指定名称的 FSM
+    // Check if FSM exists
     FF8.FSM.HasFSM<Transform>("FSMTesterA");
     
-    // 设置 FSM 群组
+    // Set FSM group
     FF8.FSM.SetFSMGroup<Transform>("FSMTesterA", "FSMGroupName");
     
-    // 获取所有 FSM
+    // Get all FSMs
     IList<FSMBase> fsms = FF8.FSM.GetAllFSMs();
     
-    // 是否存在 FSM 群组
+    // Check if FSM group exists
     bool hasFSMGroup1 = FF8.FSM.HasFSMGroup("FSMGroupName");
     
-    // 获取 FSM 群组
+    // Get FSM group
     bool hasFSMGroup2 = FF8.FSM.PeekFSMGroup("FSMGroupName", out var fsmGroup);
     
-    // 移除 FSM 群组
+    // Remove FSM group
     FF8.FSM.RemoveFSMGroup("FSMGroupName");
     
-    // 销毁 FSM
+    // Destroy FSM
     FF8.FSM.DestoryFSM<Transform>("FSMTesterA");
     
-    // 销毁所有 FSM
+    // Destroy all FSMs
     FF8.FSM.DestoryAllFSM();
 }
 
-/*------------------------------继承FSMState/FSMSwitch使用------------------------------*/
+/*------------------------------Using Inherited FSMState/FSMSwitch------------------------------*/
 
-// 继承有限状态机状态
+// Inherit from FSM state
 public class EnterRangeState : FSMState<Transform>
 {
     public override void OnInitialization(IFSM<Transform> fsm)
@@ -102,7 +102,7 @@ public class EnterRangeState : FSMState<Transform>
     {
     }
 }
-// 继承状态切换
+// Inherit from state transition
 public class EnterSwitch : FSMSwitch<Transform>
 {
     public override bool SwitchFunction(IFSM<Transform> fsm)
@@ -115,7 +115,7 @@ public class EnterSwitch : FSMSwitch<Transform>
     }
 }
 
-// 继承有限状态机状态
+// Inherit from FSM state
 public class ExitRangeState : FSMState<Transform>
 {
     public override void OnInitialization(IFSM<Transform> fsm)
@@ -146,7 +146,7 @@ public class ExitRangeState : FSMState<Transform>
     {
     }
 }
-// 继承状态切换
+// Inherit from state transition
 public class ExitSwitch : FSMSwitch<Transform>
 {
     public override bool SwitchFunction(IFSM<Transform> fsm)
