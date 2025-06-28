@@ -20,70 +20,72 @@ public RectTransform canvasRect;
 
 void Start()
 {
-    /*-------------------------------------Basic Animations-------------------------------------*/
-    // Play animation with easing and completion callback
+    /*----------------------------------------- Basic Usage -----------------------------------------*/
+    // Play animation, set Ease type, and set OnComplete callback
     int id = gameObject.ScaleTween(Vector3.one, 1f).SetEase(Ease.Linear).SetOnComplete(OnViewOpen).ID;
 
     void OnViewOpen()
     {
-        // Animation complete handler
+
     }
 
     // Rotation
     gameObject.RotateTween(Vector3.one, 1f);
-    // Position
+    // Position movement
     gameObject.Move(Vector3.one, 1f);
     gameObject.MoveAtSpeed(Vector3.one, 2f);
     gameObject.LocalMove(Vector3.one, 1f);
     gameObject.LocalMoveAtSpeed(Vector3.one, 1f);
-    // Scale
+    // Scaling
     gameObject.ScaleTween(Vector3.one * 2f, 1f);
-    // Fade
+    // Fading
     gameObject.GetComponent<CanvasGroup>().Fade(0f, 1f);
     gameObject.GetComponent<Image>().ColorTween(Color.green, 1f);
-    // Fill
+    // Fill amount
     gameObject.GetComponent<Image>().FillAmountTween(1f, 1f);
-    // Shake
+    // Shaking effects
     gameObject.ShakePosition(Vector3.one, shakeCount: 8, t: 0.05f, fadeOut: false);
     gameObject.ShakeRotation(Vector3.one);
     gameObject.ShakeScale(Vector3.one);
     gameObject.ShakePositionAtSpeed(Vector3.one, shakeCount: 8, speed: 5f, fadeOut: false);
 
-    // Set delay
-    gameObject.Move(Vector3.one, 1f).SetDelay(2f);
-    
-    // Set event at specific time
-    gameObject.Move(Vector3.one, 5f).SetEvent(OnViewOpen, 2.5f);
-    
-    // Set loop type and count
-    gameObject.Move(Vector3.one, 1f).SetLoopType(LoopType.Yoyo, 3);
+    // Method chaining
+    gameObject.Move(Vector3.one, 1f)
+        .SetEase(Ease.EaseOutQuad) // Set easing type
+        .SetOnComplete(OnViewOpen) // Set completion callback
+        .SetDelay(2f) // Set delay
+        .SetEvent(OnViewOpen, 2.5f) // Set event to trigger at specific time
+        .SetLoopType(LoopType.Yoyo, 3) // Set loop type (Restart, Flip, Incremental, Yoyo) and count
+        .SetUpdateMode(UpdateMode.Update) // Set update mode (default is Update)
+        .SetOwner(gameObject) // Set animation owner
+        .SetIsPause(false); // Set pause state
     
     // Pause control
-    gameObject.Move(Vector3.one, 1f).SetIsPause(true);
     FF8.Tween.SetIsPause(id, true);
-    
-    // Value tween with update callback
+        
+    // Alternative usage with OnUpdate
+    // Numeric value tweening
     BaseTween valueTween = FF8.Tween.ValueTween(0f, 100f, 3f).SetOnUpdateFloat((float v) =>
     {
         LogF8.Log(v);
     });
     
-    // Cancel animation by ID
+    // Cancel animation by ID (base tween will be recycled but ID remains unique)
     int id2 = valueTween.ID;
     FF8.Tween.CancelTween(id2);
     
-    // Object movement with update
+    // Object movement
     BaseTween gameObjectTween = FF8.Tween.Move(gameObject, Vector3.one, 3f).SetOnUpdateVector3((Vector3 v) =>
     {
         LogF8.Log(v);
     });
         
-    // Cancel by owner object
+    // Alternative cancellation using owner object
     gameObjectTween.SetOwner(gameObject);
     FF8.Tween.CancelTween(gameObject);
     gameObject.CancelAllTweens();
     
-    // UI relative position animation
+    // UI movement using relative coordinates
     // (0.0 , 1.0) _______________________(1.0 , 1.0)
     //            |                      |
     //            |                      |                  
@@ -94,24 +96,24 @@ void Start()
         .SetEase(Ease.EaseOutBounce);
     
     
-    /*-------------------------------------Animation Sequences-------------------------------------*/
-    // Create animation sequence
+    /*----------------------------------------- Animation Sequences -----------------------------------------*/
+    // Initialize sequence (sequential/parallel execution with callbacks)
     var sequence = SequenceManager.GetSequence();
     
     sequence.Append(valueTween); // First animation
-    sequence.Join(gameObjectTween);   // Parallel animation
-    sequence.Append(valueTween); // Runs after first completes
-    sequence.Append(() => LogF8.Log("Complete!")); // Final callback
+    sequence.Join(gameObjectTween);   // Runs concurrently with first animation
+    sequence.Append(valueTween); // Runs after first animation completes
+    sequence.Append(() => LogF8.Log("Complete!")); // Callback after sequence
     sequence.SetOnComplete(() => LogF8.Log("Sequence complete"));
     
     // Set loop count (-1 for infinite)
     sequence.SetLoops(3);
     
-    // Timed events in sequence
-    sequence.RunAtTime(() => LogF8.Log("Mid-event"), 1.5f); // Callback at 1.5s
-    sequence.RunAtTime(gameObjectTween, 2.0f); // Start animation at 2s
+    // Schedule events/animations at specific times
+    sequence.RunAtTime(() => LogF8.Log("Mid-sequence event"), 1.5f); // Callback at 1.5s
+    sequence.RunAtTime(gameObjectTween, 2.0f); // Start animation at 2.0s
     
-    // Cleanup sequence
+    // Recycle sequence and stop all animations
     SequenceManager.KillSequence(sequence);
 }
 

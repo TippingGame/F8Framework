@@ -18,11 +18,11 @@ namespace F8Framework.Core
         public bool IsPaused = false;
         
         // 存储初始值以便重置
-        private readonly float _initialStep;
-        private readonly float _initialDelay;
-        private readonly int _initialField;
+        private float _initialStep;
+        private float _initialDelay;
+        private int _initialField;
         
-        public Timer(object handle, int id, float step = 1f, float delay = 0f, int field = 0, Action onSecond = null, Action onComplete = null, bool isFrameTimer = false)
+        public void Init(object handle, int id, float step = 1f, float delay = 0f, int field = 0, Action onSecond = null, Action onComplete = null, bool isFrameTimer = false)
         {
             Handle = handle;
             ID = id;

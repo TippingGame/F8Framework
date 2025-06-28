@@ -51,6 +51,10 @@ namespace F8Framework.Core
         {
             for (int i = 0; i < tweens.Count; i++)
             {
+                if (tweens[i].UpdateMode != UpdateMode.LateUpdate)
+                {
+                    continue;
+                }
                 if (tweens[i].IsRecycle == true)
                 {
                     TweenPool.AddTweenToPool(tweens[i]);
@@ -58,9 +62,7 @@ namespace F8Framework.Core
                     i--;
                     continue;
                 }
-                
-                if (tweens[i].UpdateMode == UpdateMode.LateUpdate)
-                    tweens[i].Update(Time.deltaTime);
+                tweens[i].Update(Time.deltaTime);
             }
         }
 
@@ -68,6 +70,10 @@ namespace F8Framework.Core
         {
             for (int i = 0; i < tweens.Count; i++)
             {
+                if (tweens[i].UpdateMode != UpdateMode.FixedUpdate)
+                {
+                    continue;
+                }
                 if (tweens[i].IsRecycle == true)
                 {
                     TweenPool.AddTweenToPool(tweens[i]);
@@ -75,9 +81,7 @@ namespace F8Framework.Core
                     i--;
                     continue;
                 }
-                
-                if (tweens[i].UpdateMode == UpdateMode.FixedUpdate)
-                    tweens[i].Update(Time.deltaTime);
+                tweens[i].Update(Time.fixedDeltaTime);
             }
         }
 

@@ -8,6 +8,7 @@ namespace F8Framework.Core
     public class TimerManager : ModuleSingleton<TimerManager>, IModule
     {
         private List<Timer> times = new List<Timer>(); // 存储计时器的列表
+        private Stack<Timer> timerPool = new Stack<Timer>();
         private long initTime; // 初始化时间
         private long serverTime; // 服务器时间
         private long tempTime; // 临时时间
@@ -54,6 +55,7 @@ namespace F8Framework.Core
                 if (timer.IsFinish)
                 {
                     times.RemoveAt(i);
+                    ReturnTimer(timer);
                     i--;
                     continue;
                 }
@@ -101,11 +103,31 @@ namespace F8Framework.Core
             }
         }
 
+        private Timer GetTimer(object handle, int id, float step = 1f, float delay = 0f, int field = 0, Action onSecond = null, Action onComplete = null, bool isFrameTimer = false) {
+            Timer timer;
+            if (timerPool.Count > 0) {
+                timer = timerPool.Pop();
+                timer.Reset();
+            } else {
+                timer = new Timer();
+            }
+
+            timer.Init(handle, id, step, delay, field, onSecond, onComplete, isFrameTimer);
+            return timer;
+        }
+
+        private void ReturnTimer(Timer timer) {
+            timer.Handle = null;
+            timer.OnSecond = null;
+            timer.OnComplete = null;
+            timerPool.Push(timer);
+        }
+        
         // 注册一个计时器并返回其ID
         public int AddTimer(object handle, float step = 1f, float delay = 0f, int field = 0, Action onSecond = null, Action onComplete = null)
         {
             int id = Guid.NewGuid().GetHashCode(); // 生成一个唯一的ID
-            Timer timer = new Timer(handle, id, step, delay, field, onSecond, onComplete, false); // 创建一个计时器对象
+            Timer timer = GetTimer(handle, id, step, delay, field, onSecond, onComplete, false); // 创建一个计时器对象
             times.Add(timer);
             return id;
         }
@@ -114,7 +136,7 @@ namespace F8Framework.Core
         public int AddTimerFrame(object handle, float stepFrame = 1f, float delayFrame = 0f, int field = 0, Action onFrame = null, Action onComplete = null)
         {
             int id = Guid.NewGuid().GetHashCode(); // 生成一个唯一的ID
-            Timer timer = new Timer(handle, id, stepFrame, delayFrame, field, onFrame, onComplete, true); // 创建一个以帧为单位的计时器对象
+            Timer timer = GetTimer(handle, id, stepFrame, delayFrame, field, onFrame, onComplete, true); // 创建一个以帧为单位的计时器对象
             times.Add(timer);
             return id;
         }
