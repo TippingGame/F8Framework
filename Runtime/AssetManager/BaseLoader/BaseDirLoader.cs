@@ -62,7 +62,6 @@ namespace F8Framework.Core
     }
 
     [EditorBrowsable(EditorBrowsableState.Never)]
-    [Obsolete("这个结构是异步/等待支持所必需的，你不应该直接使用它。")]
     public readonly struct LoaderDirAwaiter : INotifyCompletion
     {
         private readonly BaseDirLoader loader;

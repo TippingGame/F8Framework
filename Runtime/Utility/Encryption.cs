@@ -23,15 +23,6 @@ namespace F8Framework.Core
         public static class Encryption
         {
             static StringBuilder stringBuilderCache = new StringBuilder(1024);
-            
-            public enum GUIDFormat : byte
-            {
-                N,
-                D,
-                B,
-                P,
-                X
-            }
 
             /// <summary>
             /// 生成一个GUID
@@ -43,9 +34,9 @@ namespace F8Framework.Core
             /// </summary>
             /// <param name="format">格式化类型</param>
             /// <returns>格式化后的GUID</returns>
-            public static string GUID(GUIDFormat format = GUIDFormat.N)
+            public static string GUID(string format = "D")
             {
-                return Guid.NewGuid().ToString(format.ToString());
+                return Guid.NewGuid().ToString(format);
             }
 
             /// <summary>

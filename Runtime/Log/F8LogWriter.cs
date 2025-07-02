@@ -127,7 +127,7 @@ namespace F8Framework.Core
             {
                 writer = new StreamWriter(logFilePath, true, Encoding.UTF8);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 try
                 {

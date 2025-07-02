@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.7.160] - 2025-07-03
+1.优化GUID方法  
+2.优化警告打印  
+
 ## [1.7.159] - 2025-06-28
 1.优化Timer模块使用对象池  
 2.优化Tween模块遍历，FixedUpdate使用fixedDeltaTime  
