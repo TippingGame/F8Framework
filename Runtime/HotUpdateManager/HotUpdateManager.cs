@@ -175,20 +175,13 @@ namespace F8Framework.Core
         /// <param name="overallProgress"></param>
         public void StartHotUpdate(Dictionary<string, string> hotUpdateAssetUrl, Action completed = null, Action failure = null, Action<float> overallProgress = null)
         {
-            if (!GameConfig.LocalGameVersion.EnableHotUpdate)
+            if (!GameConfig.LocalGameVersion.EnableHotUpdate || hotUpdateAssetUrl.Count <= 0 || AssetManager.ForceRemoteAssetBundle)
             {
                 WriteVersion();
                 completed?.Invoke();
                 return;
             }
-            
-            if (hotUpdateAssetUrl.Count <= 0)
-            {
-                WriteVersion();
-                completed?.Invoke();
-                return;
-            }
-            
+
             // 创建热更下载器
             hotUpdateDownloader = DownloadManager.Instance.CreateDownloader("hotUpdateDownloader", new Downloader());
             
@@ -282,18 +275,12 @@ namespace F8Framework.Core
         /// <param name="overallProgress"></param>
         public void StartPackageUpdate(List<string> subPackages, Action completed = null, Action failure = null, Action<float> overallProgress = null)
         {
-            if (!GameConfig.LocalGameVersion.EnablePackage)
+            if (!GameConfig.LocalGameVersion.EnablePackage || subPackages.Count <= 0 || AssetManager.ForceRemoteAssetBundle)
             {
                 completed?.Invoke();
                 return;
             }
 
-            if (subPackages.Count <= 0)
-            {
-                completed?.Invoke();
-                return;
-            }
-            
             List<string> downloadPaths = new List<string>(subPackages.Count);
             
             // 创建分包下载器

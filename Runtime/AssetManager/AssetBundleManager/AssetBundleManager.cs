@@ -878,10 +878,14 @@ namespace F8Framework.Core
         {
             string fullPath;
             
-            if (GameConfig.LocalGameVersion.EnableHotUpdate &&
-                AssetBundleMap.Mappings.TryGetValue(assetName, out AssetBundleMap.AssetMapping assetMapping) &&
-                assetMapping != null &&
-                !string.IsNullOrEmpty(assetMapping.Updated))
+            if (AssetManager.ForceRemoteAssetBundle)
+            {
+                fullPath = AssetBundleHelper.GetAssetBundleFullName(null, AssetBundleHelper.SourceType.REMOTE_ADDRESS);
+            }
+            else if (GameConfig.LocalGameVersion.EnableHotUpdate &&
+                     AssetBundleMap.Mappings.TryGetValue(assetName, out AssetBundleMap.AssetMapping assetMapping) &&
+                     assetMapping != null &&
+                     !string.IsNullOrEmpty(assetMapping.Updated))
             {
                 fullPath = AssetBundleHelper.GetAssetBundleFullName(null, AssetBundleHelper.SourceType.HOT_UPDATE_PATH);
             }
@@ -891,10 +895,6 @@ namespace F8Framework.Core
                      !string.IsNullOrEmpty(assetMappingPackage.Package))
             {
                 fullPath = AssetBundleHelper.GetAssetBundleFullName(null, AssetBundleHelper.SourceType.PACKAGE_PATH);
-            }
-            else if (AssetManager.ForceRemoteAssetBundle)
-            {
-                fullPath = AssetBundleHelper.GetAssetBundleFullName(null, AssetBundleHelper.SourceType.REMOTE_ADDRESS);
             }
             else
             {
@@ -913,17 +913,17 @@ namespace F8Framework.Core
         {
             string fullPath;
             
-            if (GameConfig.LocalGameVersion.EnableHotUpdate && File.Exists(AssetBundleHelper.GetAssetBundleFullName(abName, AssetBundleHelper.SourceType.HOT_UPDATE_PATH)))
+            if (AssetManager.ForceRemoteAssetBundle)
+            {
+                fullPath = AssetBundleHelper.GetAssetBundleFullName(abName, AssetBundleHelper.SourceType.REMOTE_ADDRESS);
+            }
+            else if (GameConfig.LocalGameVersion.EnableHotUpdate && File.Exists(AssetBundleHelper.GetAssetBundleFullName(abName, AssetBundleHelper.SourceType.HOT_UPDATE_PATH)))
             {
                 fullPath = AssetBundleHelper.GetAssetBundleFullName(abName, AssetBundleHelper.SourceType.HOT_UPDATE_PATH);
             }
             else if (GameConfig.LocalGameVersion.EnablePackage && File.Exists(AssetBundleHelper.GetAssetBundleFullName(abName, AssetBundleHelper.SourceType.PACKAGE_PATH)))
             {
                 fullPath = AssetBundleHelper.GetAssetBundleFullName(abName, AssetBundleHelper.SourceType.PACKAGE_PATH);
-            }
-            else if (AssetManager.ForceRemoteAssetBundle)
-            {
-                fullPath = AssetBundleHelper.GetAssetBundleFullName(abName, AssetBundleHelper.SourceType.REMOTE_ADDRESS);
             }
             else
             {
