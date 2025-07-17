@@ -12,6 +12,8 @@ Unity F8 ReferencePool组件，引用池管理，入池/取出/回收/清空
 方式一：直接下载文件，放入Unity  
 方式二：Unity->点击菜单栏->Window->Package Manager->点击+号->Add Package from git URL->输入：https://github.com/TippingGame/F8Framework.git  
 
+### 视频教程：[【Unity框架】（9）引用池](https://www.bilibili.com/video/BV1tFDwYJECv)
+
 ### 代码使用方法
 ```C#
     // 使用IReference接口

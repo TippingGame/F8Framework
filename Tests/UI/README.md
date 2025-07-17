@@ -16,6 +16,8 @@ UI界面分为三大类：
 方式一：直接下载文件，放入Unity  
 方式二：Unity->点击菜单栏->Window->Package Manager->点击+号->Add Package from git URL->输入：https://github.com/TippingGame/F8Framework.git  
 
+### 视频教程：[【Unity框架】（14）UI界面管理](https://www.bilibili.com/video/BV14ErTYuEFD)
+
 ### 初始化，创建UI，创建代码模板
 
 1. 制作UI预制体，放到`AssetBundles`或者`Resources`文件夹下任意目录  
@@ -174,6 +176,7 @@ public class UIMain : BaseView
 }
 ```
 ## 拓展功能
+#### 视频教程：[【Unity框架】（14.5）UI的常用功能](https://www.bilibili.com/video/BV1Pyf6YGET7)
 1. 编辑器功能
     * 图片自动切割九宫格（将图片中间部分相同颜色切除，减少图片体积）
     * 图集切割（需要预先点击 Sprite Editor 的 Slice 切分图片，图片 Read/Write 勾选，压缩等级设置为None）

@@ -5,16 +5,32 @@
 [![Platform](https://img.shields.io/badge/platform-Win%20%7C%20Android%20%7C%20iOS%20%7C%20Mac%20%7C%20Linux%20%7C%20WebGL-orange)]()
 
 ## 简介（希望自己点击F8，就能开始制作游戏，不想多余的事）
-Unity F8 AssetManager资产加载组件。
-1. 编辑器下：点击F8自动生成资产索引/AB名称，自动区分不同平台，清理多余AB和文件夹，Editor模式下减少开发周期。
-2. 运行时：同步/异步加载单个资产，展开文件夹或同一AB下所有资产，自动判断是 Resources / AssetBundle 资产，加载Remote远程资产，获取加载进度，同步打断异步加载。
-3. AssetBundle可以这样加载：1. 单个资产单个AB 2. 指定文件夹名称（文件夹第一层的AB） 3. 设置多个资产为同一AB名（指定任意资产名）
+
+**Unity F8 AssetManager资产加载组件**
+1. 编辑器下:
+   * 点击F8自动生成资产索引/AB名称
+   * 自动区分不同平台
+   * 清理多余AB和文件夹
+   * 编辑器模式下减少开发周期
+2. 运行时:
+   * 同步/异步加载单个资产
+   * 展开文件夹或同一AB下所有资产
+   * 自动判断是 Resources / AssetBundle 资产
+   * 加载Remote远程资产
+   * 获取加载进度
+   * 同步打断异步加载
+3. AssetBundle可以这样加载:
+   * 单个资产单个AB
+   * 指定文件夹名称（文件夹第一层的AB）
+   * 设置多个资产为同一AB名（指定任意资产名）
 4. 注意AB资产地址(大小写不敏感)，文件和目录名需要保证唯一。
 
 ## 导入插件（需要首先导入核心）
 注意！内置在->F8Framework核心：https://github.com/TippingGame/F8Framework.git  
 方式一：直接下载文件，放入Unity  
 方式二：Unity->点击菜单栏->Window->Package Manager->点击+号->Add Package from git URL->输入：https://github.com/TippingGame/F8Framework.git
+
+### 视频教程：[【Unity框架】（2）资源加载](https://www.bilibili.com/video/BV1WZ421x7TP)
 
 ### 初始化
 

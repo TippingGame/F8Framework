@@ -14,6 +14,8 @@ Unity F8 Module模块中心组件。提供三种模块可使用。
 方式一：直接下载文件，放入Unity  
 方式二：Unity->点击菜单栏->Window->Package Manager->点击+号->Add Package from git URL->输入：https://github.com/TippingGame/F8Framework.git  
 
+### 视频教程：[【Unity框架】（3）模块管理](https://www.bilibili.com/video/BV1Sr421F7Vw)
+
 ### 创建模板
 
 1. 右键资源文件夹，看到（F8模块中心功能），创建模板 Module / ModuleMono / StaticModule  

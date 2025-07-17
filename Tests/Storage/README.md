@@ -12,6 +12,8 @@ Unity F8 StorageManager组件，本地数据存储/读取
 方式一：直接下载文件，放入Unity  
 方式二：Unity->点击菜单栏->Window->Package Manager->点击+号->Add Package from git URL->输入：https://github.com/TippingGame/F8Framework.git  
 
+### 视频教程：[【Unity框架】（17）本地数据存储](https://www.bilibili.com/video/BV1EQRwYEE9x)
+
 ### 代码使用方法
 ```C#
 public class ClassInfo

@@ -12,6 +12,8 @@ Unity F8 SDKManager组件，与原生平台交互，接入多个平台或者渠�
 方式一：直接下载文件，放入Unity  
 方式二：Unity->点击菜单栏->Window->Package Manager->点击+号->Add Package from git URL->输入：https://github.com/TippingGame/F8Framework.git
 
+### 视频教程：[【Unity框架】（18）SDK接入管理](https://www.bilibili.com/video/BV1PhR8YiEBa)
+
 ### 代码使用方法
 ```C#
     // 启动SDK，平台id，渠道id
@@ -98,9 +100,11 @@ Unity F8 SDKManager组件，与原生平台交互，接入多个平台或者渠�
 
 ---
 ## WebGL游戏
+#### 视频教程：[【Unity框架】（22）打包WebGL游戏](https://www.bilibili.com/video/BV1FnVozVEbG)
 * 注意：WebGL不能使用同步加载 AB 资源，可同步加载 Resources 资源
 ---
 ## 微信小游戏接入方法
+#### 视频教程：[【Unity框架】（23）打包微信小游戏](https://www.bilibili.com/video/BV1NugPzFESf)
 * 浏览[WebGL转微信小游戏](https://github.com/wechat-miniprogram/minigame-unity-webgl-transform)插件的使用方法，下载[ unitypackage ](https://game.weixin.qq.com/cgi-bin/gamewxagwasmsplitwap/getunityplugininfo?download=1)并导入至游戏项目中
 ---
 * 删除WX-WASM-SDK-V2插件里的`LitJson.dll`（注意：团结引擎也有，建议保留F8Framework里的）  
@@ -114,6 +118,8 @@ Unity F8 SDKManager组件，与原生平台交互，接入多个平台或者渠�
 //强制更改资产加载模式为远程（微信小游戏使用）
 public static bool ForceRemoteAssetBundle = false;
 ```
+* 使用强制远程加载模式后，需要将完整的 AssetBundles 目录上传至 CDN  
+![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1752739146608.png)  
 2. [ABBuildTool.cs](https://github.com/TippingGame/F8Framework/blob/main/Editor/AssetManager/ABBuildTool.cs)
 ```C#
 // 打包后AB名加上MD5（微信小游戏使用）

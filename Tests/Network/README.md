@@ -13,6 +13,8 @@ Unity F8 Network(互联)网络组件。
 方式一：直接下载文件，放入Unity  
 方式二：Unity->点击菜单栏->Window->Package Manager->点击+号->Add Package from git URL->输入：https://github.com/TippingGame/F8Framework.git  
 
+### 视频教程：[【Unity框架】（19）网络连接](https://www.bilibili.com/video/BV1tqX5YbEXd)
+
 ### 使用方法
 #### kcp 或 tcp
 * kcp 或 tcp 的 Client 使用示例 [MultiNetworkClient.cs](https://github.com/TippingGame/F8Framework/blob/main/Tests/Network/MultiNetworkChannel/MultiNetworkClient.cs)  

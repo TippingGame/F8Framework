@@ -12,6 +12,8 @@ Unity F8 Timer组件，提供Timer、FrameTimer两种计时器，暂停/恢复�
 方式一：直接下载文件，放入Unity  
 方式二：Unity->点击菜单栏->Window->Package Manager->点击+号->Add Package from git URL->输入：https://github.com/TippingGame/F8Framework.git  
 
+### 视频教程：[【Unity框架】（7）时间管理](https://www.bilibili.com/video/BV1CkCXYTEJP)
+
 ### 代码使用方法
 ```C#
 void Start()

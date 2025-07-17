@@ -25,6 +25,8 @@ Unity 读取 Excel 的工具
 方式一：直接下载文件，放入Unity  
 方式二：Unity->点击菜单栏->Window->Package Manager->点击+号->Add Package from git URL->输入：https://github.com/TippingGame/F8Framework.git
 
+### 视频教程：[【Unity框架】（1）配置表使用](https://www.bilibili.com/video/BV1Jw4m1X7kZ)
+
 ## 初始化
 
 1. 在 `Assets` 下，创建 `StreamingAssets/config` 目录，按照下面 "Excel 示例" 创建你的 Excel[（Excel例子）](https://github.com/TippingGame/F8Framework/blob/main/Runtime/ExcelTool/StreamingAssets_config/DemoWorkSheet.xlsx)（首次F8后自动创建Excel）

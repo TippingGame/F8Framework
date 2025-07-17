@@ -9,6 +9,8 @@
 方式一：直接下载文件，放入Unity  
 方式二：Unity->点击菜单栏->Window->Package Manager->点击+号->Add Package from git URL->输入：https://github.com/focus-creative-games/hybridclr_unity.git
 
+### 视频教程：[【Unity框架】（21）接入HybridCLR](https://www.bilibili.com/video/BV1wpXCYaEAd)
+
 ## 简介（希望自己点击F8，就能开始制作游戏，不想多余的事）
 接入HybridCLR热更新代码组件。
 1. 使用这个[ 官方教程（快速上手） ](https://hybridclr.doc.code-philosophy.com/docs/beginner/quickstart)创建HotUpdate程序集后。  

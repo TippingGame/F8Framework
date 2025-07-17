@@ -6,10 +6,9 @@
 
 ## Introduction (Simply press F8 to start game development without distractions)
 **Unity F8 Event Component**  
-An elegant message dispatch and event listening system with:
+* An elegant message dispatch and event listening system
 * Dead-loop prevention - Safeguards against infinite message cycles
 * Auto-cleanup - EventDispatcher automatically releases events
-* Type-safe communication - Strongly-typed event handling
 
 ## Plugin Installation (Requires Core Framework First)
 Note! Built into → F8Framework Core: https://github.com/TippingGame/F8Framework.git  

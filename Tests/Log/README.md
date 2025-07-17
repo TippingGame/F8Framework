@@ -12,6 +12,8 @@ Unity F8 Log组件，打印日志，写入文件，上报错误
 方式一：直接下载文件，放入Unity  
 方式二：Unity->点击菜单栏->Window->Package Manager->点击+号->Add Package from git URL->输入：https://github.com/TippingGame/F8Framework.git  
 
+### 视频教程：[【Unity框架】（4）日志管理](https://www.bilibili.com/video/BV1fH4y1c7Xs)
+
 ### 代码使用方法
 ```C#
         /*----------Log基础功能----------*/

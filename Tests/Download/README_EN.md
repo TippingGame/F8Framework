@@ -6,7 +6,7 @@
 
 ## Introduction (Simply press F8 to start game development without distractions)
 **Unity F8 Download Component**  
-Supports file downloads from both localhost and HTTP sources with:
+* Supports file downloads from both localhost and HTTP sources
 * Local file writing
 * Download progress monitoring
 * Resumable transfers

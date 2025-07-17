@@ -5,12 +5,20 @@
 [![Platform](https://img.shields.io/badge/platform-Win%20%7C%20Android%20%7C%20iOS%20%7C%20Mac%20%7C%20Linux%20%7C%20WebGL-orange)]() 
 
 ## 简介（希望自己点击F8，就能开始制作游戏，不想多余的事）
-Unity F8 GameObjectPool组件，对象池管理，预加载池化，生成/销毁/延迟销毁，生命周期事件监听  
+**Unity F8 GameObjectPool组件**
+1. 预加载池化 - 提前初始化对象以实现即时使用
+2. 核心功能:
+    * 生成 - 从池中获取对象
+    * 销毁 - 将对象归还到池
+    * 延迟销毁 - 延迟一段时间后归还对象
+3. 生命周期事件监听 - 监视对象状态更改
 
 ## 导入插件（需要首先导入核心）
 注意！内置在->F8Framework核心：https://github.com/TippingGame/F8Framework.git  
 方式一：直接下载文件，放入Unity  
 方式二：Unity->点击菜单栏->Window->Package Manager->点击+号->Add Package from git URL->输入：https://github.com/TippingGame/F8Framework.git  
+
+### 视频教程：[【Unity框架】（10）游戏对象池](https://www.bilibili.com/video/BV1hAS1YGEoc)
 
 ### 代码使用方法
 ```C#
