@@ -30,6 +30,7 @@ namespace F8Framework.Core.Editor
             BuildPkgTool.SetBuildTarget();
             BuildPkgTool.DrawRootDirectory();
             BuildPkgTool.DrawVersion();
+            BuildPkgTool.DrawAssetSetting();
             BuildPkgTool.DrawHotUpdate();
             BuildPkgTool.DrawBuildPkg();
             GUILayout.EndVertical();

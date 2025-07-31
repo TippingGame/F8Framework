@@ -17,7 +17,18 @@ namespace F8Framework.Core.Editor
 
         // 打包后AB名加上MD5（微信小游戏使用）
         private static bool appendHashToAssetBundleName = false;
-        
+
+        public static void JenkinsBuildAllAB()
+        {
+            F8EditorPrefs.SetBool("compilationFinishedBuildAB", false);
+            string[] args = Environment.GetCommandLineArgs();
+            bool enableFullPathAssetLoading = BuildPkgTool.GetArgValue(args, "EnableFullPathAssetLoading-").Equals("true", StringComparison.OrdinalIgnoreCase);
+            bool enableFullPathExtensionAssetLoading = BuildPkgTool.GetArgValue(args, "EnableFullPathExtensionAssetLoading-").Equals("true", StringComparison.OrdinalIgnoreCase);
+            F8EditorPrefs.SetBool(BuildPkgTool.EnableFullPathAssetLoadingKey, enableFullPathAssetLoading);
+            F8EditorPrefs.SetBool(BuildPkgTool.EnableFullPathExtensionAssetLoadingKey, enableFullPathExtensionAssetLoading);
+            BuildAllAB();
+        }
+
         public static void BuildAllAB()
         {
             AssetDatabase.RemoveUnusedAssetBundleNames();
@@ -255,6 +266,9 @@ namespace F8Framework.Core.Editor
         private static IEnumerable<string> allAssetBundlesPaths;
         public static void GenerateAssetNames(bool isWrite = false)
         {
+            bool _enableFullPathAssetLoading = F8EditorPrefs.GetBool(BuildPkgTool.EnableFullPathAssetLoadingKey, false);
+            bool _enableFullPathExtensionAssetLoading = F8EditorPrefs.GetBool(BuildPkgTool.EnableFullPathExtensionAssetLoadingKey, false);
+            
             if (!isWrite)
                 DiscrepantAssetPathMapping.Clear();
 
@@ -314,6 +328,20 @@ namespace F8Framework.Core.Editor
                             BuildPkgTool.ToVersion, FileTools.GetFileSize(URLSetting.GetAssetBundlesOutPath() + "/" + realAbName).ToString(),
                             FileTools.CreateMd5ForFile(URLSetting.GetAssetBundlesOutPath() + "/" + realAbName), GetPackage(filePath), ""));
 
+                        if (_enableFullPathAssetLoading)
+                        {
+                            assetMapping.TryAdd(Path.ChangeExtension(GetAssetBundlesPath(filePath), null), new AssetBundleMap.AssetMapping(realAbName, assetPathsForAbName.ToArray(),
+                                BuildPkgTool.ToVersion, FileTools.GetFileSize(URLSetting.GetAssetBundlesOutPath() + "/" + realAbName).ToString(),
+                                FileTools.CreateMd5ForFile(URLSetting.GetAssetBundlesOutPath() + "/" + realAbName), GetPackage(filePath), ""));
+                        }
+
+                        if (_enableFullPathExtensionAssetLoading)
+                        {
+                            assetMapping.TryAdd(GetAssetBundlesPath(filePath), new AssetBundleMap.AssetMapping(realAbName, assetPathsForAbName.ToArray(),
+                                BuildPkgTool.ToVersion, FileTools.GetFileSize(URLSetting.GetAssetBundlesOutPath() + "/" + realAbName).ToString(),
+                                FileTools.CreateMd5ForFile(URLSetting.GetAssetBundlesOutPath() + "/" + realAbName), GetPackage(filePath), ""));
+                        }
+                        
                         if (filePath.IsContainChinese())
                         {
                             LogF8.LogError("AssetBundle名中不推荐含有中文： " + filePath);
@@ -344,7 +372,13 @@ namespace F8Framework.Core.Editor
                         
                         assetMapping.Add(fileNameWithoutExtension, new AssetBundleMap.AssetMapping("", assetNameDir,
                             BuildPkgTool.ToVersion, "", "", "", ""));
-
+                        
+                        if (_enableFullPathAssetLoading || _enableFullPathExtensionAssetLoading)
+                        {
+                            assetMapping.TryAdd(GetAssetBundlesPath(filePath) + AssetManager.DirSuffix, new AssetBundleMap.AssetMapping("", assetNameDir,
+                                BuildPkgTool.ToVersion, "", "", "", ""));
+                        }
+                        
                         if (filePath.IsContainChinese())
                         {
                             LogF8.LogError("AssetBundle文件夹中不推荐含有中文： " + filePath);
@@ -392,6 +426,9 @@ namespace F8Framework.Core.Editor
         
         public static void GenerateResourceNames(bool isWrite = false)
         {
+            bool _enableFullPathAssetLoading = F8EditorPrefs.GetBool(BuildPkgTool.EnableFullPathAssetLoadingKey, false);
+            bool _enableFullPathExtensionAssetLoading = F8EditorPrefs.GetBool(BuildPkgTool.EnableFullPathExtensionAssetLoadingKey, false);
+            
             if (!isWrite)
             {
                 return;
@@ -437,6 +474,16 @@ namespace F8Framework.Core.Editor
                         tempNames.Add(fileNameWithoutExtension);
 
                         resourceMapping.Add(fileNameWithoutExtension, new[] { realPath });
+
+                        if (_enableFullPathAssetLoading)
+                        {
+                            resourceMapping.TryAdd(Path.ChangeExtension(GetResourcesPath(filePath), null), new[] { realPath });
+                        }
+
+                        if (_enableFullPathExtensionAssetLoading)
+                        {
+                            resourceMapping.TryAdd(GetResourcesPath(filePath), new[] { realPath });
+                        }
                     }
                     else if (Directory.Exists(filePath)) // 文件夹
                     {
@@ -460,6 +507,11 @@ namespace F8Framework.Core.Editor
                         tempNames.Add(fileNameWithoutExtension);
 
                         resourceMapping.Add(fileNameWithoutExtension, assetNameDir);
+                        
+                        if (_enableFullPathAssetLoading || _enableFullPathExtensionAssetLoading)
+                        {
+                            resourceMapping.TryAdd(GetResourcesPath(filePath) + AssetManager.DirSuffix, assetNameDir);
+                        }
                     }
                 }
             }

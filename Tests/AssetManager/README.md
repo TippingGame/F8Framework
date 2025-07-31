@@ -23,7 +23,7 @@
    * 单个资产单个AB
    * 指定文件夹名称（文件夹第一层的AB）
    * 设置多个资产为同一AB名（指定任意资产名）
-4. 注意AB资产地址(大小写不敏感)，文件和目录名需要保证唯一。
+4. 注意AB资产地址(大小写不敏感)
 
 ## 导入插件（需要首先导入核心）
 注意！内置在->F8Framework核心：https://github.com/TippingGame/F8Framework.git  
@@ -34,8 +34,8 @@
 
 ### 初始化
 
-1. 点击F8，自动获取 Resources 下的所有资产，生成索引（注意：资产名称唯一）  
-   自动获取 Assets / AssetBundles 下的所有资产，生成索引（注意：资产名称唯一）  
+1. 点击F8，自动获取 Resources 下的所有资产，生成索引  
+   自动获取 Assets / AssetBundles 下的所有资产，生成索引  
    自动生成索引文件 Assets / F8Framework / AssetMap 目录下面  
    ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_20240205225637.png)  
    ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_20240205230012_2.png)
@@ -67,6 +67,9 @@ IEnumerator Start()
     /*-------------------------------------同步加载-------------------------------------*/
     // 加载单个资产
     GameObject go = FF8.Asset.Load<GameObject>("Cube");
+    // 如要使用完整路径加载，需点击F5打包工具勾选对应功能
+    go = FF8.Asset.Load<GameObject>("AssetBundles/Prefabs/Cube");
+    go = FF8.Asset.Load<GameObject>("Resources/Prefabs/Cube.prefab");
 
     // assetName：资产名
     // subAssetName：子资产名，使用Multiple模式的Sprite图片则可使用

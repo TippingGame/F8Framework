@@ -22,7 +22,7 @@
    * Single asset per AB
    * Folder-based AB (first-level only)
    * Custom AB grouping (multiple assets under same AB name)
-4. Important: AB asset paths are case-insensitive. Ensure unique file/directory names.
+4. Important: AB asset paths are case-insensitive
 
 ## Plugin Installation (Requires Core Framework First)
 Note! Built into → F8Framework Core: https://github.com/TippingGame/F8Framework.git  
@@ -32,8 +32,8 @@ Method 2: Unity → Menu Bar → Window → Package Manager → "+" → Add Pack
 ### Initialization
 
 1. Press F8 to:
-   * Auto-scan all assets in Resources (Note: Asset names must be unique)
-   * Auto-scan all assets in Assets/AssetBundles (Note: Asset names must be unique)
+   * Auto-scan all assets in Resources
+   * Auto-scan all assets in Assets/AssetBundles
    * Generate index files in Assets/F8Framework/AssetMap  
    ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_20240205225637.png)  
    ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_20240205230012_2.png)
@@ -71,6 +71,9 @@ IEnumerator Start()
     /*-------------------------------------Sync Loading-------------------------------------*/
     // Load single asset
     GameObject go = FF8.Asset.Load<GameObject>("Cube");
+    // 如要使用完整路径加载，需点击F5打包工具勾选对应功能
+    go = FF8.Asset.Load<GameObject>("AssetBundles/Prefabs/Cube");
+    go = FF8.Asset.Load<GameObject>("Resources/Prefabs/Cube.prefab");
 
     // assetName: Asset name
     // subAssetName: Sub-asset name (for Sprite in Multiple mode)

@@ -20,6 +20,9 @@ namespace F8Framework.Tests
             /*-------------------------------------同步加载-------------------------------------*/
             // 加载单个资产
             GameObject go = FF8.Asset.Load<GameObject>("Cube");
+            // 如要使用完整路径加载，需点击F5打包工具勾选对应功能
+            go = FF8.Asset.Load<GameObject>("AssetBundles/Prefabs/Cube");
+            go = FF8.Asset.Load<GameObject>("Resources/Prefabs/Cube.prefab");
 
             // assetName：资产名
             // subAssetName：子资产名，使用Multiple模式的Sprite图片则可使用

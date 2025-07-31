@@ -32,6 +32,8 @@ namespace F8Framework.Core.Editor
         private static string _androidKeystorePassKey = "AndroidKeystorePassKey";
         private static string _androidKeyAliasNameKey = "AndroidKeyAliasNameKey";
         private static string _androidKeyAliasPassKey = "AndroidKeyAliasPassKey";
+        public static string EnableFullPathAssetLoadingKey = "FullPathAssetLoadingKey";
+        public static string EnableFullPathExtensionAssetLoadingKey = "FullPathExtensionAssetLoadingKey";
         
         private static string _buildPath = "";
         private static string _toVersion = "1.0.0";
@@ -43,6 +45,8 @@ namespace F8Framework.Core.Editor
         private static string _optionalPackage = "0_1_2_3";
         private static string _assetRemoteAddress = ""; //"http://127.0.0.1:6789/"
         private static bool _enablePackage = false;
+        private static bool _enableFullPathAssetLoading = false;
+        private static bool _enableFullPathExtensionAssetLoading = false;
         
         private static BuildTarget _buildTarget = BuildTarget.NoTarget;
 
@@ -576,6 +580,45 @@ namespace F8Framework.Core.Editor
             GUILayout.Space(5);
         }
 
+        // 资产设置
+        public static void DrawAssetSetting()
+        {
+            GUILayout.Space(5);
+            GUILayout.Label("【资产设置】", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, fontSize = 16 });
+            GUILayout.Space(10);
+    
+            bool enableFullPathAssetLoading = F8EditorPrefs.GetBool(EnableFullPathAssetLoadingKey, false);
+            _enableFullPathAssetLoading = EditorGUILayout.Toggle("启用完整资源路径加载", enableFullPathAssetLoading);
+            if (enableFullPathAssetLoading != _enableFullPathAssetLoading)
+            {
+                F8EditorPrefs.SetBool(EnableFullPathAssetLoadingKey, _enableFullPathAssetLoading);
+            }
+
+            if (enableFullPathAssetLoading)
+            {
+                EditorGUILayout.LabelField("※ 如：AssetBundles/UI/UIPanel，Resources/UI/UIPanel，勾选后将增加AssetBundleMap.json和ResourceMap.json文件体积", EditorStyles.miniLabel);
+            }
+            
+            GUILayout.Space(10);
+            
+            bool enableFullPathExtensionAssetLoading = F8EditorPrefs.GetBool(EnableFullPathExtensionAssetLoadingKey, false);
+            _enableFullPathExtensionAssetLoading = EditorGUILayout.Toggle("启用完整资源路径带扩展名", enableFullPathExtensionAssetLoading);
+
+            if (enableFullPathExtensionAssetLoading != _enableFullPathExtensionAssetLoading)
+            {
+                F8EditorPrefs.SetBool(EnableFullPathExtensionAssetLoadingKey, _enableFullPathExtensionAssetLoading);
+            }
+
+            if (enableFullPathExtensionAssetLoading)
+            {
+                EditorGUILayout.LabelField("※ 如：AssetBundles/UI/UIPanel.prefab，Resources/UI/UIPanel.prefab，勾选后将增加AssetBundleMap.json和ResourceMap.json文件体积", EditorStyles.miniLabel);
+            }
+            
+            GUILayout.Space(5);
+            GUILayout.Label("-----------------------------------------------------------------------");
+            GUILayout.Space(5);
+        }
+        
         // 热更新管理
         public static void DrawHotUpdate()
         {
