@@ -80,7 +80,7 @@ namespace F8Framework.Core
                 get
                 {
 #if UNITY_EDITOR
-                    return _isEditorMode || UnityEditor.EditorPrefs.GetBool(Application.dataPath.GetHashCode() + "IsEditorMode", false);
+                    return _isEditorMode || F8EditorPrefs.GetBool("IsEditorMode", false);
 #else
                     return false;
 #endif

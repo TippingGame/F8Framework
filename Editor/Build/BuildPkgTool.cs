@@ -34,6 +34,7 @@ namespace F8Framework.Core.Editor
         private static string _androidKeyAliasPassKey = "AndroidKeyAliasPassKey";
         public static string EnableFullPathAssetLoadingKey = "FullPathAssetLoadingKey";
         public static string EnableFullPathExtensionAssetLoadingKey = "FullPathExtensionAssetLoadingKey";
+        private static string _excelPathKey = "ExcelPath";
         
         private static string _buildPath = "";
         private static string _toVersion = "1.0.0";
@@ -47,6 +48,7 @@ namespace F8Framework.Core.Editor
         private static bool _enablePackage = false;
         private static bool _enableFullPathAssetLoading = false;
         private static bool _enableFullPathExtensionAssetLoading = false;
+        private static string _excelPath = "";
         
         private static BuildTarget _buildTarget = BuildTarget.NoTarget;
 
@@ -400,11 +402,17 @@ namespace F8Framework.Core.Editor
             if (_exportCurrentPlatform)
             {
                 _buildTarget = EditorUserBuildSettings.activeBuildTarget;
+                GUILayout.Space(10);
+                GUILayout.Label(_buildTarget.ToString(), new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, fontSize = 16 });
             }
             
-            GUILayout.Space(10);
             if (!_exportCurrentPlatform)
             {
+                if (F8EditorPrefs.GetString(_exportPlatformKey, "").IsNullOrEmpty())
+                {
+                    F8EditorPrefs.SetString(_exportPlatformKey, EditorUserBuildSettings.activeBuildTarget.ToString());
+                }
+                GUILayout.Space(10);
                 Array enumValues = Enum.GetValues(typeof(BuildTarget));
                 _index = Array.FindIndex((BuildTarget[])enumValues, target => 
                     target.ToString() == F8EditorPrefs.GetString(_exportPlatformKey, ""));
@@ -421,7 +429,7 @@ namespace F8Framework.Core.Editor
             DrawPublishingSettings();
             
             GUILayout.Space(5);
-            GUILayout.Label("-----------------------------------------------------------------------");
+            GUILayout.Box("", GUILayout.Height(2), GUILayout.ExpandWidth(true));
             GUILayout.Space(5);
         }
         
@@ -430,7 +438,9 @@ namespace F8Framework.Core.Editor
         {
             if (_buildTarget == BuildTarget.Android)
             {
-                GUILayout.Space(15);
+                GUILayout.Space(5);
+                GUILayout.Box("", GUILayout.Height(2), GUILayout.ExpandWidth(true));
+                GUILayout.Space(10);
                 GUILayout.Label("【Android签名设置】",
                     new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, fontSize = 16 });
                 GUILayout.Space(10);
@@ -526,9 +536,9 @@ namespace F8Framework.Core.Editor
             GUILayout.Label("【打包输出目录】", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, fontSize = 16 });
             GUILayout.Space(10);
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("点击设置目录", NormalWidth, ButtonHeight))
+            if (GUILayout.Button("设置打包目录", NormalWidth, ButtonHeight))
             {
-                string _buildPath = EditorUtility.OpenFolderPanel("设置打包根目录", BuildPkgTool._buildPath, BuildPkgTool._buildPath);
+                string _buildPath = EditorUtility.OpenFolderPanel("设置打包目录", BuildPkgTool._buildPath, BuildPkgTool._buildPath);
                 if (!string.IsNullOrEmpty(_buildPath))
                 {
                     BuildPkgTool._buildPath = _buildPath;
@@ -537,11 +547,15 @@ namespace F8Framework.Core.Editor
             }
 
             _buildPath = F8EditorPrefs.GetString(_prefBuildPathKey, "");
-           
-            GUILayout.Label("输出目录：" + _buildPath);
+            
+            if (_buildPath.IsNullOrEmpty())
+            {
+                EditorGUILayout.HelpBox("未设置打包目录", MessageType.Warning, true);
+            }
+            GUILayout.Label(_buildPath);
             GUILayout.EndHorizontal();
             GUILayout.Space(5);
-            GUILayout.Label("-----------------------------------------------------------------------");
+            GUILayout.Box("", GUILayout.Height(2), GUILayout.ExpandWidth(true));
             GUILayout.Space(5);
         }
         
@@ -576,7 +590,7 @@ namespace F8Framework.Core.Editor
             GUILayout.EndHorizontal();
             
             GUILayout.Space(5);
-            GUILayout.Label("-----------------------------------------------------------------------");
+            GUILayout.Box("", GUILayout.Height(2), GUILayout.ExpandWidth(true));
             GUILayout.Space(5);
         }
 
@@ -586,7 +600,32 @@ namespace F8Framework.Core.Editor
             GUILayout.Space(5);
             GUILayout.Label("【资产设置】", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, fontSize = 16 });
             GUILayout.Space(10);
-    
+            
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("设置Excel目录", NormalWidth, ButtonHeight))
+            {
+                string excelPath = EditorUtility.OpenFolderPanel("设置Excel存放目录", _excelPath, _excelPath);
+                if (!string.IsNullOrEmpty(excelPath))
+                {
+                    _excelPath = excelPath;
+                    F8EditorPrefs.SetString(_excelPathKey, BuildPkgTool._excelPath);
+                }
+            }
+
+            if (F8EditorPrefs.GetString(_excelPathKey, "").IsNullOrEmpty())
+            {
+                F8EditorPrefs.SetString(_excelPathKey, Application.dataPath + ExcelDataTool.ExcelPath);
+            }
+            _excelPath = F8EditorPrefs.GetString(_excelPathKey, "");
+
+            if (_excelPath.IsNullOrEmpty())
+            {
+                EditorGUILayout.HelpBox("未设置Excel目录", MessageType.Warning);
+            }
+            GUILayout.Label(_excelPath);
+            GUILayout.EndHorizontal();
+            GUILayout.Space(10);
+            
             bool enableFullPathAssetLoading = F8EditorPrefs.GetBool(EnableFullPathAssetLoadingKey, false);
             _enableFullPathAssetLoading = EditorGUILayout.Toggle("启用完整资源路径加载", enableFullPathAssetLoading);
             if (enableFullPathAssetLoading != _enableFullPathAssetLoading)
@@ -615,7 +654,7 @@ namespace F8Framework.Core.Editor
             }
             
             GUILayout.Space(5);
-            GUILayout.Label("-----------------------------------------------------------------------");
+            GUILayout.Box("", GUILayout.Height(2), GUILayout.ExpandWidth(true));
             GUILayout.Space(5);
         }
         
@@ -626,7 +665,6 @@ namespace F8Framework.Core.Editor
             GUILayout.Label("【热更新管理】", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, fontSize = 16 });
             GUILayout.Space(10);
             
-            GUILayout.Space(10);
             GUILayout.BeginHorizontal();
             GUILayout.Label("资产远程地址/游戏远程版本 例：http://127.0.0.1:6789/", GUILayout.Width(360));
             GUILayout.EndHorizontal();
@@ -640,6 +678,13 @@ namespace F8Framework.Core.Editor
             }
             _assetRemoteAddress = EditorGUILayout.TextField(assetRemoteAddressValue);
             F8EditorPrefs.SetString(_assetRemoteAddressKey, _assetRemoteAddress);
+            // 不可编辑的后缀（灰色）
+            GUI.enabled = false;
+            string suffix = " + Remote/" + URLSetting.GetPlatformName();
+            GUIStyle textFieldStyle = EditorStyles.textField;
+            float suffixWidth = textFieldStyle.CalcSize(new GUIContent(suffix)).x + 5;
+            EditorGUILayout.TextField(suffix, GUILayout.Width(suffixWidth));
+            GUI.enabled = true;
             GUILayout.EndHorizontal();
             GUILayout.Space(10);
             
@@ -659,7 +704,7 @@ namespace F8Framework.Core.Editor
             }
 
             GUILayout.Space(5);
-            GUILayout.Label("-----------------------------------------------------------------------");
+            GUILayout.Box("", GUILayout.Height(2), GUILayout.ExpandWidth(true));
             GUILayout.Space(5);
         }
         
