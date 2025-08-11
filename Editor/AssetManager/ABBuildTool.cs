@@ -74,7 +74,7 @@ namespace F8Framework.Core.Editor
             string outpath = URLSetting.GetAssetBundlesStreamPath();
             FileTools.SafeClearDir(outpath);
             FileTools.CheckDirAndCreateWhenNeeded(outpath);
-            FileTools.SafeCopyDirectory(strABOutPAthDir, outpath, true);
+            FileTools.SafeCopyDirectory(strABOutPAthDir, outpath, true, new[] { ".manifest" });
             AssetDatabase.Refresh();
             
             LogF8.LogAsset("资产打包成功!");
@@ -112,11 +112,6 @@ namespace F8Framework.Core.Editor
                         {
                             FileTools.SafeDeleteFile(abpath + ".meta");
                         }
-
-                        if (!abpath.EndsWith(".manifest"))
-                        {
-                            LogF8.LogAsset("删除多余AB文件：" + abpath);
-                        }
                     }
                     else if (Directory.Exists(abpath))
                     {
@@ -138,7 +133,6 @@ namespace F8Framework.Core.Editor
                     }
                 }
             }
-            LogF8.LogAsset("删除全部的.manifest文件");
             
             AssetDatabase.Refresh();
         }
@@ -170,7 +164,7 @@ namespace F8Framework.Core.Editor
                 foreach (string file in files)
                 {
                     string extension = Path.GetExtension(file).ToLower();
-                    if (extension != ".meta" && extension != ".ds_store")
+                    if (extension != ".meta" && extension != ".manifest" && extension != ".ds_store")
                     {
                         // It's a file under AssetBundles, record as "Audio/click11"
                         if (removeExtension)
@@ -312,7 +306,10 @@ namespace F8Framework.Core.Editor
                         {
                             string id = Util.Encryption.MD5Encrypt(assetPath);
                             fileNameWithoutExtension += id;
-                            LogF8.Log("AB资源名称重复（大小写不敏感）：" + filePath + "，增加唯一识别ID后为：" + fileNameWithoutExtension);
+                            if (!_enableFullPathAssetLoading && !_enableFullPathExtensionAssetLoading)
+                            {
+                                LogF8.Log("AB资源名称重复（大小写不敏感）：" + filePath + "，增加唯一识别ID后为：" + fileNameWithoutExtension);
+                            }
                         }
                         tempNames.Add(fileNameWithoutExtension.ToLower());
 
@@ -323,23 +320,26 @@ namespace F8Framework.Core.Editor
                         string hash = appendHashToAssetBundleName ? ParseManifestFile(URLSetting.GetAssetBundlesOutPath() + "/" + abName) : null;
                         
                         string realAbName = InsertBeforeLastDot(abName, hash);
-                        
-                        assetMapping.Add(fileNameWithoutExtension, new AssetBundleMap.AssetMapping(realAbName, assetPathsForAbName.ToArray(),
-                            BuildPkgTool.ToVersion, FileTools.GetFileSize(URLSetting.GetAssetBundlesOutPath() + "/" + realAbName).ToString(),
-                            FileTools.CreateMd5ForFile(URLSetting.GetAssetBundlesOutPath() + "/" + realAbName), GetPackage(filePath), ""));
+                        string[] assetPathsArray = assetPathsForAbName.ToArray();
+                        string version = BuildPkgTool.ToVersion;
+                        string abFullPath = URLSetting.GetAssetBundlesOutPath() + "/" + realAbName;
+                        string fileSize = FileTools.GetFileSize(abFullPath).ToString();
+                        string md5 = FileTools.CreateMd5ForFile(abFullPath);
+                        string package = GetPackage(filePath);
+                        assetMapping.Add(fileNameWithoutExtension, new AssetBundleMap.AssetMapping(realAbName, assetPathsArray, version, fileSize,
+                            md5, package, ""));
 
                         if (_enableFullPathAssetLoading)
                         {
-                            assetMapping.TryAdd(Path.ChangeExtension(GetAssetBundlesPath(filePath), null), new AssetBundleMap.AssetMapping(realAbName, assetPathsForAbName.ToArray(),
-                                BuildPkgTool.ToVersion, FileTools.GetFileSize(URLSetting.GetAssetBundlesOutPath() + "/" + realAbName).ToString(),
-                                FileTools.CreateMd5ForFile(URLSetting.GetAssetBundlesOutPath() + "/" + realAbName), GetPackage(filePath), ""));
+                            assetMapping.TryAdd(Path.ChangeExtension(GetAssetBundlesPath(filePath), null), 
+                                new AssetBundleMap.AssetMapping(realAbName, assetPathsArray, version, fileSize,
+                                md5, package, ""));
                         }
 
                         if (_enableFullPathExtensionAssetLoading)
                         {
-                            assetMapping.TryAdd(GetAssetBundlesPath(filePath), new AssetBundleMap.AssetMapping(realAbName, assetPathsForAbName.ToArray(),
-                                BuildPkgTool.ToVersion, FileTools.GetFileSize(URLSetting.GetAssetBundlesOutPath() + "/" + realAbName).ToString(),
-                                FileTools.CreateMd5ForFile(URLSetting.GetAssetBundlesOutPath() + "/" + realAbName), GetPackage(filePath), ""));
+                            assetMapping.TryAdd(GetAssetBundlesPath(filePath), new AssetBundleMap.AssetMapping(realAbName, assetPathsArray, version, fileSize,
+                                md5, package, ""));
                         }
                         
                         if (filePath.IsContainChinese())
@@ -366,7 +366,10 @@ namespace F8Framework.Core.Editor
                         {
                             string id = Util.Encryption.MD5Encrypt(assetPath);
                             fileNameWithoutExtension += id;
-                            LogF8.Log("AB文件夹名称重复（大小写不敏感）：" + filePath + "，增加唯一识别ID后为：" + fileNameWithoutExtension);
+                            if (!_enableFullPathAssetLoading && !_enableFullPathExtensionAssetLoading)
+                            {
+                                LogF8.Log("AB文件夹名称重复（大小写不敏感）：" + filePath + "，增加唯一识别ID后为：" + fileNameWithoutExtension);
+                            }
                         }
                         tempNames.Add(fileNameWithoutExtension);
                         
@@ -468,7 +471,10 @@ namespace F8Framework.Core.Editor
                         {
                             string id = Util.Encryption.MD5Encrypt(assetPath);
                             fileNameWithoutExtension += id;
-                            LogF8.Log("Resources资源名称重复（大小写不敏感）：" + filePath + "，增加唯一识别ID后为：" + fileNameWithoutExtension);
+                            if (!_enableFullPathAssetLoading && !_enableFullPathExtensionAssetLoading)
+                            {
+                                LogF8.Log("Resources资源名称重复（大小写不敏感）：" + filePath + "，增加唯一识别ID后为：" + fileNameWithoutExtension);
+                            }
                         }
 
                         tempNames.Add(fileNameWithoutExtension);
@@ -501,7 +507,10 @@ namespace F8Framework.Core.Editor
                         {
                             string id = Util.Encryption.MD5Encrypt(assetPath);
                             fileNameWithoutExtension += id;
-                            LogF8.Log("Resources文件夹名称重复（大小写不敏感）：" + filePath + "，增加唯一识别ID后为：" + fileNameWithoutExtension);
+                            if (!_enableFullPathAssetLoading && !_enableFullPathExtensionAssetLoading)
+                            {
+                                LogF8.Log("Resources文件夹名称重复（大小写不敏感）：" + filePath + "，增加唯一识别ID后为：" + fileNameWithoutExtension);
+                            }
                         }
 
                         tempNames.Add(fileNameWithoutExtension);

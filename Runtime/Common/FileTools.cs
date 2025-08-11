@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using UnityEngine;
 
 namespace F8Framework.Core
 {
@@ -129,17 +128,17 @@ namespace F8Framework.Core
         
         public static string FormatToUnityPath(string path)
         {
-            return path.Replace("\\", "/");
+            return path?.Replace("\\", "/");
         }
 
         public static string FormatToSysFilePath(string path)
         {
-            return path.Replace("/", "\\");
+            return path?.Replace("/", "\\");
         }
 
         public static string GetFileExtension(string path)
         {
-            return Path.GetExtension(path).ToLower();
+            return Path.GetExtension(path)?.ToLower();
         }
 
         public static string[] GetSpecifyFilesInFolder(string path, string[] extensions = null, bool exclude = false)
@@ -600,7 +599,7 @@ namespace F8Framework.Core
                     foreach (DirectoryInfo subdir in dirs)
                     {
                         string temppath = Path.Combine(destDirName, subdir.Name);
-                        SafeCopyDirectory(subdir.FullName, temppath, copySubDirs);
+                        SafeCopyDirectory(subdir.FullName, temppath, copySubDirs, excludeName);
                     }
                 }
                 return true;

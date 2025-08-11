@@ -1959,13 +1959,15 @@ namespace F8Framework.Core
                     dirs = assetBundlesDirs.ToArray();
                 }
                 
-                string[] guids = UnityEditor.AssetDatabase.FindAssets(assetName, dirs);
+                string[] guids = UnityEditor.AssetDatabase.FindAssets(assetName.Contains('/') ? Path.GetFileNameWithoutExtension(assetName) : assetName, dirs);
                 foreach (string guid in guids)
                 {
                     // 将 GUID 转换为路径
                     string assetPath = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
-    
-                    if (Path.GetFileNameWithoutExtension(assetPath) == assetName)
+                    bool isMatch = (assetName.Contains('/') && assetPath.Contains(assetName)) ||
+                                   Path.GetFileNameWithoutExtension(assetPath) == assetName;
+
+                    if (isMatch)
                     {
                         assetPath = assetPath.ToLower();
                         if (accessMode == AssetAccessMode.UNKNOWN)
