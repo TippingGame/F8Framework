@@ -46,6 +46,7 @@ namespace F8Framework.Core
         protected LoopType loopType = LoopType.None;
         protected int loopCount = 0;
         protected int tempLoopCount = 0;
+        protected bool ignoreTimeScale = false;
         #endregion
 
         public int ID
@@ -69,14 +70,15 @@ namespace F8Framework.Core
         protected Action<Vector2> onUpdateVector2 = null;
         protected Action<Quaternion> onUpdateQuaternion = null;
         protected List<TimeEvent> events = new List<TimeEvent>();
+        protected Action PauseReset = null;
         #endregion
 
-        public GameObject Owner { get { return owner; } }
-        public UpdateMode UpdateMode { get { return updateMode; } }
-        public Action PauseReset = null;
+        public GameObject Owner => owner;
+        public UpdateMode UpdateMode => updateMode;
         public bool CanRecycle = true;
         public bool IsRecycle = false;
-        
+        public bool IgnoreTimeScale => ignoreTimeScale;
+
         public BaseTween()
         {
             onComplete = FinishTween;
@@ -113,7 +115,13 @@ namespace F8Framework.Core
             if(onUpdate != null)
                 onUpdate();
         }
-
+        
+        public BaseTween SetIgnoreTimeScale(bool value)
+        {
+            ignoreTimeScale = value;
+            return this;
+        }
+        
         public BaseTween SetIsPause(bool value)
         {
             if (isPause && !value)

@@ -16,13 +16,14 @@ namespace F8Framework.Core
         public bool IsFinish = false;
         public bool IsFrameTimer = false;
         public bool IsPaused = false;
+        public bool IgnoreTimeScale = false;
         
         // 存储初始值以便重置
         private float _initialStep;
         private float _initialDelay;
         private int _initialField;
         
-        public void Init(object handle, int id, float step = 1f, float delay = 0f, int field = 0, Action onSecond = null, Action onComplete = null, bool isFrameTimer = false)
+        public void Init(object handle, int id, float step = 1f, float delay = 0f, int field = 0, Action onSecond = null, Action onComplete = null, bool ignoreTimeScale = false, bool isFrameTimer = false)
         {
             Handle = handle;
             ID = id;
@@ -32,6 +33,7 @@ namespace F8Framework.Core
             OnSecond = onSecond;
             OnComplete = onComplete;
             IsFrameTimer = isFrameTimer;
+            IgnoreTimeScale = ignoreTimeScale;
             // 保存初始值
             _initialStep = step;
             _initialDelay = delay;

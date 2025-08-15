@@ -46,7 +46,6 @@ namespace F8Framework.Core
             {
                 return;
             }
-            float dt = Time.deltaTime;
 
             for (int i = 0; i < times.Count; i++)
             {
@@ -60,8 +59,10 @@ namespace F8Framework.Core
                     continue;
                 }
 
+                float dt = timer.IgnoreTimeScale ? Time.unscaledDeltaTime : Time.deltaTime;
+                
                 // 调用计时器
-                int triggerCount = timer.IsFrameTimer ? timer.Update(frameTime) : timer.Update(dt);
+                int triggerCount = timer.IsFrameTimer ? timer.Update(dt > 0 ? frameTime : 0) : timer.Update(dt);
 
                 if (triggerCount > 0) // 如果本帧触发次数大于0，执行相关逻辑
                 {
@@ -103,7 +104,7 @@ namespace F8Framework.Core
             }
         }
 
-        private Timer GetTimer(object handle, int id, float step = 1f, float delay = 0f, int field = 0, Action onSecond = null, Action onComplete = null, bool isFrameTimer = false) {
+        private Timer GetTimer(object handle, int id, float step = 1f, float delay = 0f, int field = 0, Action onSecond = null, Action onComplete = null, bool ignoreTimeScale = false, bool isFrameTimer = false) {
             Timer timer;
             if (timerPool.Count > 0) {
                 timer = timerPool.Pop();
@@ -112,7 +113,7 @@ namespace F8Framework.Core
                 timer = new Timer();
             }
 
-            timer.Init(handle, id, step, delay, field, onSecond, onComplete, isFrameTimer);
+            timer.Init(handle, id, step, delay, field, onSecond, onComplete, ignoreTimeScale, isFrameTimer);
             return timer;
         }
 
@@ -124,19 +125,19 @@ namespace F8Framework.Core
         }
         
         // 注册一个计时器并返回其ID
-        public int AddTimer(object handle, float step = 1f, float delay = 0f, int field = 0, Action onSecond = null, Action onComplete = null)
+        public int AddTimer(object handle, float step = 1f, float delay = 0f, int field = 0, Action onSecond = null, Action onComplete = null, bool ignoreTimeScale = false)
         {
             int id = Guid.NewGuid().GetHashCode(); // 生成一个唯一的ID
-            Timer timer = GetTimer(handle, id, step, delay, field, onSecond, onComplete, false); // 创建一个计时器对象
+            Timer timer = GetTimer(handle, id, step, delay, field, onSecond, onComplete, ignoreTimeScale, false); // 创建一个计时器对象
             times.Add(timer);
             return id;
         }
 
         // 注册一个以帧为单位的计时器并返回其ID
-        public int AddTimerFrame(object handle, float stepFrame = 1f, float delayFrame = 0f, int field = 0, Action onFrame = null, Action onComplete = null)
+        public int AddTimerFrame(object handle, float stepFrame = 1f, float delayFrame = 0f, int field = 0, Action onFrame = null, Action onComplete = null, bool ignoreTimeScale = false)
         {
             int id = Guid.NewGuid().GetHashCode(); // 生成一个唯一的ID
-            Timer timer = GetTimer(handle, id, stepFrame, delayFrame, field, onFrame, onComplete, true); // 创建一个以帧为单位的计时器对象
+            Timer timer = GetTimer(handle, id, stepFrame, delayFrame, field, onFrame, onComplete, ignoreTimeScale, true); // 创建一个以帧为单位的计时器对象
             times.Add(timer);
             return id;
         }

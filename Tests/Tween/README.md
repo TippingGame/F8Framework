@@ -60,6 +60,7 @@ void Start()
         .SetUpdateMode(UpdateMode.Update) // 设置Update模式，默认为Update
         .SetOwner(gameObject) // 设置动画拥有者
         .SetIsPause(false); // 设置是否暂停
+        .SetIgnoreTimeScale(true); // 设置是否忽略时间缩放
     
     // 设置是否暂停
     FF8.Tween.SetIsPause(id, true);
@@ -106,6 +107,7 @@ void Start()
     sequence.Append(valueTween); // 第二个动画完成后执行
     sequence.Append(() => LogF8.Log("完成了！")); // 动画序列结束后的回调
     sequence.SetOnComplete(() => LogF8.Log("Sequence 完成"));
+    sequence.SetIgnoreTimeScale(true); // 设置是否忽略时间缩放
     
     // 设置循环次数，-1代表无限循环
     sequence.SetLoops(3);

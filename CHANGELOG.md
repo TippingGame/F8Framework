@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.8.166] - 2025-08-15
+1.新增Timer模块忽略TimeScale参数IgnoreTimeScale  
+2.新增Tween模块SetIgnoreTimeScale方法  
+
 ## [1.8.165] - 2025-08-11
 1.修复资产模块编辑器模式下，启动完整路径加载时不能搜索到新增资产名的问题  
 2.优化打包时的提示  

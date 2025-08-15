@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using UnityEngine;
 
 namespace F8Framework.Core
 {
@@ -21,8 +22,8 @@ namespace F8Framework.Core
 		private List<Command> commandQueue = new List<Command>();
 		private int loops = 0;
 		private bool ignoreCommands = false;
-
-		public Action OnComplete = null;
+		private bool ignoreTimeScale = false;
+		private Action OnComplete = null;
 		
 		public Action Recycle { get; set; }
 
@@ -31,9 +32,9 @@ namespace F8Framework.Core
 			OnComplete += CheckLoops;
 		}
 
-		public void Update(float deltaTime)
+		public void Update()
 		{
-			timer += deltaTime;
+			timer += ignoreTimeScale ? Time.unscaledDeltaTime : Time.deltaTime;
 
 			for (int n = 0; n < timeEvents.Count ; n++)
 			{
@@ -89,6 +90,11 @@ namespace F8Framework.Core
 
 		}
 
+		public void SetIgnoreTimeScale(bool value)
+		{
+			ignoreTimeScale = value;
+		}
+		
 		public void Append(BaseTween tween)
 		{
 			tween.CanRecycle = false;

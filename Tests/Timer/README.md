@@ -25,7 +25,7 @@ void Start()
     }, () =>
     {
         LogF8.Log("完成");
-    });
+    }, ignoreTimeScale: true);
     
     // FrameTimer,传入自身this，每1帧执行一次，延迟0帧后开始，循环执行(-1表示循环)
     timeid = FF8.Timer.AddTimerFrame(this, 1f, 0f, -1, () =>
@@ -34,7 +34,7 @@ void Start()
     }, () =>
     {
         LogF8.Log("完成");
-    });
+    }, ignoreTimeScale: true);
     
     FF8.Timer.RemoveTimer(timeid); // 停止名为timeid的Timer
     

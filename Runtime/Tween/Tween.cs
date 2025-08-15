@@ -18,7 +18,7 @@ namespace F8Framework.Core
         private Dictionary<GameObject, List<int>> tweenConnections = new Dictionary<GameObject, List<int>>();
         #endregion
 
-        public Action<float> OnUpdateAction;
+        public Action OnUpdateAction;
         
         #region UNITY_EVENTS
         
@@ -30,7 +30,7 @@ namespace F8Framework.Core
         public void OnUpdate()
         {
             if(OnUpdateAction != null)
-                OnUpdateAction.Invoke(Time.deltaTime);
+                OnUpdateAction.Invoke();
             
             for (int i = 0; i < tweens.Count; i++)
             {
@@ -43,7 +43,7 @@ namespace F8Framework.Core
                 }
                 
                 if (tweens[i].UpdateMode == UpdateMode.Update)
-                    tweens[i].Update(Time.deltaTime);
+                    tweens[i].Update(tweens[i].IgnoreTimeScale ? Time.unscaledDeltaTime : Time.deltaTime);
             }
         }
 
@@ -62,7 +62,7 @@ namespace F8Framework.Core
                     i--;
                     continue;
                 }
-                tweens[i].Update(Time.deltaTime);
+                tweens[i].Update(tweens[i].IgnoreTimeScale ? Time.unscaledDeltaTime : Time.deltaTime);
             }
         }
 
@@ -81,7 +81,7 @@ namespace F8Framework.Core
                     i--;
                     continue;
                 }
-                tweens[i].Update(Time.fixedDeltaTime);
+                tweens[i].Update(tweens[i].IgnoreTimeScale ? Time.fixedUnscaledDeltaTime : Time.fixedDeltaTime);
             }
         }
 
@@ -114,6 +114,18 @@ namespace F8Framework.Core
             else
             {
                 tweenConnections[tween.Owner] = new List<int>() { tween.ID };
+            }
+        }
+        
+        public void SetIgnoreTimeScale(int id, bool ignoreTimeScale)
+        {
+            for (int n = 0; n < tweens.Count; n++)
+            {
+                if (tweens[n].ID == id)
+                {
+                    tweens[n].SetIgnoreTimeScale(ignoreTimeScale);
+                    break;
+                }
             }
         }
         

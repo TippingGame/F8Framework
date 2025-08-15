@@ -59,6 +59,7 @@ void Start()
         .SetUpdateMode(UpdateMode.Update) // Set update mode (default is Update)
         .SetOwner(gameObject) // Set animation owner
         .SetIsPause(false); // Set pause state
+        .SetIgnoreTimeScale(true); // Set whether to ignore timeScale
     
     // Pause control
     FF8.Tween.SetIsPause(id, true);
@@ -105,6 +106,7 @@ void Start()
     sequence.Append(valueTween); // Runs after first animation completes
     sequence.Append(() => LogF8.Log("Complete!")); // Callback after sequence
     sequence.SetOnComplete(() => LogF8.Log("Sequence complete"));
+    sequence.SetIgnoreTimeScale(true); // Set whether to ignore timeScale
     
     // Set loop count (-1 for infinite)
     sequence.SetLoops(3);
