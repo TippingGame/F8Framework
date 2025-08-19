@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.8.167] - 2025-08-19
+1.新增组件绑定支持数组形式的名称  
+
 ## [1.8.166] - 2025-08-15
 1.新增Timer模块忽略TimeScale参数IgnoreTimeScale  
 2.新增Tween模块SetIgnoreTimeScale方法  

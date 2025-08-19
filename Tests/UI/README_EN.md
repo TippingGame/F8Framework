@@ -36,6 +36,9 @@ Method 2: Unity → Menu Bar → Window → Package Manager → "+" → Add Pack
 3. UI Component Indexing
     * (Optional) Open [DefaultCodeBindNameTypeConfig.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/ComponentBind/DefaultCodeBindNameTypeConfig.cs) Add your component naming conventions (e.g., "btn" for Button)  
     * May require double-clicking to refresh bindings  
+    * Support combination types, such as:`Button_Image`
+    * Supports arrays, for example:`Image[0]，Image[1]`
+    * C # variable names have strict restrictions, allowing only letters, numbers, underscores, and Chinese characters, with the first letter not being a number and the last being:`Simplified name + underline + component type`
    ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_20240205223438.png)
 ### Code Examples
 ```C#

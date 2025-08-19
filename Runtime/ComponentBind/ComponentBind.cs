@@ -71,6 +71,10 @@ namespace F8Framework.Core
             }
             
             System.Collections.Generic.Dictionary<string, int> tempDic = new System.Collections.Generic.Dictionary<string, int>();
+            // 用于存储数组组件的字典
+            System.Collections.Generic.Dictionary<string, System.Collections.Generic.List<(string path, string componentType)>> arrayComponents = 
+                new System.Collections.Generic.Dictionary<string, System.Collections.Generic.List<(string path, string componentType)>>();
+            
             // 遍历Prefab中的所有物体
             foreach (Transform child in childs)
             {
@@ -104,7 +108,7 @@ namespace F8Framework.Core
                         string normalizeName = RemoveSpecialCharacters(child.gameObject.name);
 
                         string normalizeKey = RemoveSpecialCharacters(key);
-
+                        
                         if (!tempDic.TryAdd($"{normalizeName}_{normalizeKey}", 1))
                         {
                             tempDic[$"{normalizeName}_{normalizeKey}"] += 1;
@@ -113,21 +117,77 @@ namespace F8Framework.Core
                         }
                         
                         // 生成自动获取组件的代码
-                        generatedCode.AppendLine($"    [SerializeField] private {componentType} {normalizeName}_{normalizeKey};");
+                        generatedCode.AppendLine($"\t[SerializeField] private {componentType} {normalizeName}_{normalizeKey};");
                         // 生成引用代码
                         string childPath = GetChildPath(child, prefab.transform);
                         if (componentType == typeof(UnityEngine.GameObject).ToString())
                         {
-                            referenceCode.AppendLine($"        {normalizeName}_{normalizeKey} = transform.Find(\"{SelectiveEscape(childPath)}\").gameObject;");
+                            referenceCode.AppendLine($"\t\t{normalizeName}_{normalizeKey} = transform.Find(\"{SelectiveEscape(childPath)}\").gameObject;");
                         }
                         else
                         {
-                            referenceCode.AppendLine($"        {normalizeName}_{normalizeKey} = transform.Find(\"{SelectiveEscape(childPath)}\").GetComponent<{componentType}>();");
+                            referenceCode.AppendLine($"\t\t{normalizeName}_{normalizeKey} = transform.Find(\"{SelectiveEscape(childPath)}\").GetComponent<{componentType}>();");
+                        }
+                        
+                        // 检查是否是数组元素（名字以[数字]结尾）
+                        System.Text.RegularExpressions.Match matchArray = System.Text.RegularExpressions.Regex.Match(child.gameObject.name, @"^(.*?)\[\d+\]$");
+                        if (matchArray.Success)
+                        {
+                            string baseName = matchArray.Groups[1].Value;
+                            // 添加到数组字典
+                            if (!arrayComponents.ContainsKey(baseName + "_" + normalizeKey))
+                            {
+                                arrayComponents[baseName + "_" + normalizeKey] = new System.Collections.Generic.List<(string path, string componentType)>();
+                            }
+                            arrayComponents[baseName + "_" + normalizeKey].Add((childPath, componentType));
                         }
                     }
                 }
             }
+            
+            // 处理数组组件
+            foreach (var arrayItem in arrayComponents)
+            {
+                string arrayName = RemoveSpecialCharacters(arrayItem.Key);
+                string componentType = arrayItem.Value[0].componentType;
 
+                // 提取所有索引并找到最大值
+                int maxIndex = 0;
+                var indexedItems = new System.Collections.Generic.List<(int index, string path)>();
+                foreach (var item in arrayItem.Value)
+                {
+                    var matchArray = System.Text.RegularExpressions.Regex.Match(item.path, @"\[(\d+)\]$");
+                    if (matchArray.Success)
+                    {
+                        int currentIndex = int.Parse(matchArray.Groups[1].Value);
+                        indexedItems.Add((currentIndex, item.path));
+                        if (currentIndex > maxIndex)
+                        {
+                            maxIndex = currentIndex;
+                        }
+                    }
+                }
+
+                // 数组大小 = 最大索引 + 1
+                int arraySize = maxIndex + 1;
+    
+                // 生成数组声明
+                generatedCode.AppendLine($"\t[SerializeField] private {componentType}[] {arrayName} = new {componentType}[{arraySize}];");
+    
+                // 生成数组元素赋值代码（使用元素自身的索引）
+                foreach (var item in indexedItems)
+                {
+                    if (componentType == typeof(UnityEngine.GameObject).ToString())
+                    {
+                        referenceCode.AppendLine($"\t\t{arrayName}[{item.index}] = transform.Find(\"{SelectiveEscape(item.path)}\").gameObject;");
+                    }
+                    else
+                    {
+                        referenceCode.AppendLine($"\t\t{arrayName}[{item.index}] = transform.Find(\"{SelectiveEscape(item.path)}\").GetComponent<{componentType}>();");
+                    }
+                }
+            }
+            
             // 将生成的代码插入到脚本中
             string scriptContent;
             using (System.IO.StreamReader reader = new System.IO.StreamReader(scriptPath))
@@ -148,12 +208,12 @@ namespace F8Framework.Core
                 scriptContent = scriptContent.Remove(match.Groups[0].Index, match.Groups[0].Length);
                 scriptContent = scriptContent.Insert(match.Groups[0].Index, $"// 自动获取组件（自动生成，不能删除）\n{generatedCode}" +
                                                                             $"\n#if UNITY_EDITOR" +
-                                                                            $"\n    protected override void SetComponents()" +
-                                                                            $"\n    {{" +
+                                                                            $"\n\tprotected override void SetComponents()" +
+                                                                            $"\n\t{{" +
                                                                             $"\n{referenceCode}" +
-                                                                            $"    }}" +
+                                                                            $"\t}}" +
                                                                             $"\n#endif" +
-                                                                            $"\n    // 自动获取组件（自动生成，不能删除）");
+                                                                            $"\n\t// 自动获取组件（自动生成，不能删除）");
                 
                 // 将所有换行符替换为 UNIX 风格的 "\n"
                 scriptContent = scriptContent.Replace("\r\n", "\n").Replace("\r", "\n");
@@ -203,7 +263,13 @@ namespace F8Framework.Core
         {
             // 定义正则表达式，只允许字母、数字、下划线和中文字符
             System.Text.RegularExpressions.Regex regex = new System.Text.RegularExpressions.Regex("[^a-zA-Z0-9_\\u4e00-\\u9fa5]");
-            return regex.Replace(input, "");
+            string cleaned = regex.Replace(input, "");
+            // 确保不以数字开头
+            if (cleaned.Length > 0 && char.IsDigit(cleaned[0]))
+            {
+                cleaned = "_" + cleaned; // 在数字前添加下划线
+            }
+            return cleaned;
         }
         
         // 获取子物体的路径

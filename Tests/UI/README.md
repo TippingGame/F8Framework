@@ -24,8 +24,12 @@ UI界面分为三大类：
 2. 右键资源文件夹，看到（F8UI界面管理功能），创建`BaseView`模板，挂载到UI根层级上  
 ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_20240302154254.png)
 --------------------------
-3. 生成UI组件的索引，可以在 [DefaultCodeBindNameTypeConfig.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/ComponentBind/DefaultCodeBindNameTypeConfig.cs) 中添加名称索引（可能需要点击两次）  
-![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_20240205223438.png)
+3. 生成UI组件的索引，可以在 [DefaultCodeBindNameTypeConfig.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/ComponentBind/DefaultCodeBindNameTypeConfig.cs) 中添加名称索引  
+   * 注意（可能需要点击两次）
+   * 支持组合类型，例如：`Button_Image`
+   * 支持数组，例如：`Image[0]，Image[1]`
+   * C#变量名限制严格，这里只允许字母、数字、下划线和中文字符，且首字母不能为数字，最后为：`简化的名称 + 下划线 + 组件类型`
+   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_20240205223438.png)
 ### 代码使用方法
 ```C#
 // UI的定义，枚举
