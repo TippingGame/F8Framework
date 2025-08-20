@@ -17,6 +17,17 @@ Note! Built into → F8Framework Core: https://github.com/TippingGame/F8Framewor
 Method 1: Download files directly and import to Unity  
 Method 2: Unity → Menu Bar → Window → Package Manager → "+" → Add Package from git URL → Enter: https://github.com/TippingGame/F8Framework.git
 
+### Instructions for use
+1. Using KeyCode defined by Unity
+    * For example: `FF8.Input.GetKeyDown(KeyCode.M)`
+2. Use custom virtual key strings
+    * Customized virtual buttons, such as: [InputDeviceBase.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/Input/Device/InputDeviceBase.cs) `InputButtonType` and `InputAxisType`
+    * Monitor virtual buttons, refer to: [MobileInputDevice](https://github.com/TippingGame/F8Framework/blob/main/Runtime/Input/Device/MobileInputDevice.cs)，
+      1. Inherit the `InputDeviceBase` class
+      2. Register virtual keys `RegisterVirtualButton`
+      3. Call according to requirements `SetButtonStart，SetButtonDown，SetButtonUp`
+      4. Cancel registration of virtual button `UnRegisterVirtualButton`
+
 ### Code Examples
 ```C#
 /*------------------------------Input Management Methods------------------------------*/
@@ -74,13 +85,19 @@ void Update()
         
     }
     
+    // Using KeyCode defined by Unity
+    if (FF8.Input.GetKeyDown(KeyCode.M))
+    {
+        
+    }
+
     // Key combination pressed
     if (FF8.Input.GetKeyDown(KeyCode.LeftControl, KeyCode.LeftAlt, KeyCode.M))
     {
         
     }
     
-    // Mouse right button held
+    // Mouse right button held, using custom virtual key strings
     if (FF8.Input.GetButton(InputButtonType.MouseRight))
     {
         

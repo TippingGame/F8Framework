@@ -18,6 +18,17 @@
 
 ### 视频教程：[【Unity框架】（15）输入系统管理](https://www.bilibili.com/video/BV1kVXDYDEXj)
 
+### 使用方法
+1. 使用Unity定义的KeyCode
+   * 例如：`FF8.Input.GetKeyDown(KeyCode.M)`
+2. 使用自定义的虚拟按键字符串
+   * 自定义的虚拟按键，例如：[InputDeviceBase.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/Input/Device/InputDeviceBase.cs) 中的 `InputButtonType` 和 `InputAxisType`
+   * 监听虚拟按键，参考 [MobileInputDevice](https://github.com/TippingGame/F8Framework/blob/main/Runtime/Input/Device/MobileInputDevice.cs)，
+     1. 继承 `InputDeviceBase` 类
+     2. 注册虚拟按键 `RegisterVirtualButton`
+     3. 按照需求调用 `SetButtonStart，SetButtonDown，SetButtonUp`
+     4. 取消注册虚拟按键 `UnRegisterVirtualButton`
+
 ### 代码使用方法
 ```C#
 /*------------------------------输入管理方法------------------------------*/
@@ -72,13 +83,19 @@ void Update()
         
     }
     
+    // 使用Unity定义的KeyCode
+    if (FF8.Input.GetKeyDown(KeyCode.M))
+    {
+        
+    }
+
     // 按下组合键
     if (FF8.Input.GetKeyDown(KeyCode.LeftControl, KeyCode.LeftAlt, KeyCode.M))
     {
         
     }
     
-    // 鼠标右键按住
+    // 鼠标右键按住，使用自定义的虚拟按键字符串
     if (FF8.Input.GetButton(InputButtonType.MouseRight))
     {
         

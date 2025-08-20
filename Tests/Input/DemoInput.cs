@@ -55,11 +55,18 @@ namespace F8Framework.Tests
                 LogF8.Log("任意键按下");
             }
 
+            // 使用Unity定义的KeyCode
+            if (FF8.Input.GetKeyDown(KeyCode.M))
+            {
+                LogF8.Log("按下组合键Control+Alt+M");
+            }
+            
             if (FF8.Input.GetKeyDown(KeyCode.LeftControl, KeyCode.LeftAlt, KeyCode.M))
             {
                 LogF8.Log("按下组合键Control+Alt+M");
             }
 
+            // 使用自定义的虚拟按键字符串
             if (FF8.Input.GetButtonDown(InputButtonType.MouseLeft))
             {
                 LogF8.Log("鼠标左键按下");
