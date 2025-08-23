@@ -317,7 +317,12 @@ namespace F8Framework.Core.Editor
                         List<string> assetPathsForAbName = new List<string>();
                         assetPathsForAbName.Add(assetPath.ToLower());
                         
-                        string hash = appendHashToAssetBundleName ? ParseManifestFile(URLSetting.GetAssetBundlesOutPath() + "/" + abName) : null;
+                        string hash =  null;
+                        if (appendHashToAssetBundleName)
+                        {
+                            BuildPipeline.GetHashForAssetBundle(abName, out Hash128 hash128);
+                            hash = hash128.ToString();
+                        }
                         
                         string realAbName = InsertBeforeLastDot(abName, hash);
                         string[] assetPathsArray = assetPathsForAbName.ToArray();
@@ -615,29 +620,6 @@ namespace F8Framework.Core.Editor
             string scriptPath = Path.GetFullPath(Path.Combine(Application.dataPath, "..", scriptRelativePath));
 
             return scriptPath;
-        }
-        
-        private static string ParseManifestFile(string manifestPath)
-        {
-            manifestPath += ".manifest";
-            if (!File.Exists(manifestPath))
-            {
-                LogF8.LogError($"Manifest 文件不存在: {manifestPath}");
-                return null;
-            }
-
-            string[] lines = File.ReadAllLines(manifestPath);
-
-            foreach (string line in lines)
-            {
-                if (line.Trim().StartsWith("Hash:"))
-                {
-                    // 找到 "Hash:" 行，提取哈希值
-                    return line.Trim().Substring(5).Trim();
-                }
-            }
-            LogF8.LogError("Manifest 文件内不存在 Hash:");
-            return null;
         }
         
         private static string InsertBeforeLastDot(string original, string insertStr = null)

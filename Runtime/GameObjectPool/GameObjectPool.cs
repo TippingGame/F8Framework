@@ -324,7 +324,8 @@ namespace F8Framework.Core
             if (action == null)
                 throw new ArgumentNullException(nameof(action));
 #endif
-            foreach (F8GameObjectPool pool in AllPoolsMap.Values)
+            var pools = new List<F8GameObjectPool>(AllPoolsMap.Values);
+            foreach (F8GameObjectPool pool in pools)
             {
                 action.Invoke(pool);
             }
@@ -341,7 +342,8 @@ namespace F8Framework.Core
             if (action == null)
                 throw new ArgumentNullException(nameof(action));
 #endif
-            foreach (Poolable poolable in ClonesMap.Values)
+            var clones = new List<Poolable>(ClonesMap.Values);
+            foreach (Poolable poolable in clones)
             {
                 action.Invoke(poolable._gameObject);
             }
@@ -1152,7 +1154,8 @@ namespace F8Framework.Core
             if (PersistentPoolsMap.Count == 0)
                 return;
 
-            foreach (F8GameObjectPool persistentPool in PersistentPoolsMap.Values)
+            var pools = new List<F8GameObjectPool>(PersistentPoolsMap.Values);
+            foreach (F8GameObjectPool persistentPool in pools)
             {
                 persistentPool.DespawnAllClones();
             }

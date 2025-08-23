@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.8.169] - 2025-08-23
+1.修复游戏对象池模块DestroyAllPools报错的问题  
+2.优化打包AB时使用GetHashForAssetBundle获取Hash  
+
 ## [1.8.168] - 2025-08-20
 1.完善文档  
 
