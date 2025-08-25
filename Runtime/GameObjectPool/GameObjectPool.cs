@@ -1072,6 +1072,10 @@ namespace F8Framework.Core
         private void InvokeCallbacks<T>(GameObject gameObject, CallbacksType callbacksType,
             Action<T> poolableCallback, List<T> listForComponentsCaching, string messageKey)
         {
+            if (gameObject == null)
+            {
+                return;
+            }
             switch (callbacksType)
             {
                 case CallbacksType.Interfaces:
@@ -1098,6 +1102,10 @@ namespace F8Framework.Core
         private void InvokeGameObjectPoolEvents<T>(GameObject gameObject, List<T> listForComponentCaching,
             Action<T> callback, bool inChildren)
         {
+            if (gameObject == null)
+            {
+                return;
+            }
             if (inChildren)
                 gameObject.GetComponentsInChildren(listForComponentCaching);
             else

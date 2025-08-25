@@ -161,6 +161,7 @@ namespace F8Framework.Core
                 if (request.Poolable._status == PoolableStatus.Despawned)
                 {
                     GameObjectPool.Instance.DespawnRequests.RemoveUnorderedAt(i);
+                    i--;
                     continue;
                 }
                 
@@ -170,6 +171,7 @@ namespace F8Framework.Core
                 {
                     GameObjectPool.Instance.DespawnImmediate(request.Poolable);
                     GameObjectPool.Instance.DespawnRequests.RemoveUnorderedAt(i);
+                    i--;
                 }
             }
         }

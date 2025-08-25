@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.8.170] - 2025-08-25
+1.修复游戏对象池模块延时销毁时报错的问题  
+
 ## [1.8.169] - 2025-08-23
 1.修复游戏对象池模块DestroyAllPools报错的问题  
 2.优化打包AB时使用GetHashForAssetBundle获取Hash  

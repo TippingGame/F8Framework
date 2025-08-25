@@ -628,15 +628,18 @@ namespace F8Framework.Core
 #endif
                 return;
             }
-            
-            poolable._gameObject.SetActive(false);
 
-            switch (_despawnType)
+            if (poolable._gameObject != null)
             {
-                case DespawnType.DeactivateAndHide: HidePoolable(poolable); break;
-                case DespawnType.DeactivateAndSetNullParent: SetPoolableParentAsNull(poolable); break;
-                case DespawnType.OnlyDeactivate: break;
-                default: throw new ArgumentOutOfRangeException(nameof(_despawnType));
+                poolable._gameObject.SetActive(false);
+                
+                switch (_despawnType)
+                {
+                    case DespawnType.DeactivateAndHide: HidePoolable(poolable); break;
+                    case DespawnType.DeactivateAndSetNullParent: SetPoolableParentAsNull(poolable); break;
+                    case DespawnType.OnlyDeactivate: break;
+                    default: throw new ArgumentOutOfRangeException(nameof(_despawnType));
+                }
             }
 
             AddPoolableToList(_despawnedPoolables, poolable, ref _despawnedClonesCount);
