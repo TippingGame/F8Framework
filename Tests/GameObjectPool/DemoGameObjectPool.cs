@@ -24,8 +24,7 @@ namespace F8Framework.Tests
             // 使用名称或GameObject或者Component创建对象
             GameObject spawnedClone = FF8.GameObjectPool.Spawn("name");
             spawnedClone = FF8.GameObjectPool.Spawn(_gameObjectPrefab);
-            DemoGameObjectPool component =
-                FF8.GameObjectPool.Spawn(_componentPrefab, Vector3.zero, Quaternion.identity, this.transform);
+            DemoGameObjectPool component = FF8.GameObjectPool.Spawn(_componentPrefab, Vector3.zero, Quaternion.identity, this.transform);
 
             // 销毁
             FF8.GameObjectPool.Despawn(gameObject, delay: 0.5f);
@@ -35,6 +34,9 @@ namespace F8Framework.Tests
                 .Spawn(_particleSystemPrefab)
                 .DespawnOnComplete();
 
+            // 生成预设对象池（_poolsPreset可使用资源模块加载）
+            FF8.GameObjectPool.InstallPools(_poolsPreset);
+            
             // 如何获取对象池
             F8GameObjectPool _pool = FF8.GameObjectPool.GetPoolByPrefab(_gameObjectPrefab);
             _pool = FF8.GameObjectPool.GetPoolByPrefabName(_gameObjectPrefab.name);

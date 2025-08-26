@@ -45,6 +45,9 @@ void Start()
         .Spawn(_particleSystemPrefab)
         .DespawnOnComplete();
     
+    // Generate preset GameObjectPools (_poolsPreset can be loaded using the resource module)
+    FF8.GameObjectPool.InstallPools(_poolsPreset);
+    
     // Get pool reference
     F8GameObjectPool _pool = FF8.GameObjectPool.GetPoolByPrefab(_gameObjectPrefab);
     F8GameObjectPool _pool = FF8.GameObjectPool.GetPoolByPrefabName(_gameObjectPrefab.name);
