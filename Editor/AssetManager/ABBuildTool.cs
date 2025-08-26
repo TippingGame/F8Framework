@@ -107,19 +107,25 @@ namespace F8Framework.Core.Editor
                     string abpath = URLSetting.GetAssetBundlesOutPath() + ab;
                     if (File.Exists(abpath))
                     {
-                        // It's a file, delete the file
                         if (FileTools.SafeDeleteFile(abpath))
                         {
                             FileTools.SafeDeleteFile(abpath + ".meta");
                         }
+                        LogF8.LogAsset("删除多余AB文件：" + abpath);
+                    }
+                    else if (File.Exists(abpath + ".manifest"))
+                    {
+                        if (FileTools.SafeDeleteFile(abpath + ".manifest"))
+                        {
+                            FileTools.SafeDeleteFile(abpath+ ".manifest" + ".meta");
+                        }
+                        LogF8.LogAsset("删除多余AB.manifest文件：" + abpath);
                     }
                     else if (Directory.Exists(abpath))
                     {
-                        // It's a folder, delete the folder
                         if (FileTools.SafeDeleteDir(abpath))
                         {
                             LogF8.LogAsset("删除多余AB文件夹：" + abpath);
-                            // If the folder is deleted successfully, handle .meta file
                             string metaFilePath = abpath + ".meta";
                             if (File.Exists(metaFilePath))
                             {
@@ -164,10 +170,10 @@ namespace F8Framework.Core.Editor
                 foreach (string file in files)
                 {
                     string extension = Path.GetExtension(file).ToLower();
-                    if (extension != ".meta" && extension != ".manifest" && extension != ".ds_store")
+                    if (extension != ".meta" && extension != ".ds_store")
                     {
                         // It's a file under AssetBundles, record as "Audio/click11"
-                        if (removeExtension)
+                        if (removeExtension || extension == ".manifest")
                         {
                             assetPaths.Add(FileTools.FormatToUnityPath(Path.ChangeExtension(relativePath + "/" + Path.GetFileName(file), null)));
                         }
