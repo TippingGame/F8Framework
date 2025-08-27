@@ -19,7 +19,7 @@ F8 Framework是一个**优雅，轻量，符合直觉的**基于Unity引擎的�
 
 ## 支持版本
 Unity 2021、2022、2023、6000  
-构建可支持：Win / Android / iOS / Mac / Linux / WebGL / 微信小游戏（[构建文档，Jenkins集成](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/README.md)）
+构建可支持：Win / Android / iOS / Mac / Linux / WebGL / 微信小游戏 / 抖音小游戏（[构建文档，Jenkins集成](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/README.md)）
 
 ## 文档快速预览 - 1分钟
 ### ----------可选功能----------

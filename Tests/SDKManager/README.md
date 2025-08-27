@@ -105,7 +105,7 @@ Unity F8 SDKManager组件，与原生平台交互，接入多个平台或者渠�
 ---
 ## 微信小游戏接入方法
 #### 视频教程：[【Unity框架】（23）打包微信小游戏](https://www.bilibili.com/video/BV1NugPzFESf)
-* 浏览[WebGL转微信小游戏](https://github.com/wechat-miniprogram/minigame-unity-webgl-transform)插件的使用方法，下载[ unitypackage ](https://game.weixin.qq.com/cgi-bin/gamewxagwasmsplitwap/getunityplugininfo?download=1)并导入至游戏项目中
+* 浏览[ WebGL转微信小游戏 ](https://github.com/wechat-miniprogram/minigame-unity-webgl-transform)插件的使用方法，下载[ unitypackage ](https://game.weixin.qq.com/cgi-bin/gamewxagwasmsplitwap/getunityplugininfo?download=1)并导入至游戏项目中
 ---
 * 删除WX-WASM-SDK-V2插件里的`LitJson.dll`（注意：团结引擎也有，建议保留F8Framework里的）  
   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20240524000853.png)
@@ -130,6 +130,10 @@ private static bool appendHashToAssetBundleName = false;
 // 禁用Unity缓存系统在WebGL平台（微信小游戏使用）
 public static bool DisableUnityCacheOnWebGL = false;
 ```
+---
+## 抖音小游戏接入方法
+* 除了不用移除LitJson.dll，其余和微信小游戏一致
+* 浏览[ WebGL方案接入流程 ](https://developer.open-douyin.com/docs/resource/zh-CN/mini-game/develop/guide/game-engine/rd-to-SCgame/open-capacity/overview-and-compatibility/sc_webgl_access_flow)插件的使用方法
 ---
 
 * （注意）由于微信小游戏只能使用远程AB加载，请点击F5，配置好资产远程地址后构建一次游戏。  

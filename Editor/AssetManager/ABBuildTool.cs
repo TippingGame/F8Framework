@@ -119,7 +119,10 @@ namespace F8Framework.Core.Editor
                         {
                             FileTools.SafeDeleteFile(abpath+ ".manifest" + ".meta");
                         }
-                        LogF8.LogAsset("删除多余AB.manifest文件：" + abpath);
+                        if (!appendHashToAssetBundleName)
+                        {
+                            LogF8.LogAsset("删除多余AB.manifest文件：" + abpath);
+                        }
                     }
                     else if (Directory.Exists(abpath))
                     {
@@ -326,7 +329,7 @@ namespace F8Framework.Core.Editor
                         string hash =  null;
                         if (appendHashToAssetBundleName)
                         {
-                            BuildPipeline.GetHashForAssetBundle(abName, out Hash128 hash128);
+                            BuildPipeline.GetHashForAssetBundle(URLSetting.GetAssetBundlesOutPath() + "/" + abName, out Hash128 hash128);
                             hash = hash128.ToString();
                         }
                         
@@ -409,7 +412,7 @@ namespace F8Framework.Core.Editor
                     }
                     else
                     {
-                        if (File.Exists(URLSetting.GetAssetBundlesOutPath() + "/" + URLSetting.GetPlatformName()))
+                        if (File.Exists(URLSetting.GetAssetBundlesOutPath() + "/" + URLSetting.GetPlatformName()) && assetMapping.Count > 0)
                         {
                             assetMapping.Add(URLSetting.GetPlatformName(), new AssetBundleMap.AssetMapping(URLSetting.GetPlatformName(), new string[]{},
                                 BuildPkgTool.ToVersion, FileTools.GetFileSize(URLSetting.GetAssetBundlesOutPath() + "/" + URLSetting.GetPlatformName()).ToString(),
