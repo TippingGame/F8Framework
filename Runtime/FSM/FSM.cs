@@ -9,6 +9,8 @@ namespace F8Framework.Core
     {
         // FSM 的状态基类的类型
         Type stateBaseType = typeof(FSMState<T>);
+        // 黑板数据
+        Blackboard blackboard;
         // FSM 的所有者
         T owner;
         // 当前状态
@@ -19,6 +21,13 @@ namespace F8Framework.Core
         FSMState<T> defaultState;
         // 状态改变事件委托
         Action<FSMState<T>, FSMState<T>> onStateChange;
+        
+        // 黑板数据
+        public Blackboard Blackboard
+        {
+            get { return blackboard; }
+            private set { blackboard = value; }
+        }
         
         // 获取所有者
         public T Owner
@@ -240,13 +249,14 @@ namespace F8Framework.Core
         }
 
         // 创建 FSM 实例
-        internal static FSM<T> Create(string name, T owner, params FSMState<T>[] states)
+        internal static FSM<T> Create(string name, T owner, Blackboard blackboard, params FSMState<T>[] states)
         {
             if (states == null || states.Length < 1)
                 throw new ArgumentNullException("FSM owner 是无效的！");
             // 从引用池获得同类
             FSM<T> fsm = ReferencePool.Acquire<FSM<T>>();
             fsm.Name = name;
+            fsm.Blackboard = blackboard;
             fsm.Owner = owner;
             fsm.IsDestoryed = false;
             for (int i = 0; i < states.Length; i++)
@@ -266,13 +276,14 @@ namespace F8Framework.Core
         }
         
         // 创建 FSM 实例
-        internal static FSM<T> Create(string name, T owner, IList<FSMState<T>> states)
+        internal static FSM<T> Create(string name, T owner, Blackboard blackboard, IList<FSMState<T>> states)
         {
             if (states == null || states.Count < 1)
                 throw new ArgumentNullException("FSM owner 是无效的！");
             // 从引用池获得同类
             FSM<T> fsm = ReferencePool.Acquire<FSM<T>>();
             fsm.Name = name;
+            fsm.Blackboard = blackboard;
             fsm.Owner = owner;
             fsm.IsDestoryed = false;
             for (int i = 0; i < states.Count; i++)

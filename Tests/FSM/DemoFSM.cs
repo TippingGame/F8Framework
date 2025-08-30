@@ -24,13 +24,42 @@ namespace F8Framework.Tests
             enterState.AddSwitch(enterSwitch, typeof(ExitRangeState));
 
             // 创建有限状态机
-            IFSM<Transform> fsmA = FF8.FSM.CreateFSM<Transform>("FSMTesterA", objectA, "FSMGroupName", exitState, enterState);
+            // name：有限状态机名称
+            // owner：有限状态机拥有者
+            // fsmGroupName：有限状态机所属群组
+            // blackboard：有限状态机的黑板
+            // params states：有限状态机的状态
+            IFSM<Transform> fsmA = FF8.FSM.CreateFSM<Transform>("FSMTesterA", objectA, "FSMGroupName", new Blackboard(), exitState, enterState);
             fsmA.DefaultState = exitState;
             fsmA.ChangeToDefaultState();
 
             // 切换状态
             fsmA.ChangeState<ExitRangeState>();
 
+            // 黑板，设置数据
+            fsmA.Blackboard.SetValue<float>("health", 100f);
+            fsmA.Blackboard.SetValue<Vector2>("position", new Vector2(10, 5));
+            // 黑板，获取、删除数据
+            fsmA.Blackboard.GetValue<float>("health");
+            fsmA.Blackboard.HasValue("health");
+            fsmA.Blackboard.RemoveValue("health");
+            fsmA.Blackboard.Clear();
+            
+            // 黑板订阅事件
+            fsmA.Blackboard.RegisterValueChanged<Vector2>(OnValueChanged);
+            fsmA.Blackboard.RegisterValueRemoved(OnValueRemoved);
+            
+            // 黑板取消订阅事件
+            fsmA.Blackboard.UnregisterValueChanged<Vector2>(OnValueChanged);
+            fsmA.Blackboard.UnregisterValueRemoved(OnValueRemoved);
+            
+            void OnValueChanged(string key, Vector2 value)
+            {
+            }
+    
+            void OnValueRemoved(string key)
+            {
+            }
             
             /*-------------------------------------其他功能-------------------------------------*/
             // 获取 FSM

@@ -94,7 +94,19 @@ namespace F8Framework.Core
         }
         
         // 创建 FSM
+        public IFSM<T> CreateFSM<T>(string name, T owner, Blackboard blackboard, IList<FSMState<T>> states) where T : class
+        {
+            return CreateFSM<T>(name, owner, string.Empty, blackboard, states);
+        }
+        
+        // 创建 FSM
         public IFSM<T> CreateFSM<T>(string name, T owner, string fsmGroupName, IList<FSMState<T>> states) where T : class
+        {
+            return CreateFSM(name, owner, fsmGroupName, null, states);
+        }
+        
+        // 创建 FSM
+        public IFSM<T> CreateFSM<T>(string name, T owner, string fsmGroupName, Blackboard blackboard, IList<FSMState<T>> states) where T : class
         {
             Type type = typeof(T);
             FSM<T> fsm = default;
@@ -103,12 +115,12 @@ namespace F8Framework.Core
             {
                 if (fsmDict.ContainsKey(fsmKey))
                     throw new ArgumentException($"FSMManager : FSM {type} 已存在");
-                fsm = FSM<T>.Create(name, owner, states);
+                fsm = FSM<T>.Create(name, owner, blackboard, states);
                 fsmDict.Add(fsmKey, fsm);
             }
             else
             {
-                fsm = FSM<T>.Create(name, owner, states);
+                fsm = FSM<T>.Create(name, owner, blackboard, states);
                 fsm.GroupName = fsmGroupName;
                 if (HasFSMGroup(fsmGroupName))
                 {
@@ -131,6 +143,12 @@ namespace F8Framework.Core
         // 创建 FSM
         public IFSM<T> CreateFSM<T>(string name, T owner, string fsmGroupName, params FSMState<T>[] states) where T : class
         {
+            return CreateFSM(name, owner, fsmGroupName, null, states);
+        }
+        
+        // 创建 FSM
+        public IFSM<T> CreateFSM<T>(string name, T owner, string fsmGroupName, Blackboard blackboard, params FSMState<T>[] states) where T : class
+        {
             Type type = typeof(T);
             FSM<T> fsm = default;
             var fsmKey = new TypeStringPair(type, name);
@@ -138,12 +156,12 @@ namespace F8Framework.Core
             {
                 if (fsmDict.ContainsKey(fsmKey))
                     throw new ArgumentException($"FSMManager : FSM {type} 已存在");
-                fsm = FSM<T>.Create(name, owner, states);
+                fsm = FSM<T>.Create(name, owner, blackboard, states);
                 fsmDict.Add(fsmKey, fsm);
             }
             else
             {
-                fsm = FSM<T>.Create(name, owner, states);
+                fsm = FSM<T>.Create(name, owner, blackboard, states);
                 fsm.GroupName = fsmGroupName;
                 if (HasFSMGroup(fsmGroupName))
                 {

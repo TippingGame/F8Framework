@@ -10,6 +10,11 @@ namespace F8Framework.Core
         where T : class
     {
         /// <summary>
+        /// 黑板数据
+        /// </summary>
+        Blackboard Blackboard { get; }
+        
+        /// <summary>
         /// 状态机持有者
         /// </summary>
         T Owner { get; }

@@ -32,13 +32,42 @@ private void Start()
     enterState.AddSwitch(enterSwitch, typeof(ExitRangeState));
 
     // Create finite state machine
-    IFSM<Transform> fsmA = FF8.FSM.CreateFSM<Transform>("FSMTesterA", objectA, "FSMGroupName", exitState, enterState);
+    // name: Name of Finite State Machine
+    // owner: Finite state machine owner
+    // fsmGroupName: Group to which the finite state machine belongs
+    // blackboard: Blackboard of Finite State Machine
+    // params states: The state of a finite state machine
+    IFSM<Transform> fsmA = FF8.FSM.CreateFSM<Transform>("FSMTesterA", objectA, "FSMGroupName", new Blackboard(), exitState, enterState);
     fsmA.DefaultState = exitState;
     fsmA.ChangeToDefaultState();
 
     // Switch state
     fsmA.ChangeState<ExitRangeState>();
 
+    // Blackboard, set data
+    fsmA.Blackboard.SetValue<float>("health", 100f);
+    fsmA.Blackboard.SetValue<Vector2>("position", new Vector2(10, 5));
+    // Blackboard, get and remove data
+    fsmA.Blackboard.GetValue<float>("health");
+    fsmA.Blackboard.HasValue("health");
+    fsmA.Blackboard.RemoveValue("health");
+    fsmA.Blackboard.Clear();
+    
+    // Blackboard subscription event
+    fsmA.Blackboard.RegisterValueChanged<Vector2>(OnValueChanged);
+    fsmA.Blackboard.RegisterValueRemoved(OnValueRemoved);
+    
+    // Blackboard unsubscribe event
+    fsmA.Blackboard.UnregisterValueChanged<Vector2>(OnValueChanged);
+    fsmA.Blackboard.UnregisterValueRemoved(OnValueRemoved);
+    
+    void OnValueChanged(string key, Vector2 value)
+    {
+    }
+    
+    void OnValueRemoved(string key)
+    {
+    }
     
     /*-------------------------------------Additional Functions-------------------------------------*/
     // Get FSM
