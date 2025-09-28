@@ -7,13 +7,13 @@ namespace F8Framework.Core
     public class MessageManager : ModuleSingletonMono<MessageManager>, IMessageManager, IModule
     {
         // 存储事件ID与事件处理器列表的字典
-        private Dictionary<int, List<IEventDataBase>> events = new Dictionary<int, List<IEventDataBase>>();
+        internal Dictionary<int, List<IEventDataBase>> events = new Dictionary<int, List<IEventDataBase>>();
         // 存储待删除的事件处理器列表
         private List<IEventDataBase> delects = new List<IEventDataBase>();
         // 用于检测死循环调用的调用栈
-        private HashSet<IEventDataBase> callStack = new HashSet<IEventDataBase>();
+        internal HashSet<IEventDataBase> callStack = new HashSet<IEventDataBase>();
         // 存储待触发的事件处理器列表
-        private Dictionary<int, Queue<IEventDataBase>> dispatchInvokes = new Dictionary<int, Queue<IEventDataBase>>();
+        internal Dictionary<int, Queue<IEventDataBase>> dispatchInvokes = new Dictionary<int, Queue<IEventDataBase>>();
 
         // 输出消息死循环的函数
         private void MessageLoop(string debugInfo)
@@ -96,7 +96,7 @@ namespace F8Framework.Core
             {
                 if (events[eventId].Contains(eventData))
                 {
-                    LogF8.LogEvent("不能允许存在重复的事件处理函数。");
+                    LogF8.LogEvent("【{0}】不能允许存在重复的事件处理函数。", eventId);
                     return;
                 }
             }
@@ -123,7 +123,7 @@ namespace F8Framework.Core
             {
                 if (events[eventId].Contains(eventData))
                 {
-                    LogF8.LogEvent("不能允许存在重复的事件处理函数。");
+                    LogF8.LogEvent("【{0}】不能允许存在重复的事件处理函数。", eventId);
                     return;
                 }
             }

@@ -15,8 +15,8 @@ namespace F8Framework.Core.Editor
         private string searchFilter = "";
         private Dictionary<string, AssetBundleLoader> assetBundleLoaders;
         private HashSet<string> expandedItems = new HashSet<string>();
-        private double lastUpdateTime;
-        [SerializeField] private double updateInterval = 0.5;
+        private float lastUpdateTime;
+        [SerializeField] private float updateInterval = 0.5f;
         
         private enum TabType
         {
@@ -52,7 +52,7 @@ namespace F8Framework.Core.Editor
         {
             // 注册更新回调
             EditorApplication.update += UpdateWindow;
-            lastUpdateTime = EditorApplication.timeSinceStartup;
+            lastUpdateTime = Time.realtimeSinceStartup;
         }
 
         void OnDisable()
@@ -60,15 +60,15 @@ namespace F8Framework.Core.Editor
             // 取消注册更新回调
             EditorApplication.update -= UpdateWindow;
             // 保存设置
-            F8EditorPrefs.SetFloat("AssetBundleInspector_UpdateInterval", (float)updateInterval);
+            F8EditorPrefs.SetFloat("AssetBundleInspector_UpdateInterval", updateInterval);
         }
 
         void UpdateWindow()
         {
             // 控制刷新频率
-            if (EditorApplication.timeSinceStartup - lastUpdateTime > updateInterval)
+            if (Time.realtimeSinceStartup - lastUpdateTime > updateInterval)
             {
-                lastUpdateTime = EditorApplication.timeSinceStartup;
+                lastUpdateTime = Time.realtimeSinceStartup;
                 Repaint();
             }
         }
@@ -132,8 +132,8 @@ namespace F8Framework.Core.Editor
 
                 // 添加刷新间隔设置
                 EditorGUIUtility.labelWidth = 80;
-                updateInterval = EditorGUILayout.DoubleField("刷新间隔(秒)", updateInterval, GUILayout.Width(150));
-                updateInterval = Mathf.Clamp((float)updateInterval, 0.1f, 5f); // 限制在0.1-5秒之间
+                updateInterval = EditorGUILayout.FloatField("刷新间隔(秒)", updateInterval, GUILayout.Width(150));
+                updateInterval = Mathf.Clamp(updateInterval, 0.1f, 5f); // 限制在0.1-5秒之间
                 EditorGUIUtility.labelWidth = 0; // 重置为默认值
 
                 if (GUILayout.Button("刷新", EditorStyles.toolbarButton))

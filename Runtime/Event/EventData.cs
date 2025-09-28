@@ -44,7 +44,7 @@ namespace F8Framework.Core
         
         public string LogDebugInfo()
         {
-            return "【" + Event + "】【" + Listener.Method.Name + "】";
+            return "【" + Event + "】【" + Listener.Target + "】【" + Listener.Method.Name + "】";
         }
         
         public override bool Equals(object obj)
@@ -100,7 +100,7 @@ namespace F8Framework.Core
         
         public string LogDebugInfo()
         {
-            return "【" + Event + "】【" + Listener.Method.Name + "】";
+            return "【" + Event + "】【" + Listener.Target + "】【" + Listener.Method.Name + "】";
         }
         
         public override bool Equals(object obj)
