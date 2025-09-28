@@ -71,4 +71,8 @@ RemoveEventListener(MessageEvent.ApplicationFocus, OnPlayerSpawned);
 ```
 
 ## EventDispatcher Usage Guide[（Refer to BaseView.cs）](https://github.com/TippingGame/F8Framework/blob/main/Runtime/UI/Base/BaseView.cs)
-For Demo: Simply drag and attach DemoEventDispatcher.cs to a GameObject  
+For Demo: Simply drag and attach [(DemoEventDispatcher.cs)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Event/DemoEventDispatcher.cs) to a GameObject  
+
+### Editor extension function
+#### Event System Monitor
+![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/Event/ui_1759047457821.png)

@@ -72,5 +72,9 @@ DispatchEvent(MessageEvent.ApplicationFocus);
 RemoveEventListener(MessageEvent.ApplicationFocus, OnPlayerSpawned);
 ```
 
-## EventDispatcher使用方法[（参考BaseView.cs）](https://github.com/TippingGame/F8Framework/blob/main/Runtime/UI/Base/BaseView.cs)
-Demo直接拖拽DemoEventDispatcher.cs，挂载到GameObject  
+### EventDispatcher使用方法[（参考BaseView.cs）](https://github.com/TippingGame/F8Framework/blob/main/Runtime/UI/Base/BaseView.cs)
+Demo直接拖拽[（DemoEventDispatcher.cs）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Event/DemoEventDispatcher.cs)，挂载到GameObject  
+
+### 编辑器拓展功能
+#### 事件系统监视器
+![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/Event/ui_1759047457821.png)
