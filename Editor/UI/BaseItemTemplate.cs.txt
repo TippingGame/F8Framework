@@ -51,7 +51,8 @@ public class #SCRIPTNAME# : BaseItem
     // OnDisable
     private void OnDisable()
     {
-        #NOTRIM#
+        // 在合适的时候清除事件
+        base.ClearEventDispatcher();
     }
     
     // 自动获取组件（自动生成，不能删除）

@@ -19,6 +19,14 @@ namespace F8Framework.Core
             }
         }
         
+        public void ClearEventDispatcher()
+        {
+            if (_eventDispatcher != null) {
+                _eventDispatcher.Clear();
+                _eventDispatcher = null;
+            }
+        }
+        
         private void Awake()
         {
             OnAwake();
