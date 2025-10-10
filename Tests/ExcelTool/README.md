@@ -32,7 +32,7 @@ Unity 读取 Excel 的工具
 1. 在 `Assets` 下，创建 `StreamingAssets/config` 目录，按照下面 "Excel 示例" 创建你的 Excel[（Excel例子）](https://github.com/TippingGame/F8Framework/blob/main/Runtime/ExcelTool/StreamingAssets_config/DemoWorkSheet.xlsx)（首次F8后自动创建Excel）
 
 
-2. 点击菜单的**开发工具**项 -> **导入配置表**\_F8（快捷键），在 `Assets/AssetBundles/Config/BinConfigData` 下生成 **bytes** 文件（WebGL下生成 **Json** 文件）  
+2. 点击菜单的**开发工具**项 -> **导入配置表**\_F8（快捷键），在 `Assets/AssetBundles/Config/BinConfigData` 下生成 **json** 文件（也可选择 **binary** 文件）  
 
 
 3. **注意**：如果你不想生成在`AssetBundles`目录下，在代码 [ExcelDataTool.cs](https://github.com/TippingGame/F8Framework/blob/main/Editor/ExcelTool/ExcelDataTool.cs) 中修改 "BinDataFolder" 的值

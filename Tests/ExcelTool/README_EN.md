@@ -23,7 +23,7 @@ Method 2: Unity → Menu Bar → Window → Package Manager → "+" → Add Pack
 
 1. Under `Assets`, create the `StreamingAssets/config` directory. Follow the Excel Example below to create your Excel file [(Excel Example)](https://github.com/TippingGame/F8Framework/blob/main/Runtime/ExcelTool/StreamingAssets_config/DemoWorkSheet.xlsx) (Excel will be auto-generated after the first F8 execution).
 
-2. Click the **Development Tools** menu → **Import Config Tables**_F8 (shortcut). This generates **.bytes** files under `Assets/AssetBundles/Config/BinConfigData` (or **.json** files for WebGL).
+2. Click the **Development Tools** menu → **Import Config Tables**_F8 (shortcut). This generates **.bytes** files under `Assets/AssetBundles/Config/BinConfigData` (**json** or **binary** files can be selected).
 
 3. **Note**: If you don’t want to generate files in the `AssetBundles` directory, modify the BinDataFolder value in [ExcelDataTool.cs](https://github.com/TippingGame/F8Framework/blob/main/Editor/ExcelTool/ExcelDataTool.cs):
     ```C#

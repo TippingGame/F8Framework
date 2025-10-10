@@ -16,7 +16,7 @@ namespace F8Framework.Core.Editor
             {
                 BuildPkgToolWindow window = EditorWindow.GetWindow<BuildPkgToolWindow>("打包工具 F5");
                 int stringLen = BuildPkgTool.StringLen(BuildPkgTool.BuildPath);
-                window.minSize = new Vector2(Mathf.Max(stringLen * 11f - 250f, 500f), 777f);
+                window.minSize = new Vector2(Mathf.Max(stringLen * 11f - 250f, 500f), 860f);
             }
         }
         

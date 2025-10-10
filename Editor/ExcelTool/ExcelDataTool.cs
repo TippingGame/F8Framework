@@ -84,7 +84,9 @@ namespace F8Framework.Core.Editor
         {
             string[] args = Environment.GetCommandLineArgs();
             string ExcelPath = BuildPkgTool.GetArgValue(args, "ExcelPath-");
+            string ConvertExcelToOtherFormats = BuildPkgTool.GetArgValue(args, "ConvertExcelToOtherFormats-");
             F8EditorPrefs.SetString("ExcelPath", ExcelPath);
+            F8EditorPrefs.SetString(BuildPkgTool.ConvertExcelToOtherFormatsKey, ConvertExcelToOtherFormats);
             LoadAllExcelData();
         }
         
@@ -195,7 +197,9 @@ namespace F8Framework.Core.Editor
         {
             string[] args = Environment.GetCommandLineArgs();
             string ExcelPath = BuildPkgTool.GetArgValue(args, "ExcelPath-");
+            string ConvertExcelToOtherFormats = BuildPkgTool.GetArgValue(args, "ConvertExcelToOtherFormats-");
             F8EditorPrefs.SetString("ExcelPath", ExcelPath);
+            F8EditorPrefs.SetString(BuildPkgTool.ConvertExcelToOtherFormatsKey, ConvertExcelToOtherFormats);
             F8EditorPrefs.SetBool("compilationFinished", true);
             AllScriptsReloaded();
         }
@@ -537,41 +541,33 @@ namespace F8Framework.Core.Editor
                 dict.GetType().GetMethod("Add").Invoke(dict, new System.Object[] { id, t });
             }
 
-// #if UNITY_WEBGL
-			try
+            string exportFormat = F8EditorPrefs.GetString(BuildPkgTool.ConvertExcelToOtherFormatsKey, BuildPkgTool.ExcelToOtherFormats[0]);
+            if (exportFormat == BuildPkgTool.ExcelToOtherFormats[1])
             {
-                // 序列化对象
-                string json = Util.LitJson.ToJson(container);
-                // 写入到文件
-                string filePath = BinDataPath + "/" + container.GetType().Name + ".json";
-                FileTools.SafeWriteAllText(filePath, json);
-                // 记录日志
-                LogF8.LogConfig("已序列化 " + BinDataPath + "/<color=#FFFF00>" + container.GetType().Name + ".json</color>");
-            }
-            catch (Exception e)
+                try
+                {
+                    string filePath = BinDataPath + "/" + container.GetType().Name + ".bytes";
+                    Util.BinarySerializer.SerializeToFile(container, filePath);
+                    LogF8.LogConfig("已序列化 " + BinDataPath + "/<color=#FFFF00>" + container.GetType().Name + ".bytes</color>");
+                }
+                catch (Exception e)
+                {
+                    LogF8.LogError($"序列化失败: {e}");
+                }
+            }else
             {
-                LogF8.LogError($"序列化失败: {e.Message}");
+                try
+                {
+                    string json = Util.LitJson.ToJson(container);
+                    string filePath = BinDataPath + "/" + container.GetType().Name + ".json";
+                    FileTools.SafeWriteAllText(filePath, json);
+                    LogF8.LogConfig("已序列化 " + BinDataPath + "/<color=#FFFF00>" + container.GetType().Name + ".json</color>");
+                }
+                catch (Exception e)
+                {
+                    LogF8.LogError($"序列化失败: {e}");
+                }
             }
-// #else
-//             // 暂不使用BinaryFormatter序列化
-//             try
-//             {
-//                 IFormatter formatter = new BinaryFormatter();
-//                 string filePath = Path.Combine(BinDataPath, container.GetType().Name + ".bytes");
-//             
-//                 // 使用 using 语句确保流被正确关闭
-//                 using (Stream stream = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None))
-//                 {
-//                     formatter.Serialize(stream, container);
-//                 }
-//             
-//                 LogF8.LogConfig($"已序列化 {BinDataPath}/<color=#FFFF00>{container.GetType().Name}.bytes</color>");
-//             }
-//             catch (Exception e)
-//             {
-//                 LogF8.LogError($"序列化失败: {e.Message}");
-//             }
-// #endif
         }
     }
 }
