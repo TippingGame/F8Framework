@@ -218,8 +218,11 @@ namespace F8Framework.Core
         /// 通过相对资源名称同步卸载。
         /// </summary>
         /// <param name="resourcePath">资源文件夹的相对路径。</param>
-        public void Unload(string resourcePath)
+        /// <param name="unloadAllLoadedObjects"></param>
+        public void Unload(string resourcePath, bool unloadAllLoadedObjects = false)
         {
+            if (!unloadAllLoadedObjects)
+                return;
             if (resourceLoaders.TryGetValue(resourcePath, out ResourcesLoader loader))
             {
                 loader.Clear();
@@ -230,11 +233,13 @@ namespace F8Framework.Core
         /// 通过已存在的资源加载器同步卸载。
         /// </summary>
         /// <param name="loader">要卸载的资源加载器。</param>
-        public void Unload(ResourcesLoader loader)
+        /// <param name="unloadAllLoadedObjects"></param>
+        public void Unload(ResourcesLoader loader, bool unloadAllLoadedObjects = false)
         {
             if (loader == null)
                 return;
-
+            if (!unloadAllLoadedObjects)
+                return;
             if (resourceLoaders.ContainsValue(loader))
             {
                 List<string> keys = new List<string>();
@@ -248,7 +253,7 @@ namespace F8Framework.Core
 
                 foreach (string key in keys)
                 {
-                    Unload(key);
+                    Unload(key, unloadAllLoadedObjects);
                 }
             }
             else
@@ -261,11 +266,13 @@ namespace F8Framework.Core
         /// 通过已加载的资源对象同步卸载。
         /// </summary>
         /// <param name="obj">已加载的资源对象。</param>
-        public void Unload(Object obj)
+        /// <param name="unloadAllLoadedObjects"></param>
+        public void Unload(Object obj, bool unloadAllLoadedObjects = false)
         {
             if (obj == null)
                 return;
-            
+            if (!unloadAllLoadedObjects)
+                return;
             List<string> keys = new List<string>();
             foreach (var kv in resourceLoaders)
             {
@@ -277,7 +284,7 @@ namespace F8Framework.Core
 
             foreach (string key in keys)
             {
-                Unload(key);
+                Unload(key, unloadAllLoadedObjects);
             }
 
             if (keys.Count <= 0 && obj != null)
@@ -292,6 +299,7 @@ namespace F8Framework.Core
         /// <param name="resourcePath">资源文件夹的相对路径。</param>
         /// <param name="subAssetName">子资产名称。</param>
         /// <param name="loader">ResourcesLoader</param>
+        /// <param name="isLoadAll"></param>
         /// <returns>加载的资源对象。</returns>
         public T LoadAll<T>(
             string resourcePath,
@@ -323,6 +331,7 @@ namespace F8Framework.Core
         /// <param name="assetType">返回对象的类型筛选器。</param>
         /// <param name="subAssetName">子资产名称。</param>
         /// <param name="loader">ResourcesLoader</param>
+        /// <param name="isLoadAll"></param>
         /// <returns>加载的资源对象。</returns>
         public Object LoadAll(
             string resourcePath,

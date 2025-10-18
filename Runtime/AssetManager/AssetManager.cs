@@ -1738,7 +1738,7 @@ namespace F8Framework.Core
                     AssetInfo editorRes = GetAssetInfoFromResource(assetName);
                     if (IsLegal(ref editorRes))
                     {
-                        ResourcesManager.Instance.Unload(editorRes.AssetPath[0]);
+                        ResourcesManager.Instance.Unload(editorRes.AssetPath[0], unloadAllLoadedObjects);
                     }
                     return;
                 }
@@ -1756,7 +1756,7 @@ namespace F8Framework.Core
                 AssetInfo res = GetAssetInfoFromResource(assetName);
                 if (IsLegal(ref res))
                 {
-                    ResourcesManager.Instance.Unload(res.AssetPath[0]);
+                    ResourcesManager.Instance.Unload(res.AssetPath[0], unloadAllLoadedObjects);
                 }
             }
             
@@ -1778,7 +1778,7 @@ namespace F8Framework.Core
                     AssetInfo editorRes = GetAssetInfoFromResource(assetName);
                     if (IsLegal(ref editorRes))
                     {
-                        ResourcesManager.Instance.Unload(editorRes.AssetPath[0]);
+                        ResourcesManager.Instance.Unload(editorRes.AssetPath[0], unloadAllLoadedObjects);
                     }
                     callback?.Invoke();
                     return;
@@ -1797,7 +1797,7 @@ namespace F8Framework.Core
                 AssetInfo res = GetAssetInfoFromResource(assetName);
                 if (IsLegal(ref res))
                 {
-                    ResourcesManager.Instance.Unload(res.AssetPath[0]);
+                    ResourcesManager.Instance.Unload(res.AssetPath[0], unloadAllLoadedObjects);
                     callback?.Invoke();
                 }
             }
