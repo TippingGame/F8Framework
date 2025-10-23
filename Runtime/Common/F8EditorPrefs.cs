@@ -8,9 +8,18 @@ namespace F8Framework.Core
     {
         private static F8EditorConfig _config;
         private static readonly string _configPath = "Assets/F8Framework/Editor/F8EditorConfig.asset";
+        private static bool IsBuilding => BuildPipeline.isBuildingPlayer;
         
         private static F8EditorConfig LoadConfig()
         {
+            if (IsBuilding)
+            {
+                if (_config == null)
+                {
+                    _config = AssetDatabase.LoadAssetAtPath<F8EditorConfig>(_configPath);
+                }
+                return _config ?? ScriptableObject.CreateInstance<F8EditorConfig>();
+            }
             if (_config == null)
             {
                 _config = AssetDatabase.LoadAssetAtPath<F8EditorConfig>(_configPath);
@@ -27,6 +36,7 @@ namespace F8Framework.Core
         
         private static void SaveConfig()
         {
+            if (IsBuilding) return;
             EditorUtility.SetDirty(_config);
             AssetDatabase.SaveAssets();
         }
@@ -40,6 +50,7 @@ namespace F8Framework.Core
 
         public static void SetString(string key, string value)
         {
+            if (IsBuilding) return;
             var entry = LoadConfig().GetOrCreateEntry(key);
             if (entry.valueType == F8EditorConfig.ConfigEntry.ValueType.String && entry.stringValue == value)
             {
@@ -59,6 +70,7 @@ namespace F8Framework.Core
 
         public static void SetBool(string key, bool value)
         {
+            if (IsBuilding) return;
             var entry = LoadConfig().GetOrCreateEntry(key);
             if (entry.valueType == F8EditorConfig.ConfigEntry.ValueType.Bool && entry.boolValue == value)
             {
@@ -78,6 +90,7 @@ namespace F8Framework.Core
 
         public static void SetInt(string key, int value)
         {
+            if (IsBuilding) return;
             var entry = LoadConfig().GetOrCreateEntry(key);
             if (entry.valueType == F8EditorConfig.ConfigEntry.ValueType.Int && entry.intValue == value)
             {
@@ -97,6 +110,7 @@ namespace F8Framework.Core
 
         public static void SetFloat(string key, float value)
         {
+            if (IsBuilding) return;
             var entry = LoadConfig().GetOrCreateEntry(key);
             if (entry.valueType == F8EditorConfig.ConfigEntry.ValueType.Float && entry.floatValue == value)
             {
