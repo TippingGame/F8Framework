@@ -170,10 +170,20 @@ namespace F8Framework.Core.Editor
                                       HotUpdateManager.Separator + nameof(AssetBundleMap) + ".json";
             if (!File.Exists(gameVersionPath) || !File.Exists(assetBundleMapPath))
             {
+                EditorUtility.DisplayDialog("注意！！！", "\n请先构建一个游戏版本，再构建热更新文件！~", "确定");
                 LogF8.LogError("请先构建一个游戏版本，再构建热更新文件！~");
                 return;
             }
 
+            GameVersion remoteGameVersion = Util.LitJson.ToObject<GameVersion>(FileTools.SafeReadAllText(gameVersionPath));
+            int result = GameConfig.CompareVersions(toVersion, remoteGameVersion.Version);
+            if (result <= 0)
+            {
+                EditorUtility.DisplayDialog("注意！！！", "\n热更新版本必须大于当前游戏版本！~", "确定");
+                LogF8.LogError("热更新版本必须大于当前游戏版本！~");
+                return;
+            }
+            
             var resAssetBundleMappings = Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(Resources.Load<TextAsset>(nameof(AssetBundleMap)).ToString());
 
             var assetBundleMappings = Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(FileTools.SafeReadAllText(assetBundleMapPath));
@@ -205,8 +215,7 @@ namespace F8Framework.Core.Editor
             FileTools.SafeClearDir(hotUpdatePath);
             CopyHotUpdateAb(URLSetting.GetAssetBundlesStreamPath(), generateAssetBundleMappings,
                 hotUpdatePath);
-
-            GameVersion remoteGameVersion = Util.LitJson.ToObject<GameVersion>(FileTools.SafeReadAllText(gameVersionPath));
+            
             remoteGameVersion.Version = toVersion;
             if (!remoteGameVersion.HotUpdateVersion.Contains(toVersion))
                 remoteGameVersion.HotUpdateVersion.Add(toVersion);
