@@ -598,12 +598,8 @@ namespace F8Framework.Core.Editor
             
             string focusedControlName = GUI.GetNameOfFocusedControl();
             GUI.SetNextControlName(_toVersionKey);
-            string newToVersion = EditorGUILayout.TextField(toVersionValue);
-            if (newToVersion != _toVersion)
-            {
-                _toVersion = newToVersion;
-                F8EditorPrefs.SetString(_toVersionKey, _toVersion);
-            }
+            _toVersion = EditorGUILayout.TextField(toVersionValue);
+            F8EditorPrefs.SetString(_toVersionKey, _toVersion);
             
             if (GUILayout.Button("+1", GUILayout.Width(40)))
             {
@@ -639,12 +635,8 @@ namespace F8Framework.Core.Editor
             }
 
             GUI.SetNextControlName(_codeVersionKey);
-            string newCodeVersion = EditorGUILayout.TextField(codeVersionValue);
-            if (newCodeVersion != _codeVersion)
-            {
-                _codeVersion = newCodeVersion;
-                F8EditorPrefs.SetString(_codeVersionKey, _codeVersion);
-            }
+            _codeVersion = EditorGUILayout.TextField(codeVersionValue);
+            F8EditorPrefs.SetString(_codeVersionKey, _codeVersion);
 
             if (GUILayout.Button("+1", GUILayout.Width(40)))
             {
