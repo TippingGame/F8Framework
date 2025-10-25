@@ -275,6 +275,8 @@ namespace F8Framework.Core.Editor
             PlayerSettings.bundleVersion = toVersion; // 设置显示版本号
             PlayerSettings.Android.bundleVersionCode = int.Parse(codeVersion); // 设置 Android 内部版本号
             PlayerSettings.iOS.buildNumber = codeVersion; // 设置 iOS 内部版本号
+            PlayerSettings.macOS.buildNumber = codeVersion;
+            PlayerSettings.tvOS.buildNumber = codeVersion;
 
             bool enableFullPackage = F8EditorPrefs.GetBool(_enableFullPackageKey, true);
             bool enableOptionalPackage = F8EditorPrefs.GetBool(_enableOptionalPackageKey, false);
@@ -513,6 +515,8 @@ namespace F8Framework.Core.Editor
                 {
                     EditorGUILayout.LabelField("Keystore路径:");
                     EditorGUI.indentLevel++;
+                    string focusedControlName = GUI.GetNameOfFocusedControl();
+                    GUI.SetNextControlName(_androidKeystoreNameKey);
                     _androidKeystoreName = EditorGUILayout.TextField(F8EditorPrefs.GetString(_androidKeystoreNameKey, ""));
                     if (GUILayout.Button("浏览..."))
                     {
@@ -522,6 +526,10 @@ namespace F8Framework.Core.Editor
                         {
                             EditorGUILayout.TextField(path);
                             F8EditorPrefs.SetString(_androidKeystoreNameKey, path);
+                            if (focusedControlName == _androidKeystoreNameKey)
+                            {
+                                GUI.FocusControl(null);
+                            }
                         }
                     }
 
@@ -579,7 +587,7 @@ namespace F8Framework.Core.Editor
             GUILayout.Space(5);
             GUILayout.Label("【构建版本】", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, fontSize = 16 });
             GUILayout.Space(10);
-            
+
             GUILayout.BeginHorizontal();
             GUILayout.Label("构建的版本：", GUILayout.Width(80));
             string toVersionValue = F8EditorPrefs.GetString(_toVersionKey, "");
@@ -587,10 +595,40 @@ namespace F8Framework.Core.Editor
             {
                 toVersionValue = _toVersion;
             }
-            _toVersion = EditorGUILayout.TextField(toVersionValue);
-            F8EditorPrefs.SetString(_toVersionKey, _toVersion);
-            GUILayout.EndHorizontal();
             
+            string focusedControlName = GUI.GetNameOfFocusedControl();
+            GUI.SetNextControlName(_toVersionKey);
+            string newToVersion = EditorGUILayout.TextField(toVersionValue);
+            if (newToVersion != _toVersion)
+            {
+                _toVersion = newToVersion;
+                F8EditorPrefs.SetString(_toVersionKey, _toVersion);
+            }
+            
+            if (GUILayout.Button("+1", GUILayout.Width(40)))
+            {
+                if (!string.IsNullOrEmpty(_toVersion))
+                {
+                    string[] versionParts = _toVersion.Split('.');
+                    if (versionParts.Length > 0)
+                    {
+                        string lastPart = versionParts[versionParts.Length - 1];
+                        if (int.TryParse(lastPart, out int lastNumber))
+                        {
+                            versionParts[versionParts.Length - 1] = (lastNumber + 1).ToString();
+                            _toVersion = string.Join(".", versionParts);
+                            F8EditorPrefs.SetString(_toVersionKey, _toVersion);
+                            if (focusedControlName == _toVersionKey)
+                            {
+                                GUI.FocusControl(null);
+                            }
+                        }
+                    }
+                }
+            }
+
+            GUILayout.EndHorizontal();
+
             GUILayout.Space(10);
             GUILayout.BeginHorizontal();
             GUILayout.Label("构建次数（某些平台需要递增）：", GUILayout.Width(185));
@@ -599,15 +637,35 @@ namespace F8Framework.Core.Editor
             {
                 codeVersionValue = _codeVersion;
             }
-            _codeVersion = EditorGUILayout.TextField(codeVersionValue);
-            F8EditorPrefs.SetString(_codeVersionKey, _codeVersion);
+
+            GUI.SetNextControlName(_codeVersionKey);
+            string newCodeVersion = EditorGUILayout.TextField(codeVersionValue);
+            if (newCodeVersion != _codeVersion)
+            {
+                _codeVersion = newCodeVersion;
+                F8EditorPrefs.SetString(_codeVersionKey, _codeVersion);
+            }
+
+            if (GUILayout.Button("+1", GUILayout.Width(40)))
+            {
+                if (int.TryParse(_codeVersion, out int codeVersion))
+                {
+                    _codeVersion = (codeVersion + 1).ToString();
+                    F8EditorPrefs.SetString(_codeVersionKey, _codeVersion);
+                    if (focusedControlName == _codeVersionKey)
+                    {
+                        GUI.FocusControl(null);
+                    }
+                }
+            }
+
             GUILayout.EndHorizontal();
-            
+
             GUILayout.Space(5);
             GUILayout.Box("", GUILayout.Height(2), GUILayout.ExpandWidth(true));
             GUILayout.Space(5);
         }
-
+        
         // 资产设置
         public static void DrawAssetSetting()
         {

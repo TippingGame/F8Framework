@@ -118,7 +118,7 @@ Unity F8 SDKManager组件，与原生平台交互，接入多个平台或者渠�
 //强制更改资产加载模式为远程（微信小游戏使用）
 public static bool ForceRemoteAssetBundle = false;
 ```
-* 使用强制远程加载模式后，需要将完整的 AssetBundles 目录上传至 CDN  
+* 使用强制远程加载模式后，需要将工程打包后的 `StreamingAssets` 文件夹下的 `AssetBundles` 目录上传至 CDN  
 ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1752739146608.png)  
 2. [ABBuildTool.cs](https://github.com/TippingGame/F8Framework/blob/main/Editor/AssetManager/ABBuildTool.cs)
 ```C#
@@ -132,7 +132,7 @@ public static bool DisableUnityCacheOnWebGL = false;
 ```
 * 构建设置。  
   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20240329230924.png)  
-* 使用微信的缓存系统，需在 MiniGameConfig 手动填入 CDN 地址和 Bundle Path Identifier（默认为StreamingAssets，需改为AssetBundles）。
+* 使用微信的缓存系统，需在 MiniGameConfig 手动填入 CDN 地址和 Bundle Path Identifier（默认为`StreamingAssets`，需改为`AssetBundles`）。
   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1760931585420.png)  
 ---
 ## 抖音小游戏接入方法
