@@ -118,7 +118,7 @@ namespace F8Framework.Core
                         break;
                 }
                 this.ReplayReset();
-                return this.tempLoopCount > 0;
+                return this.tempLoopCount > 0 || this.tempLoopCount == -1;
             }
         }
     }
