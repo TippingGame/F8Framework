@@ -52,7 +52,9 @@
 ---------------------------------
 5. **注意**：Unity的WebGL平台不能使用同步加载AB包，可以使用Resources进行同步加载
 ---------------------------------
-6. 假如没有报错，就可以愉快地使用了
+6. **注意**：如要使用同名资源，可启用完整资源路径加载，点击F5打包工具勾选对应功能  
+   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_1761979618779.png)
+7. 假如没有报错，就可以愉快地使用了
 
 ### 代码使用方法
 ```C#
@@ -194,12 +196,14 @@ Project Settings -> Editor -> Build Pipeline -> Multi-Process AssetBundle Buildi
 #### 资产状态检查器
 ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_20250523001_2.png)
 #### 你应该注意每次移出AssetBundles目录的文件，AB名都需要手动清空
-1. 编辑器功能
-* 1. 寻找资源是否被引用（将搜索全工程文件，输出Log信息）
-* 2. 清空所有选中的资产AB名（可选择多个文件，也可以选中文件夹）
-* 3. 设置选中的所有资产为相同Ab名（可选择多个文件，也可以选中文件夹）
-* 4. 全局空引用查找（打开窗口，显示引用丢失的资产）
-     ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_20240216212631_2.png)
+1. 编辑器功能  
+   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_20240216212631_2.png)
+* 1. 寻找资源是否被引用（将搜索全工程文件，输出Log信息）  
+     ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_1761979131320.png)
+* 2. 清空所有选中的资产AB名（可选择多个文件，也可以选中文件夹）  
+* 3. 设置选中的所有资产为相同Ab名（可选择多个文件，也可以选中文件夹）  
+* 4. 全局空引用查找（打开窗口，显示引用丢失的资产）  
+     ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_1761979410848.png)
 
 #### 你可以在资源栏 **鼠标指着** 文件/文件夹并按下 **键盘空格键** ，跳转到系统资源管理器：如windows文件夹
 ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_20241112212631.png)  
