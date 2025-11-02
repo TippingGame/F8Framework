@@ -229,9 +229,22 @@ namespace F8Framework.Core
                 if (!IsFinished)
                     return null;
 
-                if (type == DownloadType.ASSET_BUNDLE &&
-                    uwr != null)
-                    return DownloadHandlerAssetBundle.GetContent(uwr);
+                if (type != DownloadType.ASSET_BUNDLE) return null;
+                if (uwr == null) return null;
+                
+                var handler = uwr.downloadHandler;
+                if (handler is not DownloadHandlerAssetBundle downloadHandler) return null;
+                
+                try
+                {
+                    var assetBundle = downloadHandler.assetBundle;
+                    return assetBundle != null ? assetBundle : DownloadHandlerAssetBundle.GetContent(uwr);
+                }
+                catch (SystemException e)
+                {
+                    LogF8.LogException(e);
+                    return null;
+                }
 
                 return null;
             }
