@@ -12,13 +12,13 @@ namespace F8Framework.Tests
             int timeid = FF8.Timer.AddTimer(this, 1f, 0f, 3,
                 () => { LogF8.Log("tick"); },
                 () => { LogF8.Log("完成"); },
-                ignoreTimeScale: true);
+                ignoreTimeScale: false);
 
             // FrameTimer,传入自身this，每1帧执行一次，延迟0帧后开始，循环执行(-1表示循环)
             timeid = FF8.Timer.AddTimerFrame(this, 1f, 0f, -1,
                 () => { LogF8.Log("tick"); },
                 () => { LogF8.Log("完成"); },
-                ignoreTimeScale: true);
+                ignoreTimeScale: false);
 
             FF8.Timer.RemoveTimer(timeid); // 停止名为timeid的Timer
 

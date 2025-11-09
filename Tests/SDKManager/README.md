@@ -130,20 +130,21 @@ private static bool appendHashToAssetBundleName = false;
 // 禁用Unity缓存系统在WebGL平台（微信小游戏使用）
 public static bool DisableUnityCacheOnWebGL = false;
 ```
+* （注意）由于微信小游戏只能使用远程AB加载，请点击F5，配置好资产远程地址后构建一次游戏。  
+  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20241203214539_2.png)  
+* 也可以在此处直接修改 [GameVersion.json](https://github.com/TippingGame/F8Framework/blob/main/AssetMap/Resources/GameVersion.json) 里的 "AssetRemoteAddress" 参数  
+  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20241203214624.png)  
 * 构建设置。  
   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20240329230924.png)  
 * 使用微信的缓存系统，需在 MiniGameConfig 手动填入 CDN 地址和 Bundle Path Identifier（默认为`StreamingAssets`，需改为`AssetBundles`）。
   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1760931585420.png)  
+
 ---
 ## 抖音小游戏接入方法
 * 除了不用移除LitJson.dll，其余和微信小游戏一致
 * 浏览[ WebGL方案接入流程 ](https://developer.open-douyin.com/docs/resource/zh-CN/mini-game/develop/guide/game-engine/rd-to-SCgame/open-capacity/overview-and-compatibility/sc_webgl_access_flow)插件的使用方法
 ---
 
-* （注意）由于微信小游戏只能使用远程AB加载，请点击F5，配置好资产远程地址后构建一次游戏。  
-  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20241203214539_2.png)  
-* 也可以在此处直接修改 [GameVersion.json](https://github.com/TippingGame/F8Framework/blob/main/AssetMap/Resources/GameVersion.json) 里的 "AssetRemoteAddress" 参数  
-  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20241203214624.png)  
 * 使用抖音的缓存系统，同样需在 BuildTool 界面填入缓存资源域名。
   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1760932083174.png)  
 ### 如构建失败：请尝试使用Unity自带的Build一次后再尝试

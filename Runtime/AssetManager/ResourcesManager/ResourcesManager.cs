@@ -20,10 +20,7 @@ namespace F8Framework.Core
         
         public ResourcesLoader GetResourceLoader(string resourcePath)
         {
-            if (resourceLoaders.TryGetValue(resourcePath, out ResourcesLoader loader))
-                return loader;
-
-            return null;
+            return resourceLoaders.GetValueOrDefault(resourcePath);
         }
         
         /// <summary>
@@ -37,9 +34,9 @@ namespace F8Framework.Core
             where T : Object
         {
             ResourcesLoader loader;
-            if (resourceLoaders.ContainsKey(resourcePath))
+            if (resourceLoaders.TryGetValue(resourcePath, out var resourceLoader))
             {
-                loader = resourceLoaders[resourcePath];
+                loader = resourceLoader;
             }
             else
             {
@@ -61,9 +58,9 @@ namespace F8Framework.Core
         public Object Load(string resourcePath, System.Type resourceType)
         {
             ResourcesLoader loader;
-            if (resourceLoaders.ContainsKey(resourcePath))
+            if (resourceLoaders.TryGetValue(resourcePath, out var resourceLoader))
             {
-                loader = resourceLoaders[resourcePath];
+                loader = resourceLoader;
             }
             else
             {
@@ -84,9 +81,9 @@ namespace F8Framework.Core
         public Object Load(string resourcePath)
         {
             ResourcesLoader loader;
-            if (resourceLoaders.ContainsKey(resourcePath))
+            if (resourceLoaders.TryGetValue(resourcePath, out var resourceLoader))
             {
-                loader = resourceLoaders[resourcePath];
+                loader = resourceLoader;
             }
             else
             {
@@ -111,9 +108,9 @@ namespace F8Framework.Core
             where T : Object
         {
             ResourcesLoader loader;
-            if (resourceLoaders.ContainsKey(resourcePath))
+            if (resourceLoaders.TryGetValue(resourcePath, out var resourceLoader))
             {
-                loader = resourceLoaders[resourcePath];
+                loader = resourceLoader;
             }
             else
             {
@@ -129,9 +126,9 @@ namespace F8Framework.Core
         public IEnumerator LoadAsyncCoroutine<T>(string resourcePath) where T : Object
         {
             ResourcesLoader loader;
-            if (resourceLoaders.ContainsKey(resourcePath))
+            if (resourceLoaders.TryGetValue(resourcePath, out var resourceLoader))
             {
-                loader = resourceLoaders[resourcePath];
+                loader = resourceLoader;
             }
             else
             {
@@ -156,9 +153,9 @@ namespace F8Framework.Core
             OnAssetObject<Object> callback = null)
         {
             ResourcesLoader loader;
-            if (resourceLoaders.ContainsKey(resourcePath))
+            if (resourceLoaders.TryGetValue(resourcePath, out var resourceLoader))
             {
-                loader = resourceLoaders[resourcePath];
+                loader = resourceLoader;
             }
             else
             {
@@ -174,9 +171,9 @@ namespace F8Framework.Core
         public IEnumerator LoadAsyncCoroutine(string resourcePath, System.Type resourceType = null)
         {
             ResourcesLoader loader;
-            if (resourceLoaders.ContainsKey(resourcePath))
+            if (resourceLoaders.TryGetValue(resourcePath, out var resourceLoader))
             {
-                loader = resourceLoaders[resourcePath];
+                loader = resourceLoader;
             }
             else
             {
@@ -199,9 +196,9 @@ namespace F8Framework.Core
             OnAssetObject<Object> callback = null)
         {
             ResourcesLoader loader;
-            if (resourceLoaders.ContainsKey(resourcePath))
+            if (resourceLoaders.TryGetValue(resourcePath, out var resourceLoader))
             {
-                loader = resourceLoaders[resourcePath];
+                loader = resourceLoader;
             }
             else
             {

@@ -448,7 +448,7 @@ namespace F8Framework.Core
                         assetPath = info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0];
                     }
 #endif
-                    ResourcesManager.Instance.LoadAll(assetPath, null, null, out ResourcesLoader loader);
+                    ResourcesManager.Instance.LoadAll(assetPath, null, null, out ResourcesLoader loader, true);
 
                     return ResourcesManager.Instance.GetAllAssetObject(assetPath);
                 }

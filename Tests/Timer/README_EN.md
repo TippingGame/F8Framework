@@ -28,7 +28,7 @@ void Start()
     }, () =>
     {
         LogF8.Log("Timer completed"); // Completion callback
-    }, ignoreTimeScale: true);
+    }, ignoreTimeScale: false);
     
     // FrameTimer - Attached to this object
     // Triggers every frame, starts immediately (0 frame delay), loops infinitely (-1)
@@ -38,7 +38,7 @@ void Start()
     }, () =>
     {
         LogF8.Log("Timer completed"); // Completion callback
-    }, ignoreTimeScale: true);
+    }, ignoreTimeScale: false);
     
     // Stop a specific timer by its ID
     FF8.Timer.RemoveTimer(timeid);

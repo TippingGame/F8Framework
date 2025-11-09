@@ -487,6 +487,7 @@ namespace F8Framework.Core
         /// <param name="assetPath">资源对象的路径。</param>
         /// <param name="assetType">资产对象的目标对象类型。</param>
         /// <param name="subAssetName">子资产名称。</param>
+        /// <param name="isLoadAll"></param>
         /// <returns>找到资产对象。</returns>
         public Object LoadAssetObject(string assetPath, System.Type assetType, string subAssetName = null, bool isLoadAll = false)
         {
@@ -539,24 +540,21 @@ namespace F8Framework.Core
             }
             assetObject = o;
             
-            if (assetType == null)
+            if (o == null)
+            {
+                LogF8.LogError(subAssetName.IsNullOrEmpty() ?
+                    $"加载资产对象失败，请检查类型：{assetType}，路径：{assetPath}":
+                    $"加载资产对象失败，请检查类型：{assetType}，路径：{assetPath}，子资产名称：{subAssetName}");
+                return o;
+            }
+            if (assetType == null || assetType.IsAssignableFrom(o.GetType()))
             {
                 return o;
             }
-            else
-            {
-                if (assetType.IsAssignableFrom(o.GetType()))
-                {
-                    return o;
-                }
-                else
-                {
-                    LogF8.LogError("与输入的资产类型不一致：" + assetPath);
-                    return null;
-                }
-            }
+
+            return null;
         }
-        
+
         /// <summary>
         /// 通过资产捆绑路径异步加载。
         /// </summary>
@@ -564,6 +562,7 @@ namespace F8Framework.Core
         /// <param name="assetType">资产对象的目标对象类型。</param>
         /// <param name="subAssetName">子资产名称。</param>
         /// <param name="callback">异步加载完成的回调。</param>
+        /// <param name="isLoadAll"></param>
         public void LoadAssetObjectAsync(string assetPath,
             System.Type assetType,
             string subAssetName = null,
@@ -616,20 +615,18 @@ namespace F8Framework.Core
                         }
                     }
                     
-                    if (assetType == null)
+                    if (o == null)
                     {
-                        End(o);
+                        LogF8.LogError(subAssetName.IsNullOrEmpty() ?
+                            $"加载资产对象失败，请检查类型：{assetType}，路径：{assetPath}":
+                            $"加载资产对象失败，请检查类型：{assetType}，路径：{assetPath}，子资产名称：{subAssetName}");
+                        End();
                     }
                     else
                     {
-                        if (assetType.IsAssignableFrom(o.GetType()))
+                        if (assetType == null || assetType.IsAssignableFrom(o.GetType()))
                         {
                             End(o);
-                        }
-                        else
-                        {
-                            LogF8.LogError("与输入的资产类型不一致：" + assetPath);
-                            End();
                         }
                     }
                 };

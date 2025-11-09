@@ -267,10 +267,11 @@ namespace F8Framework.Core
                 yield return resouceObject;
             }
         }
-        
+
         /// <summary>
         /// 异步加载资源。
         /// </summary>
+        /// <param name="resourceType"></param>
         /// <param name="callback">异步加载完成的回调。</param>
         public virtual void LoadAsync(System.Type resourceType, OnAssetObject<Object> callback = null)
         {
@@ -377,9 +378,9 @@ namespace F8Framework.Core
         public virtual Object LoadAll(System.Type assetType = null, string subAssetName = null, bool isLoadAll = false)
         {
             if (resourceLoadState == LoaderState.FINISHED && subAssetName != null &&
-                resouceObjects.ContainsKey(subAssetName))
+                resouceObjects.TryGetValue(subAssetName, out var o))
             {
-                return resouceObjects[subAssetName];
+                return o;
             }
             
             loadType = LoaderType.SYNC;
@@ -409,7 +410,8 @@ namespace F8Framework.Core
                     resouceObject = assetType == null
                         ? Resources.Load(resourcePath)
                         : Resources.Load(resourcePath, assetType);
-                    SetResouceObject(resourcePath, _resouceObject);
+                    SetResouceObject(resourcePath, resouceObject);
+                    _resouceObject = resouceObject;
                 }
                 else
                 {
@@ -429,9 +431,21 @@ namespace F8Framework.Core
                     }
                 }
             }
-
+            
             resourceLoadState = LoaderState.FINISHED;
-            return _resouceObject != null ? _resouceObject : resouceObject;
+            if (_resouceObject == null)
+            {
+                LogF8.LogError(subAssetName.IsNullOrEmpty() ?
+                    $"加载资产对象失败，请检查类型：{assetType}，路径：{resourcePath}":
+                    $"加载资产对象失败，请检查类型：{assetType}，路径：{resourcePath}，子资产名称：{subAssetName}");
+                return _resouceObject;
+            }
+            if (assetType == null || assetType.IsAssignableFrom(_resouceObject.GetType()))
+            {
+                return _resouceObject;
+            }
+            
+            return null;
         }
         
         /// <summary>
@@ -463,9 +477,9 @@ namespace F8Framework.Core
 
         public bool TryGetAsset(string resourcePath, out Object obj)
         {
-            if (resouceObjects.ContainsKey(resourcePath))
+            if (resouceObjects.TryGetValue(resourcePath, out var o))
             {
-                obj = resouceObjects[resourcePath];
+                obj = o;
                 return true;
             }
             obj = null;
