@@ -49,7 +49,11 @@ void Start()
     gameObject.ShakeRotation(Vector3.one);
     gameObject.ShakeScale(Vector3.one);
     gameObject.ShakePositionAtSpeed(Vector3.one, shakeCount: 8, speed: 5f, fadeOut: false);
-
+    // 路径动画
+    gameObject.PathTween(new Vector3[] { Vector3.zero, Vector3.one * 100f, Vector3.one * 200f }, duration: 1f, pathType: PathType.CatmullRom,
+        pathMode: PathMode.Ignore, resolution: 10, closePath: false);
+    gameObject.LocalPathTween(new Vector3[] { Vector3.zero, Vector3.one * 100f, Vector3.one * 200f }, duration: 1f);
+    
     // 链式调用
     gameObject.Move(Vector3.one, 1f)
         .SetEase(Ease.EaseOutQuad) // 设置Ease
@@ -60,11 +64,20 @@ void Start()
         .SetUpdateMode(UpdateMode.Update) // 设置Update模式，默认为Update
         .SetOwner(gameObject) // 设置动画拥有者
         .SetIsPause(false); // 设置是否暂停
-        .SetIgnoreTimeScale(true); // 设置是否忽略时间缩放
+        .SetIgnoreTimeScale(true) // 设置是否忽略时间缩放
+        .SetCustomId("customId"); // 设置自定义ID
+    
+    // 设置自定义ID
+    FF8.Tween.SetCustomId(id, "customId");
     
     // 设置是否暂停
     FF8.Tween.SetIsPause(id, true);
-        
+    FF8.Tween.SetIsPause("customId", true);
+    
+    // 设置是否忽略时间缩放
+    FF8.Tween.SetIgnoreTimeScale(id, true);
+    FF8.Tween.SetIgnoreTimeScale("customId", true);
+    
     // 你也可以这样使用，设置OnUpdate
     // 数字缓动变化
     BaseTween valueTween = FF8.Tween.ValueTween(0f, 100f, 3f).SetOnUpdateFloat((float v) =>
@@ -75,6 +88,7 @@ void Start()
     // 取消动画，只允许使用ID取消动画，动画基类会回收再利用，但ID唯一递增
     int id2 = valueTween.ID;
     FF8.Tween.CancelTween(id2);
+    FF8.Tween.CancelTween("customId");
     
     // 物体移动
     BaseTween gameObjectTween = FF8.Tween.Move(gameObject, Vector3.one, 3f).SetOnUpdateVector3((Vector3 v) =>

@@ -48,7 +48,11 @@ void Start()
     gameObject.ShakeRotation(Vector3.one);
     gameObject.ShakeScale(Vector3.one);
     gameObject.ShakePositionAtSpeed(Vector3.one, shakeCount: 8, speed: 5f, fadeOut: false);
-
+    // Path animation
+    gameObject.PathTween(new Vector3[] { Vector3.zero, Vector3.one * 100f, Vector3.one * 200f }, duration: 1f, pathType: PathType.CatmullRom,
+        pathMode: PathMode.Ignore, resolution: 10, closePath: false);
+    gameObject.LocalPathTween(new Vector3[] { Vector3.zero, Vector3.one * 100f, Vector3.one * 200f }, duration: 1f);
+    
     // Method chaining
     gameObject.Move(Vector3.one, 1f)
         .SetEase(Ease.EaseOutQuad) // Set easing type
@@ -60,10 +64,19 @@ void Start()
         .SetOwner(gameObject) // Set animation owner
         .SetIsPause(false); // Set pause state
         .SetIgnoreTimeScale(true); // Set whether to ignore timeScale
+        .SetCustomId("customId"); // Set custom ID
+    
+    // Set custom ID
+    FF8.Tween.SetCustomId(id, "customId");
     
     // Pause control
     FF8.Tween.SetIsPause(id, true);
-        
+    FF8.Tween.SetIsPause("customId", true);
+    
+    // Set whether to ignore timeScale
+    FF8.Tween.SetIgnoreTimeScale(id, true);
+    FF8.Tween.SetIgnoreTimeScale("customId", true);
+    
     // Alternative usage with OnUpdate
     // Numeric value tweening
     BaseTween valueTween = FF8.Tween.ValueTween(0f, 100f, 3f).SetOnUpdateFloat((float v) =>
@@ -74,6 +87,7 @@ void Start()
     // Cancel animation by ID (base tween will be recycled but ID remains unique)
     int id2 = valueTween.ID;
     FF8.Tween.CancelTween(id2);
+    FF8.Tween.CancelTween("customId");
     
     // Object movement
     BaseTween gameObjectTween = FF8.Tween.Move(gameObject, Vector3.one, 3f).SetOnUpdateVector3((Vector3 v) =>

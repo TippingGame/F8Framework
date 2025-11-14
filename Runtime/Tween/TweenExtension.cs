@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace F8Framework.Core
@@ -452,75 +453,111 @@ namespace F8Framework.Core
         public static Sequence ShakePosition(this Transform obj, Vector3 vibrato, int shakeCount = 8, float t = 0.05f,
             bool fadeOut = false)
         {
-            return Tween.Instance.ShakePosition(obj, vibrato, shakeCount, t);
+            return Tween.Instance.ShakePosition(obj, vibrato, shakeCount, t, fadeOut);
         }
 
         public static Sequence ShakePosition(this GameObject obj, Vector3 vibrato, int shakeCount = 8, float t = 0.05f,
             bool fadeOut = false)
         {
-            return Tween.Instance.ShakePosition(obj.transform, vibrato, shakeCount, t);
+            return Tween.Instance.ShakePosition(obj.transform, vibrato, shakeCount, t, fadeOut);
         }
 
         public static Sequence ShakePositionAtSpeed(this Transform obj, Vector3 vibrato, int shakeCount = 8,
             float speed = 5f, bool fadeOut = false)
         {
-            return Tween.Instance.ShakePositionAtSpeed(obj, vibrato, shakeCount, speed);
+            return Tween.Instance.ShakePositionAtSpeed(obj, vibrato, shakeCount, speed, fadeOut);
         }
 
         public static Sequence ShakePositionAtSpeed(this GameObject obj, Vector3 vibrato, int shakeCount = 8,
             float speed = 5f, bool fadeOut = false)
         {
-            return Tween.Instance.ShakePositionAtSpeed(obj, vibrato, shakeCount, speed);
+            return Tween.Instance.ShakePositionAtSpeed(obj, vibrato, shakeCount, speed, fadeOut);
         }
 
         public static Sequence ShakeRotation(this Transform obj, Vector3 vibrato, int shakeCount = 8, float t = 0.05f,
             bool fadeOut = false)
         {
-            return Tween.Instance.ShakeRotation(obj, vibrato, shakeCount, t);
+            return Tween.Instance.ShakeRotation(obj, vibrato, shakeCount, t, fadeOut);
         }
 
         public static Sequence ShakeRotation(this GameObject obj, Vector3 vibrato, int shakeCount = 8, float t = 0.05f,
             bool fadeOut = false)
         {
-            return Tween.Instance.ShakeRotation(obj.transform, vibrato, shakeCount, t);
+            return Tween.Instance.ShakeRotation(obj.transform, vibrato, shakeCount, t, fadeOut);
         }
 
         public static Sequence ShakeRotationAtSpeed(this Transform obj, Vector3 vibrato, int shakeCount = 8,
             float speed = 5f, bool fadeOut = false)
         {
-            return Tween.Instance.ShakeRotationAtSpeed(obj, vibrato, shakeCount, speed);
+            return Tween.Instance.ShakeRotationAtSpeed(obj, vibrato, shakeCount, speed, fadeOut);
         }
 
         public static Sequence ShakeRotationAtSpeed(this GameObject obj, Vector3 vibrato, int shakeCount = 8,
             float speed = 5f, bool fadeOut = false)
         {
-            return Tween.Instance.ShakeRotationAtSpeed(obj, vibrato, shakeCount, speed);
+            return Tween.Instance.ShakeRotationAtSpeed(obj, vibrato, shakeCount, speed, fadeOut);
         }
 
         public static Sequence ShakeScale(this Transform obj, Vector3 vibrato, int shakeCount = 8, float t = 0.05f,
             bool fadeOut = false)
         {
-            return Tween.Instance.ShakeScale(obj, vibrato, shakeCount, t);
+            return Tween.Instance.ShakeScale(obj, vibrato, shakeCount, t, fadeOut);
         }
 
         public static Sequence ShakeScale(this GameObject obj, Vector3 vibrato, int shakeCount = 8, float t = 0.05f,
             bool fadeOut = false)
         {
-            return Tween.Instance.ShakeScale(obj.transform, vibrato, shakeCount, t);
+            return Tween.Instance.ShakeScale(obj.transform, vibrato, shakeCount, t, fadeOut);
         }
 
         public static Sequence ShakeScaleAtSpeed(this Transform obj, Vector3 vibrato, int shakeCount = 8,
             float speed = 5f,
             bool fadeOut = false)
         {
-            return Tween.Instance.ShakeScaleAtSpeed(obj, vibrato, shakeCount, speed);
+            return Tween.Instance.ShakeScaleAtSpeed(obj, vibrato, shakeCount, speed, fadeOut);
         }
 
         public static Sequence ShakeScaleAtSpeed(this GameObject obj, Vector3 vibrato, int shakeCount = 8,
             float speed = 5f,
             bool fadeOut = false)
         {
-            return Tween.Instance.ShakeScaleAtSpeed(obj, vibrato, shakeCount, speed);
+            return Tween.Instance.ShakeScaleAtSpeed(obj, vibrato, shakeCount, speed, fadeOut);
+        }
+        
+        /// <summary>
+        /// 设置路径闭合
+        /// </summary>
+        public static T SetClosePath<T>(this T tween, bool closePath) where T : BaseTween
+        {
+            if (tween is PathTween pathTween)
+            {
+                pathTween.SetClosePath(closePath);
+            }
+            return tween;
+        }
+
+        public static BaseTween PathTween(this GameObject transform, IList<Vector3> path, float duration, 
+            PathType pathType = PathType.CatmullRom, PathMode pathMode = PathMode.Ignore, int resolution = 10, bool closePath = false)
+        {
+            return Tween.Instance.PathTween(transform, path, duration, pathType, pathMode, resolution, closePath);
+        }
+        
+        public static BaseTween LocalPathTween(this GameObject transform, IList<Vector3> localPath, float duration, 
+            PathType pathType = PathType.CatmullRom, PathMode pathMode = PathMode.Ignore, int resolution = 10, bool closePath = false)
+        {
+            return Tween.Instance.LocalPathTween(transform, localPath, duration, pathType, pathMode, resolution, closePath);
+        }
+        
+        public static BaseTween PathTween(this Transform transform, IList<Vector3> path, float duration, 
+            PathType pathType = PathType.CatmullRom, PathMode pathMode = PathMode.Ignore, int resolution = 10, bool closePath = false)
+        {
+            return Tween.Instance.PathTween(transform, path, duration, pathType, pathMode, resolution, closePath);
+        }
+        
+        public static BaseTween LocalPathTween(this Transform transform, IList<Vector3> localPath, float duration, 
+            PathType pathType = PathType.CatmullRom, PathMode pathMode = PathMode.Ignore, int resolution = 10, bool closePath = false)
+        {
+            return Tween.Instance.LocalPathTween(transform, localPath, duration, pathType, pathMode, resolution, closePath);
         }
 
         public static void CancelAllTweens(this GameObject go)

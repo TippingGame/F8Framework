@@ -73,6 +73,7 @@ namespace F8Framework.Core
             internal const string PoolName = "池名字。";
             internal const string PoolEnabled = "池是否启用。";
             internal const string PreloadSize = "要预加载的个数。";
+            internal const string PrefabObject = "预制体。";
         }
     }
 }

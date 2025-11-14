@@ -42,6 +42,8 @@ namespace F8Framework.Tests
             FF8.Download = ModuleCenter.CreateModule<DownloadManager>();
             FF8.LogWriter = ModuleCenter.CreateModule<F8LogWriter>();
 
+            yield return new WaitForEndOfFrame();
+            
             StartGame();
             yield break;
         }

@@ -16,12 +16,12 @@ namespace F8Framework.Core
     {
 #if UNITY_EDITOR
         [Tooltip(Constants.Tooltips.PoolName)]
-        [SerializeField] private string _name;
+        private string _name;
         [Space]
 #endif
         [Tooltip(Constants.Tooltips.PoolEnabled)]
         [SerializeField] private bool _enabled = true;
-        [Tooltip(Constants.Tooltips.Persistent)]
+        [Tooltip(Constants.Tooltips.PrefabObject)]
         [SerializeField] private GameObject _prefab;
         [Tooltip(Constants.Tooltips.OverflowBehaviour)]
         [SerializeField] private BehaviourOnCapacityReached _behaviourOnCapacityReached = Constants.DefaultBehaviourOnCapacityReached;

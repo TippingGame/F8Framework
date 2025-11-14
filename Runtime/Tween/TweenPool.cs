@@ -11,6 +11,7 @@ namespace F8Framework.Core
         static List<Vector3Tween> vector3Tweens = new List<Vector3Tween>();
         static List<ColorTween> colorTweens = new List<ColorTween>();
         static List<QuaternionTween> quaternionTweens = new List<QuaternionTween>();
+        static List<PathTween> pathTweens = new List<PathTween>();
 
         static int counter = 0;
 
@@ -46,6 +47,9 @@ namespace F8Framework.Core
                     break;
                 case QuaternionTween quaternionTween:
                     quaternionTweens.Add(quaternionTween);
+                    break;
+                case PathTween pathTween:
+                    pathTweens.Add(pathTween);
                     break;
                 default:
                     break;
@@ -148,6 +152,24 @@ namespace F8Framework.Core
             else
             {
                 tween = new QuaternionTween(from, to, t, GenerateId());
+            }
+            Tween.Instance.tweens.Add(tween);
+            return tween;
+        }
+        
+        internal static PathTween GetPathTween(Transform target, IList<Vector3> path, float duration, 
+            PathType pathType, PathMode pathMode, int resolution, bool closePath)
+        {
+            PathTween tween;
+            if (TryGetTween(pathTweens, out tween))
+            {
+                tween.Reset();
+                tween.Init(target, path, duration, pathType, pathMode, resolution, closePath);
+                tween.ID = GenerateId();
+            }
+            else
+            {
+                tween = new PathTween(target, path, duration, pathType, pathMode, resolution, closePath, GenerateId());
             }
             Tween.Instance.tweens.Add(tween);
             return tween;

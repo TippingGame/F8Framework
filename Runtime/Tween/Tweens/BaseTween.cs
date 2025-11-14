@@ -34,6 +34,7 @@ namespace F8Framework.Core
     {
         #region PROTECTED
         protected int id = 0;
+        protected object customId = null;
         protected float delay = 0.0f;
         protected float duration = 0.0f;
         protected float currentTime = 0.0f;
@@ -49,6 +50,11 @@ namespace F8Framework.Core
         protected bool ignoreTimeScale = false;
         #endregion
 
+        public object CustomId
+        {
+            get => customId;
+            set => customId = value;
+        }
         public int ID
         {
             get => id;
@@ -114,6 +120,12 @@ namespace F8Framework.Core
 
             if(onUpdate != null)
                 onUpdate();
+        }
+        
+        public BaseTween SetCustomId(object customId)
+        {
+            CustomId = customId;
+            return this;
         }
         
         public BaseTween SetIgnoreTimeScale(bool value)
@@ -275,6 +287,7 @@ namespace F8Framework.Core
         public virtual void Reset()
         {
             id = 0;
+            CustomId = null;
             delay = 0.0f;
             duration = 0.0f;
             currentTime = 0.0f;

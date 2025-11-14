@@ -100,8 +100,7 @@ namespace F8Framework.Core
 
         public void ProcessConnection(BaseTween tween)
         {
-            List<int> idList;
-            if (tweenConnections.TryGetValue(tween.Owner, out idList))
+            if (tweenConnections.TryGetValue(tween.Owner, out var idList))
             {
                 if (idList == null)
                 {
@@ -117,6 +116,29 @@ namespace F8Framework.Core
             }
         }
         
+        public void SetCustomId(int id, object customId)
+        {
+            for (int n = 0; n < tweens.Count; n++)
+            {
+                if (tweens[n].ID == id)
+                {
+                    tweens[n].SetCustomId(customId);
+                    break;
+                }
+            }
+        }
+        
+        public void SetIgnoreTimeScale(object customId, bool ignoreTimeScale)
+        {
+            for (int n = 0; n < tweens.Count; n++)
+            {
+                if (tweens[n].CustomId == customId)
+                {
+                    tweens[n].SetIgnoreTimeScale(ignoreTimeScale);
+                }
+            }
+        }
+        
         public void SetIgnoreTimeScale(int id, bool ignoreTimeScale)
         {
             for (int n = 0; n < tweens.Count; n++)
@@ -129,6 +151,17 @@ namespace F8Framework.Core
             }
         }
         
+        public void SetIsPause(object customId, bool isPause)
+        {
+            for (int n = 0; n < tweens.Count; n++)
+            {
+                if (tweens[n].CustomId == customId)
+                {
+                    tweens[n].SetIsPause(isPause);
+                }
+            }
+        }
+        
         public void SetIsPause(int id, bool isPause)
         {
             for (int n = 0; n < tweens.Count; n++)
@@ -137,6 +170,17 @@ namespace F8Framework.Core
                 {
                     tweens[n].SetIsPause(isPause);
                     break;
+                }
+            }
+        }
+        
+        public void CancelTween(object customId)
+        {
+            for (int n = 0; n < tweens.Count; n++)
+            {
+                if (tweens[n].CustomId == customId)
+                {
+                    tweens[n].IsRecycle = true;
                 }
             }
         }
@@ -162,9 +206,7 @@ namespace F8Framework.Core
 
         public void CancelTween(GameObject owner)
         {
-            List<int> idList = null;
-
-            if (tweenConnections.TryGetValue(owner, out idList))
+            if (tweenConnections.TryGetValue(owner, out var idList))
             {
                 if (idList == null)
                     return;
@@ -971,17 +1013,17 @@ namespace F8Framework.Core
         public Sequence ShakePositionAtSpeed(Transform obj, Vector3 vibrato, int shakeCount = 8, float speed = 5f, bool fadeOut = false)
         {
             float t = Vector3.Distance(obj.transform.position, vibrato) / speed;
-            return ShakeScale(obj, vibrato, shakeCount, t);
+            return ShakeScale(obj, vibrato, shakeCount, t, fadeOut);
         }
         
         public Sequence ShakePosition(GameObject obj, Vector3 vibrato, int shakeCount = 8, float t = 0.05f, bool fadeOut = false)
         {
-            return ShakeScale(obj.transform, vibrato, shakeCount, t);
+            return ShakeScale(obj.transform, vibrato, shakeCount, t, fadeOut);
         }
         
         public Sequence ShakePositionAtSpeed(GameObject obj, Vector3 vibrato, int shakeCount = 8, float speed = 5f, bool fadeOut = false)
         {
-            return ShakePositionAtSpeed(obj.transform, vibrato, shakeCount, speed);
+            return ShakePositionAtSpeed(obj.transform, vibrato, shakeCount, speed, fadeOut);
         }
         
         public Sequence ShakeRotation(Transform obj, Vector3 vibrato, int shakeCount = 8, float t = 0.05f, bool fadeOut = false)
@@ -1014,17 +1056,17 @@ namespace F8Framework.Core
         public Sequence ShakeRotationAtSpeed(Transform obj, Vector3 vibrato, int shakeCount = 8, float speed = 5f, bool fadeOut = false)
         {
             float t = Vector3.Distance(obj.transform.eulerAngles, vibrato) / speed;
-            return ShakeRotation(obj, vibrato, shakeCount, t);
+            return ShakeRotation(obj, vibrato, shakeCount, t, fadeOut);
         }
         
         public Sequence ShakeRotation(GameObject obj, Vector3 vibrato, int shakeCount = 8, float t = 0.05f, bool fadeOut = false)
         {
-            return ShakeRotation(obj.transform, vibrato, shakeCount, t);
+            return ShakeRotation(obj.transform, vibrato, shakeCount, t, fadeOut);
         }
         
         public Sequence ShakeRotationAtSpeed(GameObject obj, Vector3 vibrato, int shakeCount = 8, float speed = 5f, bool fadeOut = false)
         {
-            return ShakeRotationAtSpeed(obj.transform, vibrato, shakeCount, speed);
+            return ShakeRotationAtSpeed(obj.transform, vibrato, shakeCount, speed, fadeOut);
         }
         
         public Sequence ShakeScale(Transform obj, Vector3 vibrato, int shakeCount = 8, float t = 0.05f, bool fadeOut = false)
@@ -1057,19 +1099,99 @@ namespace F8Framework.Core
         public Sequence ShakeScaleAtSpeed(Transform obj, Vector3 vibrato, int shakeCount = 8, float speed = 5f, bool fadeOut = false)
         {
             float t = Vector3.Distance(obj.transform.localScale, vibrato) / speed;
-            return ShakeScale(obj, vibrato, shakeCount, t);
+            return ShakeScale(obj, vibrato, shakeCount, t, fadeOut);
         }
         
         public Sequence ShakeScale(GameObject obj, Vector3 vibrato, int shakeCount = 8, float t = 0.05f, bool fadeOut = false)
         {
-            return ShakeScale(obj.transform, vibrato, shakeCount, t);
+            return ShakeScale(obj.transform, vibrato, shakeCount, t, fadeOut);
         }
         
         public Sequence ShakeScaleAtSpeed(GameObject obj, Vector3 vibrato, int shakeCount = 8, float speed = 5f, bool fadeOut = false)
         {
-            return ShakeScaleAtSpeed(obj.transform, vibrato, shakeCount, speed);
+            return ShakeScaleAtSpeed(obj.transform, vibrato, shakeCount, speed, fadeOut);
         }
         
+        #endregion
+        
+        #region PATH_TWEEN
+
+        public BaseTween PathTween(GameObject target, IList<Vector3> path, float duration,
+            PathType pathType = PathType.CatmullRom, PathMode pathMode = PathMode.Ignore, int resolution = 10, bool closePath = false)
+        {
+            
+            return PathTween(target.transform, path, duration, pathType, pathMode, resolution, closePath);
+        }
+        
+        public BaseTween PathTweenAtSpeed(GameObject target, IList<Vector3> path, float speed, 
+            PathType pathType = PathType.CatmullRom, PathMode pathMode = PathMode.Ignore, int resolution = 10, bool closePath = false)
+        {
+            return PathTweenAtSpeed(target.transform, path, speed, pathType, pathMode, resolution, closePath);
+        }
+        
+        public BaseTween LocalPathTween(GameObject target, IList<Vector3> localPath, float duration, 
+            PathType pathType = PathType.CatmullRom, PathMode pathMode = PathMode.Ignore, int resolution = 10, bool closePath = false)
+        {
+            return PathTween(target, localPath, duration, pathType, pathMode, resolution, closePath);
+        }
+        
+        /// <summary>
+        /// 创建路径动画
+        /// </summary>
+        public BaseTween PathTween(Transform target, IList<Vector3> path, float duration, 
+            PathType pathType = PathType.CatmullRom, PathMode pathMode = PathMode.Ignore, int resolution = 10, bool closePath = false)
+        {
+            if (target == null || path == null || path.Count < 2)
+            {
+                LogF8.LogError("PathTween: Target or path is invalid!");
+                return null;
+            }
+            
+            PathTween tween = TweenPool.GetPathTween(target, path, duration, pathType, pathMode, resolution, closePath);
+            return tween;
+        }
+
+        /// <summary>
+        /// 创建路径动画（根据速度计算时间）
+        /// </summary>
+        public BaseTween PathTweenAtSpeed(Transform target, IList<Vector3> path, float speed, 
+            PathType pathType = PathType.CatmullRom, PathMode pathMode = PathMode.Ignore, int resolution = 10, bool closePath = false)
+        {
+            if (path == null || path.Count < 2)
+                return null;
+                
+            // 估算路径长度
+            float estimatedLength = 0f;
+            for (int i = 0; i < path.Count - 1; i++)
+            {
+                estimatedLength += Vector3.Distance(path[i], path[i + 1]);
+            }
+            
+            float duration = estimatedLength / speed;
+            return PathTween(target, path, duration, pathType, pathMode, resolution, closePath);
+        }
+
+        /// <summary>
+        /// 创建本地坐标路径动画
+        /// </summary>
+        public BaseTween LocalPathTween(Transform target, IList<Vector3> localPath, float duration, 
+            PathType pathType = PathType.CatmullRom, PathMode pathMode = PathMode.Ignore, int resolution = 10, bool closePath = false)
+        {
+            if (target == null || localPath == null || localPath.Count < 2)
+            {
+                LogF8.LogError("LocalPathTween: Target or path is invalid!");
+                return null;
+            }
+            
+            // 将本地坐标转换为世界坐标
+            Vector3[] worldPath = new Vector3[localPath.Count];
+            for (int i = 0; i < localPath.Count; i++)
+            {
+                worldPath[i] = target.TransformPoint(localPath[i]);
+            }
+            
+            return PathTween(target, worldPath, duration, pathType, pathMode, resolution, closePath);
+        }
         #endregion
     }
 

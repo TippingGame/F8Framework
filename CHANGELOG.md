@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.8.188] - 2025-11-14
+1.新增Tween模块路径动画PathTween，LocalPathTween方法，新增SetCustomId方法可批量暂停取消动画  
+2.修复Tween震动方法漏加fadeOut参数的问题  
+3.等待一帧后再开始游戏  
+
 ## [1.8.187] - 2025-11-09
 1.修复资产加载模块子资产不存在会报错的问题，并且改为返回null  
 
