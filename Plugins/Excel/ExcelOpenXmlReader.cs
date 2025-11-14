@@ -493,37 +493,55 @@
                 }
                 if ((this._xmlReader.NodeType == XmlNodeType.Text) && flag)
                 {
-                    double num4;
                     object obj2 = null;
-                    NumberStyles any = NumberStyles.Any;
-                    if (double.TryParse(this._xmlReader.Value.ToString(), any, CultureInfo.InvariantCulture, out num4))
-                    {
-                        obj2 = num4;
-                    }
+                    
                     if ((attribute != null) && (attribute == "s"))
                     {
-                        obj2 = Helpers.ConvertEscapeChars(this._workbook.SST[int.Parse(obj2.ToString())]);
+                        if (int.TryParse(this._xmlReader.Value, out int sharedStringIndex))
+                        {
+                            if (sharedStringIndex >= 0 && sharedStringIndex < this._workbook.SST.Count)
+                            {
+                                obj2 = Helpers.ConvertEscapeChars(this._workbook.SST[sharedStringIndex]);
+                            }
+                        }
                     }
                     else if ((attribute != null) && (attribute == "inlineStr"))
                     {
-                        obj2 = Helpers.ConvertEscapeChars(obj2.ToString());
+                        obj2 = Helpers.ConvertEscapeChars(this._xmlReader.Value);
                     }
                     else if (attribute == "b")
                     {
                         obj2 = this._xmlReader.Value == "1";
                     }
-                    else if (s != null)
+                    else if (attribute == "n" || attribute == null)
                     {
-                        XlsxXf xf = this._workbook.Styles.CellXfs[int.Parse(s)];
-                        if ((obj2 != null) && ((obj2.ToString() != string.Empty) && this.IsDateTimeStyle(xf.NumFmtId)))
+                        if (double.TryParse(this._xmlReader.Value, NumberStyles.Any, CultureInfo.InvariantCulture, out double numValue))
                         {
-                            obj2 = Helpers.ConvertFromOATime(num4);
+                            obj2 = numValue;
+                            
+                            if (s != null)
+                            {
+                                XlsxXf xf = this._workbook.Styles.CellXfs[int.Parse(s)];
+                                if (this.IsDateTimeStyle(xf.NumFmtId))
+                                {
+                                    obj2 = Helpers.ConvertFromOATime(numValue);
+                                }
+                                else if (xf.NumFmtId == 0x31)
+                                {
+                                    obj2 = this._xmlReader.Value;
+                                }
+                            }
                         }
-                        else if (xf.NumFmtId == 0x31)
+                        else
                         {
-                            obj2 = obj2.ToString();
+                            obj2 = this._xmlReader.Value;
                         }
                     }
+                    else
+                    {
+                        obj2 = this._xmlReader.Value;
+                    }
+    
                     if ((num2 - 1) < this._cellsValues.Length)
                     {
                         this._cellsValues[num2 - 1] = obj2;

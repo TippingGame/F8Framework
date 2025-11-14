@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.8.189] - 2025-11-14
+1.修复Excel库读取.xls文档时报错的问题  
+2.修复Excel库读取.xlsx文档时引用其他表的单元格失效的问题  
+
 ## [1.8.188] - 2025-11-14
 1.新增Tween模块路径动画PathTween，LocalPathTween方法，新增SetCustomId方法可批量暂停取消动画  
 2.修复Tween震动方法漏加fadeOut参数的问题  
