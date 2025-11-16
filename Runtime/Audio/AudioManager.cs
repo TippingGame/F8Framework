@@ -200,6 +200,10 @@ namespace F8Framework.Core
                 {
                     AudioMusic.MusicSource.Stop();
                 }
+                else
+                {
+                    AudioMusic.MusicSource.Play();
+                }
             }
         }
         
@@ -263,6 +267,10 @@ namespace F8Framework.Core
                 if (!value)
                 {
                     AudioMusicVoice.MusicSource.Stop();
+                }
+                else
+                {
+                    AudioMusicVoice.MusicSource.Play();
                 }
             }
         }

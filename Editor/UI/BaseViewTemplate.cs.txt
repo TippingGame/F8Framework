@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using F8Framework.Core;
+using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
     #ROOTNAMESPACEBEGIN#
 public class #SCRIPTNAME# : BaseView
@@ -52,6 +54,37 @@ public class #SCRIPTNAME# : BaseView
     protected override void OnRemoved()
     {
         #NOTRIM#
+    }
+    
+    // UI组件监听函数
+    protected override void ButtonClick(BaseEventData eventData)
+    {
+	    base.ButtonClick(eventData);
+    }
+    
+    protected override void ValueChange(UIBehaviour ui, int value)
+    {
+	    base.ValueChange(ui, value);
+    }
+        
+    protected override void ValueChange(UIBehaviour ui, float value)
+    {
+	    base.ValueChange(ui, value);
+    }
+        
+    protected override void ValueChange(UIBehaviour ui, string value)
+    {
+	    base.ValueChange(ui, value);
+    }
+        
+    protected override void ValueChange(UIBehaviour ui, bool value)
+    {
+	    base.ValueChange(ui, value);
+    }
+        
+    protected override void ValueChange(UIBehaviour ui, Vector2 value)
+    {
+	    base.ValueChange(ui, value);
     }
     
     // 自动获取组件（自动生成，不能删除）

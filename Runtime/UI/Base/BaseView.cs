@@ -1,4 +1,7 @@
 using System;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace F8Framework.Core
 {
@@ -26,9 +29,14 @@ namespace F8Framework.Core
         private void Awake()
         {
             OnAwake();
+            OnAddUIComponentListener();
         }
 
         protected virtual void OnAwake()
+        {
+        }
+        
+        protected virtual void OnAddUIComponentListener()
         {
         }
 
@@ -68,6 +76,34 @@ namespace F8Framework.Core
         {
         }
 
+        protected virtual void ButtonClick(BaseEventData eventData)
+        {
+        }
+        
+        protected virtual void ValueChange(UIBehaviour ui, int value)
+        {
+        }
+        
+        protected virtual void ValueChange(UIBehaviour ui, float value)
+        {
+        }
+        
+        protected virtual void ValueChange(UIBehaviour ui, string value)
+        {
+        }
+        
+        protected virtual void ValueChange(UIBehaviour ui, bool value)
+        {
+        }
+        
+        protected virtual void ValueChange(UIBehaviour ui, Vector2 value)
+        {
+        }
+        
+        protected virtual void ValueChange(UIBehaviour ui, Toggle value)
+        {
+        }
+        
         public void AddEscBtn()
         {
 

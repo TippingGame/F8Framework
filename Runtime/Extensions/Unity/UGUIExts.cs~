@@ -134,6 +134,121 @@ namespace F8Framework.Core
             return @this;
         }
         
+        // Slider 值改变
+        public static Slider AddValueChangedListener(this Slider @this, UnityAction<UIBehaviour, float> handle)
+        {
+            @this.onValueChanged.AddListener((value) => handle(@this, value));
+            return @this;
+        }
+
+        public static Slider RemoveValueChangedListener(this Slider @this, UnityAction<UIBehaviour, float> handle)
+        {
+            @this.onValueChanged.RemoveListener((value) => handle(@this, value));
+            return @this;
+        }
+
+        public static Slider RemoveAllValueChangedListeners(this Slider @this)
+        {
+            @this.onValueChanged.RemoveAllListeners();
+            return @this;
+        }
+
+        // Scrollbar 值改变
+        public static Scrollbar AddValueChangedListener(this Scrollbar @this, UnityAction<UIBehaviour, float> handle)
+        {
+            @this.onValueChanged.AddListener((value) => handle(@this, value));
+            return @this;
+        }
+
+        public static Scrollbar RemoveValueChangedListener(this Scrollbar @this, UnityAction<UIBehaviour, float> handle)
+        {
+            @this.onValueChanged.RemoveListener((value) => handle(@this, value));
+            return @this;
+        }
+
+        // Dropdown 值改变
+        public static Dropdown AddValueChangedListener(this Dropdown @this, UnityAction<UIBehaviour, int> handle)
+        {
+            @this.onValueChanged.AddListener((value) => handle(@this, value));
+            return @this;
+        }
+
+        public static Dropdown RemoveValueChangedListener(this Dropdown @this, UnityAction<UIBehaviour, int> handle)
+        {
+            @this.onValueChanged.RemoveListener((value) => handle(@this, value));
+            return @this;
+        }
+
+        // Toggle 值改变
+        public static Toggle AddValueChangedListener(this Toggle @this, UnityAction<UIBehaviour, bool> handle)
+        {
+            @this.onValueChanged.AddListener((value) => handle(@this, value));
+            return @this;
+        }
+
+        public static Toggle RemoveValueChangedListener(this Toggle @this, UnityAction<UIBehaviour, bool> handle)
+        {
+            @this.onValueChanged.RemoveListener((value) => handle(@this, value));
+            return @this;
+        }
+
+        // InputField 值改变
+        public static InputField AddValueChangedListener(this InputField @this, UnityAction<UIBehaviour, string> handle)
+        {
+            @this.onValueChanged.AddListener((value) => handle(@this, value));
+            return @this;
+        }
+
+        public static InputField RemoveValueChangedListener(this InputField @this, UnityAction<UIBehaviour, string> handle)
+        {
+            @this.onValueChanged.RemoveListener((value) => handle(@this, value));
+            return @this;
+        }
+        
+        public static InputField RemoveAllValueChangedListener(this InputField @this)
+        {
+            @this.onValueChanged.RemoveAllListeners();
+            return @this;
+        }
+
+        // InputField 结束编辑
+        public static InputField AddEndEditListener(this InputField @this, UnityAction<UIBehaviour, string> handle)
+        {
+            @this.onEndEdit.AddListener((value) => handle(@this, value));
+            return @this;
+        }
+        
+        public static InputField RemoveEndEditListener(this InputField @this, UnityAction<UIBehaviour, string> handle)
+        {
+            @this.onEndEdit.RemoveListener((value) => handle(@this, value));
+            return @this;
+        }
+        
+        public static InputField RemoveEndEditListener(this InputField @this)
+        {
+            @this.onEndEdit.RemoveAllListeners();
+            return @this;
+        }
+
+        // ScrollRect 值改变
+        public static ScrollRect AddValueChangedListener(this ScrollRect @this, UnityAction<UIBehaviour, Vector2> handle)
+        {
+            @this.onValueChanged.AddListener((value) => handle(@this, value));
+            return @this;
+        }
+
+        public static ScrollRect RemoveValueChangedListener(this ScrollRect @this, UnityAction<UIBehaviour, Vector2> handle)
+        {
+            @this.onValueChanged.RemoveListener((value) => handle(@this, value));
+            return @this;
+        }
+        
+        public static ScrollRect RemoveAllValueChangedListener(this ScrollRect @this, UnityAction<UIBehaviour, Vector2> handle)
+        {
+            @this.onValueChanged.RemoveListener((value) => handle(@this, value));
+            return @this;
+        }
+        
         public static void EnableImage(this Image @this)
         {
             var c = @this.color;

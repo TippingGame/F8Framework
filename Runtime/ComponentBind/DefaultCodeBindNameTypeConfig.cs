@@ -31,8 +31,10 @@ namespace F8Framework.Core
             { "Toggle", typeof(UnityEngine.UI.Toggle).ToString() },
             { "Scrollbar", typeof(UnityEngine.UI.Scrollbar).ToString() },
             { "ScrollRect", typeof(UnityEngine.UI.ScrollRect).ToString() },
-            { "Dropdown", typeof(UnityEngine.UI.Dropdown).ToString() },
+            { "Dropdown (Legacy)", typeof(UnityEngine.UI.Dropdown).ToString() },
             { "Text (TMP)", "TMPro.TMP_Text" },{ "tmp", "TMPro.TMP_Text" },
+            { "Dropdown", "TMPro.TMP_Dropdown" },
+            { "InputField (TMP)", "TMPro.TMP_InputField" },
         };
     }
 }

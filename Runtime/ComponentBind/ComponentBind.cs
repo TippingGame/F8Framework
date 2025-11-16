@@ -34,17 +34,17 @@ namespace F8Framework.Core
         //         Bind();
         //     }
         // }
-        
+
         private void GenerateAutoBindComponentsCode()
         {
             string scriptPath = GetScriptPath(this);
-            
+
             // 不是C#脚本就返回
             if (!System.IO.Path.GetExtension(scriptPath).Equals(".cs", System.StringComparison.OrdinalIgnoreCase))
             {
                 return;
             }
-            
+
             // Load the prefab
             GameObject prefab = gameObject;
 
@@ -52,7 +52,15 @@ namespace F8Framework.Core
             System.Text.StringBuilder generatedCode = new System.Text.StringBuilder();
             // 自动生成的引用代码
             System.Text.StringBuilder referenceCode = new System.Text.StringBuilder();
-            
+            // 自动生成的监听事件代码
+            System.Text.StringBuilder listenerCode = new System.Text.StringBuilder();
+            // 自动生成的监听事件字段
+            System.Text.StringBuilder listenerFieldCode = new System.Text.StringBuilder();
+
+            // 存储需要生成监听事件的组件
+            System.Collections.Generic.List<(string fieldName, string componentType)> listenerComponents =
+                new System.Collections.Generic.List<(string fieldName, string componentType)>();
+
             System.Collections.Generic.Queue<Transform> transforms = new System.Collections.Generic.Queue<Transform>();
             System.Collections.Generic.Queue<Transform> childs = new System.Collections.Generic.Queue<Transform>();
             transforms.Enqueue(gameObject.transform);
@@ -60,31 +68,34 @@ namespace F8Framework.Core
             while (transforms.Count > 0)
             {
                 Transform current = transforms.Dequeue();
-                
+
                 childs.Enqueue(current);
-                
+
                 // 将当前物体的子物体加入队列
                 foreach (Transform child in current)
                 {
                     transforms.Enqueue(child);
                 }
             }
-            
-            System.Collections.Generic.Dictionary<string, int> tempDic = new System.Collections.Generic.Dictionary<string, int>();
+
+            System.Collections.Generic.Dictionary<string, int> tempDic =
+                new System.Collections.Generic.Dictionary<string, int>();
             // 用于存储数组组件的字典
-            System.Collections.Generic.Dictionary<string, System.Collections.Generic.List<(string path, string componentType)>> arrayComponents = 
-                new System.Collections.Generic.Dictionary<string, System.Collections.Generic.List<(string path, string componentType)>>();
-            
+            System.Collections.Generic.Dictionary<string,
+                System.Collections.Generic.List<(string path, string componentType)>> arrayComponents =
+                new System.Collections.Generic.Dictionary<string,
+                    System.Collections.Generic.List<(string path, string componentType)>>();
+
             // 遍历Prefab中的所有物体
             foreach (Transform child in childs)
             {
-                if (child.Equals(transform))// 忽略自身
+                if (child.Equals(transform)) // 忽略自身
                     continue;
-                
+
                 System.Collections.Generic.List<string> componentNames = null;
-                
+
                 string[] nameDivision = child.gameObject.name.Split(_division);
-                
+
                 foreach (var name in nameDivision)
                 {
                     // 检查物体名字的一部分是否包含在字典的key中
@@ -102,49 +113,64 @@ namespace F8Framework.Core
 
                         string extension = System.IO.Path.GetExtension(componentType);
                         string typeToCheck = string.IsNullOrEmpty(extension) ? componentType : extension[1..];
-                        if (componentType != typeof(UnityEngine.GameObject).ToString() && !child.GetComponent(typeToCheck))
+                        if (componentType != typeof(UnityEngine.GameObject).ToString() &&
+                            !child.GetComponent(typeToCheck))
                             continue;
-                        
+
                         string normalizeName = RemoveSpecialCharacters(child.gameObject.name);
 
                         string normalizeKey = RemoveSpecialCharacters(key);
-                        
+
                         if (!tempDic.TryAdd($"{normalizeName}_{normalizeKey}", 1))
                         {
                             tempDic[$"{normalizeName}_{normalizeKey}"] += 1;
                             // LogF8.LogView("有重名物体：" + normalizeKey);
                             normalizeKey += _division + tempDic[$"{normalizeName}_{normalizeKey}"];
                         }
-                        
+
+                        string fieldName = $"{normalizeName}_{normalizeKey}";
+
                         // 生成自动获取组件的代码
-                        generatedCode.AppendLine($"\t[SerializeField] private {componentType} {normalizeName}_{normalizeKey};");
+                        generatedCode.AppendLine($"\t[SerializeField] private {componentType} {fieldName};");
                         // 生成引用代码
                         string childPath = GetChildPath(child, prefab.transform);
                         if (componentType == typeof(UnityEngine.GameObject).ToString())
                         {
-                            referenceCode.AppendLine($"\t\t{normalizeName}_{normalizeKey} = transform.Find(\"{SelectiveEscape(childPath)}\").gameObject;");
+                            referenceCode.AppendLine(
+                                $"\t\t{fieldName} = transform.Find(\"{SelectiveEscape(childPath)}\").gameObject;");
                         }
                         else
                         {
-                            referenceCode.AppendLine($"\t\t{normalizeName}_{normalizeKey} = transform.Find(\"{SelectiveEscape(childPath)}\").GetComponent<{componentType}>();");
+                            referenceCode.AppendLine(
+                                $"\t\t{fieldName} = transform.Find(\"{SelectiveEscape(childPath)}\").GetComponent<{componentType}>();");
                         }
-                        
+
+                        // 检查是否需要生成监听事件
+                        if (ShouldGenerateListener(componentType))
+                        {
+                            listenerComponents.Add((fieldName, componentType));
+                        }
+
                         // 检查是否是数组元素（名字以[数字]结尾）
-                        System.Text.RegularExpressions.Match matchArray = System.Text.RegularExpressions.Regex.Match(child.gameObject.name, @"^(.*?)\[\d+\]$");
+                        System.Text.RegularExpressions.Match matchArray =
+                            System.Text.RegularExpressions.Regex.Match(child.gameObject.name, @"^(.*?)\[\d+\]$");
                         if (matchArray.Success)
                         {
                             string baseName = matchArray.Groups[1].Value;
                             // 添加到数组字典
-                            if (!arrayComponents.ContainsKey(baseName + "_" + normalizeKey))
+                            string arrayKey = baseName + "_" + normalizeKey;
+                            if (!arrayComponents.ContainsKey(arrayKey))
                             {
-                                arrayComponents[baseName + "_" + normalizeKey] = new System.Collections.Generic.List<(string path, string componentType)>();
+                                arrayComponents[arrayKey] =
+                                    new System.Collections.Generic.List<(string path, string componentType)>();
                             }
-                            arrayComponents[baseName + "_" + normalizeKey].Add((childPath, componentType));
+
+                            arrayComponents[arrayKey].Add((childPath, componentType));
                         }
                     }
                 }
             }
-            
+
             // 处理数组组件
             foreach (var arrayItem in arrayComponents)
             {
@@ -170,24 +196,67 @@ namespace F8Framework.Core
 
                 // 数组大小 = 最大索引 + 1
                 int arraySize = maxIndex + 1;
-    
+
                 // 生成数组声明
-                generatedCode.AppendLine($"\t[SerializeField] private {componentType}[] {arrayName} = new {componentType}[{arraySize}];");
-    
+                generatedCode.AppendLine(
+                    $"\t[SerializeField] private {componentType}[] {arrayName} = new {componentType}[{arraySize}];");
+
                 // 生成数组元素赋值代码（使用元素自身的索引）
                 foreach (var item in indexedItems)
                 {
                     if (componentType == typeof(UnityEngine.GameObject).ToString())
                     {
-                        referenceCode.AppendLine($"\t\t{arrayName}[{item.index}] = transform.Find(\"{SelectiveEscape(item.path)}\").gameObject;");
+                        referenceCode.AppendLine(
+                            $"\t\t{arrayName}[{item.index}] = transform.Find(\"{SelectiveEscape(item.path)}\").gameObject;");
                     }
                     else
                     {
-                        referenceCode.AppendLine($"\t\t{arrayName}[{item.index}] = transform.Find(\"{SelectiveEscape(item.path)}\").GetComponent<{componentType}>();");
+                        referenceCode.AppendLine(
+                            $"\t\t{arrayName}[{item.index}] = transform.Find(\"{SelectiveEscape(item.path)}\").GetComponent<{componentType}>();");
+                    }
+                }
+
+                // 检查数组组件是否需要生成监听事件
+                if (ShouldGenerateListener(componentType))
+                {
+                    // 为数组中的每个元素生成监听
+                    for (int i = 0; i < arraySize; i++)
+                    {
+                        listenerComponents.Add(($"{arrayName}[{i}]", componentType));
                     }
                 }
             }
-            
+
+            // 生成监听事件代码
+            if (listenerComponents.Count > 0)
+            {
+                // 生成监听事件字段
+                foreach (var component in listenerComponents)
+                {
+                    string listenerField = GenerateListenerField(component.fieldName, component.componentType);
+                    if (!string.IsNullOrEmpty(listenerField))
+                    {
+                        listenerFieldCode.AppendLine($"\t{listenerField}");
+                    }
+                }
+                
+                listenerCode.AppendLine(listenerFieldCode.ToString());
+                listenerCode.AppendLine("\t// 自动生成");
+                listenerCode.AppendLine("\tprotected override void OnAddUIComponentListener()");
+                listenerCode.AppendLine("\t{");
+
+                foreach (var component in listenerComponents)
+                {
+                    string listenerCall = GenerateListenerCall(component.fieldName, component.componentType);
+                    if (!string.IsNullOrEmpty(listenerCall))
+                    {
+                        listenerCode.AppendLine($"\t\t{listenerCall}");
+                    }
+                }
+
+                listenerCode.AppendLine("\t}");
+            }
+
             // 将生成的代码插入到脚本中
             string scriptContent;
             using (System.IO.StreamReader reader = new System.IO.StreamReader(scriptPath))
@@ -199,27 +268,32 @@ namespace F8Framework.Core
 
             // 使用正则表达式匹配并替换注释之间的内容
             string pattern = @"// 自动获取组件（自动生成，不能删除）(.*?)// 自动获取组件（自动生成，不能删除）";
-            System.Text.RegularExpressions.Regex regex = new System.Text.RegularExpressions.Regex(pattern, System.Text.RegularExpressions.RegexOptions.Singleline);
+            System.Text.RegularExpressions.Regex regex =
+                new System.Text.RegularExpressions.Regex(pattern,
+                    System.Text.RegularExpressions.RegexOptions.Singleline);
             System.Text.RegularExpressions.Match match = regex.Match(scriptContent);
 
             if (match.Success)
             {
                 // 替换注释之间的内容，包含头尾的注释
                 scriptContent = scriptContent.Remove(match.Groups[0].Index, match.Groups[0].Length);
-                scriptContent = scriptContent.Insert(match.Groups[0].Index, $"// 自动获取组件（自动生成，不能删除）\n{generatedCode}" +
-                                                                            $"\n#if UNITY_EDITOR" +
-                                                                            $"\n\tprotected override void SetComponents()" +
-                                                                            $"\n\t{{" +
-                                                                            $"\n{referenceCode}" +
-                                                                            $"\t}}" +
-                                                                            $"\n#endif" +
-                                                                            $"\n\t// 自动获取组件（自动生成，不能删除）");
-                
+                scriptContent = scriptContent.Insert(match.Groups[0].Index,
+                    $"// 自动获取组件（自动生成，不能删除）\n{generatedCode}" +
+                    $"\n{listenerCode}" +
+                    $"\n#if UNITY_EDITOR" +
+                    $"\n\t// 自动生成" +
+                    $"\n\tprotected override void SetComponents()" +
+                    $"\n\t{{" +
+                    $"\n{referenceCode}" +
+                    $"\t}}" +
+                    $"\n#endif" +
+                    $"\n\t// 自动获取组件（自动生成，不能删除）");
+
                 // 将所有换行符替换为 UNIX 风格的 "\n"
                 scriptContent = scriptContent.Replace("\r\n", "\n").Replace("\r", "\n");
-                
+
                 // 保存脚本文件
-                using (System.IO.StreamWriter writer = new System.IO.StreamWriter(scriptPath, false)) // 第二个参数表示是否覆盖已有内容，这里设置为 false 表示覆盖
+                using (System.IO.StreamWriter writer = new System.IO.StreamWriter(scriptPath, false))
                 {
                     writer.Write(scriptContent);
                     // 关闭文件句柄
@@ -243,6 +317,79 @@ namespace F8Framework.Core
             {
                 LogF8.Log("在脚本中找不到插入标记。请在要生成代码的位置添加“// 自动获取组件（自动生成，不能删除）”。");
             }
+        }
+
+        // 检查组件类型是否需要生成监听事件
+        private bool ShouldGenerateListener(string componentType)
+        {
+            string[] listenerTypes =
+            {
+                "UnityEngine.UI.Button",
+                "UnityEngine.UI.Slider",
+                "UnityEngine.UI.Scrollbar",
+                "UnityEngine.UI.Dropdown",
+                "UnityEngine.UI.Toggle",
+                "UnityEngine.UI.InputField",
+                "UnityEngine.UI.ScrollRect"
+            };
+
+            return Array.Exists(listenerTypes, type => componentType.Contains(type));
+        }
+
+        // 生成监听事件字段
+        private string GenerateListenerField(string fieldName, string componentType)
+        {
+            string normalizedFieldName = fieldName.Replace("[", "_").Replace("]", "_");
+
+            if (componentType.Contains("UnityEngine.UI.Slider"))
+            {
+                return $"private UnityAction<float> unityAction_{normalizedFieldName};";
+            }
+            else if (componentType.Contains("UnityEngine.UI.Scrollbar"))
+            {
+                return $"private UnityAction<float> unityAction_{normalizedFieldName};";
+            }
+            else if (componentType.Contains("UnityEngine.UI.Dropdown"))
+            {
+                return $"private UnityAction<int> unityAction_{normalizedFieldName};";
+            }
+            else if (componentType.Contains("UnityEngine.UI.Toggle"))
+            {
+                return $"private UnityAction<bool> unityAction_{normalizedFieldName};";
+            }
+            else if (componentType.Contains("UnityEngine.UI.InputField"))
+            {
+                return $"private UnityAction<string> unityAction_{normalizedFieldName};";
+            }
+            else if (componentType.Contains("UnityEngine.UI.ScrollRect"))
+            {
+                return $"private UnityAction<Vector2> unityAction_{normalizedFieldName};";
+            }
+
+            return string.Empty;
+        }
+
+        // 生成监听事件调用代码
+        private string GenerateListenerCall(string fieldName, string componentType)
+        {
+            string normalizedFieldName = fieldName.Replace("[", "_").Replace("]", "_");
+
+            if (componentType.Contains("UnityEngine.UI.Button"))
+            {
+                return $"{fieldName}?.AddButtonClickListener(ButtonClick);";
+            }
+            else if (componentType.Contains("UnityEngine.UI.Slider") ||
+                     componentType.Contains("UnityEngine.UI.Scrollbar") ||
+                     componentType.Contains("UnityEngine.UI.Dropdown") ||
+                     componentType.Contains("UnityEngine.UI.Toggle") ||
+                     componentType.Contains("UnityEngine.UI.InputField") ||
+                     componentType.Contains("UnityEngine.UI.ScrollRect"))
+            {
+                return
+                    $"unityAction_{normalizedFieldName} = (value) => ValueChange({fieldName}, value);\n\t\t{fieldName}?.onValueChanged.AddListener(unityAction_{normalizedFieldName});";
+            }
+
+            return string.Empty;
         }
         
         private string SelectiveEscape(string input)
