@@ -147,7 +147,7 @@ ReadExcel.Instance.LoadAllExcelData(); // 运行时加载 Excel 最新文件
 
 ## 使用到的库
 
-Excel.dll（已修改缓存地址为Application.persistentDataPath）  
+Excel.dll（已修改缓存地址为Application.persistentDataPath，新增使用byte[]读取Excel方法）  
 I18N.CJK.dll\
 I18N.dll\
 I18N.MidEast.dll\
@@ -180,67 +180,12 @@ I18N.West.dll\
     
 ## 注意
 
-**由于 Android 资源都在包内，在 Android 上使用实时读取Excel功能，需要先复制到可读写文件夹中再进行读取**
+**由于 Android 资源都在包内，在 Android 上使用实时读取Excel功能，需要先复制到可读写文件夹中再进行读取**  
+**框架内使用ICSharpCode.SharpZipLib.Zip库ZipFile类直接读取，可直接读取StreamingAssets文件，具体请看：[SyncStreamingAssetsLoader.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/Utility/StreamingAssetsHelper/SyncStreamingAssetsLoader.cs)**
 
 ```C#
-    // 方式二：运行时读取Excel
-    IEnumerator Start()
-    {
-        // 由于安卓资源都在包内，需要先复制到可读写文件夹1
-        string assetPath = URLSetting.STREAMINGASSETS_URL + "config";
-        string[] paths = null;
-        WWW www = new WWW(assetPath + "/fileindex.txt");
-        yield return www;
-        if (www.error != null)
-        {
-            LogF8.Log(www.error);
-            yield return null;
-        }
-        else
-        {
-            string ss = www.text;
-            // 去除夹杂的空行
-            string[] lines = ss.Split('\n');
-            List<string> nonEmptyLines = new List<string>();
-    
-            foreach (string line in lines)
-            {
-                string trimmedLine = line.Trim();
-    
-                if (!string.IsNullOrEmpty(trimmedLine))
-                {
-                    nonEmptyLines.Add(trimmedLine);
-                }
-            }
-    
-            paths = nonEmptyLines.ToArray();
-        }
-    
-        for (int i = 0; i < paths.Length; i++)
-        {
-            yield return CopyAssets(paths[i].Replace("\r", ""));
-        }
-        // 读取Excel文件
-        ReadExcel.Instance.LoadAllExcelData();
-        LogF8.Log(FF8.Config.GetSheet1ByID(1).name);
-        LogF8.Log(FF8.Config.GetSheet1());
-    }
-    
-    // 由于安卓资源都在包内，需要先复制到可读写文件夹2
-    IEnumerator CopyAssets(string paths)
-    {
-        string assetPath = URLSetting.STREAMINGASSETS_URL + "config";
-        string sdCardPath = Application.persistentDataPath + "/config";
-        WWW www = new WWW(assetPath + "/" + paths);
-        yield return www;
-        if(www.error != null)
-        {
-            LogF8.Log(www.error);
-            yield return null;
-        }
-        else
-        {
-            FileTools.SafeWriteAllBytes(sdCardPath + "/" + paths, www.bytes);
-        }
-    }
+    // 同步读取config文件夹下的文件
+    string[] files = SyncStreamingAssetsLoader.Instance.ReadAllLines("config/fileindex.txt");
+    // 使用后释放资源
+    SyncStreamingAssetsLoader.Instance.Close();
 ```

@@ -144,7 +144,7 @@ foreach (var item in FF8.Config.GetSheet1())
 
 ## Libraries Used
 
-Excel.dll (cache path modified to **Application.persistentDataPath**)  
+Excel.dll (cache path modified to **Application.persistentDataPath**, Add the method of using byte [] to read Excel)  
 I18N.CJK.dll\
 I18N.dll\
 I18N.MidEast.dll\
@@ -176,65 +176,12 @@ public static void WriteExcel(string str, int row, int col, string value)
 
 ## Important Notes
 
-**On Android, resources are inside the APK. To use runtime Excel reading, copy files to a writable folder first:**
+**On Android, resources are inside the APK. To use runtime Excel reading, copy files to a writable folder first:**  
+**Using the ICSharpCode.SharpZipLib.Zip library ZipFile class within the framework can directly read StreamingAssets files. Please refer to the details for more information:[SyncStreamingAssetsLoader.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/Utility/StreamingAssetsHelper/SyncStreamingAssetsLoader.cs)**
 
 ```C#
-IEnumerator Start()  
-{  
-    // Method 2: Read Excel at runtime  
-    // Copy files to a writable folder on Android  
-    string assetPath = URLSetting.STREAMINGASSETS_URL + "config";  
-    string[] paths = null;  
-    WWW www = new WWW(assetPath + "/fileindex.txt");  
-    yield return www;  
-    if (www.error != null)  
-    {  
-        LogF8.Log(www.error);  
-        yield return null;  
-    }  
-    else  
-    {  
-        string ss = www.text;  
-        // Remove empty lines  
-        string[] lines = ss.Split('\n');  
-        List<string> nonEmptyLines = new List<string>();  
-
-        foreach (string line in lines)  
-        {  
-            string trimmedLine = line.Trim();  
-            if (!string.IsNullOrEmpty(trimmedLine))  
-            {  
-                nonEmptyLines.Add(trimmedLine);  
-            }  
-        }  
-        paths = nonEmptyLines.ToArray();  
-    }  
-
-    for (int i = 0; i < paths.Length; i++)  
-    {  
-        yield return CopyAssets(paths[i].Replace("\r", ""));  
-    }  
-
-    // Read Excel files  
-    ReadExcel.Instance.LoadAllExcelData();  
-    LogF8.Log(FF8.Config.GetSheet1ByID(1).name);  
-    LogF8.Log(FF8.Config.GetSheet1());  
-}  
-
-IEnumerator CopyAssets(string paths)  
-{  
-    string assetPath = URLSetting.STREAMINGASSETS_URL + "config";  
-    string sdCardPath = Application.persistentDataPath + "/config";  
-    WWW www = new WWW(assetPath + "/" + paths);  
-    yield return www;  
-    if (www.error != null)  
-    {  
-        LogF8.Log(www.error);  
-        yield return null;  
-    }  
-    else  
-    {  
-        FileTools.SafeWriteAllBytes(sdCardPath + "/" + paths, www.bytes);  
-    }  
-}  
+    // 同步读取config文件夹下的文件
+    string[] files = SyncStreamingAssetsLoader.Instance.ReadAllLines("config/fileindex.txt");
+    // 使用后释放资源
+    SyncStreamingAssetsLoader.Instance.Close();
 ```

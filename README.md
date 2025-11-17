@@ -46,7 +46,7 @@ Unity 2021、2022、2023、6000
 * [18. SDK接入管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/README.md) - 与**原生平台交互**，接入多个平台或者渠道SDK，登录/退出/切换/支付/视频广告/退出游戏/原生Toast。
 * [19. 网络连接与通信（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Network/README.md) - 使用 KCP / TCP / WebSocket 网络通讯协议建立长连接通道，支持Client端和Server端。
 ### ----------第三方库（注意冲突）----------
-* Excel.dll：读/写 Excel（已修改缓存地址为Application.persistentDataPath）
+* Excel.dll：读/写 Excel（已修改缓存地址为Application.persistentDataPath，新增使用byte[]读取Excel方法）
 * I18N.CJK.dll，I18N.dll，I18N.MidEast.dll，I18N.Other.dll，I18N.Rare.dll，I18N.West.dll：只为读/写 Excel
 * [ICSharpCode.SharpZipLib](https://github.com/icsharpcode/SharpZipLib)：压缩/解压缩
 * [Mirror(内置):KCP](https://github.com/MirrorNetworking/kcp2k)：Reliable UDP

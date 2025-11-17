@@ -76,7 +76,7 @@ namespace F8Framework.Core
 #elif UNITY_STANDALONE
         string INPUT_PATH = URLSetting.CS_STREAMINGASSETS_URL + ExcelPath;
 #elif UNITY_ANDROID
-        string INPUT_PATH = UnityEngine.Application.persistentDataPath + "/" + ExcelPath;
+        string INPUT_PATH = URLSetting.CS_STREAMINGASSETS_URL + ExcelPath;
 #elif UNITY_IPHONE || UNITY_IOS
         string INPUT_PATH = URLSetting.CS_STREAMINGASSETS_URL + ExcelPath;
 #elif UNITY_WEBGL
@@ -91,8 +91,12 @@ namespace F8Framework.Core
                 throw new Exception("请先设置数据表路径！");
             }
 
+#if !UNITY_EDITOR && UNITY_ANDROID
+            var files = SyncStreamingAssetsLoader.Instance.ReadAllLines(INPUT_PATH + "/fileindex.txt");
+#else
             var files = Directory.GetFiles(INPUT_PATH, "*.*", SearchOption.AllDirectories)
                 .Where(s => s.EndsWith(".xls") || s.EndsWith(".xlsx")).ToArray();
+#endif
             if (files == null || files.Length == 0)
             {
                 throw new Exception("暂无可以导入的数据表！首次F8请手动导入，【DemoWorkSheet.xlsx / Localization.xlsx】两个表格！" + INPUT_PATH + " 目录");
@@ -113,6 +117,10 @@ namespace F8Framework.Core
                 step++;
                 GetExcelData(item);
             }
+            
+#if !UNITY_EDITOR && UNITY_ANDROID
+            SyncStreamingAssetsLoader.Instance.Close();
+#endif
 
             var assembly = Assembly.Load(CODE_NAMESPACE);
             step = 1;
@@ -144,24 +152,32 @@ namespace F8Framework.Core
         private void GetExcelData(string inputPath)
         {
             FileStream stream = null;
+            IExcelDataReader excelReader = null;
             try
             {
-                stream = File.Open(inputPath, FileMode.Open, FileAccess.Read);
-            }
-            catch
-            {
-                throw new Exception("请关闭 " + inputPath + " 后再导表！");
-            }
+#if !UNITY_EDITOR && UNITY_ANDROID
+                inputPath = ExcelPath + "/" + inputPath;
+                if (inputPath.EndsWith(".xls"))
+                {
+                    byte[] excelData = SyncStreamingAssetsLoader.Instance.LoadBytes(inputPath);
+                    excelReader = ExcelReaderFactory.CreateBinaryReader(excelData);
+                }
+                else if (inputPath.EndsWith(".xlsx"))
+                {
+                    byte[] excelData = SyncStreamingAssetsLoader.Instance.LoadBytes(inputPath);
+                    excelReader = ExcelReaderFactory.CreateOpenXmlReader(excelData);
+                }
+#else
+                stream = File.Open(inputPath, FileMode.Open, FileAccess.Read, FileShare.Read);
 
-            IExcelDataReader excelReader = null;
-            if (inputPath.EndsWith(".xls")) excelReader = ExcelReaderFactory.CreateBinaryReader(stream);
-            else if (inputPath.EndsWith(".xlsx")) excelReader = ExcelReaderFactory.CreateOpenXmlReader(stream);
-            if (!excelReader.IsValid)
-            {
-                throw new Exception("无法读取的文件:  " + inputPath);
-            }
-            else
-            {
+                if (inputPath.EndsWith(".xls")) excelReader = ExcelReaderFactory.CreateBinaryReader(stream);
+                else if (inputPath.EndsWith(".xlsx")) excelReader = ExcelReaderFactory.CreateOpenXmlReader(stream);
+#endif
+                if (!excelReader.IsValid)
+                {
+                    throw new Exception("无法读取的文件:  " + inputPath);
+                }
+
                 do // 读取所有的sheet
                 {
                     // sheet name
@@ -195,9 +211,11 @@ namespace F8Framework.Core
                         //后面的表示数据
                         else if (index > 2)
                         {
-                            if (types == null || names == null || datas == null){
-                                throw new Exception("数据错误！["+ className +"]配置表！第" + index + "行" + inputPath);
+                            if (types == null || names == null || datas == null)
+                            {
+                                throw new Exception("数据错误！[" + className + "]配置表！第" + index + "行" + inputPath);
                             }
+
                             //把读取的数据和数据类型,名称保存起来,后面用来动态生成类
                             List<ConfigData> configDataList = new List<ConfigData>();
                             for (int j = 0; j < datas.Length; ++j)
@@ -234,9 +252,20 @@ namespace F8Framework.Core
                     }
                 } while (excelReader.NextResult()); //excelReader.NextResult() Excel表下一个sheet页有没有数据
             }
-
-            stream.Dispose();
-            stream.Close();
+            catch (IOException)
+            {
+                throw new Exception("请关闭 " + inputPath + " 后再导表！");
+            }
+            catch (Exception ex)
+            {
+                LogF8.LogError($"处理Excel文件失败: {inputPath}, 错误: {ex.Message}");
+                throw;
+            }
+            finally
+            {
+                excelReader?.Dispose();
+                stream?.Dispose();
+            }
         }
 
         //序列化对象

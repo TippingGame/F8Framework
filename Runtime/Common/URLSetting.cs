@@ -79,7 +79,7 @@ namespace F8Framework.Core
 #if UNITY_EDITOR || UNITY_STANDALONE
         public static string CS_STREAMINGASSETS_URL = Application.streamingAssetsPath + "/";
 #elif UNITY_ANDROID
-        public static string CS_STREAMINGASSETS_URL = "null";
+        public static string CS_STREAMINGASSETS_URL = string.Empty;
 #elif UNITY_IPHONE || UNITY_IOS
         public static string CS_STREAMINGASSETS_URL = Application.streamingAssetsPath + "/";
 #elif UNITY_WEBGL

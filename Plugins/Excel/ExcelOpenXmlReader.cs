@@ -31,13 +31,23 @@
         private string instanceId = Guid.NewGuid().ToString();
         private List<int> _defaultDateTimeStyles;
         private string _namespaceUri;
+        private bool _isFromBytes; // 新增：标记是否从字节数组初始化
+        private byte[] _fileBytes; // 新增：存储字节数组
 
         internal ExcelOpenXmlReader()
         {
             int[] collection = new int[] { 14, 15, 0x10, 0x11, 0x12, 0x13, 20, 0x15, 0x16, 0x2d, 0x2e, 0x2f };
             this._defaultDateTimeStyles = new List<int>(collection);
+            this._isFromBytes = false; // 默认不是从字节数组初始化
         }
 
+        // 新增：从字节数组初始化的构造函数
+        internal ExcelOpenXmlReader(byte[] fileBytes) : this()
+        {
+            this._fileBytes = fileBytes;
+            this._isFromBytes = true;
+        }
+        
         public DataSet AsDataSet() => 
             this.AsDataSet(true);
 
@@ -194,6 +204,7 @@
                 this._workbook = null;
                 this._cellsValues = null;
                 this._savedCellsValues = null;
+                this._fileBytes = null; // 释放字节数组引用
                 this.disposed = true;
             }
         }
@@ -306,8 +317,47 @@
             throw new NotSupportedException();
         }
 
+        // 新增：从字节数组初始化
+        public void Initialize(byte[] fileBytes)
+        {
+            this._fileBytes = fileBytes;
+            this._isFromBytes = true;
+            InitializeFromBytes();
+        }
+
+        // 新增：从字节数组初始化的具体实现
+        private void InitializeFromBytes()
+        {
+            if (this._fileBytes == null || this._fileBytes.Length == 0)
+            {
+                this._isValid = false;
+                this._exceptionMessage = "File bytes cannot be null or empty";
+                this.Close();
+                return;
+            }
+
+            // 创建内存流
+            using (var memoryStream = new MemoryStream(this._fileBytes, false))
+            {
+                this._zipWorker = new ZipWorker();
+                this._zipWorker.Extract(memoryStream);
+                
+                if (this._zipWorker.IsValid)
+                {
+                    this.ReadGlobals();
+                }
+                else
+                {
+                    this._isValid = false;
+                    this._exceptionMessage = this._zipWorker.ExceptionMessage;
+                    this.Close();
+                }
+            }
+        }
+        
         public void Initialize(Stream fileStream)
         {
+            this._isFromBytes = false; // 标记为从流初始化
             this._zipWorker = new ZipWorker();
             this._zipWorker.Extract(fileStream);
             if (this._zipWorker.IsValid)
@@ -557,6 +607,9 @@
             return true;
         }
 
+        // 新增属性：检查是否从字节数组初始化
+        public bool IsFromBytes => this._isFromBytes;
+        
         public bool IsFirstRowAsColumnNames
         {
             get => 

@@ -45,6 +45,8 @@
         private bool m_IsFirstRead;
         private bool _isFirstRowAsColumnNames;
         private bool disposed;
+        private bool m_isFromBytes; // 新增：标记是否从字节数组初始化
+        private byte[] m_fileBytes; // 新增：存储字节数组
 
         internal ExcelBinaryReader()
         {
@@ -54,6 +56,7 @@
             this.m_isValid = true;
             this.m_SheetIndex = -1;
             this.m_IsFirstRead = true;
+            this.m_isFromBytes = false; // 默认不是从字节数组初始化
         }
 
         internal ExcelBinaryReader(Excel.ReadOption readOption) : this()
@@ -61,6 +64,20 @@
             this.m_ReadOption = readOption;
         }
 
+        // 新增：从字节数组初始化的构造函数
+        internal ExcelBinaryReader(byte[] fileBytes) : this()
+        {
+            this.m_fileBytes = fileBytes;
+            this.m_isFromBytes = true;
+        }
+
+        // 新增：从字节数组初始化的构造函数（带读取选项）
+        internal ExcelBinaryReader(byte[] fileBytes, Excel.ReadOption readOption) : this(readOption)
+        {
+            this.m_fileBytes = fileBytes;
+            this.m_isFromBytes = true;
+        }
+        
         public DataSet AsDataSet() => 
             this.AsDataSet(false);
 
@@ -83,7 +100,22 @@
                         this.m_workbookData.Tables.Add(table);
                     }
                 }
-                this.m_file.Close();
+                // 修改：根据初始化方式决定如何关闭流
+                if (this.m_isFromBytes)
+                {
+                    // 从字节数组初始化的，只需要关闭内存流
+                    if (this.m_file != null)
+                    {
+                        this.m_file.Close();
+                        this.m_file.Dispose();
+                        this.m_file = null;
+                    }
+                }
+                else
+                {
+                    // 从文件流初始化的，关闭原始文件流
+                    this.m_file.Close();
+                }
                 this.m_isClosed = true;
                 this.m_workbookData.AcceptChanges();
                 Helpers.FixDataTypes(this.m_workbookData);
@@ -93,7 +125,15 @@
 
         public void Close()
         {
-            this.m_file.Close();
+            if (this.m_file != null)
+            {
+                this.m_file.Close();
+                if (this.m_isFromBytes)
+                {
+                    this.m_file.Dispose();
+                    this.m_file = null;
+                }
+            }
             this.m_isClosed = true;
         }
 
@@ -117,6 +157,12 @@
                     {
                         this.m_sheets.Clear();
                     }
+                    // 新增：释放内存流
+                    if (this.m_isFromBytes && this.m_file != null)
+                    {
+                        this.m_file.Dispose();
+                        this.m_file = null;
+                    }
                 }
                 this.m_workbookData = null;
                 this.m_sheets = null;
@@ -124,8 +170,32 @@
                 this.m_globals = null;
                 this.m_encoding = null;
                 this.m_hdr = null;
+                this.m_fileBytes = null; // 释放字节数组引用
                 this.disposed = true;
             }
+        }
+
+        // 新增：从字节数组初始化
+        public void Initialize(byte[] fileBytes)
+        {
+            this.m_fileBytes = fileBytes;
+            this.m_isFromBytes = true;
+            InitializeFromBytes();
+        }
+
+        // 新增：从字节数组初始化的具体实现
+        private void InitializeFromBytes()
+        {
+            if (this.m_fileBytes == null || this.m_fileBytes.Length == 0)
+            {
+                this.fail("File bytes cannot be null or empty");
+                return;
+            }
+
+            // 创建内存流
+            this.m_file = new MemoryStream(this.m_fileBytes, false);
+            this.readWorkBookGlobals();
+            this.m_SheetIndex = 0;
         }
 
         private void DumpBiffRecords()
@@ -309,6 +379,7 @@
         public void Initialize(Stream fileStream)
         {
             this.m_file = fileStream;
+            this.m_isFromBytes = false; // 标记为从流初始化
             this.readWorkBookGlobals();
             this.m_SheetIndex = 0;
         }
@@ -1162,6 +1233,9 @@
             return (!double.TryParse(value.ToString(), out num) ? value : this.tryConvertOADateTime(num, XFormat));
         }
 
+        // 新增属性：检查是否从字节数组初始化
+        public bool IsFromBytes => this.m_isFromBytes;
+        
         public string ExceptionMessage =>
             this.m_exceptionMessage;
 
