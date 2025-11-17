@@ -113,6 +113,8 @@ foreach(var item in FF8.Config.LoadAllAsync())
 {  
     yield return item;  
 }  
+// async/await method (no multithreading, WebGL can also be used)
+await FF8.Config.LoadAllAsyncTask();
 ```
 
 Read Excel at Runtime (Use with Caution):
@@ -180,8 +182,9 @@ public static void WriteExcel(string str, int row, int col, string value)
 **Using the ICSharpCode.SharpZipLib.Zip library ZipFile class within the framework can directly read StreamingAssets files. Please refer to the details for more information:[SyncStreamingAssetsLoader.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/Utility/StreamingAssetsHelper/SyncStreamingAssetsLoader.cs)**
 
 ```C#
-    // 同步读取config文件夹下的文件
+    // Sync reading files from the config folder
     string[] files = SyncStreamingAssetsLoader.Instance.ReadAllLines("config/fileindex.txt");
-    // 使用后释放资源
+    
+    // Release resources after use
     SyncStreamingAssetsLoader.Instance.Close();
 ```

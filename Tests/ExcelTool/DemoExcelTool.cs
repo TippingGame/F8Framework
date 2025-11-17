@@ -26,6 +26,8 @@ namespace F8Framework.Tests
             {
                 yield return item;
             }
+            // async/await方式（无多线程，WebGL也可使用）
+            // await FF8.Config.LoadAllAsyncTask();
         
             // 单个表单个数据
             LogF8.Log(FF8.Config.GetSheet1ByID(2).name);

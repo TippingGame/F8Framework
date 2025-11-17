@@ -277,6 +277,7 @@ namespace F8Framework.Core.Editor
             source.Append("using System;\n");
             source.Append("using System.Collections;\n");
             source.Append("using System.Collections.Generic;\n");
+            source.Append("using System.Threading.Tasks;\n");
             source.Append("using UnityEngine;\n");
             source.Append("using F8Framework.Core;\n");
             source.Append("using UnityEngine.Scripting;\n\n");
@@ -385,6 +386,22 @@ namespace F8Framework.Core.Editor
             
             //异步加载所有配置表
             source.Append("\t\t[Preserve]\n");
+            source.Append("\t\tpublic async Task LoadAllAsyncTask()\n");
+            source.Append("\t\t{\n");
+            foreach (string t in types)
+            {
+                source.Append("\t\t\tawait LoadAsyncTask<" + t + ">("+ '"' + t + '"' + ", result => " +  "p_" + t + " = result" + " as " + t + ");\n");
+            }
+            source.Append("#if UNITY_EDITOR\n");
+            source.Append("\t\t\tif (AssetManager.Instance.IsEditorMode)\n");
+            source.Append("\t\t\t{\n");
+            source.Append("\t\t\t\tReadExcel.Instance.LoadAllExcelData();\n");
+            source.Append("\t\t\t}\n");
+            source.Append("#endif\n");
+            source.Append("\t\t}\n\n");
+            
+            //异步加载所有配置表
+            source.Append("\t\t[Preserve]\n");
             source.Append("\t\tpublic void LoadAllAsyncCallback(Action onLoadComplete = null)\n");
             source.Append("\t\t{\n");
             source.Append("\t\t\tUtil.Unity.StartCoroutine(LoadAllAsyncIEnumerator(onLoadComplete));\n");
@@ -448,6 +465,27 @@ namespace F8Framework.Core.Editor
             source.Append("\t\t\t\tcallback(obj);\n");
             source.Append("\t\t\t}\n");
             source.Append("\t\t}\n\n");
+            
+            source.Append("\t\t[Preserve]\n");
+            source.Append("\t\tpublic async Task LoadAsyncTask<T>(string name, Action<T> callback)\n");
+            source.Append("\t\t{\n");
+            source.Append("\t\t\tBaseLoader load = AssetManager.Instance.LoadAsync<TextAsset>(name);\n");
+            source.Append("\t\t\tawait load;\n");
+            source.Append("\t\t\tTextAsset textAsset = AssetManager.Instance.GetAssetObject<TextAsset>(name);\n");
+            source.Append("\t\t\tif (textAsset != null)\n");
+            source.Append("\t\t\t{\n");
+            source.Append("\t\t\t\tAssetManager.Instance.Unload(name, false);\n");
+            if (exportFormat == BuildPkgTool.ExcelToOtherFormats[1])
+            {
+                source.Append("\t\t\t\tT obj = Util.BinarySerializer.Deserialize<T>(textAsset.bytes);\n");
+            }else
+            {
+                source.Append("\t\t\t\tT obj = Util.LitJson.ToObject<T>(textAsset.text);\n");
+            }
+            source.Append("\t\t\t\tcallback(obj);\n");
+            source.Append("\t\t\t}\n");
+            source.Append("\t\t}\n\n");
+            
             source.Append("\t\tpublic void OnInit(object createParam)\n");
             source.Append("\t\t{\n");
             source.Append("\t\t\t\n");

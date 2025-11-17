@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.8.194] - 2025-11-18
+1.新增加载配置表LoadAllAsyncTask方法，LoadAsyncTask方法  
+
 ## [1.8.193] - 2025-11-17
 1.优化Excel可在运行时读表时打开  
 

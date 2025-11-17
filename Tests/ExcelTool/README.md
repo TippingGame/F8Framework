@@ -117,6 +117,8 @@ foreach(var item in FF8.Config.LoadAllAsync())
 {
     yield return item;
 }
+// async/await方式（无多线程，WebGL也可使用）
+await FF8.Config.LoadAllAsyncTask();
 ```
 
 运行时读取Excel的方式（如没有需求请谨慎使用）：
@@ -186,6 +188,7 @@ I18N.West.dll\
 ```C#
     // 同步读取config文件夹下的文件
     string[] files = SyncStreamingAssetsLoader.Instance.ReadAllLines("config/fileindex.txt");
+    
     // 使用后释放资源
     SyncStreamingAssetsLoader.Instance.Close();
 ```
