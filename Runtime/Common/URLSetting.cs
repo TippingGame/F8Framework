@@ -16,12 +16,17 @@ namespace F8Framework.Core
 
         public static string GetAssetBundlesOutPath()
         {
-            return Application.dataPath + "/../Bundles/" + AssetBundlesName + "/" + GetPlatformName();
+            return FileTools.FormatToUnityPath(FileTools.TruncatePath(Application.dataPath, 1)) + "/Bundles/" + AssetBundlesName + "/" + GetPlatformName();
         }
 
         public static string GetAssetBundlesStreamPath()
         {
             return Application.dataPath + "/StreamingAssets/" + AssetBundlesName + "/" + GetPlatformName();
+        }
+        
+        public static string GetTempExcelPath()
+        {
+            return FileTools.FormatToUnityPath(FileTools.TruncatePath(Application.dataPath, 1)) + "/temp_Excel";
         }
 
         public static string GetPlatformName()

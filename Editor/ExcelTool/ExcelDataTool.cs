@@ -106,7 +106,7 @@ namespace F8Framework.Core.Editor
             FileTools.CheckDirAndCreateWhenNeeded(INPUT_PATH);
             
             var files = Directory.GetFiles(INPUT_PATH, "*.*", SearchOption.AllDirectories)
-                .Where(s => s.EndsWith(".xls") || s.EndsWith(".xlsx")).ToArray();
+                .Where(s => (s.EndsWith(".xls") || s.EndsWith(".xlsx")) && !Path.GetFileName(s).StartsWith("~$")).ToArray();
             if (files == null || files.Length == 0)
             {
                 FileTools.SafeCopyFile(
@@ -118,7 +118,7 @@ namespace F8Framework.Core.Editor
                     "/Runtime/Localization/StreamingAssets_config/Localization.xlsx",
                     lastExcelPath + "/Localization.xlsx");
                 files = Directory.GetFiles(INPUT_PATH, "*.*", SearchOption.AllDirectories)
-                    .Where(s => s.EndsWith(".xls") || s.EndsWith(".xlsx")).ToArray();
+                    .Where(s => (s.EndsWith(".xls") || s.EndsWith(".xlsx")) && !Path.GetFileName(s).StartsWith("~$")).ToArray();
                 LogF8.LogError("暂无可以导入的数据表！自动为你创建：【DemoWorkSheet.xlsx / Localization.xlsx】两个表格！" + lastExcelPath + " 目录");
             }
             
@@ -147,6 +147,9 @@ namespace F8Framework.Core.Editor
             FileTools.SafeDeleteFile(URLSetting.CS_STREAMINGASSETS_URL + FileIndexFile + ".meta");
             AssetDatabase.Refresh();
             FileTools.CheckFileAndCreateDirWhenNeeded(URLSetting.CS_STREAMINGASSETS_URL + FileIndexFile);
+            FileTools.SafeCopyDirectory(F8EditorPrefs.GetString("ExcelPath", null) ?? Application.dataPath + ExcelPath,
+                URLSetting.GetTempExcelPath(), false,
+                new string[] { ".meta", ".DS_Store" }, new string[] { "~$" });
             foreach (string item in files)
             {
                 GetExcelData(item);
@@ -224,7 +227,7 @@ namespace F8Framework.Core.Editor
             
             string INPUT_PATH = lastExcelPath;
             var files = Directory.GetFiles(INPUT_PATH, "*.*", SearchOption.AllDirectories)
-                .Where(s => s.EndsWith(".xls") || s.EndsWith(".xlsx")).ToArray();
+                .Where(s => (s.EndsWith(".xls") || s.EndsWith(".xlsx")) && !Path.GetFileName(s).StartsWith("~$")).ToArray();
             if (codeList == null)
             {
                 codeList = new Dictionary<string, ScriptGenerator>();
@@ -254,6 +257,7 @@ namespace F8Framework.Core.Editor
                 //序列化数据
                 Serialize(container, temp, each.Value, BinDataPath);
             }
+            FileTools.SafeDeleteDir(URLSetting.GetTempExcelPath());
             LogF8.LogConfig("<color=yellow>导表成功!</color>");
             
             // 如果 Unity 检测到任何脚本更改，则会重新加载 C# 域。这样做的原因是可能已创建新的脚本化导入器 (Scripted Importer)，
@@ -335,26 +339,19 @@ namespace F8Framework.Core.Editor
 
         private static void GetExcelData(string inputPath)
         {
+            inputPath = URLSetting.GetTempExcelPath() + "/" + Path.GetFileName(inputPath);
             FileStream stream = null;
+            IExcelDataReader excelReader = null;
             try
             {
                 stream = File.Open(inputPath, FileMode.Open, FileAccess.Read);
-            }
-            catch
-            {
-                EditorUtility.DisplayDialog("注意！！！", "\n请关闭 " + inputPath + " 后再导表！", "确定");
-                throw new Exception("请关闭 " + inputPath + " 后再导表！");
-            }
-
-            IExcelDataReader excelReader = null;
-            if (inputPath.EndsWith(".xls")) excelReader = ExcelReaderFactory.CreateBinaryReader(stream);
-            else if (inputPath.EndsWith(".xlsx")) excelReader = ExcelReaderFactory.CreateOpenXmlReader(stream);
-            if (!excelReader.IsValid)
-            {
-                throw new Exception("无法读取的文件:  " + inputPath);
-            }
-            else
-            {
+                
+                if (inputPath.EndsWith(".xls")) excelReader = ExcelReaderFactory.CreateBinaryReader(stream);
+                else if (inputPath.EndsWith(".xlsx")) excelReader = ExcelReaderFactory.CreateOpenXmlReader(stream);
+                if (!excelReader.IsValid)
+                {
+                    throw new Exception("无法读取的文件:  " + inputPath);
+                }
                 do // 读取所有的sheet
                 {
                     // sheet name
@@ -388,9 +385,11 @@ namespace F8Framework.Core.Editor
                         //后面的表示数据
                         else if (index > 2)
                         {
-                            if (types == null || names == null || datas == null){
-                                throw new Exception("数据错误！["+ className +"]配置表！第" + index + "行" + inputPath);
+                            if (types == null || names == null || datas == null)
+                            {
+                                throw new Exception("数据错误！[" + className + "]配置表！第" + index + "行" + inputPath);
                             }
+
                             //把读取的数据和数据类型,名称保存起来,后面用来动态生成类
                             List<ConfigData> configDataList = new List<ConfigData>();
                             for (int j = 0; j < datas.Length; ++j)
@@ -424,6 +423,7 @@ namespace F8Framework.Core.Editor
                         {
                             throw new Exception("类名重复: " + className + " ,路径:  " + inputPath);
                         }
+
                         codeList.Add(className, generator);
                         if (dataDict.ContainsKey(className))
                         {
@@ -434,9 +434,21 @@ namespace F8Framework.Core.Editor
                     }
                 } while (excelReader.NextResult()); //excelReader.NextResult() Excel表下一个sheet页有没有数据
             }
-
-            stream.Dispose();
-            stream.Close();
+            catch (IOException)
+            {
+                EditorUtility.DisplayDialog("注意！！！", "\n请关闭 " + inputPath + " 后再导表！", "确定");
+                throw new Exception("请关闭 " + inputPath + " 后再导表！");
+            }
+            catch (Exception ex)
+            {
+                LogF8.LogError($"处理Excel文件失败: {inputPath}, 错误: {ex.Message}");
+                throw;
+            }
+            finally
+            {
+                excelReader?.Dispose();
+                stream?.Dispose();
+            }
         }
 
         //编译代码

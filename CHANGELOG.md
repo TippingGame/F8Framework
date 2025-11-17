@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.8.192] - 2025-11-17
+1.优化Excel可在导表时打开  
+
 ## [1.8.191] - 2025-11-17
 1.新增Excel库可使用byte[]参数读取方法  
 2.新增APK下可同步读取资源SyncStreamingAssetsLoader  

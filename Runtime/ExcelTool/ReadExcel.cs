@@ -95,7 +95,7 @@ namespace F8Framework.Core
             var files = SyncStreamingAssetsLoader.Instance.ReadAllLines(INPUT_PATH + "/fileindex.txt");
 #else
             var files = Directory.GetFiles(INPUT_PATH, "*.*", SearchOption.AllDirectories)
-                .Where(s => s.EndsWith(".xls") || s.EndsWith(".xlsx")).ToArray();
+                .Where(s => (s.EndsWith(".xls") || s.EndsWith(".xlsx")) && !Path.GetFileName(s).StartsWith("~$")).ToArray();
 #endif
             if (files == null || files.Length == 0)
             {

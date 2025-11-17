@@ -385,7 +385,7 @@ namespace F8Framework.Core
             }
         }
 
-        private static void DeleteDirectory(string dirPath, string[] excludeName = null)
+        private static void DeleteDirectory(string dirPath, string[] excludeExtensions = null, string[] excludeFileNames = null)
         {
             if (!Directory.Exists(dirPath))
             {
@@ -397,28 +397,27 @@ namespace F8Framework.Core
 
             foreach (string file in files)
             {
-                bool delete = true;
-                if (excludeName != null)
+                if (excludeExtensions != null)
                 {
-                    foreach (string s in excludeName)
+                    if (excludeExtensions.Any(s => file.EndsWith(s)))
                     {
-                        if (file.EndsWith(s))
-                        {
-                            delete = false;
-                        }
+                        continue;
                     }
                 }
-
-                if (delete)
+                if (excludeFileNames != null)
                 {
-                    File.SetAttributes(file, FileAttributes.Normal);
-                    File.Delete(file);
+                    if (excludeFileNames.Any(s => file.StartsWith(s)))
+                    {
+                        continue;
+                    }
                 }
+                File.SetAttributes(file, FileAttributes.Normal);
+                File.Delete(file);
             }
 
             foreach (string dir in dirs)
             {
-                DeleteDirectory(dir, excludeName);
+                DeleteDirectory(dir, excludeExtensions, excludeFileNames);
             }
 
             string[] filesAfter = Directory.GetFiles(dirPath);
@@ -429,7 +428,7 @@ namespace F8Framework.Core
             }
         }
 
-        public static bool SafeClearDir(string folderPath, string[] excludeName = null)
+        public static bool SafeClearDir(string folderPath, string[] excludeExtensions = null, string[] excludeFileNames = null)
         {
             try
             {
@@ -440,7 +439,7 @@ namespace F8Framework.Core
 
                 if (Directory.Exists(folderPath))
                 {
-                    DeleteDirectory(folderPath, excludeName);
+                    DeleteDirectory(folderPath, excludeExtensions, excludeFileNames);
                 }
 
                 Directory.CreateDirectory(folderPath);
@@ -453,7 +452,7 @@ namespace F8Framework.Core
             }
         }
 
-        public static bool SafeDeleteDir(string folderPath, string[] excludeName = null)
+        public static bool SafeDeleteDir(string folderPath, string[] excludeExtensions = null, string[] excludeFileNames = null)
         {
             try
             {
@@ -464,7 +463,7 @@ namespace F8Framework.Core
 
                 if (Directory.Exists(folderPath))
                 {
-                    DeleteDirectory(folderPath, excludeName);
+                    DeleteDirectory(folderPath, excludeExtensions, excludeFileNames);
                 }
 
                 return true;
@@ -555,7 +554,7 @@ namespace F8Framework.Core
             }
         }
 
-        public static bool SafeCopyDirectory(string sourceDirName, string destDirName, bool copySubDirs, string[] excludeName = null)
+        public static bool SafeCopyDirectory(string sourceDirName, string destDirName, bool copySubDirs, string[] excludeExtensions = null, string[] excludeFileNames = null)
         {
             try
             {
@@ -576,30 +575,30 @@ namespace F8Framework.Core
                 FileInfo[] files = dir.GetFiles();
                 foreach (FileInfo file in files)
                 {
-                    bool copy = true;
-                    if (excludeName != null)
+                    if (excludeExtensions != null)
                     {
-                        foreach (string s in excludeName)
+                        if (excludeExtensions.Any(s => file.Name.EndsWith(s)))
                         {
-                            if (file.Name.EndsWith(s))
-                            {
-                                copy = false;
-                            }
+                            continue;
                         }
                     }
-                    if (copy)
+                    if (excludeFileNames != null)
                     {
-                        string temppath = Path.Combine(destDirName, file.Name);
-                        file.CopyTo(temppath, true);
+                        if (excludeFileNames.Any(s => file.Name.StartsWith(s)))
+                        {
+                            continue;
+                        }
                     }
+                    string tempPath = Path.Combine(destDirName, file.Name);
+                    file.CopyTo(tempPath, true);
                 }
 
                 if (copySubDirs == true)
                 {
                     foreach (DirectoryInfo subdir in dirs)
                     {
-                        string temppath = Path.Combine(destDirName, subdir.Name);
-                        SafeCopyDirectory(subdir.FullName, temppath, copySubDirs, excludeName);
+                        string tempPath = Path.Combine(destDirName, subdir.Name);
+                        SafeCopyDirectory(subdir.FullName, tempPath, copySubDirs, excludeExtensions, excludeFileNames);
                     }
                 }
                 return true;
