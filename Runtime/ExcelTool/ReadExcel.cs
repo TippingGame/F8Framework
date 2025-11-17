@@ -90,7 +90,13 @@ namespace F8Framework.Core
             {
                 throw new Exception("请先设置数据表路径！");
             }
-
+            
+#if UNITY_EDITOR
+            FileTools.SafeCopyDirectory(F8EditorPrefs.GetString("ExcelPath", null) ?? Application.dataPath + ExcelPath,
+                URLSetting.GetTempExcelPath(), false,
+                new string[] { ".meta", ".DS_Store" }, new string[] { "~$" });
+#endif
+            
 #if !UNITY_EDITOR && UNITY_ANDROID
             var files = SyncStreamingAssetsLoader.Instance.ReadAllLines(INPUT_PATH + "/fileindex.txt");
 #else
@@ -117,6 +123,9 @@ namespace F8Framework.Core
                 step++;
                 GetExcelData(item);
             }
+#if UNITY_EDITOR
+            FileTools.SafeDeleteDir(URLSetting.GetTempExcelPath());
+#endif
             
 #if !UNITY_EDITOR && UNITY_ANDROID
             SyncStreamingAssetsLoader.Instance.Close();
@@ -151,6 +160,9 @@ namespace F8Framework.Core
 
         private void GetExcelData(string inputPath)
         {
+#if UNITY_EDITOR
+            inputPath = URLSetting.GetTempExcelPath() + "/" + Path.GetFileName(inputPath);
+#endif
             FileStream stream = null;
             IExcelDataReader excelReader = null;
             try
