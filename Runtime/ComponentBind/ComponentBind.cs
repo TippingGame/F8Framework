@@ -341,7 +341,11 @@ namespace F8Framework.Core
         {
             string normalizedFieldName = fieldName.Replace("[", "_").Replace("]", "_");
 
-            if (componentType.Contains("UnityEngine.UI.Slider"))
+            if (componentType.Contains("UnityEngine.UI.Button"))
+            {
+                return $"private UnityAction unityAction_{normalizedFieldName};";
+            }
+            else if (componentType.Contains("UnityEngine.UI.Slider"))
             {
                 return $"private UnityAction<float> unityAction_{normalizedFieldName};";
             }
@@ -376,7 +380,8 @@ namespace F8Framework.Core
 
             if (componentType.Contains("UnityEngine.UI.Button"))
             {
-                return $"{fieldName}?.AddButtonClickListener(ButtonClick);";
+                return 
+                    $"unityAction_{normalizedFieldName} = () => ButtonClick({fieldName});\n\t\t{fieldName}?.onClick.AddListener(unityAction_{normalizedFieldName});";
             }
             else if (componentType.Contains("UnityEngine.UI.Slider") ||
                      componentType.Contains("UnityEngine.UI.Scrollbar") ||

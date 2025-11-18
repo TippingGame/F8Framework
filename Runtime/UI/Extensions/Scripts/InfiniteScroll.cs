@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
@@ -91,13 +92,73 @@ namespace F8Framework.Core
                 Initialize();
             }
 
-            foreach (InfiniteScrollData data in datas)
+            if (datas == null || datas.Length == 0)
+                return;
+
+            // 第一步：批量创建DataContext并初始化
+            int startIndex = dataList.Count;
+            var newDataContexts = new DataContext[datas.Length];
+            var validDataContexts = new List<DataContext>(); // 通过过滤的数据
+
+            for (int i = 0; i < datas.Length; i++)
             {
-                AddData(data);
+                DataContext addData = new DataContext(datas[i], startIndex + i);
+                InitFitContext(addData);
+                newDataContexts[i] = addData;
+
+                // 同时进行过滤检查
+                if (onFilter == null || onFilter(addData.data) == false)
+                {
+                    validDataContexts.Add(addData);
+                }
             }
 
+            // 第二步：批量计算itemIndex
+            int baseItemIndex = GetLastValidItemIndex();
+            for (int i = 0; i < validDataContexts.Count; i++)
+            {
+                validDataContexts[i].itemIndex = baseItemIndex + i + 1;
+            }
+
+            // 第三步：批量更新后续数据的itemIndex（如果有的话）
+            if (validDataContexts.Count > 0 && startIndex < dataList.Count)
+            {
+                int increment = validDataContexts.Count;
+                for (int i = startIndex; i < dataList.Count; i++)
+                {
+                    if (dataList[i].itemIndex != -1)
+                    {
+                        dataList[i].itemIndex += increment;
+                    }
+                }
+            }
+
+            // 第四步：批量添加到主列表
+            dataList.AddRange(newDataContexts);
+            itemCount += validDataContexts.Count;
+
+            // 第五步：标记需要重建布局（只标记一次）
+            needReBuildLayout = true;
+
+            // 第六步：更新显示
             UpdateAllData(immediately);
         }
+        
+        // 辅助方法：获取最后一个有效的itemIndex
+        private int GetLastValidItemIndex()
+        {
+            if (itemCount == 0) return -1;
+    
+            for (int i = dataList.Count - 1; i >= 0; i--)
+            {
+                if (dataList[i].itemIndex != -1)
+                {
+                    return dataList[i].itemIndex;
+                }
+            }
+            return -1;
+        }
+        
         public void InsertData(InfiniteScrollData[] datas, int insertIndex, bool immediately = false)
         {
             if (insertIndex < 0 || insertIndex > dataList.Count)
@@ -110,14 +171,86 @@ namespace F8Framework.Core
                 Initialize();
             }
 
-            foreach (InfiniteScrollData data in datas)
+            if (datas == null || datas.Length == 0)
+                return;
+
+            // 第一步：批量创建DataContext并初始化
+            var newDataContexts = new DataContext[datas.Length];
+            var validDataContexts = new List<DataContext>(); // 通过过滤的数据
+
+            for (int i = 0; i < datas.Length; i++)
             {
-                InsertData(data, insertIndex++);
+                DataContext addData = new DataContext(datas[i], insertIndex + i);
+                InitFitContext(addData);
+                newDataContexts[i] = addData;
+
+                // 同时进行过滤检查
+                if (onFilter == null || onFilter(addData.data) == false)
+                {
+                    validDataContexts.Add(addData);
+                }
             }
 
+            // 第二步：更新插入位置之后所有数据的index
+            if (insertIndex < dataList.Count)
+            {
+                for (int i = insertIndex; i < dataList.Count; i++)
+                {
+                    dataList[i].index += datas.Length;
+                }
+            }
+
+            // 第三步：批量插入到主列表
+            dataList.InsertRange(insertIndex, newDataContexts);
+
+            // 第四步：批量计算itemIndex
+            if (validDataContexts.Count > 0)
+            {
+                // 获取插入位置前一个有效的itemIndex
+                int baseItemIndex = GetItemIndexBefore(insertIndex);
+        
+                // 更新插入数据的itemIndex
+                for (int i = 0; i < validDataContexts.Count; i++)
+                {
+                    validDataContexts[i].itemIndex = baseItemIndex + i + 1;
+                }
+
+                // 更新插入位置之后所有有效数据的itemIndex
+                int increment = validDataContexts.Count;
+                int startUpdateIndex = insertIndex + newDataContexts.Length;
+                for (int i = startUpdateIndex; i < dataList.Count; i++)
+                {
+                    if (dataList[i].itemIndex != -1)
+                    {
+                        dataList[i].itemIndex += increment;
+                    }
+                }
+
+                itemCount += validDataContexts.Count;
+            }
+
+            // 第五步：标记需要重建布局（只标记一次）
+            needReBuildLayout = true;
+
+            // 第六步：更新显示
             UpdateAllData(immediately);
         }
 
+        // 辅助方法：获取指定位置前一个有效的itemIndex
+        private int GetItemIndexBefore(int targetIndex)
+        {
+            if (targetIndex == 0) return -1;
+    
+            for (int i = targetIndex - 1; i >= 0; i--)
+            {
+                if (dataList[i].itemIndex != -1)
+                {
+                    return dataList[i].itemIndex;
+                }
+            }
+            return -1;
+        }
+        
         public void RemoveData(InfiniteScrollData data, bool immediately = false)
         {
             if (isInitialize == false)

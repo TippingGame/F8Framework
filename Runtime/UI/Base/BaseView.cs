@@ -76,7 +76,7 @@ namespace F8Framework.Core
         {
         }
 
-        protected virtual void ButtonClick(BaseEventData eventData)
+        protected virtual void ButtonClick(UIBehaviour ui)
         {
         }
         
