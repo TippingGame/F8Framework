@@ -2,8 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using F8Framework.Core;
-using F8Framework.F8ExcelDataClass;
-using F8Framework.Launcher;
 
 namespace F8Framework.Tests
 {
@@ -13,14 +11,14 @@ namespace F8Framework.Tests
         IEnumerator Start()
         {
             // 指定名字加载
-            Sheet1 sheet1 = FF8.Config.Load<Sheet1>("Sheet1");
+            DemoSheet1 sheet1 = FF8.Config.Load<DemoSheet1>("Sheet1");
             LogF8.Log(sheet1.Dict[2].name);
             
             // 同步加载全部配置
             FF8.Config.LoadAll();
 
             // 异步加载全部配置
-            // yield return FF8.Config.LoadAllAsyncIEnumerator();
+            yield return FF8.Config.LoadAllAsyncIEnumerator();
             // 也可以这样
             foreach (var item in FF8.Config.LoadAllAsync())
             {

@@ -2,7 +2,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using F8Framework.Core;
-using F8Framework.Launcher;
 
 namespace F8Framework.Tests
 {

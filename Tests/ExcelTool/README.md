@@ -18,8 +18,6 @@ Unity 读取 Excel 的工具
 
   - **必须**先完成本指南的[初始化](#初始化)部分（因：对于结构、类型等变动，运行时无法刷新 C# 代码）。
 
-系统支持：Win/Android/iOS/Mac/Linux/WebGL
-
 ## 导入插件（需要首先导入核心）
 注意！内置在->F8Framework核心：https://github.com/TippingGame/F8Framework.git  
 方式一：直接下载文件，放入Unity  

@@ -1,8 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using F8Framework.Core;
-using F8Framework.F8ExcelDataClass;
-using F8Framework.Launcher;
 using UnityEngine;
 
 namespace F8Framework.Tests
@@ -30,7 +28,7 @@ namespace F8Framework.Tests
 #if UNITY_WEBGL
             yield return AssetBundleManager.Instance.LoadAssetBundleManifest(); // WebGL专用，如果游戏中没有使用任何AB包加载资源，可以删除此方法的调用！
 #endif
-            FF8.Config = ModuleCenter.CreateModule<F8DataManager>();
+            FF8.Config = ModuleCenter.CreateModule<DemoF8DataManager>();
             FF8.Audio = ModuleCenter.CreateModule<AudioManager>();
             FF8.Tween = ModuleCenter.CreateModule<Tween>();
             FF8.UI = ModuleCenter.CreateModule<UIManager>();

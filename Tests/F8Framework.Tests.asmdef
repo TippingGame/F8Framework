@@ -3,10 +3,15 @@
     "rootNamespace": "",
     "references": [
         "F8Framework.Core",
+        "Unity.TextMeshPro",
         "Unity.Timeline",
+        "ICSharpCode.SharpZipLib",
+        "Excel",
+        "LitJson",
+        "kcp2k",
+        "Telepathy",
         "SimpleWebTransport",
-        "F8Framework.F8ExcelDataClass",
-        "F8Framework.Launcher"
+        "HybridCLR.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -14,9 +19,7 @@
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": false,
-    "defineConstraints": [
-        "BUILD_F8FRAMEWORK_TEST"
-    ],
+    "defineConstraints": [],
     "versionDefines": [],
     "noEngineReferences": false
 }

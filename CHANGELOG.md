@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.8.195] - 2025-11-18
+1.优化Tests程序集默认启用  
+
 ## [1.8.194] - 2025-11-18
 1.新增加载配置表LoadAllAsyncTask方法，LoadAsyncTask方法  
 

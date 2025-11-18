@@ -19,11 +19,11 @@
 
 ### 编辑器界面使用
 
-* 如何设置分包资源  
+* 如何设置分包资源，命名规则：`Package_ + 标识`  
   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/HotUpdateManager/ui_20240323173756.png)
 --------------------------
 * 选择打包平台，输出路径，版本号，远程资产加载地址，启用热更新，全量打包，分包，空包。  
-  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/HotUpdateManager/ui_20240317214323_2.png)
+  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/HotUpdateManager/ui_20240317214323_3.png)
 --------------------------
 * 如需本地测试热更新，注意清理沙盒目录中的临时文件
 --------------------------

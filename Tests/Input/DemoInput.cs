@@ -1,6 +1,5 @@
 using System;
 using F8Framework.Core;
-using F8Framework.Launcher;
 using UnityEngine;
 
 namespace F8Framework.Tests

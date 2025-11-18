@@ -18,7 +18,7 @@ Method 2: Unity → Menu Bar → Window → Package Manager → "+" → Add Pack
 
 ### Editor Interface Usage
 
-* How to Set Up Subpackage Resources  
+* How to Set Up Subpackage Resources, Naming convention: ` Package_ + identifier`  
   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/HotUpdateManager/ui_20240323173756.png)
 --------------------------
 * Configuration Options:
@@ -29,7 +29,7 @@ Method 2: Unity → Menu Bar → Window → Package Manager → "+" → Add Pack
   * Enable hot updates
   * Full build / Subpackage build / Empty build  
 
-![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/HotUpdateManager/ui_20240317214323_2.png)  
+![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/HotUpdateManager/ui_20240317214323_3.png)  
 
 --------------------------
 * For Local Hot Update Testing: Clear temporary files in the sandbox directory before testing.
