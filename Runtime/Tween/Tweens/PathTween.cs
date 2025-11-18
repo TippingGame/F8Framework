@@ -99,7 +99,7 @@ namespace F8Framework.Core
             }
             else
             {
-                float normalizedProgress = currentTime / duration;
+                float normalizedProgress = currentTime >= duration ? 1.0f : currentTime / duration;
                 // 通过曲线函数计算缓动进度
                 float curveProgress = GetCurveProgress(normalizedProgress);
                 
