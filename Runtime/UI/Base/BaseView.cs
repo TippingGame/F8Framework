@@ -80,27 +80,7 @@ namespace F8Framework.Core
         {
         }
         
-        protected virtual void ValueChange(UIBehaviour ui, int value)
-        {
-        }
-        
-        protected virtual void ValueChange(UIBehaviour ui, float value)
-        {
-        }
-        
-        protected virtual void ValueChange(UIBehaviour ui, string value)
-        {
-        }
-        
-        protected virtual void ValueChange(UIBehaviour ui, bool value)
-        {
-        }
-        
-        protected virtual void ValueChange(UIBehaviour ui, Vector2 value)
-        {
-        }
-        
-        protected virtual void ValueChange(UIBehaviour ui, Toggle value)
+        protected virtual void ValueChange<T>(UIBehaviour ui, T value)
         {
         }
         

@@ -62,29 +62,9 @@ public class #SCRIPTNAME# : BaseView
 	    base.ButtonClick(ui);
     }
     
-    protected override void ValueChange(UIBehaviour ui, int value)
+    protected virtual void ValueChange<T>(UIBehaviour ui, T value)
     {
-	    base.ValueChange(ui, value);
-    }
-        
-    protected override void ValueChange(UIBehaviour ui, float value)
-    {
-	    base.ValueChange(ui, value);
-    }
-        
-    protected override void ValueChange(UIBehaviour ui, string value)
-    {
-	    base.ValueChange(ui, value);
-    }
-        
-    protected override void ValueChange(UIBehaviour ui, bool value)
-    {
-	    base.ValueChange(ui, value);
-    }
-        
-    protected override void ValueChange(UIBehaviour ui, Vector2 value)
-    {
-	    base.ValueChange(ui, value);
+        base.ValueChange<T>(ui, value);
     }
     
     // 自动获取组件（自动生成，不能删除）

@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.8.200] - 2025-11-19
+1.优化UI模块BaseView模板ValueChange方法  
+
 ## [1.8.199] - 2025-11-19
 1.新增编辑器PlayModePlus显示当前选择的场景  
 
