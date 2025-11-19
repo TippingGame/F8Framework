@@ -1,5 +1,6 @@
 using System.Linq;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -15,6 +16,7 @@ namespace F8Framework.Core.Editor
         private readonly DropdownField _selectSceneDropdown;
         private readonly DropdownField _selectPlayModeSettingsDropdown;
         private readonly DropdownField _selectPlayerSettingsPresetsDropdown;
+        private readonly Label _sceneLabel;
 
         private readonly Texture2D _playButtonTexture = 
             Resources.Load<Texture2D>("com.disillusion.play-mode-plus/CustomPlayButton");
@@ -32,7 +34,7 @@ namespace F8Framework.Core.Editor
             visualTree.CloneTree(this);
 
             style.flexGrow = 1;
-
+            
             _playButton = this.Q<Button>("play-button");
             _playButton.clicked -= OnPlayButtonClicked;
             _playButton.clicked += OnPlayButtonClicked;
@@ -45,19 +47,41 @@ namespace F8Framework.Core.Editor
             EditorApplication.playModeStateChanged += OnPlayModeChanged;
             OnPlayModeChanged(PlayModeStateChange.EnteredEditMode);
             
+            _sceneLabel = this.Q<Label>("scene-name");
+            _sceneLabel.RegisterCallback<MouseEnterEvent>(evt =>
+            {
+                _sceneLabel.style.color = new StyleColor(new Color(89f / 255f, 158f / 255f, 94f / 255f));
+                _sceneLabel.style.cursor = new StyleCursor((StyleKeyword)MouseCursor.Link);
+            });
+    
+            _sceneLabel.RegisterCallback<MouseLeaveEvent>(evt =>
+            {
+                _sceneLabel.style.color = new StyleColor(new Color(238f / 255f, 238f / 255f, 238f / 255f));
+                _sceneLabel.style.cursor = new StyleCursor((StyleKeyword)MouseCursor.Arrow);
+            });
+            _sceneLabel.RegisterCallback<ClickEvent>(OnSceneLabelClicked);
+                
             #region Select Scene Dropdown
 
             _selectSceneDropdown = this.Q<DropdownField>("select-scene-dropdown");
             _selectSceneDropdown.RegisterCallback<FocusEvent>(evt =>
-                _selectSceneDropdown.choices = _playModeManager.GenerateSceneList());
+            {
+                var sceneData = _playModeManager.GenerateSceneList();
+                _selectSceneDropdown.choices = sceneData.displayNames;
+            });
             _selectSceneDropdown.RegisterCallback<ChangeEvent<string>>(evt =>
             {
-                _playModeManager.SelectedScene =
-                    _playModeManager.ScenesInProject.FirstOrDefault(scenesInProject =>
-                        scenesInProject.name == evt.newValue);
-                _playModeManager.LastScene =
-                    _playModeManager.ScenesInProject.FirstOrDefault(scenesInProject =>
-                        scenesInProject.name == evt.newValue);
+                var sceneData = _playModeManager.GetSceneData();
+                int selectedIndex = sceneData.displayNames.IndexOf(evt.newValue);
+                if (selectedIndex >= 0 && selectedIndex < sceneData.sceneAssets.Count)
+                {
+                    _playModeManager.SelectedScene = sceneData.sceneAssets[selectedIndex];
+                    _playModeManager.LastScene = sceneData.sceneAssets[selectedIndex];
+                }
+                
+                UpdateSceneLabel();
+                string scenePath = AssetDatabase.GetAssetPath(_playModeManager.SelectedScene) ?? "";
+                LogF8.Log("当前选择场景：" + scenePath);
             });
 
             #endregion
@@ -66,7 +90,10 @@ namespace F8Framework.Core.Editor
 
             _selectPlayModeSettingsDropdown = this.Q<DropdownField>("play-mode-settings-dropdown");
             _selectPlayModeSettingsDropdown.RegisterCallback<FocusEvent>(evt =>
-                _selectSceneDropdown.choices = _playModeManager.GenerateSceneList());
+            {
+                var sceneData = _playModeManager.GenerateSceneList();
+                _selectSceneDropdown.choices = sceneData.displayNames;
+            });
             _selectPlayModeSettingsDropdown.RegisterCallback<ChangeEvent<string>>(evt =>
             {
                 var editorSettings = new SerializedObject(
@@ -126,18 +153,67 @@ namespace F8Framework.Core.Editor
             PlayModeManager.EditorStartScene();
 
             // Populate Dropdowns
-            _selectSceneDropdown.choices = _playModeManager.GenerateSceneList();
+            var sceneData = _playModeManager.GenerateSceneList();
+            _selectSceneDropdown.choices = sceneData.displayNames;
             _selectPlayModeSettingsDropdown.choices = _playModeManager.GeneratePlayModeSettingsList();
             _selectPlayerSettingsPresetsDropdown.choices = _buildManager.GenerateBuildSettingsList();
 
             // Set Select Scene Dropdown value to Last Scene which was opened
-            _selectSceneDropdown.value = _playModeManager.LastScene?.name;
+            var currentSceneData = _playModeManager.GetSceneData();
+            int lastSceneIndex = currentSceneData.sceneAssets.IndexOf(_playModeManager.LastScene);
+            if (lastSceneIndex >= 0 && lastSceneIndex < currentSceneData.displayNames.Count)
+            {
+                _selectSceneDropdown.value = currentSceneData.displayNames[lastSceneIndex];
+            }
+            
             _playModeManager.SelectedScene = _selectSceneDropdown.value == null
-                ? _playModeManager.ScenesInProject.FirstOrDefault()
-                : _playModeManager.ScenesInProject.FirstOrDefault(scenesInProject =>
-                    scenesInProject.name == _selectSceneDropdown.value);
+                ? GetCurrentSceneAsset()
+                : _playModeManager.LastScene;
+            
+            UpdateSceneLabel();
         }
 
+        private void OnSceneLabelClicked(ClickEvent evt)
+        {
+            if (_playModeManager.SelectedScene != null)
+            {
+                var projectWindowType = typeof(EditorWindow).Assembly.GetType("UnityEditor.ProjectBrowser");
+                var projectWindow = EditorWindow.GetWindow(projectWindowType);
+                if (projectWindow != null)
+                {
+                    projectWindow.Focus();
+                }
+                EditorGUIUtility.PingObject(_playModeManager.SelectedScene);
+            }
+        }
+        
+        private SceneAsset GetCurrentSceneAsset()
+        {
+            var currentScene = EditorSceneManager.GetActiveScene();
+            if (currentScene.IsValid() && !string.IsNullOrEmpty(currentScene.path))
+            {
+                return AssetDatabase.LoadAssetAtPath<SceneAsset>(currentScene.path);
+            }
+            return null;
+        }
+        
+        private void UpdateSceneLabel()
+        {
+            if (_playModeManager.SelectedScene != null)
+            {
+                _sceneLabel.text = _playModeManager.SelectedScene.name;
+            }
+            else if (_playModeManager.LastScene != null)
+            {
+                _sceneLabel.text = _playModeManager.LastScene.name;
+            }
+            else
+            {
+                var currentScene = GetCurrentSceneAsset();
+                _sceneLabel.text = string.IsNullOrEmpty(currentScene?.name) ? "No Scene1" : currentScene.name;
+            }
+        }
+        
         private void OnPlayButtonClicked()
         {
             _playModeManager.PlayScene();
