@@ -91,10 +91,10 @@ IEnumerator Start()
     });
 
     // async/await方式（无多线程，WebGL也可使用）
-    // await FF8.Asset.LoadAsync<GameObject>("Cube");
+    await FF8.Asset.LoadAsync<GameObject>("Cube");
     // 或者
-    // BaseLoader load = FF8.Asset.LoadAsync<GameObject>("Cube");
-    // await load;
+    BaseLoader load = FF8.Asset.LoadAsync<GameObject>("Cube");
+    await load;
     
     // 协程方式
     yield return FF8.Asset.LoadAsync<GameObject>("Cube");
@@ -119,8 +119,8 @@ IEnumerator Start()
     FF8.Asset.LoadDir("NewFolder");
     
     // async/await方式（无多线程，WebGL也可使用）
-    // BaseDirLoader loadDir = FF8.Asset.LoadDirAsync("NewFolder", () => { });
-    // await loadDir;
+    BaseDirLoader loadDir = FF8.Asset.LoadDirAsync("NewFolder", () => { });
+    await loadDir;
     
     // 加载文件夹内资产
     BaseDirLoader loadDir2 = FF8.Asset.LoadDirAsync("NewFolder", () => { });

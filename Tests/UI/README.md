@@ -88,11 +88,11 @@ IEnumerator Start()
     
     /*-------------------------------------异步加载-------------------------------------*/
     // async/await方式（无多线程，WebGL也可使用）
-    // await FF8.UI.OpenAsync(UIID.UIMain);
+    await FF8.UI.OpenAsync(UIID.UIMain);
     // 或者
-    // UILoader load = FF8.UI.OpenAsync(UIID.UIMain);
-    // await load;
-    // string guid2 = load.Guid;
+    UILoader load = FF8.UI.OpenAsync(UIID.UIMain);
+    await load;
+    string guid2 = load.Guid;
     
     // 协程方式
     yield return FF8.UI.OpenAsync(UIID.UIMain);
@@ -106,8 +106,8 @@ IEnumerator Start()
     FF8.UI.ShowNotify(UIID.UIMain, "tip");
     FF8.UI.ShowNotify(1, "tip");
     // 异步加载
-    // await FF8.UI.ShowNotifyAsync(UIID.UIMain, "tip");
-    // yield return FF8.UI.ShowNotifyAsync(UIID.UIMain, "tip");
+    await FF8.UI.ShowNotifyAsync(UIID.UIMain, "tip");
+    yield return FF8.UI.ShowNotifyAsync(UIID.UIMain, "tip");
     
     // UI是否存在
     FF8.UI.Has(UIID.UIMain);

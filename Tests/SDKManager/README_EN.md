@@ -100,42 +100,54 @@ Method 2: Unity → Menu Bar → Window → Package Manager → "+" → Add Pack
 
 ---
 ## WebGL Games
-* Note: WebGL cannot use synchronous AssetBundle (AB) loading but can load Resources synchronously.
+#### Video Tutorial: [【Unity Framework】（22）Packaging WebGL Games](https://www.bilibili.com/video/BV1FnVozVEbG)
+* Note: WebGL cannot synchronously load AssetBundle resources, but can synchronously load Resources resources
 ---
-## WeChat Mini Game Integration
-* Review the usage guide for the [WebGL to WeChat Mini Game Plugin](https://github.com/wechat-miniprogram/minigame-unity-webgl-transform) and download the[ UnityPackage ](https://game.weixin.qq.com/cgi-bin/gamewxagwasmsplitwap/getunityplugininfo?download=1)to import into your project.
+## WeChat Mini Game Integration Method
+#### Video Tutorial: [【Unity Framework】（23）Packaging WeChat Mini Games](https://www.bilibili.com/video/BV1NugPzFESf)
+* Browse the usage of[ WebGL to WeChat Mini Game ](https://github.com/wechat-miniprogram/minigame-unity-webgl-transform)plugin, download[ unitypackage ](https://game.weixin.qq.com/cgi-bin/gamewxagwasmsplitwap/getunityplugininfo?download=1)and import into your game project
 ---
-* Delete `LitJson.dll` from the WX-WASM-SDK-V2 plugin (Note: The Unity Engine also includes this; keep the one in F8Framework).  
+* Delete `LitJson.dll` from the WX-WASM-SDK-V2 plugin (Note: Unity China Engine also has it, recommended to keep the one in F8Framework)  
   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20240524000853.png)
-* Add F8Framework’s `LitJson` reference to the `.asmdef` files in the WX-WASM-SDK-V2’s `Editor` and `Runtime` directories.  
+* Add F8 framework's `LitJson` reference to the two `.asmdef` files under the WX-WASM-SDK-V2 directory's `Editor` and `Runtime` respectively  
   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20240524001621.png)
 ---
-* Set the following three variables to true:
+* Change three variables to true.
 1. [AssetManager.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/AssetManager/AssetManager.cs)
 ```C#
-// Force asset loading mode to remote (for WeChat Mini Games)  
+// Force change asset loading mode to remote (for WeChat Mini Games)
 public static bool ForceRemoteAssetBundle = false;
 ```
+* After using forced remote loading mode, you need to upload the `AssetBundles` directory under the packaged project's `StreamingAssets` folder to CDN  
+  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1752739146608.png)
 2. [ABBuildTool.cs](https://github.com/TippingGame/F8Framework/blob/main/Editor/AssetManager/ABBuildTool.cs)
 ```C#
-// Append MD5 to AB names after building (for WeChat Mini Games)  
+// Append MD5 to AB names after packaging (for WeChat Mini Games)
 private static bool appendHashToAssetBundleName = false;
 ```
 3. [DownloadRequest.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/AssetManager/DownloadRequest/DownloadRequest.cs)
 ```C#
-// Disable Unity's cache system on WebGL (for WeChat Mini Games)  
+// Disable Unity cache system on WebGL platform (for WeChat Mini Games)
 public static bool DisableUnityCacheOnWebGL = false;
 ```
+* (Note) Since WeChat Mini Games can only use remote AB loading, please press F5, configure the asset remote address, and build the game once.  
+  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20241203214539_2.png)
+* You can also directly modify the "AssetRemoteAddress" parameter in [GameVersion.json](https://github.com/TippingGame/F8Framework/blob/main/AssetMap/Resources/GameVersion.json) here  
+  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20241203214624.png)
+* Build settings.  
+  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20240329230924.png)
+* To use WeChat's cache system, manually enter the CDN address and Bundle Path Identifier in MiniGameConfig (default is `StreamingAssets`, should be changed to `AssetBundles`).
+  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1760931585420.png)
+
+---
+## Douyin Mini Game Integration Method
+* Except for not needing to remove LitJson.dll, everything else is the same as WeChat Mini Games
+* Browse the[ WebGL Solution Integration Process ](https://developer.open-douyin.com/docs/resource/zh-CN/mini-game/develop/guide/game-engine/rd-to-SCgame/open-capacity/overview-and-compatibility/sc_webgl_access_flow)plugin usage method
 ---
 
-* (Note) Since WeChat Mini Games only support remote AB loading, press F5, configure the remote asset address, and build the game once.  
-  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20241203214539_2.png)
-* Alternatively, directly modify the `AssetRemoteAddress` parameter in [GameVersion.json](https://github.com/TippingGame/F8Framework/blob/main/AssetMap/Resources/GameVersion.json)  
-  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20241203214624.png)
-* Build settings:  
-  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20240329230924.png)
-
-### If the build fails: Try building with Unity’s default settings first.
+* To use Douyin's cache system, also need to enter the cache resource domain in the BuildTool interface.
+  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1760932083174.png)
+### If build fails: Try using Unity's built-in Build once before attempting again
 
 ---
 

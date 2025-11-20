@@ -69,11 +69,11 @@ Excel Example (**id** is the unique index and must be included!):
 
 Excel Example:  
 
-| int\[] | string\[]   | vec2\[]            | obj\[]\[]              | list\<obj\>       | dict\<int,string\> | dict\<int,list\<float\>\> |
-| ------ |-------------|--------------------|------------------------|-------------------|--------------------|---------------------------|
-| name1  | name2       | name3              | name4                  | name5             | name6              | name7                     |
-| \[1,5] | \[test,str] | \[[12,66],[12,66]] | \[\[22,"str"],\[33,"obj"]] | 123,1.888,"列表"    | 1,"Dict",2,"Dict"     | 1,\[1.11,2.22],2,\[3.33]  |
-| \[1,5] | \[test,str] | \[[12,66],[12,66]] | \[\[22,"str"],\[33,"obj"]] | \[123,1.888,"列表"] | \[1,"Dict",2,"Dict"]  | 1,\[1.11,2.22],2,\[3.33]  |
+| int\[] | string\[]   | vec2\[]            | obj\[]\[]              | list\<obj\>       | dict\<int,list\<string\>\> | valuetuple\<int,string\> |
+| ------ |-------------|--------------------|------------------------|-------------------|----------------------------|--------------------------|
+| name1  | name2       | name3              | name4                  | name5             | name6                      | name7                    |
+| \[1,5] | \[test,str] | \[[12,66],[12,66]] | \[\[22,"str"],\[33,"obj"]] | 123,1.888,"列表"    | 1,\[di,ct],2,\["di,ct"]        | 1,valuetuple                    |
+| \[1,5] | \[test,str] | \[[12,66],[12,66]] | \[\[22,"str"],\[33,"obj"]] | \[123,1.888,"列表"] | [1,\["di","ct"],2,\["di,ct"]]  | [1,"value,tuple"]                |
 
 * 3.Special Types
   * Enum: [enum](https://learn.microsoft.com/en-us/dotnet/api/system.enum?view=net-9.0)<name,int,Flags>{}
@@ -182,7 +182,7 @@ public static void WriteExcel(string str, int row, int col, string value)
 **Using the ICSharpCode.SharpZipLib.Zip library ZipFile class within the framework can directly read StreamingAssets files. Please refer to the details for more information:[SyncStreamingAssetsLoader.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/Utility/StreamingAssetsHelper/SyncStreamingAssetsLoader.cs)**
 
 ```C#
-    // Sync reading files from the config folder
+    // Sync reading files from the StreamingAssets/config folder
     string[] files = SyncStreamingAssetsLoader.Instance.ReadAllLines("config/fileindex.txt");
     
     // Release resources after use

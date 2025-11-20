@@ -14,7 +14,7 @@ Method 2: Unity → Menu Bar → Window → Package Manager → "+" → Add Pack
 1. First, follow this[ Official Quickstart Guide ](https://hybridclr.doc.code-philosophy.com/docs/beginner/quickstart)to create a HotUpdate assembly
 2. Locate the[ F8Helper.cs ](https://github.com/TippingGame/F8Framework/blob/main/Editor/F8Helper/F8Helper.cs)code file:
    * Uncomment the following code section
-3. (Optional) Add metadata - see[ Official Generic Types Tutorial ](https://hybridclr.doc.code-philosophy.com/docs/beginner/generic)
+3. Add metadata - see[ Official Generic Types Tutorial ](https://hybridclr.doc.code-philosophy.com/docs/beginner/generic)
 
 ```C#
 // Metadata supplementation - DLLs here won't be hot updated. Typically found in {project}/HybridCLRData/AssembliesPostIl2CppStrip/{target}
@@ -65,11 +65,12 @@ public static void GenerateCopyHotUpdateDll()
 }
 ```
 3. Code has been split into assemblies (Note: AOT code cannot reference hot update code)
-   * AOT Assemblies: (F8Framework.Core) (Note: Other scattered project code will also be packaged as AOT)
-   * Hot Update Assemblies: (F8Framework.F8ExcelDataClass), (F8Framework.Launcher)
+   * AOT Assemblies: (`F8Framework.Core`) (Note: Other scattered project code will also be packaged as AOT)
+   * Hot Update Assemblies: (`F8Framework.F8ExcelDataClass`), (`F8Framework.Launcher`)
 4. Drag these two hot update assemblies into HybridCLR settings panel  
    ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/HybridCLR/ui_20241128235509.png)
-5. Important: Main project cannot directly reference hot update code - must use reflection:
+5. Assembly-CSharp is the default global assembly in Unity, and it can be treated as a hot update assembly just like a regular DLL [(Official Configuration)](https://www.hybridclr.cn/docs/basic/projectsettings). Simply add `Assembly-CSharp` to the `Hot Update Assemblies` list below, while the `LoadDll.cs` script needs to be placed in a separate assembly as AOT code.
+6. Important: Main project cannot directly reference hot update code - must use reflection:
    * Attach a DLL loading script to startup scene (handles metadata supplementation and assembly loading)
 ```C#
 using System;

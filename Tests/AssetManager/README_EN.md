@@ -56,7 +56,9 @@ Method 2: Unity → Menu Bar → Window → Package Manager → "+" → Add Pack
 ---------------------------------
 5. **Important**: WebGL doesn't support synchronous AB loading. Use Resources for sync loading instead.
 ---------------------------------
-6. If no errors occur, you're ready to go!
+6. **Important**: If you need to use resources with the same name, you can enable full resource path loading. Click F5 in the build tool and check the corresponding feature.  
+   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_1761979618779.png)
+7. If no errors occur, you're ready to go!
 
 ### Code Examples
 ```C#
@@ -93,10 +95,10 @@ IEnumerator Start()
     });
 
     // [Note] async/await (no multithreading, works on WebGL)
-    // await FF8.Asset.LoadAsync<GameObject>("Cube");
+    await FF8.Asset.LoadAsync<GameObject>("Cube");
     // or
-    // BaseLoader load = FF8.Asset.LoadAsync<GameObject>("Cube");
-    // await load;
+    BaseLoader load = FF8.Asset.LoadAsync<GameObject>("Cube");
+    await load;
     
     // Coroutine method
     yield return FF8.Asset.LoadAsync<GameObject>("Cube");
@@ -121,8 +123,8 @@ IEnumerator Start()
     FF8.Asset.LoadDir("NewFolder");
     
     // async/await (no multithreading, works on WebGL)
-    // BaseDirLoader loadDir = FF8.Asset.LoadDirAsync("NewFolder", () => { });
-    // await loadDir;
+    BaseDirLoader loadDir = FF8.Asset.LoadDirAsync("NewFolder", () => { });
+    await loadDir;
     
     // Async folder loading
     BaseDirLoader loadDir2 = FF8.Asset.LoadDirAsync("NewFolder", () => { });
@@ -201,10 +203,13 @@ Project Settings → Editor → Build Pipeline → Enable "Multi-Process AssetBu
 ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_20250523001_2.png)
 #### Important: Clear AB names manually when moving files out of AssetBundles directory
 1. Editor Tools:
+   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_20240216212631_2.png)
 * 1. Find asset references (full project scan)
+     ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_1761979131320.png)
 * 2. Clear AB names (supports multi-select)
 * 3. Set custom AB names (supports multi-select)
 * 4. Global missing reference detector
+     ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_1761979410848.png)
 
 ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_20240216212631_2.png)  
 

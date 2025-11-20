@@ -72,11 +72,11 @@ Excel 示例：（id 是唯一索引，必须添加！）
 
 Excel 示例：  
 
-| int\[] | string\[]   | vec2\[]            | obj\[]\[]              | list\<obj\>       | dict\<int,string\> | dict\<int,list\<float\>\> |
-| ------ |-------------|--------------------|------------------------|-------------------|--------------------|---------------------------|
-| name1  | name2       | name3              | name4                  | name5             | name6              | name7                     |
-| \[1,5] | \[test,str] | \[[12,66],[12,66]] | \[\[22,"str"],\[33,"obj"]] | 123,1.888,"列表"    | 1,"字典",2,"字典2"     | 1,\[1.11,2.22],2,\[3.33]  |
-| \[1,5] | \[test,str] | \[[12,66],[12,66]] | \[\[22,"str"],\[33,"obj"]] | \[123,1.888,"列表"] | \[1,"字典",2,"字典2"]  | 1,\[1.11,2.22],2,\[3.33]  |
+| int\[] | string\[]   | vec2\[]            | obj\[]\[]              | list\<obj\>       | dict\<int,list\<string\>\> | valuetuple\<int,string\> |
+| ------ |-------------|--------------------|------------------------|-------------------|----------------------------|--------------------------|
+| name1  | name2       | name3              | name4                  | name5             | name6                      | name7                    |
+| \[1,5] | \[test,str] | \[[12,66],[12,66]] | \[\[22,"str"],\[33,"obj"]] | 123,1.888,"列表"    | 1,\[字,典],2,\["字,典"]        | 1,值元组                    |
+| \[1,5] | \[test,str] | \[[12,66],[12,66]] | \[\[22,"str"],\[33,"obj"]] | \[123,1.888,"列表"] | [1,\["字","典"],2,\["字,典"]]  | [1,"值,元组"]                |
 
 * 3.特殊类型支持
   * 枚举（[enum](https://learn.microsoft.com/en-us/dotnet/api/system.enum?view=net-9.0)<name,int,Flags>{}）
@@ -184,7 +184,7 @@ I18N.West.dll\
 **框架内使用ICSharpCode.SharpZipLib.Zip库ZipFile类直接读取，可直接读取StreamingAssets文件，具体请看：[SyncStreamingAssetsLoader.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/Utility/StreamingAssetsHelper/SyncStreamingAssetsLoader.cs)**
 
 ```C#
-    // 同步读取config文件夹下的文件
+    // 同步读取StreamingAssets/config文件夹下的文件
     string[] files = SyncStreamingAssetsLoader.Instance.ReadAllLines("config/fileindex.txt");
     
     // 使用后释放资源

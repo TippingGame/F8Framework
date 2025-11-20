@@ -16,7 +16,7 @@
 1. 使用这个[ 官方教程（快速上手） ](https://hybridclr.doc.code-philosophy.com/docs/beginner/quickstart)创建HotUpdate程序集后。  
 2. 找到代码[ F8Helper.cs ](https://github.com/TippingGame/F8Framework/blob/main/Editor/F8Helper/F8Helper.cs)  
 	* 解除注释状态，如下代码  
-3. 补充元数据（可选项），具体看[ 官方教程（使用泛型） ](https://hybridclr.doc.code-philosophy.com/docs/beginner/generic)
+3. 补充元数据，具体看[ 官方教程（使用泛型） ](https://hybridclr.doc.code-philosophy.com/docs/beginner/generic)
 
 ```C#
 // 补充元数据，不会热更新此处的dll，一般在{project}/HybridCLRData/AssembliesPostIl2CppStrip/{target}目录下
@@ -67,11 +67,12 @@ public static void GenerateCopyHotUpdateDll()
 }
 ```
 3. 代码已拆分程序集（注意：AOT代码不能引用热更代码）  
-   * AOT程序集：（F8Framework.Core）、（注意：散落在工程中的其他代码也会当作AOT打包）  
-   * 热更新程序集：（F8Framework.F8ExcelDataClass）、（F8Framework.Launcher）  
+   * AOT程序集：（`F8Framework.Core`）、（注意：散落在工程中的其他代码也会当作AOT打包）  
+   * 热更新程序集：（`F8Framework.F8ExcelDataClass`）、（`F8Framework.Launcher`）  
 4. 将这两个热更新程序集拖进 HybridCLR 设置面板中  
 ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/HybridCLR/ui_20241128235509.png)  
-5. 注意：主工程不能直接引用热更新代码，这里通过反射来调用热更新代码。  
+5. Assembly-CSharp是Unity的默认全局程序集，它也可以像普通dll一样当作热更新程序集[（官方配置）](https://www.hybridclr.cn/docs/basic/projectsettings)，只需添加`Assembly-CSharp`到下方`Hot Update Assemblies`里，`LoadDll.cs`脚本则需拆分程序集作为AOT代码
+6. 注意：主工程不能直接引用热更新代码，这里通过反射来调用热更新代码。  
    * 在启动场景挂在一个加载dll脚本，先补充元数据（可选），加载热更新程序集
 ```C#
 using System;
