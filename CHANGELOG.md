@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.8.201] - 2025-11-20
+1.优化Binary序列化判空  
+
 ## [1.8.200] - 2025-11-19
 1.优化UI模块BaseView模板ValueChange方法  
 

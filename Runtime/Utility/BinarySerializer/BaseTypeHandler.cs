@@ -638,7 +638,20 @@ namespace F8Framework.Core
     {
         public override void Serialize(BinaryWriter writer, object value)
         {
+            if (value == null)
+            {
+                writer.Write(-1); // 使用 -1 表示 null 数组
+                return;
+            }
+
             var array = (Array)value;
+            
+            if (array.Length == 0)
+            {
+                writer.Write(0); // 写入 0 表示空数组
+                return;
+            }
+            
             writer.Write(array.Length);
 
             var elementType = value.GetType().GetElementType();
@@ -646,21 +659,53 @@ namespace F8Framework.Core
 
             for (int i = 0; i < array.Length; i++)
             {
-                handler.Serialize(writer, array.GetValue(i));
+                var elementValue = array.GetValue(i);
+                
+                if (elementValue == null)
+                {
+                    writer.Write((byte)0); // null 标记
+                }
+                else
+                {
+                    writer.Write((byte)1); // 非 null 标记
+                    handler.Serialize(writer, elementValue);
+                }
             }
         }
 
         public override object Deserialize(BinaryReader reader, Type type)
         {
             var length = reader.ReadInt32();
+            
+            if (length == -1)
+            {
+                return null;
+            }
+            
+            if (length == 0)
+            {
+                return Array.CreateInstance(type.GetElementType(), 0);
+            }
+
             var elementType = type.GetElementType();
             var array = Array.CreateInstance(elementType, length);
-
             var handler = TypeHandlerFactory.GetHandler(elementType);
 
             for (int i = 0; i < length; i++)
             {
-                array.SetValue(handler.Deserialize(reader, elementType), i);
+                // 读取 null 标记
+                var isNotNull = reader.ReadByte();
+            
+                if (isNotNull == 0)
+                {
+                    // null 元素
+                    array.SetValue(null, i);
+                }
+                else
+                {
+                    // 非 null 元素
+                    array.SetValue(handler.Deserialize(reader, elementType), i);
+                }
             }
 
             return array;
@@ -671,7 +716,20 @@ namespace F8Framework.Core
     {
         public override void Serialize(BinaryWriter writer, object value)
         {
+            if (value == null)
+            {
+                writer.Write(-1); // 使用 -1 表示 null 列表
+                return;
+            }
+
             var list = (System.Collections.IList)value;
+            
+            if (list.Count == 0)
+            {
+                writer.Write(0);
+                return;
+            }
+
             writer.Write(list.Count);
 
             var elementType = value.GetType().GetGenericArguments()[0];
@@ -679,21 +737,50 @@ namespace F8Framework.Core
 
             foreach (var item in list)
             {
-                handler.Serialize(writer, item);
+                if (item == null)
+                {
+                    writer.Write((byte)0); // null 标记
+                }
+                else
+                {
+                    writer.Write((byte)1); // 非 null 标记
+                    handler.Serialize(writer, item);
+                }
             }
         }
 
         public override object Deserialize(BinaryReader reader, Type type)
         {
             var count = reader.ReadInt32();
+
+            if (count == -1)
+            {
+                return null;
+            }
+
+            if (count == 0)
+            {
+                return Activator.CreateInstance(type);
+            }
+
             var elementType = type.GetGenericArguments()[0];
             var list = (System.Collections.IList)Activator.CreateInstance(type);
-
             var handler = TypeHandlerFactory.GetHandler(elementType);
 
             for (int i = 0; i < count; i++)
             {
-                list.Add(handler.Deserialize(reader, elementType));
+                var isNotNull = reader.ReadByte();
+
+                if (isNotNull == 0)
+                {
+                    // null 元素
+                    list.Add(null);
+                }
+                else
+                {
+                    // 非 null 元素
+                    list.Add(handler.Deserialize(reader, elementType));
+                }
             }
 
             return list;
@@ -704,7 +791,20 @@ namespace F8Framework.Core
     {
         public override void Serialize(BinaryWriter writer, object value)
         {
+            if (value == null)
+            {
+                writer.Write(-1); // 使用 -1 表示 null 字典
+                return;
+            }
+
             var dict = (System.Collections.IDictionary)value;
+
+            if (dict.Count == 0)
+            {
+                writer.Write(0);
+                return;
+            }
+
             writer.Write(dict.Count);
 
             var keyType = value.GetType().GetGenericArguments()[0];
@@ -714,14 +814,42 @@ namespace F8Framework.Core
 
             foreach (System.Collections.DictionaryEntry entry in dict)
             {
-                keyHandler.Serialize(writer, entry.Key);
-                valueHandler.Serialize(writer, entry.Value);
+                if (entry.Key == null)
+                {
+                    writer.Write((byte)0); // null 键标记
+                }
+                else
+                {
+                    writer.Write((byte)1); // 非 null 键标记
+                    keyHandler.Serialize(writer, entry.Key);
+                }
+
+                if (entry.Value == null)
+                {
+                    writer.Write((byte)0); // null 值标记
+                }
+                else
+                {
+                    writer.Write((byte)1); // 非 null 值标记
+                    valueHandler.Serialize(writer, entry.Value);
+                }
             }
         }
 
         public override object Deserialize(BinaryReader reader, Type type)
         {
             var count = reader.ReadInt32();
+
+            if (count == -1)
+            {
+                return null;
+            }
+
+            if (count == 0)
+            {
+                return Activator.CreateInstance(type);
+            }
+
             var keyType = type.GetGenericArguments()[0];
             var valueType = type.GetGenericArguments()[1];
             var dict = (System.Collections.IDictionary)Activator.CreateInstance(type);
@@ -731,8 +859,30 @@ namespace F8Framework.Core
 
             for (int i = 0; i < count; i++)
             {
-                var key = keyHandler.Deserialize(reader, keyType);
-                var value = valueHandler.Deserialize(reader, valueType);
+                var keyNotNull = reader.ReadByte();
+                object key;
+
+                if (keyNotNull == 0)
+                {
+                    key = null;
+                }
+                else
+                {
+                    key = keyHandler.Deserialize(reader, keyType);
+                }
+
+                var valueNotNull = reader.ReadByte();
+                object value;
+
+                if (valueNotNull == 0)
+                {
+                    value = null;
+                }
+                else
+                {
+                    value = valueHandler.Deserialize(reader, valueType);
+                }
+
                 dict.Add(key, value);
             }
 
@@ -744,6 +894,14 @@ namespace F8Framework.Core
     {
         public override void Serialize(BinaryWriter writer, object value)
         {
+            if (value == null)
+            {
+                writer.Write((byte)0); // null 对象标记
+                return;
+            }
+
+            writer.Write((byte)1); // 非 null 对象标记
+
             var type = value.GetType();
             var fields =
                 type.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
@@ -754,13 +912,29 @@ namespace F8Framework.Core
                 {
                     var fieldValue = field.GetValue(value);
                     var handler = TypeHandlerFactory.GetHandler(field.FieldType);
-                    handler.Serialize(writer, fieldValue);
+
+                    if (fieldValue == null)
+                    {
+                        writer.Write((byte)0); // null 字段标记
+                    }
+                    else
+                    {
+                        writer.Write((byte)1); // 非 null 字段标记
+                        handler.Serialize(writer, fieldValue);
+                    }
                 }
             }
         }
 
         public override object Deserialize(BinaryReader reader, Type type)
         {
+            var isNotNull = reader.ReadByte();
+
+            if (isNotNull == 0)
+            {
+                return null;
+            }
+
             var instance = Activator.CreateInstance(type);
             var fields =
                 type.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
@@ -769,9 +943,20 @@ namespace F8Framework.Core
             {
                 if (field.IsPublic && !field.IsStatic)
                 {
-                    var handler = TypeHandlerFactory.GetHandler(field.FieldType);
-                    var value = handler.Deserialize(reader, field.FieldType);
-                    field.SetValue(instance, value);
+                    var fieldNotNull = reader.ReadByte();
+
+                    if (fieldNotNull == 0)
+                    {
+                        // null 字段
+                        field.SetValue(instance, null);
+                    }
+                    else
+                    {
+                        // 非 null 字段
+                        var handler = TypeHandlerFactory.GetHandler(field.FieldType);
+                        var value = handler.Deserialize(reader, field.FieldType);
+                        field.SetValue(instance, value);
+                    }
                 }
             }
 
