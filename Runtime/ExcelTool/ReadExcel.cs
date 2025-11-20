@@ -577,7 +577,14 @@ namespace F8Framework.Core
                             o = DECIMAL_decimal;
                             break;
                         case SupportType.STRING or SupportType.STRINGFULL:
-                            o = data;
+                            if (data.StartsWith("\"") && data.EndsWith("\""))
+                            {
+                                o = data.Trim('"');
+                            }
+                            else
+                            {
+                                o = data;
+                            }
                             break;
                         case SupportType.OBJ or SupportType.OBJFULL:
                             // 检查是否为带引号的字符串
