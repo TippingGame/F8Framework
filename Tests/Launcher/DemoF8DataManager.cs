@@ -15,6 +15,7 @@ namespace F8Framework.Tests
 {
 	internal class DemoF8DataManager : ModuleSingleton<DemoF8DataManager>, IModule
 	{
+		public string VariantName { get; set; }
 		private DemoSheet1 p_Sheet1;
 		private DemoSheet2 p_Sheet2;
 		private DemoLocalizedStrings p_LocalizedStrings;

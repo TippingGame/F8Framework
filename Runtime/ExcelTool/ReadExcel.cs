@@ -55,6 +55,7 @@ namespace F8Framework.Core
         
         // 特殊类型
         public const string ENUM = "enum<";
+        public const string VARIANT = "variant<";
     }
 
     public class ReadExcel : Singleton<ReadExcel>
@@ -151,11 +152,18 @@ namespace F8Framework.Core
         }
 
         //数据表内每一格数据
-        class ConfigData
+        public class ConfigData
         {
             public string Type; //数据类型
             public string Name; //字段名
             public string Data; //数据值
+            public VariantData VariantInfo; //变体信息
+        }
+
+        public class VariantData
+        {
+            public bool HasVariant;
+            public Dictionary<string, string> Variants;
         }
 
         private void GetExcelData(string inputPath)
@@ -198,7 +206,8 @@ namespace F8Framework.Core
                     string[] names = null; //字段名
                     List<ConfigData[]> dataList = new List<ConfigData[]>();
                     int index = 1;
-
+                    //把读取的数据和数据类型,名称保存起来,后面用来动态生成类
+                    List<ConfigData> configDataList = new List<ConfigData>();
                     //开始读取
                     while (excelReader.Read())
                     {
@@ -228,18 +237,22 @@ namespace F8Framework.Core
                                 throw new Exception("数据错误！[" + className + "]配置表！第" + index + "行" + inputPath);
                             }
 
-                            //把读取的数据和数据类型,名称保存起来,后面用来动态生成类
-                            List<ConfigData> configDataList = new List<ConfigData>();
+                            configDataList.Clear();
+                            
                             for (int j = 0; j < datas.Length; ++j)
                             {
+                                if (string.IsNullOrEmpty(types[j]) || string.IsNullOrEmpty(datas[j]))
+                                    continue; //空的数据不处理
+                                
                                 ConfigData data = new ConfigData();
                                 data.Type = types[j];
                                 data.Name = names[j];
                                 data.Data = datas[j];
-                                if (string.IsNullOrEmpty(data.Type) || string.IsNullOrEmpty(data.Data))
-                                    continue; //空的数据不处理
+                                
                                 configDataList.Add(data);
                             }
+                            
+                            VariantInfoDict(ref configDataList);
 
                             dataList.Add(configDataList.ToArray());
                         }
@@ -280,6 +293,52 @@ namespace F8Framework.Core
             }
         }
 
+        public static void VariantInfoDict(ref List<ConfigData> configDatas)
+        {
+            for (int i = 0; i < configDatas.Count; i++)
+            {
+                if (string.IsNullOrEmpty(configDatas[i].Type) ||
+                    !configDatas[i].Type.StartsWith(SupportType.VARIANT) ||
+                    !configDatas[i].Type.EndsWith(">")) continue;
+                
+                // 解析变体类型，如 variant<name,english>
+                string innerContent = configDatas[i].Type.Substring(
+                    SupportType.VARIANT.Length,
+                    configDatas[i].Type.Length - SupportType.VARIANT.Length - 1);
+                string[] variantParts = innerContent.Split(',');
+
+                if (variantParts.Length < 2) continue;
+                    
+                string variantName = variantParts[1].Trim();
+                string baseFieldName = variantParts[0].Trim();
+
+                configDatas[i].Name = configDatas[i].Type;
+                configDatas[i].VariantInfo = new VariantData
+                {
+                    HasVariant = false
+                };
+
+                // 为其他同名字段创建变体信息（基础字段）
+                for (int j = 0; j < configDatas.Count; j++)
+                {
+                    if (i == j || configDatas[j].Name != baseFieldName) continue;
+                    
+                    configDatas[j].VariantInfo ??= new VariantData
+                    {
+                        HasVariant = true,
+                        Variants = new Dictionary<string, string>()
+                    };
+                                
+                    configDatas[j].VariantInfo.Variants ??= new Dictionary<string, string>();
+
+                    configDatas[j].VariantInfo.Variants.TryAdd("", configDatas[j].Data);
+                    configDatas[j].VariantInfo.Variants.TryAdd(variantName, configDatas[i].Data);
+
+                    break;
+                }
+            }
+        }
+
         //序列化对象
         private static void Serialize(object container, Type temp, List<ConfigData[]> dataList)
         {
@@ -288,33 +347,68 @@ namespace F8Framework.Core
             {
                 //Type.FullName 获取该类型的完全限定名称，包括其命名空间，但不包括程序集。
                 object t = temp.Assembly.CreateInstance(temp.FullName);
+                
                 foreach (ConfigData data in datas)
                 {
-                    //Type.GetField(String) 搜索Type内指定名称的公共字段。
-                    FieldInfo info = temp.GetField(data.Name);
-                    // FieldInfo.SetValue 设置对象内指定名称的字段的值
-                    if (info != null)
+                    if (data.VariantInfo != null)
                     {
-                        info.SetValue(t, ParseValue(data.Type, data.Data, temp.Name));
+                        string name = data.VariantInfo is { HasVariant: true }
+                            ? "_" + data.Name + "Variants"
+                            : data.Name;
+                        FieldInfo variantDictField = temp.GetField(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                        
+                        if (variantDictField == null) continue;
+                        
+                        object variantDict = variantDictField.GetValue(t);
+
+                        foreach (var variantData in data.VariantInfo.Variants)
+                        {
+                            object variantValue = ParseValue(data.Type, variantData.Value, temp.Name);
+                            variantDict.GetType().GetMethod("Add").Invoke(variantDict, new object[] { variantData.Key, variantValue });
+                        }
+                        
+                        variantDictField.SetValue(t, variantDict);
                     }
                     else
                     {
-                        //2019.4.28f1,2020.3.33f1都出现的BUG（2021.3.8f1测试通过），编译dll后没及时刷新，导致修改name或id后读取失败，需要二次编译
-                        LogF8.LogConfig("info是空的：" + data.Name);
+                        FieldInfo info = temp.GetField(data.Name);
+                        // FieldInfo.SetValue 设置对象内指定名称的字段的值
+                        if (info != null)
+                        {
+                            info.SetValue(t, ParseValue(data.Type, data.Data, temp.Name));
+                        }
+                    }
+                }
+                
+                // FieldInfo.GetValue 获取对象内指定名称的字段的值
+                FieldInfo fieldInfoId = null;
+                PropertyInfo propertyInfoId = null;
+                foreach (var field in temp.GetFields())
+                {
+                    if (!string.Equals(field.Name, "id", StringComparison.OrdinalIgnoreCase)) continue;
+                    fieldInfoId = field;
+                    break;
+                }
+                // 如果没有找到字段，再检查属性
+                if (fieldInfoId == null)
+                {
+                    foreach (var property in temp.GetProperties())
+                    {
+                        if (!string.Equals(property.Name, "id", StringComparison.OrdinalIgnoreCase)) continue;
+                        propertyInfoId = property;
+                        break;
                     }
                 }
 
-                // FieldInfo.GetValue 获取对象内指定名称的字段的值
-                FieldInfo fieldInfoId = null;
-                foreach (var field in temp.GetFields())
+                object id = null;
+                if (fieldInfoId != null)
                 {
-                    if (string.Equals(field.Name, "id", StringComparison.OrdinalIgnoreCase))
-                    {
-                        fieldInfoId = field;
-                        break;
-                    }  
+                    id = fieldInfoId.GetValue(t);
                 }
-                object id = fieldInfoId.GetValue(t); //获取id
+                else if (propertyInfoId != null)
+                {
+                    id = propertyInfoId.GetValue(t);
+                }
                 FieldInfo dictInfo = container.GetType().GetField("Dict");
                 object dict = dictInfo.GetValue(container);
 

@@ -31,6 +31,8 @@ Method 2: Unity → Menu Bar → Window → Package Manager → "+" → Add Pack
 
 ### How to Use
 
+Tip: For lightweight usage, you can directly use the [variant type](https://github.com/TippingGame/F8Framework/blob/main/Tests/ExcelTool/README.md#excel-%E7%A4%BA%E4%BE%8B) `variant<name,variantName>` in the configuration table module.  
+
 1. Create an Excel file named **Localization.xlsx** in the `StreamingAssets/config` directory (rename the sheet to **LocalizedStrings**) as your localization configuration  
    ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/Localization/ui_20240219212643.png)
 ----------------------------
@@ -53,22 +55,22 @@ Method 2: Unity → Menu Bar → Window → Package Manager → "+" → Add Pack
 /*----------------------------Localization Features----------------------------*/
 
     // Change language
-    FF8.Localization.ChangeLanguage("English");
+    FF8.Local.ChangeLanguage("English");
     
     // Get translated text
-    string text = FF8.Localization.GetTextFromId("test", "Support", "Format");
-    string text1 = FF8.Localization.GetTextFromIdLanguage("test", "English");
+    string text = FF8.Local.GetTextFromId("test", "Support", "Format");
+    string text1 = FF8.Local.GetTextFromIdLanguage("test", "English");
     
     // Available languages list
-    FF8.Localization.LanguageList;
+    FF8.Local.LanguageList;
     
     // Current language
-    FF8.Localization.CurrentLanguageName;
+    FF8.Local.CurrentLanguageName;
     
     // Reload translation table
-    FF8.Localization.Load();
+    FF8.Local.Load();
     
     // Refresh all localized components
-    FF8.Localization.InjectAll();
+    FF8.Local.InjectAll();
 ```
 

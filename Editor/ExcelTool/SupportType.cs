@@ -14,16 +14,18 @@ namespace F8Framework.Core.Editor
     {
         private string[] Names;
         private string[] Types;
+        private List<ReadExcel.ConfigData> ConfigDatas;
         private string ClassName;
         private string InputPath;
         private StringBuilder enumSource = new StringBuilder();
 
-        public ScriptGenerator(string inputPath, string className, string[] fileds, string[] types)
+        public ScriptGenerator(string inputPath, string className, List<ReadExcel.ConfigData> configDatas)
         {
             InputPath = inputPath;
             ClassName = className;
-            Names = fileds;
-            Types = types;
+            Names = configDatas.Select(x => x.Name).ToArray();
+            Types = configDatas.Select(x => x.Type).ToArray();
+            ConfigDatas = configDatas;
         }
 
         //开始生成脚本
@@ -81,10 +83,32 @@ namespace F8Framework.Core.Editor
             classSource.Append("\tpublic class " + ClassName + "Item\n"); //表里每一条数据的类型名为表类型名加Item
             classSource.Append("\t{\n");
             enumSource.Clear();
+            
             //设置成员
             for (int i = 0; i < fields.Length; ++i)
             {
-                classSource.Append(PropertyString(types[i], fields[i]));
+                // 检查这个字段是否有变体
+                if (ConfigDatas[i].VariantInfo != null)
+                {
+                    if (ConfigDatas[i].VariantInfo.HasVariant != true) continue;
+                    
+                    string fieldType = ReadExcel.GetTrueType(types[i], ClassName, InputPath);
+                    classSource.Append("\t\t[Preserve]\n");
+                    classSource.Append("\t\tpublic Dictionary<System.String, " + fieldType + "> _" + fields[i] + "Variants = new Dictionary<System.String, " + fieldType + ">();\n");
+                    classSource.Append("\t\t[Preserve]\n");
+                    classSource.Append("\t\tpublic " + fieldType + " " + fields[i] + " => _" + fields[i] + "Variants.GetValueOrDefault(F8DataManager.Instance.VariantName ?? string.Empty, _" + fields[i] + "Variants[string.Empty]);\n");
+                }
+                else
+                {
+                    // 普通字段
+                    classSource.Append(PropertyString(types[i], fields[i]));
+                }
+                
+                // 枚举定义
+                if (!string.IsNullOrEmpty(types[i]) && !string.IsNullOrEmpty(fields[i]))
+                {
+                    enumSource.Append(PropertyEnum(types[i], ClassName, InputPath));
+                }
             }
 
             classSource.Append("\t}\n");
@@ -141,8 +165,6 @@ namespace F8Framework.Core.Editor
         {
             if (string.IsNullOrEmpty(type) || string.IsNullOrEmpty(propertyName))
                 return null;
-
-            enumSource.Append(PropertyEnum(type, ClassName, InputPath));
             
             type = ReadExcel.GetTrueType(type, ClassName, InputPath);
             if (!string.IsNullOrEmpty(type))
@@ -286,6 +308,7 @@ namespace F8Framework.Core.Editor
             source.Append("\tpublic class F8DataManager : ModuleSingleton<F8DataManager>, IModule\n");
             source.Append("\t{\n");
 
+            source.Append("\t\tpublic string VariantName { get; set; }\n");
             //定义变量
             foreach (string t in types)
             {

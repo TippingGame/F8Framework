@@ -68,7 +68,7 @@ Excel 示例：（id 是唯一索引，必须添加！）
   * 列表（[list<>](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1.-ctor?view=net-9.0)）
   * 字典（[dict<,> / dictionary<,>](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2.-ctor?view=net-9.0)，注意：key只能为byte，short，int，long，float，double，str / string 类型）
   * 值元组（[valuetuple<,>](https://learn.microsoft.com/en-us/dotnet/api/system.valuetuple?view=net-9.0)，最高支持7个类型）  
-  * 容器内可以填写任意的类型  
+  * 容器内可以填写任意的类型（变体类型除外）  
 
 Excel 示例：  
 
@@ -80,8 +80,12 @@ Excel 示例：
 
 * 3.特殊类型支持
   * 枚举（[enum](https://learn.microsoft.com/en-us/dotnet/api/system.enum?view=net-9.0)<name,int,Flags>{}）
+    * name为枚举名称，int为枚举类型，Flags为枚举特性
     * 默认在当前表生成枚举类
-    * 可跨表访问枚举，支持自定义名称，类型，Flags特性  
+    * enum<Sheet1.name>可跨表访问枚举，Sheet1为表名，name为枚举名称
+  * 变体（variant<name,variantName>）
+    * name为当前表内其他变量的名称，variantName为变体名称
+    * 可实现一键切换配置表变体，以此实现多语言/多版本配置
 
 Excel 示例：  
 （可选参数：int类型(默认)，Flags特性，标志枚举：Value1, Value2，跨表访问：Sheet1.name）  
@@ -93,6 +97,18 @@ Excel 示例：
 | Value2                                                             | Value2            | Success                                                                 |
 | Value1, Value2                                                     | Value3            | 201                                                                     |
 | Value4                                                             | Value4            | 202                                                                     |
+
+```C#
+// 设置变体名
+FF8.Config.VariantName = "English";
+```
+| string | variant<desc,English> | variant<desc,Korean> | int    | variant<attack,English> | variant<attack,Korean> |
+|--------|-----------------------|----------------------|--------|-------------------------|------------------------|
+| desc    | desc                  | desc                 | attack |                         |                        |
+| 中文1    | Chinese 1             | 중국어 1                | 1000   | 800                     | 300                    |
+| 中文2    | Chinese 2             | 중국어 2                | 1000    | 800                     | 300                    |
+| 中文3    | Chinese 3             | 중국어 3                | 1000    | 800                     | 300                    |
+| 中文4    | Chinese 4             | 중국어 4                | 1000    | 800                     | 300                    |
 
 （你还可以拓展其他类型：[ReadExcel.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/ExcelTool/ReadExcel.cs)）
 ## 使用范例
@@ -130,19 +146,19 @@ ReadExcel.Instance.LoadAllExcelData(); // 运行时加载 Excel 最新文件
 基础类型，譬如 `int/float/string`，请参考[C# 类型系统 - Microsoft Document](https://learn.microsoft.com/zh-cn/dotnet/csharp/fundamentals/types/#value-types)：
 
 ```C#
-        // 注意：GetSheet1ByID 方法为自动生成的。
-        // 注意：Sheet1 需替换为实际 Sheet 名
-        // 注意：name 需替换为实际表头
-        // 注意：2 代表您设置的 ID 2 的行
-        // 单个表单个数据
-        LogF8.Log(FF8.Config.GetSheet1ByID(2).name);
-        
-        // 单个表全部数据
-        foreach (var item in FF8.Config.GetSheet1())
-        {
-            LogF8.Log(item.Key);
-            LogF8.Log(item.Value.name);
-        }
+// 注意：GetSheet1ByID 方法为自动生成的。
+// 注意：Sheet1 需替换为实际 Sheet 名
+// 注意：name 需替换为实际表头
+// 注意：2 代表您设置的 ID 2 的行
+// 单个表单个数据
+LogF8.Log(FF8.Config.GetSheet1ByID(2).name);
+
+// 单个表全部数据
+foreach (var item in FF8.Config.GetSheet1())
+{
+    LogF8.Log(item.Key);
+    LogF8.Log(item.Value.name);
+}
 ```
 
 ## 使用到的库

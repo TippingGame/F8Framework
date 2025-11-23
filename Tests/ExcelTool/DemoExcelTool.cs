@@ -37,6 +37,9 @@ namespace F8Framework.Tests
                 LogF8.Log(item.Value.name);
             }
             
+            // 设置变体名
+            FF8.Config.VariantName = "English";
+            
             // 运行时读取Excel的方式（如没有需求请谨慎使用）
             ReadExcel.Instance.LoadAllExcelData();
         }

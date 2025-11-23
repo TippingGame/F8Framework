@@ -17,7 +17,7 @@ namespace F8Framework.Core
         // 本地化字符串字典
         readonly Dictionary<string, List<string>> LocalizedStrings = new Dictionary<string, List<string>>();
         // 当前语言名称
-        public string CurrentLanguageName { get; set; }
+        public string CurrentLanguageName { get; internal set; }
         // 当前语言索引
         public int CurrentLanguageIndex => GetLanguageIndex(CurrentLanguageName);
         

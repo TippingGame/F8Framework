@@ -65,7 +65,7 @@ Excel Example (**id** is the unique index and must be included!):
     * List ([list<>](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1.-ctor?view=net-9.0))
     * Dictionary ([dict<,> / dictionary<,>](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2.-ctor?view=net-9.0), Note: Keys can only be byte, short, int, long, float, double, str/string.)
     * ValueTuple ([valuetuple<,>](https://learn.microsoft.com/en-us/dotnet/api/system.valuetuple?view=net-9.0), Supports up to 7 types).
-    * Containers can hold any type.
+    * Containers can accept any type (excluding variant types).
 
 Excel Example:  
 
@@ -75,10 +75,14 @@ Excel Example:
 | \[1,5] | \[test,str] | \[[12,66],[12,66]] | \[\[22,"str"],\[33,"obj"]] | 123,1.888,"列表"    | 1,\[di,ct],2,\["di,ct"]        | 1,valuetuple                    |
 | \[1,5] | \[test,str] | \[[12,66],[12,66]] | \[\[22,"str"],\[33,"obj"]] | \[123,1.888,"列表"] | [1,\["di","ct"],2,\["di,ct"]]  | [1,"value,tuple"]                |
 
-* 3.Special Types
-  * Enum: [enum](https://learn.microsoft.com/en-us/dotnet/api/system.enum?view=net-9.0)<name,int,Flags>{}
-    * Default: Generates an enum class in the current sheet.
-    * Supports cross-sheet enum access, custom names, types, and Flags attribute.
+* 3.Special Type Support
+  * Enum ([enum](https://learn.microsoft.com/en-us/dotnet/api/system.enum?view=net-9.0)<name,int,Flags>{})
+    * `name` is the enumeration name, `int` is the enumeration type, `Flags` is the enumeration attribute
+    * By default, generates the enumeration class in the current table
+    * `enum<Sheet1.name>` can access enumerations across tables, where `Sheet1` is the table name and `name` is the enumeration name
+  * Variant (variant<name,variantName>)
+    * `name` is the name of other variables within the current table, `variantName` is the variant name
+    * Enables one-click switching of configuration table variants, thereby supporting multi-language/multi-version configurations
 
 Excel Example:  
 (Optional parameters: int type (default), Flags attribute, cross-sheet access: Sheet1.name)
@@ -90,6 +94,18 @@ Excel Example:
 | Value2                                                             | Value2            | Success                                                                 |
 | Value1, Value2                                                     | Value3            | 201                                                                     |
 | Value4                                                             | Value4            | 202                                                                     |
+
+```C#
+// 设置变体名
+FF8.Config.VariantName = "English";
+```
+| string | variant<desc,English> | variant<desc,Korean> | int    | variant<attack,English> | variant<attack,Korean> |
+|--------|-----------------------|----------------------|--------|-------------------------|------------------------|
+| desc    | desc                  | desc                 | attack |                         |                        |
+| 中文1    | Chinese 1             | 중국어 1                | 1000   | 800                     | 300                    |
+| 中文2    | Chinese 2             | 중국어 2                | 1000    | 800                     | 300                    |
+| 中文3    | Chinese 3             | 중국어 3                | 1000    | 800                     | 300                    |
+| 中文4    | Chinese 4             | 중국어 4                | 1000    | 800                     | 300                    |
 
 (You can extend other types: [ReadExcel.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/ExcelTool/ReadExcel.cs))
 

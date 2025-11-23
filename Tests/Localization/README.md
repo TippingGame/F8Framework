@@ -31,6 +31,8 @@
 
 ### 如何使用
 
+提示：如轻量使用，可直接使用配置表模块的[变体类型](https://github.com/TippingGame/F8Framework/blob/main/Tests/ExcelTool/README.md#excel-%E7%A4%BA%E4%BE%8B)`variant<name,variantName>`  
+
 1. 在 StreamingAssets/config 目录创建一个名为：**Localization.xlsx** 的 Excel（Sheet改名为 **LocalizedStrings** ） 作为本地化配置  
 ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/Localization/ui_20240219212643.png)  
 ----------------------------
@@ -53,22 +55,22 @@
 /*----------------------------本地化功能----------------------------*/
 
     // 切换语言
-    FF8.Localization.ChangeLanguage("English");
+    FF8.Local.ChangeLanguage("English");
     
     // 获取翻译文本
-    string text = FF8.Localization.GetTextFromId("test", "Support", "Format");
-    string text1 = FF8.Localization.GetTextFromIdLanguage("test", "English");
+    string text = FF8.Local.GetTextFromId("test", "Support", "Format");
+    string text1 = FF8.Local.GetTextFromIdLanguage("test", "English");
     
     // 语言列表
-    FF8.Localization.LanguageList;
+    FF8.Local.LanguageList;
     
     // 当前语言
-    FF8.Localization.CurrentLanguageName;
+    FF8.Local.CurrentLanguageName;
     
     // 重新加载翻译表
-    FF8.Localization.Load();
+    FF8.Local.Load();
     
     // 刷新所有本地化组件
-    FF8.Localization.InjectAll();
+    FF8.Local.InjectAll();
 ```
 

@@ -32,7 +32,7 @@ namespace F8Framework.Core.Editor
         public const string FileIndexFile = "config/fileindex.txt"; //fileindex文件目录
         private static Dictionary<string, ScriptGenerator> codeList; //存放所有生成的类的代码
 
-        private static Dictionary<string, List<ConfigData[]>> dataDict; //存放所有数据表内的数据，key：类名  value：数据
+        private static Dictionary<string, List<ReadExcel.ConfigData[]>> dataDict; //存放所有数据表内的数据，key：类名  value：数据
 
         // 使用StringBuilder来优化字符串的重复构造
         private static StringBuilder FileIndex = new StringBuilder();
@@ -135,7 +135,7 @@ namespace F8Framework.Core.Editor
 
             if (dataDict == null)
             {
-                dataDict = new Dictionary<string, List<ConfigData[]>>();
+                dataDict = new Dictionary<string, List<ReadExcel.ConfigData[]>>();
             }
             else
             {
@@ -238,7 +238,7 @@ namespace F8Framework.Core.Editor
             }
             if (dataDict == null)
             {
-                dataDict = new Dictionary<string, List<ConfigData[]>>();
+                dataDict = new Dictionary<string, List<ReadExcel.ConfigData[]>>();
             }
             else
             {
@@ -249,7 +249,7 @@ namespace F8Framework.Core.Editor
                 GetExcelData(item);
             }
             
-            foreach (KeyValuePair<string, List<ConfigData[]>> each in dataDict)
+            foreach (KeyValuePair<string, List<ReadExcel.ConfigData[]>> each in dataDict)
             {
                 //Assembly.CreateInstance 方法 (String) 使用区分大小写的搜索，从此程序集中查找指定的类型，然后使用系统激活器创建它的实例化对象
                 object container = assembly.CreateInstance(CODE_NAMESPACE + "." + each.Key);
@@ -328,15 +328,7 @@ namespace F8Framework.Core.Editor
 
             FileIndex.Remove(0, FileIndex.Length);
         }
-
-        //数据表内每一格数据
-        class ConfigData
-        {
-            public string Type; //数据类型
-            public string Name; //字段名
-            public string Data; //数据值
-        }
-
+        
         private static void GetExcelData(string inputPath)
         {
             inputPath = URLSetting.GetTempExcelPath() + "/" + Path.GetFileName(inputPath);
@@ -358,9 +350,10 @@ namespace F8Framework.Core.Editor
                     string className = excelReader.Name;
                     string[] types = null; //数据类型
                     string[] names = null; //字段名
-                    List<ConfigData[]> dataList = new List<ConfigData[]>();
+                    List<ReadExcel.ConfigData[]> dataList = new List<ReadExcel.ConfigData[]>();
                     int index = 1;
-
+                    //把读取的数据和数据类型,名称保存起来,后面用来动态生成类
+                    List<ReadExcel.ConfigData> configDataList = new List<ReadExcel.ConfigData>();
                     //开始读取
                     while (excelReader.Read())
                     {
@@ -389,20 +382,23 @@ namespace F8Framework.Core.Editor
                             {
                                 throw new Exception("数据错误！[" + className + "]配置表！第" + index + "行" + inputPath);
                             }
-
-                            //把读取的数据和数据类型,名称保存起来,后面用来动态生成类
-                            List<ConfigData> configDataList = new List<ConfigData>();
+                            
+                            configDataList.Clear();
                             for (int j = 0; j < datas.Length; ++j)
                             {
-                                ConfigData data = new ConfigData();
+                                if (string.IsNullOrEmpty(types[j]) || string.IsNullOrEmpty(datas[j]))
+                                    continue; //空的数据不处理
+                                
+                                ReadExcel.ConfigData data = new ReadExcel.ConfigData();
                                 data.Type = types[j];
                                 data.Name = names[j];
                                 data.Data = datas[j];
-                                if (string.IsNullOrEmpty(data.Type) || string.IsNullOrEmpty(data.Data))
-                                    continue; //空的数据不处理
+                                
                                 configDataList.Add(data);
                             }
 
+                            ReadExcel.VariantInfoDict(ref configDataList);
+                            
                             dataList.Add(configDataList.ToArray());
                         }
 
@@ -414,10 +410,10 @@ namespace F8Framework.Core.Editor
                         throw new Exception("空的类名（excel页签名）, 路径:  " + inputPath);
                     }
 
-                    if (names != null && types != null)
+                    if (names != null && types != null && configDataList.Count > 0)
                     {
                         //根据刚才的数据来生成C#脚本
-                        ScriptGenerator generator = new ScriptGenerator(inputPath, className, names, types);
+                        ScriptGenerator generator = new ScriptGenerator(inputPath, className, configDataList);
                         //所有生成的类的代码最终保存在这
                         if (codeList.ContainsKey(className))
                         {
@@ -505,41 +501,75 @@ namespace F8Framework.Core.Editor
         }
         
         //序列化对象
-        private static void Serialize(object container, Type temp, List<ConfigData[]> dataList, string BinDataPath)
+        private static void Serialize(object container, Type temp, List<ReadExcel.ConfigData[]> dataList, string BinDataPath)
         {
             //设置数据
-            foreach (ConfigData[] datas in dataList)
+            foreach (ReadExcel.ConfigData[] datas in dataList)
             {
                 //Type.FullName 获取该类型的完全限定名称，包括其命名空间，但不包括程序集。
                 object t = Util.Assembly.GetTypeInstance(temp.FullName);
-                foreach (ConfigData data in datas)
+
+                foreach (ReadExcel.ConfigData data in datas)
                 {
-                    //Type.GetField(String) 搜索Type内指定名称的公共字段。
-                    FieldInfo info = temp.GetField(data.Name);
-                    // FieldInfo.SetValue 设置对象内指定名称的字段的值
-                    if (info != null)
+                    if (data.VariantInfo != null)
                     {
-                        info.SetValue(t, ReadExcel.ParseValue(data.Type, data.Data, temp.Name));
+                        string name = data.VariantInfo is { HasVariant: true }
+                            ? "_" + data.Name + "Variants"
+                            : data.Name;
+                        FieldInfo variantDictField = temp.GetField(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                        
+                        if (variantDictField == null) continue;
+                        
+                        object variantDict = variantDictField.GetValue(t);
+
+                        foreach (var variantData in data.VariantInfo.Variants)
+                        {
+                            object variantValue = ReadExcel.ParseValue(data.Type, variantData.Value, temp.Name);
+                            variantDict.GetType().GetMethod("Add").Invoke(variantDict, new object[] { variantData.Key, variantValue });
+                        }
+                        
+                        variantDictField.SetValue(t, variantDict);
                     }
                     else
                     {
-                        //2019.4.28f1,2020.3.33f1都出现的BUG（2021.3.8f1测试通过），编译dll后没及时刷新，导致修改name或id后读取失败，需要二次编译
-                        LogF8.LogConfig("info是空的：" + data.Name);
+                        FieldInfo info = temp.GetField(data.Name);
+                        // FieldInfo.SetValue 设置对象内指定名称的字段的值
+                        if (info != null)
+                        {
+                            info.SetValue(t, ReadExcel.ParseValue(data.Type, data.Data, temp.Name));
+                        }
                     }
                 }
 
                 // FieldInfo.GetValue 获取对象内指定名称的字段的值
-
                 FieldInfo fieldInfoId = null;
+                PropertyInfo propertyInfoId = null;
                 foreach (var field in temp.GetFields())
                 {
-                    if (string.Equals(field.Name, "id", StringComparison.OrdinalIgnoreCase))
-                    {
-                        fieldInfoId = field;
-                        break;
-                    }  
+                    if (!string.Equals(field.Name, "id", StringComparison.OrdinalIgnoreCase)) continue;
+                    fieldInfoId = field;
+                    break;
                 }
-                object id = fieldInfoId.GetValue(t); //获取id
+                // 如果没有找到字段，再检查属性
+                if (fieldInfoId == null)
+                {
+                    foreach (var property in temp.GetProperties())
+                    {
+                        if (!string.Equals(property.Name, "id", StringComparison.OrdinalIgnoreCase)) continue;
+                        propertyInfoId = property;
+                        break;
+                    }
+                }
+
+                object id = null;
+                if (fieldInfoId != null)
+                {
+                    id = fieldInfoId.GetValue(t);
+                }
+                else if (propertyInfoId != null)
+                {
+                    id = propertyInfoId.GetValue(t);
+                }
                 FieldInfo dictInfo = container.GetType().GetField("Dict");
                 object dict = dictInfo.GetValue(container);
 
