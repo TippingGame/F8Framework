@@ -241,7 +241,7 @@ namespace F8Framework.Core
                             
                             for (int j = 0; j < datas.Length; ++j)
                             {
-                                if (string.IsNullOrEmpty(types[j]) || string.IsNullOrEmpty(datas[j]))
+                                if (string.IsNullOrEmpty(types[j]))
                                     continue; //空的数据不处理
                                 
                                 ConfigData data = new ConfigData();
@@ -430,6 +430,8 @@ namespace F8Framework.Core
         public static object ParseValue(string type, string data, string classname)
         {
             object o = null;
+            if (data.IsNullOrEmpty())
+                return o;
             try
             {
                 if (type.EndsWith(SupportType.ARRAY))

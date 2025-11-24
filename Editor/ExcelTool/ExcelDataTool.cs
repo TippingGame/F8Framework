@@ -386,7 +386,7 @@ namespace F8Framework.Core.Editor
                             configDataList.Clear();
                             for (int j = 0; j < datas.Length; ++j)
                             {
-                                if (string.IsNullOrEmpty(types[j]) || string.IsNullOrEmpty(datas[j]))
+                                if (string.IsNullOrEmpty(types[j]))
                                     continue; //空的数据不处理
                                 
                                 ReadExcel.ConfigData data = new ReadExcel.ConfigData();
