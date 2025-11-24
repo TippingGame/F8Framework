@@ -903,25 +903,50 @@ namespace F8Framework.Core
             writer.Write((byte)1); // 非 null 对象标记
 
             var type = value.GetType();
-            var fields =
-                type.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+            
+            var properties = type.GetProperties();
+            foreach (var property in properties)
+            {
+                // 检查是否标记了 BinaryIgnore 特性
+                if (property.IsDefined(typeof(BinaryIgnore), true))
+                {
+                    continue;
+                }
 
+                var fieldValue = property.GetValue(value);
+                var handler = TypeHandlerFactory.GetHandler(property.PropertyType);
+
+                if (fieldValue == null)
+                {
+                    writer.Write((byte)0); // null 字段标记
+                }
+                else
+                {
+                    writer.Write((byte)1); // 非 null 字段标记
+                    handler.Serialize(writer, fieldValue);
+                }
+            }
+            
+            var fields = type.GetFields();
             foreach (var field in fields)
             {
-                if (field.IsPublic && !field.IsStatic)
+                // 检查是否标记了 BinaryIgnore 特性
+                if (field.IsDefined(typeof(BinaryIgnore), true))
                 {
-                    var fieldValue = field.GetValue(value);
-                    var handler = TypeHandlerFactory.GetHandler(field.FieldType);
+                    continue;
+                }
 
-                    if (fieldValue == null)
-                    {
-                        writer.Write((byte)0); // null 字段标记
-                    }
-                    else
-                    {
-                        writer.Write((byte)1); // 非 null 字段标记
-                        handler.Serialize(writer, fieldValue);
-                    }
+                var fieldValue = field.GetValue(value);
+                var handler = TypeHandlerFactory.GetHandler(field.FieldType);
+
+                if (fieldValue == null)
+                {
+                    writer.Write((byte)0); // null 字段标记
+                }
+                else
+                {
+                    writer.Write((byte)1); // 非 null 字段标记
+                    handler.Serialize(writer, fieldValue);
                 }
             }
         }
@@ -936,27 +961,54 @@ namespace F8Framework.Core
             }
 
             var instance = Activator.CreateInstance(type);
-            var fields =
-                type.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+            
+            var properties = type.GetProperties();
+            foreach (var property in properties)
+            {
+                // 检查是否标记了 BinaryIgnore 特性
+                if (property.IsDefined(typeof(BinaryIgnore), true))
+                {
+                    continue;
+                }
 
+                var fieldNotNull = reader.ReadByte();
+
+                if (fieldNotNull == 0)
+                {
+                    // null 字段
+                    property.SetValue(instance, null);
+                }
+                else
+                {
+                    // 非 null 字段
+                    var handler = TypeHandlerFactory.GetHandler(property.PropertyType);
+                    var value = handler.Deserialize(reader, property.PropertyType);
+                    property.SetValue(instance, value);
+                }
+            }
+            
+            var fields = type.GetFields();
             foreach (var field in fields)
             {
-                if (field.IsPublic && !field.IsStatic)
+                // 检查是否标记了 BinaryIgnore 特性
+                if (field.IsDefined(typeof(BinaryIgnore), true))
                 {
-                    var fieldNotNull = reader.ReadByte();
+                    continue;
+                }
 
-                    if (fieldNotNull == 0)
-                    {
-                        // null 字段
-                        field.SetValue(instance, null);
-                    }
-                    else
-                    {
-                        // 非 null 字段
-                        var handler = TypeHandlerFactory.GetHandler(field.FieldType);
-                        var value = handler.Deserialize(reader, field.FieldType);
-                        field.SetValue(instance, value);
-                    }
+                var fieldNotNull = reader.ReadByte();
+
+                if (fieldNotNull == 0)
+                {
+                    // null 字段
+                    field.SetValue(instance, null);
+                }
+                else
+                {
+                    // 非 null 字段
+                    var handler = TypeHandlerFactory.GetHandler(field.FieldType);
+                    var value = handler.Deserialize(reader, field.FieldType);
+                    field.SetValue(instance, value);
                 }
             }
 

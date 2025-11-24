@@ -95,6 +95,8 @@ namespace F8Framework.Core.Editor
                     string fieldType = ReadExcel.GetTrueType(types[i], ClassName, InputPath);
                     classSource.Append("\t\t[Preserve]\n");
                     classSource.Append("\t\tpublic Dictionary<System.String, " + fieldType + "> _" + fields[i] + "Variants = new Dictionary<System.String, " + fieldType + ">();\n");
+                    classSource.Append("\t\t[F8Framework.Core.BinaryIgnore]\n");
+                    classSource.Append("\t\t[LitJson.JsonIgnore]\n");
                     classSource.Append("\t\t[Preserve]\n");
                     classSource.Append("\t\tpublic " + fieldType + " " + fields[i] + " => _" + fields[i] + "Variants.GetValueOrDefault(F8DataManager.Instance.VariantName ?? string.Empty, _" + fields[i] + "Variants[string.Empty]);\n");
                 }
