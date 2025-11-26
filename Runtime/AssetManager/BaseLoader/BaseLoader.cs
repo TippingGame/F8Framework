@@ -10,7 +10,7 @@ namespace F8Framework.Core
     public class BaseLoader : IEnumerator
     {
         public virtual bool LoaderSuccess => false;
-        
+        public virtual float Progress => 0f;
         private Action onComplete;
         
         protected virtual void OnComplete()

@@ -42,6 +42,8 @@ namespace F8Framework.Core
         
         public override bool LoaderSuccess => assetBundleLoadState == LoaderState.FINISHED && assetBundleExpandState == LoaderState.FINISHED;
         
+        public override float Progress => LoadProgress;
+        
         /// <summary>
         /// 异步资产捆绑包加载完成的回调。
         /// </summary>

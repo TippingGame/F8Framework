@@ -5,6 +5,7 @@ namespace F8Framework.Core
     {
         private bool isLoadSuccess = false;
         public override bool LoaderSuccess => isLoadSuccess;
+        public override float Progress => isLoadSuccess ? 1f : 0f;
         public string Guid;
 
         public void UILoadSuccess()

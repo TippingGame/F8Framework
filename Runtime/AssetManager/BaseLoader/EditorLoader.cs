@@ -7,7 +7,7 @@ namespace F8Framework.Core
     {
         public bool isLoadSuccess = false;
         public override bool LoaderSuccess => isLoadSuccess == true;
-
+        public override float Progress => isLoadSuccess == true ? 1f : 0f;
         public Object Asset = null;
         public Dictionary<string, Object> AllAsset = null;
         

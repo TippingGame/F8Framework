@@ -64,133 +64,129 @@ Method 2: Unity → Menu Bar → Window → Package Manager → "+" → Add Pack
 ```C#
 IEnumerator Start()
 {
-    /*----------All loading methods auto-detect Resources/AssetBundle assets----------*/
-    
-    // [Important] Editor mode - no need to press F8 after every asset modification
+    /*========== Basic Configuration ==========*/
+    // Enable editor mode (no need to press F8 for every resource change), can also be toggled in the menu bar
     FF8.Asset.IsEditorMode = true;
     
-    
-    /*-------------------------------------Sync Loading-------------------------------------*/
-    // Load single asset
-    GameObject go = FF8.Asset.Load<GameObject>("Cube");
-    // 如要使用完整路径加载，需点击F5打包工具勾选对应功能
-    go = FF8.Asset.Load<GameObject>("AssetBundles/Prefabs/Cube");
-    go = FF8.Asset.Load<GameObject>("Resources/Prefabs/Cube.prefab");
 
-    // assetName: Asset name
-    // subAssetName: Sub-asset name (for Sprite in Multiple mode)
-    // [Warning] REMOTE_ASSET_BUNDLE requires AssetRemoteAddress = "http://127.0.0.1:6789/remote"
-    Sprite sprite = FF8.Asset.Load<Sprite>("PackForest01", "PackForest01_12", AssetManager.AssetAccessMode.REMOTE_ASSET_BUNDLE);
-    
-    // Load all assets
-    FF8.Asset.LoadAll("Cube");
-    // Load all sub-assets
-    FF8.Asset.LoadSub("Cube");
-    
-    
-    /*-------------------------------------Async Loading-------------------------------------*/
-    FF8.Asset.LoadAsync<GameObject>("Cube", (go) =>
-    {
-        GameObject goo = Instantiate(go);
-    });
+    /*========== 1. Synchronous Loading ==========*/
 
-    // [Note] async/await (no multithreading, works on WebGL)
-    await FF8.Asset.LoadAsync<GameObject>("Cube");
-    // or
-    BaseLoader load = FF8.Asset.LoadAsync<GameObject>("Cube");
-    await load;
-    
-    // Coroutine method
+    // Basic loading - automatically recognizes Resources or AssetBundle
+    GameObject cube = FF8.Asset.Load<GameObject>("Cube");
+
+    // Full path loading (requires enabling corresponding feature in F5 packaging tool)
+    GameObject prefab1 = FF8.Asset.Load<GameObject>("AssetBundles/Prefabs/Cube");
+    GameObject prefab2 = FF8.Asset.Load<GameObject>("Resources/Prefabs/Cube.prefab");
+
+    // Load sub-assets (e.g., Sprite images using Multiple mode)
+    Sprite sprite = FF8.Asset.Load<Sprite>("PackForest01", "PackForest01_12");
+
+    // Force remote loading mode, requires configuring remote resource address in F5 packaging tool
+    Sprite remoteSprite = FF8.Asset.Load<Sprite>("PackForest01", "PackForest01_12",
+        AssetManager.AssetAccessMode.REMOTE_ASSET_BUNDLE);
+
+
+    /*========== 2. Asynchronous Loading ==========*/
+
+    // Callback approach
+    FF8.Asset.LoadAsync<GameObject>("Cube", (go) => { Instantiate(go); });
+
+    // Coroutine approach
     yield return FF8.Asset.LoadAsync<GameObject>("Cube");
-    // or
-    BaseLoader load2 = FF8.Asset.LoadAsync<GameObject>("Cube");
-    yield return load2;
-    GameObject go2 = load2.GetAssetObject<GameObject>();
+
+    // Or get loader for control
+    BaseLoader loader = FF8.Asset.LoadAsync<GameObject>("Cube");
+    yield return loader;
+    GameObject result = loader.GetAssetObject<GameObject>();
+
+    // async/await approach (WebGL compatible)
+    // await FF8.Asset.LoadAsync<GameObject>("Cube");
+
+
+    /*========== 3. Batch Loading ==========*/
+
+    // Synchronous folder loading
+    FF8.Asset.LoadDir("UI/Prefabs");
+
+    // Asynchronous folder loading - callback approach
+    FF8.Asset.LoadDirAsync("UI/Prefabs", () => { LogF8.Log("All UI resources loaded"); });
+
+    // Asynchronous folder loading - coroutine approach
+    BaseDirLoader dirLoader = FF8.Asset.LoadDirAsync("UI/Prefabs");
+    yield return dirLoader;
+
+    // Iterate loading progress
+    foreach (var progress in FF8.Asset.LoadDirAsyncCoroutine("UI/Prefabs"))
+    {
+        LogF8.Log($"Loading progress: {progress}");
+        yield return progress;
+    }
+
+    // async/await approach (WebGL compatible)
+    // await FF8.Asset.LoadDirAsync("UI/Prefabs");
     
-    // Load all assets
+    // Load all assets of this resource
+    FF8.Asset.LoadAll("Cube");
     BaseLoader loaderAll = FF8.Asset.LoadAllAsync("Cube");
-    yield return loaderAll;
-    Dictionary<string, Object> allAsset = loaderAll.GetAllAssetObject();
     
-    // Load all sub-assets
+    // Load all sub-assets of this resource
+    FF8.Asset.LoadSub("Atlas");
     BaseLoader loaderSub = FF8.Asset.LoadSubAsync("Atlas");
-    yield return loaderSub;
-    Dictionary<string, Sprite> allAsset2 = loaderSub.GetAllAssetObject<Sprite>();
-    
-    
-    /*-------------------------------------Folder Loading-------------------------------------*/
-    // [Note] Only loads first-level assets (non-recursive)
-    FF8.Asset.LoadDir("NewFolder");
-    
-    // async/await (no multithreading, works on WebGL)
-    BaseDirLoader loadDir = FF8.Asset.LoadDirAsync("NewFolder", () => { });
-    await loadDir;
-    
-    // Async folder loading
-    BaseDirLoader loadDir2 = FF8.Asset.LoadDirAsync("NewFolder", () => { });
-    yield return loadDir2;
-    
-    // Access all BaseLoaders
-    List<BaseLoader> loaders = loadDir2.Loaders;
-    
-    // Progress tracking
-    foreach (var item in FF8.Asset.LoadDirAsyncCoroutine("NewFolder"))
-    {
-        yield return item;
-    }
 
-    // Alternative method
-    var loadDir3 = FF8.Asset.LoadDirAsyncCoroutine("NewFolder").GetEnumerator();
-    while (loadDir3.MoveNext())
-    {
-        yield return loadDir3.Current;
-    }
     
-    
-    /*-------------------------------------Utilities-------------------------------------*/
-    // Get all assets
-    Dictionary<string, Object> allAsset3 = FF8.Asset.GetAllAssetObject("Cube");
-    
-    // Get specific type only
-    Dictionary<string, Sprite> allAsset4 = FF8.Asset.GetAllAssetObject<Sprite>("Atlas");
-    
-    // Get single asset
-    GameObject go3 = FF8.Asset.GetAssetObject<GameObject>("Cube");
-    
+    /*========== 4. Scene Loading ==========*/
+
+    // Synchronous scene loading
+    FF8.Asset.LoadScene("MainScene");
+
+    // Asynchronous scene loading
+    SceneLoader sceneLoader = FF8.Asset.LoadSceneAsync("MainScene", LoadSceneMode.Single);
+    yield return sceneLoader;
+
+    // Manual scene activation control
+    SceneLoader sceneLoader2 = FF8.Asset.LoadSceneAsync("MainScene", new LoadSceneParameters(LoadSceneMode.Single),
+        allowSceneActivation: false);
+    yield return new WaitForSeconds(2);
+    sceneLoader2.AllowSceneActivation();
+
+
+    /*========== 5. Asset Management ==========*/
+
+    // Get loaded asset
+    GameObject cachedCube = FF8.Asset.GetAssetObject<GameObject>("Cube");
+
+    // Get all sub-assets
+    Dictionary<string, Object> allAssets = FF8.Asset.GetAllAssetObject("Atlas");
+    Dictionary<string, Sprite> allSprites = FF8.Asset.GetAllAssetObject<Sprite>("Atlas");
+
     // Get loading progress
-    float loadProgress = FF8.Asset.GetLoadProgress("Cube");
+    float assetProgress = FF8.Asset.GetLoadProgress("Cube"); // Single asset
+    float totalProgress = FF8.Asset.GetLoadProgress(); // All assets
 
-    // Get total progress
-    float loadProgress2 = FF8.Asset.GetLoadProgress();
+    // Asset unloading
+    FF8.Asset.Unload("Cube", false); // Keep dependencies
+    FF8.Asset.Unload("Cube", true); // Complete unload
 
-    // [Important] Sync unload
-    // Set true to completely unload AB
-    FF8.Asset.Unload("Cube", false); 
-
-    // Async unload
-    FF8.Asset.UnloadAsync("Cube", false, () =>
-    {
-        // Callback when unload completes
-    });
+    // Asynchronous unloading
+    FF8.Asset.UnloadAsync("Cube", false, () => { LogF8.Log("Asset unloaded"); });
     
     
-    /*-------------------------------------Examples-------------------------------------*/
-    // [Warning] Must load skybox material or will turn purple
-    // [Limitation] Cannot load scenes from Resources directory
-    FF8.Asset.Load("Scene");
-    SceneManager.LoadScene("Scene");
+    /*========== 6. Notes: Common Issues ==========*/
     
-    // [Prerequisite] Must load atlas first
+    // Loading AB packages for different platforms (Android, iOS, WebGL) in editor may cause shaders to turn purple, scene loading to fail, audio loading to fail, etc. (Solution: enable editor mode)
+    
+    // When loading scenes, don't forget to load skybox materials, otherwise they may turn purple, and scenes in Resources directory cannot be loaded (need to manually add to Build Settings)
+    
+    // To use sprite atlases, first need to load the atlas
     FF8.Asset.Load("SpriteAtlas");
     
-    // [Optimization] Skip preload if atlas/images share same AB name
+    // If the atlas and images are set to the same AB name, no need to preload the atlas
     FF8.Asset.LoadAsync<Sprite>("PackForest_2", sprite =>
     {
         LogF8.Log(sprite);
     });
     
-    // [Critical] Texture2D/Sprite conflict: 
-    // If loaded as Texture2D first, cannot load as Sprite later
+    // Be careful to distinguish between Texture2D and Sprite when loading images. If a resource is loaded as Texture2D, it cannot be loaded as Sprite type
     FF8.Asset.Load<Texture2D>("PackForest_2");
 }
 ```

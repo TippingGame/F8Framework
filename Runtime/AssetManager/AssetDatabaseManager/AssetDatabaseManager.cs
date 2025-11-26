@@ -36,12 +36,6 @@ namespace F8Framework.Core
                 T o = UnityEditor.AssetDatabase.LoadAssetAtPath<T>(assetPath);
                 loader.Asset = o;
                 loader.AssetDatabaseLoadSuccess();
-                if (loader.Asset is SceneAsset)
-                {
-                    var loadSceneParams = new UnityEngine.SceneManagement.LoadSceneParameters(UnityEngine.SceneManagement.LoadSceneMode.Single, UnityEngine.SceneManagement.LocalPhysicsMode.None);
-                    UnityEditor.SceneManagement.EditorSceneManager.LoadSceneInPlayMode(assetPath, loadSceneParams);
-                    LogF8.LogAsset("编辑器模式下自动加载场景");
-                }
                 return o;
             }
             else
@@ -71,12 +65,6 @@ namespace F8Framework.Core
                     Object o = UnityEditor.AssetDatabase.LoadAssetAtPath<Object>(assetPath);
                     loader.Asset = o;
                     loader.AssetDatabaseLoadSuccess();
-                    if (loader.Asset is SceneAsset)
-                    {
-                        var loadSceneParams = new UnityEngine.SceneManagement.LoadSceneParameters(UnityEngine.SceneManagement.LoadSceneMode.Single, UnityEngine.SceneManagement.LocalPhysicsMode.None);
-                        UnityEditor.SceneManagement.EditorSceneManager.LoadSceneInPlayMode(assetPath, loadSceneParams);
-                        LogF8.LogAsset("编辑器模式下自动加载场景");
-                    }
                     return o;
                 }
 

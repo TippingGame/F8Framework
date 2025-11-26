@@ -21,6 +21,8 @@ namespace F8Framework.Core
         
         public override bool LoaderSuccess => resourceLoadState == LoaderState.FINISHED;
         
+        public override float Progress => LoadProgress;
+        
         /// <summary>
         /// 加载类型：同步或异步本地加载。
         /// </summary>

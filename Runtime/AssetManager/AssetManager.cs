@@ -3,11 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 
 namespace F8Framework.Core
 {
     //异步加载完成的回调
+    public delegate void OnSceneObject(Scene obj);
     public delegate void OnAssetObject<T>(T obj) where T : Object;
     public delegate void OnAllAssetObject<TObject>(Dictionary<string, TObject> objs) where TObject : Object;
     
@@ -355,6 +357,67 @@ namespace F8Framework.Core
                 return null;
             }
             
+            /// <summary>
+            /// 场景同步加载，注意：场景不会立即加载，而是在下一帧加载。
+            /// </summary>
+            /// <param name="assetName"></param>
+            /// <param name="loadSceneParams"></param>
+            /// <param name="mode"></param>
+            /// <returns></returns>
+            public Scene LoadScene(string assetName, LoadSceneParameters loadSceneParams, AssetAccessMode mode = AssetAccessMode.UNKNOWN)
+            {
+                AssetInfo info = GetAssetInfo(assetName, mode);
+                if (!IsLegal(ref info))
+                    return default;
+#if UNITY_EDITOR
+                if (IsEditorMode)
+                {
+                    assetName = info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0];
+                    return UnityEditor.SceneManagement.EditorSceneManager.LoadSceneInPlayMode(assetName, loadSceneParams);
+                }
+#endif
+                Load(assetName, null, mode);
+                return SceneManager.LoadScene(info.AssetPath[0], loadSceneParams);
+            }
+
+            public Scene LoadScene(string assetName, LoadSceneMode loadSceneMode = LoadSceneMode.Single, AssetAccessMode mode = AssetAccessMode.UNKNOWN)
+            {
+                return LoadScene(assetName, new LoadSceneParameters(loadSceneMode), mode);
+            }
+
+            /// <summary>
+            /// 场景异步加载
+            /// </summary>
+            /// <param name="assetName"></param>
+            /// <param name="loadSceneParams"></param>
+            /// <param name="allowSceneActivation"></param>
+            /// <param name="callback"></param>
+            /// <param name="mode"></param>
+            /// <returns></returns>
+            public SceneLoader LoadSceneAsync(string assetName, LoadSceneParameters loadSceneParams, bool allowSceneActivation = true,
+                OnSceneObject callback = null, AssetAccessMode mode = AssetAccessMode.UNKNOWN)
+            {
+                AssetInfo info = GetAssetInfo(assetName, mode);
+                if (!IsLegal(ref info))
+                    return null;
+#if UNITY_EDITOR
+                if (IsEditorMode)
+                {
+                    assetName = info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0];
+                    var sceneLoader = new SceneLoader(true);
+                    return sceneLoader.LoadAsync(assetName, loadSceneParams, allowSceneActivation, callback, mode);
+                }
+#endif
+                var sceneLoader2 = new SceneLoader(false);
+                return sceneLoader2.LoadAsync(info.AssetPath[0], loadSceneParams, allowSceneActivation, callback, mode);
+            }
+            
+            public SceneLoader LoadSceneAsync(string assetName, LoadSceneMode loadSceneMode = LoadSceneMode.Single, bool allowSceneActivation = true,
+                OnSceneObject callback = null,AssetAccessMode mode = AssetAccessMode.UNKNOWN)
+            {
+                return LoadSceneAsync(assetName, new LoadSceneParameters(loadSceneMode), allowSceneActivation, callback, mode);
+            }
+
             /// <summary>
             /// 获取所有资产
             /// </summary>
