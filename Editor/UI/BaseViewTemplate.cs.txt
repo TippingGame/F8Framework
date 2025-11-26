@@ -62,7 +62,7 @@ public class #SCRIPTNAME# : BaseView
 	    base.ButtonClick(ui);
     }
     
-    protected virtual void ValueChange<T>(UIBehaviour ui, T value)
+    protected override void ValueChange<T>(UIBehaviour ui, T value)
     {
         base.ValueChange<T>(ui, value);
     }

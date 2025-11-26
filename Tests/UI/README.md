@@ -195,7 +195,7 @@ public class UIMain : BaseView
    * 红点系统 [UIRedDot.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/UI/UIRedDot/UIRedDot.cs)
    * Sprite序列帧动画 [SpriteSequenceFrame.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/UI/SequenceFrame/SpriteSequenceFrame.cs)
 ----------------------------------
-3. UI常用组件：[https://github.com/nhn/gpm.unity.git](https://github.com/nhn/gpm.unity.git)（已内置，参考目录：F8Framework/Tests/UI/Example）如要使用Tests目录下的示例，请在 Project Setting -> Player -> Script Compilation 处添加宏定义 BUILD_F8FRAMEWORK_TEST  
+3. UI常用组件：[https://github.com/nhn/gpm.unity.git](https://github.com/nhn/gpm.unity.git)（已内置，参考目录：F8Framework/Tests/UI/Example）  
 * 嵌套布局  
 ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_20240302173446.png)
 ----------------------------------

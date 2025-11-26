@@ -1,4 +1,7 @@
 using System;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace F8Framework.Core
 {
@@ -35,6 +38,11 @@ namespace F8Framework.Core
 
         protected virtual void OnAwake()
         {
+            OnAddUIComponentListener();
+        }
+        
+        protected virtual void OnAddUIComponentListener()
+        {
         }
         
         private void Start()
@@ -57,6 +65,14 @@ namespace F8Framework.Core
         }
         
         protected virtual void OnViewOpen()
+        {
+        }
+        
+        protected virtual void ButtonClick(UIBehaviour ui)
+        {
+        }
+        
+        protected virtual void ValueChange<T>(UIBehaviour ui, T value)
         {
         }
         

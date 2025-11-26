@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using F8Framework.Core;
+using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
     #ROOTNAMESPACEBEGIN#
 public class #SCRIPTNAME# : BaseItem
@@ -46,6 +48,17 @@ public class #SCRIPTNAME# : BaseItem
     protected override void OnViewOpen()
     {
         #NOTRIM#
+    }
+    
+    // UI组件监听函数
+    protected override void ButtonClick(UIBehaviour ui)
+    {
+	    base.ButtonClick(ui);
+    }
+    
+    protected override void ValueChange<T>(UIBehaviour ui, T value)
+    {
+        base.ValueChange<T>(ui, value);
     }
     
     // OnDisable

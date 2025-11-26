@@ -150,5 +150,22 @@ public class LoadDll : MonoBehaviour
             LogF8.Log("Progress: " + progress);
         });
     }
+    void Update()
+    {
+        // Update module
+        ModuleCenter.Update();
+    }
+
+    void LateUpdate()
+    {
+        // Update module
+        ModuleCenter.LateUpdate();
+    }
+
+    void FixedUpdate()
+    {
+        // Update module
+        ModuleCenter.FixedUpdate();
+    }
 }
 ```

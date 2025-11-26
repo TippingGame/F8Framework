@@ -213,7 +213,7 @@ public class UIMain : BaseView
    * Sprite Frame Animation [SpriteSequenceFrame.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/UI/SequenceFrame/SpriteSequenceFrame.cs)
 ----------------------------------
 3. UI Component Library [https://github.com/nhn/gpm.unity.git](https://github.com/nhn/gpm.unity.git)（Built-in，Location: F8Framework/Tests/UI/Example）
-   * Enable via: Project Settings → Player → Script Compilation → Add `BUILD_F8FRAMEWORK_TEST` macro
+
 * Nested Layouts  
   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_20240302173446.png)
 ----------------------------------
