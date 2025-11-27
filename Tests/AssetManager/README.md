@@ -96,7 +96,7 @@ IEnumerator Start()
     GameObject result = loader.GetAssetObject<GameObject>();
 
     // async/await 方式（WebGL 兼容）
-    // await FF8.Asset.LoadAsync<GameObject>("Cube");
+    await FF8.Asset.LoadAsync<GameObject>("Cube");
 
 
     /*========== 3. 批量加载 ==========*/
@@ -119,7 +119,7 @@ IEnumerator Start()
     }
 
     // async/await 方式（WebGL 兼容）
-    // await FF8.Asset.LoadDirAsync("UI/Prefabs");
+    await FF8.Asset.LoadDirAsync("UI/Prefabs");
     
     // 加载此资源的全部资产
     FF8.Asset.LoadAll("Cube");

@@ -11,10 +11,10 @@ namespace F8Framework.Core
         {
             public readonly byte[] key;
             public readonly byte[] iv;
-            public OptimizedAES(string key, string iv)
+            public OptimizedAES(string key, string iv = null)
             {
                 this.key = Encryption.GenerateBytesKey(key);
-                this.iv = Encryption.GenerateBytesKey(iv, 16);
+                this.iv = iv.IsNullOrEmpty() ? null : Encryption.GenerateBytesKey(iv, 16);
             }
         }
         /// <summary>
@@ -244,12 +244,24 @@ namespace F8Framework.Core
                 using (Aes aes = Aes.Create())
                 {
                     aes.Key = optimizedAES.key;
-                    aes.IV = optimizedAES.iv;
+                    
+                    if (optimizedAES.iv == null)
+                    {
+                        aes.GenerateIV();
+                    }
+                    else
+                    {
+                        aes.IV = optimizedAES.iv;
+                    }
 
                     using (var encryptor = aes.CreateEncryptor(aes.Key, aes.IV))
                     using (var ms = new MemoryStream())
                     {
-                        // 加密数据
+                        if (optimizedAES.iv == null)
+                        {
+                            ms.Write(aes.IV, 0, 16);
+                        }
+                        
                         using (var cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
                         {
                             cs.Write(plainText, 0, plainText.Length);
@@ -268,19 +280,38 @@ namespace F8Framework.Core
                 using (Aes aes = Aes.Create())
                 {
                     aes.Key = optimizedAES.key;
-                    aes.IV = optimizedAES.iv;
-
-                    using (var decryptor = aes.CreateDecryptor(aes.Key, aes.IV))
-                    using (var ms = new MemoryStream(cipherText))
-                    using (var cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read))
-                    using (var resultStream = new MemoryStream())
+        
+                    if (optimizedAES.iv == null)
                     {
-                        cs.CopyTo(resultStream);
-                        return resultStream.ToArray();
+                        if (cipherText == null || cipherText.Length < 16)
+                            throw new ArgumentException("Cipher text is too short");
+                        
+                        byte[] iv = new byte[16];
+                        Buffer.BlockCopy(cipherText, 0, iv, 0, 16);
+                        aes.IV = iv;
+                        
+                        return AES_DecryptInternal(cipherText, 16, cipherText.Length - 16, aes);
+                    }
+                    else
+                    {
+                        aes.IV = optimizedAES.iv;
+                        return AES_DecryptInternal(cipherText, 0, cipherText?.Length ?? 0, aes);
                     }
                 }
             }
 
+            private static byte[] AES_DecryptInternal(byte[] cipherText, int offset, int count, Aes aes)
+            {
+                using (var decryptor = aes.CreateDecryptor())
+                using (var ms = new MemoryStream(cipherText, offset, count))
+                using (var cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read))
+                using (var resultStream = new MemoryStream())
+                {
+                    cs.CopyTo(resultStream);
+                    return resultStream.ToArray();
+                }
+            }
+            
             /// <summary>
             /// 加密字符串（UTF-8 编码）
             /// </summary>

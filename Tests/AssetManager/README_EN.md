@@ -100,7 +100,7 @@ IEnumerator Start()
     GameObject result = loader.GetAssetObject<GameObject>();
 
     // async/await approach (WebGL compatible)
-    // await FF8.Asset.LoadAsync<GameObject>("Cube");
+    await FF8.Asset.LoadAsync<GameObject>("Cube");
 
 
     /*========== 3. Batch Loading ==========*/
@@ -123,7 +123,7 @@ IEnumerator Start()
     }
 
     // async/await approach (WebGL compatible)
-    // await FF8.Asset.LoadDirAsync("UI/Prefabs");
+    await FF8.Asset.LoadDirAsync("UI/Prefabs");
     
     // Load all assets of this resource
     FF8.Asset.LoadAll("Cube");

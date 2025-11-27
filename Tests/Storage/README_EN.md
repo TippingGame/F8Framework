@@ -24,8 +24,9 @@ public ClassInfo Info = new ClassInfo();
 
 void Start()
 {
-    // Set the key to automatically encrypt all data (not encrypted in the editor)
-    FF8.Storage.SetEncrypt(new Util.OptimizedAES("AES_Key", "AES_IV"));
+    // Set encryption key, automatically encrypt all data (not encrypted in editor)
+    // iv = null means using random IV
+    FF8.Storage.SetEncrypt(new Util.OptimizedAES(key: "AES_Key", iv: null));
     
     // Set UserId, user's private key
     FF8.Storage.SetUser("12345");

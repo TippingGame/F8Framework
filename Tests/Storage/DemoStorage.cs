@@ -16,7 +16,8 @@ namespace F8Framework.Tests
         void Start()
         {
             // 设置密钥，自动加密所有数据（编辑器下不加密）
-            FF8.Storage.SetEncrypt(new Util.OptimizedAES("AES_Key", "AES_IV"));
+            // iv = null 表示使用随机IV
+            FF8.Storage.SetEncrypt(new Util.OptimizedAES(key: "AES_Key", iv: null));
             
             // 设置UserId，用户私有的Key
             FF8.Storage.SetUser("12345");
