@@ -59,6 +59,11 @@ namespace F8Framework.Core
             SendAssetBundleDownloadRequest(uri, hash, crc);
         }
         
+        public DownloadRequest()
+        {
+            type = DownloadType.ASSET_BUNDLE;
+        }
+        
         /// <summary>
         /// 终止正在进行的下载。
         /// </summary>
@@ -88,7 +93,7 @@ namespace F8Framework.Core
             }
         }
 
-        private void SendAssetBundleDownloadRequest(string uri, Hash128 hash = default, uint crc = 0)
+        private void SendAssetBundleDownloadRequest(string uri, Hash128 hash = default, uint crc = 0U)
         {
             try
             {
@@ -111,7 +116,7 @@ namespace F8Framework.Core
             }
         }
         
-        public IEnumerator SendAssetBundleDownloadRequestCoroutine(string uri, Hash128 hash = default, uint crc = 0)
+        public IEnumerator SendAssetBundleDownloadRequestCoroutine(string uri, Hash128 hash = default, uint crc = 0U)
         {
             if (!FileTools.IsLegalURI(uri))
             {

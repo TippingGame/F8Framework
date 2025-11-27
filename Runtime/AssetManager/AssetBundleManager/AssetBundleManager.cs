@@ -997,7 +997,7 @@ namespace F8Framework.Core
 #endif
             if (FileTools.IsLegalURI(manifestPath))
             {
-                DownloadRequest assetBundleDownloadRequest = new DownloadRequest(manifestPath, default);
+                DownloadRequest assetBundleDownloadRequest = new DownloadRequest();
                 yield return assetBundleDownloadRequest.SendAssetBundleDownloadRequestCoroutine(manifestPath);
                 if (assetBundleDownloadRequest.DownloadedAssetBundle)
                 {
