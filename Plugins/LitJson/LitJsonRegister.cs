@@ -4,17 +4,9 @@ using UnityEngine.Tilemaps;
 
 namespace LitJson
 {
-#if UNITY_EDITOR
-    [UnityEditor.InitializeOnLoad]
-#endif
     public class LitJsonRegister
     {
         static bool _registerd;
-        
-        static LitJsonRegister()
-        {
-            Register();
-        }
         
         public static void Register()
         {

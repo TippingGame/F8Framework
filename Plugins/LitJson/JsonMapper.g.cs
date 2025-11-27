@@ -158,6 +158,8 @@ namespace LitJson
 
             RegisterBaseExporters ();
             RegisterBaseImporters ();
+            
+            LitJsonRegister.Register();
         }
         #endregion
 
