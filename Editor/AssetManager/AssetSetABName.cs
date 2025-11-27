@@ -29,7 +29,7 @@ namespace F8Framework.Core.Editor
                         ai.assetBundleName = null;
                         EditorUtility.SetDirty(ai);
                     }
-                    LogF8.Log("文件" + assetPath);
+                    LogF8.Log("文件：" + assetPath);
                 }
                 else if (Directory.Exists(absolutePath))
                 {
@@ -39,7 +39,7 @@ namespace F8Framework.Core.Editor
                         aiDir.assetBundleName = null;
                         EditorUtility.SetDirty(aiDir);
                     }
-                    LogF8.Log("文件夹" + assetPath);
+                    LogF8.Log("文件夹：" + assetPath);
                     
                     // 获取所有文件夹
                     string[] folderPaths = Directory.GetDirectories(absolutePath, "*", SearchOption.AllDirectories);
@@ -64,7 +64,7 @@ namespace F8Framework.Core.Editor
                             ai.assetBundleName = null;
                             EditorUtility.SetDirty(ai);
                         }
-                        LogF8.Log("文件" + _assetPath);
+                        LogF8.Log("文件：" + _assetPath);
                     }
                 }
             }
@@ -87,22 +87,20 @@ namespace F8Framework.Core.Editor
                 if (File.Exists(absolutePath))
                 {
                     AssetImporter ai = AssetImporter.GetAtPath(assetPath);
-                    // 使用 Path.ChangeExtension 去掉扩展名
-                    string bundleName = Path.ChangeExtension(assetPath, null).Replace(URLSetting.AssetBundlesPath, "");
-                    if (!ai.assetBundleName.Equals(bundleName))
+                    if (FirstName == null)
                     {
-                        if (FirstName == null)
-                        {
-                            ai.assetBundleName = bundleName;
-                            FirstName = bundleName;
-                        }
-                        else
-                        {
-                            ai.assetBundleName = FirstName;
-                        }
-                        EditorUtility.SetDirty(ai);
+                        // 使用 Path.ChangeExtension 去掉扩展名
+                        string bundleName = Path.ChangeExtension(assetPath, null).Replace(URLSetting.AssetBundlesPath, "");
+                        ai.assetBundleName = bundleName;
+                        FirstName = bundleName;
                     }
-                    LogF8.Log("文件" + assetPath);
+                    else
+                    {
+                        ai.assetBundleName = FirstName;
+                    }
+                    EditorUtility.SetDirty(ai);
+                    
+                    LogF8.Log("文件：" + assetPath);
                 }
                 else if (Directory.Exists(absolutePath))
                 {
@@ -114,22 +112,19 @@ namespace F8Framework.Core.Editor
                     {
                         string getAssetPath = ABBuildTool.GetAssetPath(_assetPath);
                         AssetImporter ai = AssetImporter.GetAtPath(getAssetPath);
-                        // 使用 Path.ChangeExtension 去掉扩展名
-                        string bundleName = Path.ChangeExtension(getAssetPath, null).Replace(URLSetting.AssetBundlesPath, "");
-                        if (!ai.assetBundleName.Equals(bundleName))
+                        if (FirstName == null)
                         {
-                            if (FirstName == null)
-                            {
-                                ai.assetBundleName = bundleName;
-                                FirstName = bundleName;
-                            }
-                            else
-                            {
-                                ai.assetBundleName = FirstName;
-                            }
-                            EditorUtility.SetDirty(ai);
+                            // 使用 Path.ChangeExtension 去掉扩展名
+                            string bundleName = Path.ChangeExtension(getAssetPath, null).Replace(URLSetting.AssetBundlesPath, "");
+                            ai.assetBundleName = bundleName;
+                            FirstName = bundleName;
                         }
-                        LogF8.Log("文件" + _assetPath);
+                        else
+                        {
+                            ai.assetBundleName = FirstName;
+                        }
+                        EditorUtility.SetDirty(ai);
+                        LogF8.Log("文件：" + _assetPath);
                     }
                 }
             }
