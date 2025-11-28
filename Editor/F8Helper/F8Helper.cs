@@ -44,6 +44,11 @@ namespace F8Framework.Core.Editor
         [MenuItem("开发工具/1: F8Run _F8", false, 200)]
         public static void F8Run()
         {
+            if (EditorApplication.isPlaying || EditorApplication.isPaused)
+            {
+                EditorUtility.DisplayDialog("提示", "游戏正在运行中，不能运行F8流程", "确定");
+                return;
+            }
             LoadAllExcelData();
             F8EditorPrefs.SetBool("compilationFinishedHotUpdateDll", true);
             F8EditorPrefs.SetBool("compilationFinishedBuildAB", true);

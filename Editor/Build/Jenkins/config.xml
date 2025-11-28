@@ -102,6 +102,16 @@
           <defaultValue>false</defaultValue>
         </hudson.model.BooleanParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
+          <name>ForceRebuildAssetBundle</name>
+          <description>强制重新构建AB包</description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>CleanBuildCache</name>
+          <description>强制清理打包缓存</description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
           <name>EnableFullPackage</name>
           <description>全量资源打包进游戏</description>
           <defaultValue>true</defaultValue>
@@ -180,12 +190,12 @@
     </org.jenkinsci.plugins.unity3d.Unity3dBuilder>
     <org.jenkinsci.plugins.unity3d.Unity3dBuilder plugin="unity3d-plugin@1.3">
       <unity3dName>unity2021.3.15</unity3dName>
-      <argLine>-quit -nographics -batchmode -projectPath $ProjectPath -executeMethod F8Framework.Core.Editor.ABBuildTool.JenkinsBuildAllAB -logFile $BuildPath\JenkinsBuildUnity.log -buildTarget $Platform EnableFullPathAssetLoading- $EnableFullPathAssetLoading EnableFullPathExtensionAssetLoading- $EnableFullPathExtensionAssetLoading</argLine>
+      <argLine>-quit -nographics -batchmode -projectPath $ProjectPath -executeMethod F8Framework.Core.Editor.ABBuildTool.JenkinsBuildAllAB -logFile $BuildPath\JenkinsBuildUnity.log -buildTarget $Platform EnableFullPathAssetLoading- $EnableFullPathAssetLoading EnableFullPathExtensionAssetLoading- $EnableFullPathExtensionAssetLoading ForceRebuildAssetBundle- $ForceRebuildAssetBundle</argLine>
       <unstableReturnCodes></unstableReturnCodes>
     </org.jenkinsci.plugins.unity3d.Unity3dBuilder>
     <org.jenkinsci.plugins.unity3d.Unity3dBuilder plugin="unity3d-plugin@1.3">
       <unity3dName>unity2021.3.15</unity3dName>
-      <argLine>-quit -nographics -batchmode -projectPath $ProjectPath -executeMethod F8Framework.Core.Editor.BuildPkgTool.JenkinsBuild -logFile $BuildPath\JenkinsBuildUnity.log -buildTarget $Platform Platform- $Platform BuildPath- $BuildPath Version- $Version CodeVersion- $CodeVersion AssetRemoteAddress- $AssetRemoteAddress EnableHotUpdate- $EnableHotUpdate EnablePackage- $EnablePackage EnableFullPackage- $EnableFullPackage EnableOptionalPackage- $EnableOptionalPackage OptionalPackage- $OptionalPackage EnableNullPackage- $EnableNullPackage AndroidBuildAppBundle- $AndroidBuildAppBundle AndroidUseKeystore- $AndroidUseKeystore AndroidKeystoreName- $AndroidKeystoreName AndroidKeystorePass- $AndroidKeystorePass AndroidKeyAliasName- $AndroidKeyAliasName AndroidKeyAliasPass- $AndroidKeyAliasPass</argLine>
+      <argLine>-quit -nographics -batchmode -projectPath $ProjectPath -executeMethod F8Framework.Core.Editor.BuildPkgTool.JenkinsBuild -logFile $BuildPath\JenkinsBuildUnity.log -buildTarget $Platform Platform- $Platform BuildPath- $BuildPath Version- $Version CodeVersion- $CodeVersion AssetRemoteAddress- $AssetRemoteAddress EnableHotUpdate- $EnableHotUpdate EnablePackage- $EnablePackage EnableFullPackage- $EnableFullPackage EnableOptionalPackage- $EnableOptionalPackage OptionalPackage- $OptionalPackage EnableNullPackage- $EnableNullPackage AndroidBuildAppBundle- $AndroidBuildAppBundle AndroidUseKeystore- $AndroidUseKeystore AndroidKeystoreName- $AndroidKeystoreName AndroidKeystorePass- $AndroidKeystorePass AndroidKeyAliasName- $AndroidKeyAliasName AndroidKeyAliasPass- $AndroidKeyAliasPass CleanBuildCache- $CleanBuildCache</argLine>
       <unstableReturnCodes></unstableReturnCodes>
     </org.jenkinsci.plugins.unity3d.Unity3dBuilder>
   </builders>

@@ -24,8 +24,10 @@ namespace F8Framework.Core.Editor
             string[] args = Environment.GetCommandLineArgs();
             bool enableFullPathAssetLoading = BuildPkgTool.GetArgValue(args, "EnableFullPathAssetLoading-").Equals("true", StringComparison.OrdinalIgnoreCase);
             bool enableFullPathExtensionAssetLoading = BuildPkgTool.GetArgValue(args, "EnableFullPathExtensionAssetLoading-").Equals("true", StringComparison.OrdinalIgnoreCase);
+            bool forceRebuildAssetBundle = BuildPkgTool.GetArgValue(args, "ForceRebuildAssetBundle-").Equals("true", StringComparison.OrdinalIgnoreCase);
             F8EditorPrefs.SetBool(BuildPkgTool.EnableFullPathAssetLoadingKey, enableFullPathAssetLoading);
             F8EditorPrefs.SetBool(BuildPkgTool.EnableFullPathExtensionAssetLoadingKey, enableFullPathExtensionAssetLoading);
+            F8EditorPrefs.SetBool(BuildPkgTool.ForceRebuildAssetBundleKey, forceRebuildAssetBundle);
             BuildAllAB();
         }
 
@@ -54,6 +56,10 @@ namespace F8Framework.Core.Editor
             if (appendHashToAssetBundleName)
             {
                 options |= BuildAssetBundleOptions.AppendHashToAssetBundleName;
+            }
+            if (F8EditorPrefs.GetBool(BuildPkgTool.ForceRebuildAssetBundleKey, false))
+            {
+                options |= BuildAssetBundleOptions.ForceRebuildAssetBundle;
             }
             // 打包生成AB包 (目标平台自动根据当前平台设置，WebGL不可使用BuildAssetBundleOptions.None压缩)
             BuildPipeline.BuildAssetBundles(strABOutPAthDir, options, EditorUserBuildSettings.activeBuildTarget);

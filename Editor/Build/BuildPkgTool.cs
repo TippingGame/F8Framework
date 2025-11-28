@@ -38,6 +38,8 @@ namespace F8Framework.Core.Editor
         public static string EnableFullPathExtensionAssetLoadingKey = "FullPathExtensionAssetLoadingKey";
         private static string _excelPathKey = "ExcelPath";
         public static string ConvertExcelToOtherFormatsKey = "ConvertExcelToOtherFormatsKey";
+        public static string ForceRebuildAssetBundleKey = "ForceRebuildAssetBundleKey";
+        public static string CleanBuildCacheKey = "CleanBuildCacheKey";
         
         private static string _buildPath = "";
         private static string _toVersion = "1.0.0";
@@ -54,6 +56,8 @@ namespace F8Framework.Core.Editor
         private static string _excelPath = "";
         private static string _convertExcelToOtherFormats = "json";
         public static string[] ExcelToOtherFormats = { "json", "binary" };
+        private static bool _forceRebuildAssetBundle = false;
+        private static bool _cleanBuildCache = false;
         
         private static BuildTarget _buildTarget = BuildTarget.NoTarget;
 
@@ -101,7 +105,8 @@ namespace F8Framework.Core.Editor
             string androidKeystoreName = GetArgValue(args, "AndroidKeystoreName-");
             string androidKeystorePass = GetArgValue(args, "AndroidKeystorePass-");
             string androidKeyAliasName = GetArgValue(args, "AndroidKeyAliasName-");
-            string androidKeyAliasPass  = GetArgValue(args, "AndroidKeyAliasPass-");
+            string androidKeyAliasPass = GetArgValue(args, "AndroidKeyAliasPass-");
+            bool cleanBuildCache = GetArgValue(args, "CleanBuildCache-").Equals("true", StringComparison.OrdinalIgnoreCase);
 
             F8EditorPrefs.SetBool(_exportCurrentPlatformKey, false);
             F8EditorPrefs.SetString(_exportPlatformKey, platformStr);
@@ -139,6 +144,7 @@ namespace F8Framework.Core.Editor
             _androidKeyAliasName = androidKeyAliasName;
             F8EditorPrefs.SetString(_androidKeyAliasPassKey, androidKeyAliasPass);
             _androidKeyAliasPass = androidKeyAliasPass;
+            F8EditorPrefs.SetBool(CleanBuildCacheKey, cleanBuildCache);
             
             WriteGameVersion();
             Build();
@@ -282,6 +288,16 @@ namespace F8Framework.Core.Editor
             bool enableOptionalPackage = F8EditorPrefs.GetBool(_enableOptionalPackageKey, false);
             bool enableNullPackage = F8EditorPrefs.GetBool(_enableNullPackageKey, false);
             
+            BuildOptions buildOptions = BuildOptions.None;
+            if (F8EditorPrefs.GetBool("compilationFinishedBuildRun"))
+            {
+                buildOptions |= BuildOptions.AutoRunPlayer;
+            }
+            if (F8EditorPrefs.GetBool(CleanBuildCacheKey))
+            {
+                buildOptions |= BuildOptions.CleanBuildCache;
+            }
+            
             // 全量包
             if (enableFullPackage)
             {
@@ -295,7 +311,7 @@ namespace F8Framework.Core.Editor
                     scenes = GetBuildScenes(),
                     locationPathName = locationPathName,
                     target = buildTarget,
-                    options = F8EditorPrefs.GetBool("compilationFinishedBuildRun") ? BuildOptions.AutoRunPlayer : BuildOptions.None,
+                    options = buildOptions,
                 };
                 BuildReport buildReport = BuildPipeline.BuildPlayer(buildPlayerOptions);
                 if (buildReport.summary.result != BuildResult.Succeeded)
@@ -345,7 +361,7 @@ namespace F8Framework.Core.Editor
                     scenes = GetBuildScenes(),
                     locationPathName = locationPathName,
                     target = buildTarget,
-                    options = F8EditorPrefs.GetBool("compilationFinishedBuildRun") ? BuildOptions.AutoRunPlayer : BuildOptions.None,
+                    options = buildOptions,
                 };
                 BuildReport buildReport = BuildPipeline.BuildPlayer(buildPlayerOptions);
                 if (buildReport.summary.result != BuildResult.Succeeded)
@@ -389,7 +405,7 @@ namespace F8Framework.Core.Editor
                     scenes = GetBuildScenes(),
                     locationPathName = locationPathName,
                     target = buildTarget,
-                    options = F8EditorPrefs.GetBool("compilationFinishedBuildRun") ? BuildOptions.AutoRunPlayer : BuildOptions.None,
+                    options = buildOptions,
                 };
                 BuildReport buildReport = BuildPipeline.BuildPlayer(buildPlayerOptions);
                 if (buildReport.summary.result != BuildResult.Succeeded)
@@ -844,8 +860,36 @@ namespace F8Framework.Core.Editor
             GUILayout.Space(10);
 
             GUILayout.BeginHorizontal();
+            bool forceRebuildAssetBundle = F8EditorPrefs.GetBool(ForceRebuildAssetBundleKey, false);
+            bool cleanBuildCache = F8EditorPrefs.GetBool(CleanBuildCacheKey, false);
+            _forceRebuildAssetBundle = EditorGUILayout.Toggle("强制重新构建AB包", forceRebuildAssetBundle);
+            if (forceRebuildAssetBundle != _forceRebuildAssetBundle)
+            {
+                F8EditorPrefs.SetBool(ForceRebuildAssetBundleKey, _forceRebuildAssetBundle);
+            }
+            GUILayout.EndHorizontal();
+            GUILayout.Space(10);
+            GUILayout.BeginHorizontal();
+            _cleanBuildCache = EditorGUILayout.Toggle("强制清理打包缓存", cleanBuildCache);
+            if (cleanBuildCache != _cleanBuildCache)
+            {
+                F8EditorPrefs.SetBool(CleanBuildCacheKey, _cleanBuildCache);
+            }
+            GUILayout.EndHorizontal();
+            
+            GUILayout.Space(5);
+            GUILayout.Box("", GUILayout.Height(2), GUILayout.ExpandWidth(true));
+            GUILayout.Space(10);
+            
+            GUILayout.BeginHorizontal();
             if (GUILayout.Button("打包游戏", BigNormalWidth, BigButtonHeight))
             {
+                if (EditorApplication.isPlaying || EditorApplication.isPaused)
+                {
+                    GUILayout.EndHorizontal();
+                    EditorUtility.DisplayDialog("提示", "游戏正在运行中，不能打包游戏", "是吗");
+                    return;
+                }
                 if (string.IsNullOrEmpty(_buildPath))
                 {
                     EditorUtility.DisplayDialog("打包游戏", "输出目录路径不能为空", "确定");
@@ -866,6 +910,12 @@ namespace F8Framework.Core.Editor
             GUILayout.Space(30);
             if (GUILayout.Button("构建热更新包", BigNormalWidth, BigButtonHeight))
             {
+                if (EditorApplication.isPlaying || EditorApplication.isPaused)
+                {
+                    GUILayout.EndHorizontal();
+                    EditorUtility.DisplayDialog("提示", "游戏正在运行中，不能构建热更新", "是吗");
+                    return;
+                }
                 if (string.IsNullOrEmpty(_buildPath))
                 {
                     EditorUtility.DisplayDialog("构建热更新包", "构建热更新包路径不能为空", "确定");
@@ -894,6 +944,12 @@ namespace F8Framework.Core.Editor
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("打包游戏并运行", BigNormalWidth, BigButtonHeight))
             {
+                if (EditorApplication.isPlaying || EditorApplication.isPaused)
+                {
+                    GUILayout.EndHorizontal();
+                    EditorUtility.DisplayDialog("提示", "游戏正在运行中，不能打包游戏", "是吗");
+                    return;
+                }
                 if (string.IsNullOrEmpty(_buildPath))
                 {
                     EditorUtility.DisplayDialog("打包游戏", "输出目录路径不能为空", "确定");
