@@ -11,15 +11,11 @@ namespace F8Framework.Core
     /// </summary>
     public class DownloadRequest
     {
-        /// <summary>
-        /// 禁用Unity缓存系统在WebGL平台（微信小游戏使用）
-        /// </summary>
-        public static bool DisableUnityCacheOnWebGL = false;
-        
         private DownloadType type;
         private UnityWebRequest uwr;
+        private AssetBundleCreateRequest assetBundleLoadRequest;
         
-        private enum DownloadType : byte
+        public enum DownloadType : byte
         {
             NONE,
             FILE,
@@ -30,9 +26,9 @@ namespace F8Framework.Core
         /// 创建一个文件下载请求。
         /// </summary>
         /// <param name="uri">请求的URI。</param>
-        public DownloadRequest(string uri)
+        public DownloadRequest(string uri, DownloadType type = DownloadType.FILE)
         {
-            type = DownloadType.FILE;
+            this.type = type;
             SendFileDownloadRequest(uri);
         }
 
@@ -50,18 +46,15 @@ namespace F8Framework.Core
         /// 如果CRC不匹配，将记录错误并不加载AssetBundle。
         /// 如果设置为零，将跳过CRC检查。
         /// </param>
-        public DownloadRequest(
-            string uri,
-            Hash128 hash,
-            uint crc = 0)
+        public DownloadRequest(string uri, Hash128 hash, uint crc = 0, DownloadType type = DownloadType.ASSET_BUNDLE)
         {
-            type = DownloadType.ASSET_BUNDLE;
+            this.type = type;
             SendAssetBundleDownloadRequest(uri, hash, crc);
         }
         
-        public DownloadRequest()
+        public DownloadRequest(DownloadType type)
         {
-            type = DownloadType.ASSET_BUNDLE;
+            this.type = type;
         }
         
         /// <summary>
@@ -99,10 +92,17 @@ namespace F8Framework.Core
             {
                 if (FileTools.IsLegalURI(uri))
                 {
-                    if (hash == default || DisableUnityCacheOnWebGL)
-                        uwr = UnityWebRequestAssetBundle.GetAssetBundle(uri, crc);
-                    else
-                        uwr = UnityWebRequestAssetBundle.GetAssetBundle(uri, hash, crc);
+                    if (type == DownloadType.FILE)
+                    {
+                        uwr = new UnityWebRequest(uri, UnityWebRequest.kHttpVerbGET, new DownloadHandlerBuffer(), null);
+                    }
+                    else if (type == DownloadType.ASSET_BUNDLE)
+                    {
+                        if (hash == default || F8GamePrefs.GetBool(nameof(F8GameConfig.DisableUnityCacheOnWebGL)))
+                            uwr = UnityWebRequestAssetBundle.GetAssetBundle(uri, crc);
+                        else
+                            uwr = UnityWebRequestAssetBundle.GetAssetBundle(uri, hash, crc);
+                    }
                     uwr.SendWebRequest();
                 }
                 else
@@ -127,10 +127,17 @@ namespace F8Framework.Core
 
             try
             {
-                if (hash == default || DisableUnityCacheOnWebGL)
-                    uwr = UnityWebRequestAssetBundle.GetAssetBundle(uri, crc);
-                else
-                    uwr = UnityWebRequestAssetBundle.GetAssetBundle(uri, hash, crc);
+                if (type == DownloadType.FILE)
+                {
+                    uwr = new UnityWebRequest(uri, UnityWebRequest.kHttpVerbGET, new DownloadHandlerBuffer(), null);
+                }
+                else if (type == DownloadType.ASSET_BUNDLE)
+                {
+                    if (hash == default || F8GamePrefs.GetBool(nameof(F8GameConfig.ForceRemoteAssetBundle)))
+                        uwr = UnityWebRequestAssetBundle.GetAssetBundle(uri, crc);
+                    else
+                        uwr = UnityWebRequestAssetBundle.GetAssetBundle(uri, hash, crc);
+                }
             }
             catch (Exception e)
             {
@@ -146,6 +153,12 @@ namespace F8Framework.Core
             {
                 LogF8.LogError($"无法对 URI：{uri} 发起资源包下载请求。错误：{uwr.error}");
                 LoadFail();
+            }
+            
+            if (type == DownloadType.FILE)
+            {
+                assetBundleLoadRequest = AssetBundleManager.GetLoadFromAssetBundleDownloadRequest(this);
+                yield return assetBundleLoadRequest;
             }
         }
         
@@ -173,6 +186,25 @@ namespace F8Framework.Core
             }
         }
 
+        public bool IsFinishedAssetBundleLoadRequest
+        {
+            get
+            {
+                if (type == DownloadType.FILE)
+                {
+                    if (assetBundleLoadRequest == null)
+                    {
+                        assetBundleLoadRequest = AssetBundleManager.GetLoadFromAssetBundleDownloadRequest(this);
+                        return false;
+                    }
+                    return IsFinished && assetBundleLoadRequest.isDone;
+                }
+                else
+                {
+                    return IsFinished;
+                }
+            }
+        }
         /// <summary>
         /// 请求的下载进度。
         /// </summary>
@@ -233,22 +265,29 @@ namespace F8Framework.Core
             {
                 if (!IsFinished)
                     return null;
-
-                if (type != DownloadType.ASSET_BUNDLE) return null;
+                
                 if (uwr == null) return null;
                 
-                var handler = uwr.downloadHandler;
-                if (handler is not DownloadHandlerAssetBundle downloadHandler) return null;
-                
-                try
+                if (type == DownloadType.FILE)
                 {
-                    var assetBundle = downloadHandler.assetBundle;
-                    return assetBundle != null ? assetBundle : DownloadHandlerAssetBundle.GetContent(uwr);
+                    if (!assetBundleLoadRequest.isDone) return null;
+                    if (assetBundleLoadRequest.assetBundle)
+                        return assetBundleLoadRequest.assetBundle;
                 }
-                catch (SystemException e)
+                else if (type == DownloadType.ASSET_BUNDLE)
                 {
-                    LogF8.LogException(e);
-                    return null;
+                    var handler = uwr.downloadHandler;
+                    if (handler is not DownloadHandlerAssetBundle downloadHandler) return null;
+                    
+                    try
+                    {
+                        return downloadHandler.assetBundle ?? DownloadHandlerAssetBundle.GetContent(uwr);
+                    }
+                    catch (SystemException e)
+                    {
+                        LogF8.LogException(e);
+                        return null;
+                    }
                 }
 
                 return null;
@@ -295,6 +334,7 @@ namespace F8Framework.Core
         {
             uwr?.Dispose();
             uwr = null;
+            assetBundleLoadRequest = null;
         }
     }
 }

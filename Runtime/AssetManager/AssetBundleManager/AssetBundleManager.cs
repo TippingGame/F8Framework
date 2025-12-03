@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -878,7 +879,7 @@ namespace F8Framework.Core
         {
             string fullPath;
             
-            if (AssetManager.ForceRemoteAssetBundle)
+            if (F8GamePrefs.GetBool(nameof(F8GameConfig.ForceRemoteAssetBundle)))
             {
                 fullPath = AssetBundleHelper.GetAssetBundleFullName(null, AssetBundleHelper.SourceType.REMOTE_ADDRESS);
             }
@@ -913,7 +914,7 @@ namespace F8Framework.Core
         {
             string fullPath;
             
-            if (AssetManager.ForceRemoteAssetBundle)
+            if (F8GamePrefs.GetBool(nameof(F8GameConfig.ForceRemoteAssetBundle)))
             {
                 fullPath = AssetBundleHelper.GetAssetBundleFullName(abName, AssetBundleHelper.SourceType.REMOTE_ADDRESS);
             }
@@ -982,6 +983,95 @@ namespace F8Framework.Core
             assetBundleLoaders.Clear();
         }
 
+        public static AssetBundleCreateRequest GetLoadFromAssetBundleDownloadRequest(DownloadRequest request)
+        {
+            AssetBundleCreateRequest assetBundleCreateRequest = null;
+            int offsetValue = F8GamePrefs.GetInt(nameof(F8GameConfig.AssetBundleOffset));
+            int xorKey = F8GamePrefs.GetInt(nameof(F8GameConfig.AssetBundleXorKey));
+            if (offsetValue != 0)
+            {
+                byte[] data = new byte[request.DownloadedFileBytes.Length - offsetValue];
+                Buffer.BlockCopy(request.DownloadedFileBytes, offsetValue, data, 0, data.Length);
+                assetBundleCreateRequest = AssetBundle.LoadFromMemoryAsync(data);
+            }
+            else if (xorKey != 0)
+            {
+                byte[] data = new byte[request.DownloadedFileBytes.Length];
+                Buffer.BlockCopy(request.DownloadedFileBytes, 0, data, 0, data.Length);
+                for (int i = 0; i < data.Length; i++) data[i] ^= (byte)xorKey;
+                assetBundleCreateRequest = AssetBundle.LoadFromMemoryAsync(data);
+            }
+            else
+            {
+                assetBundleCreateRequest = null;
+            }
+            return assetBundleCreateRequest;
+        }
+        
+        public static AssetBundleCreateRequest GetLoadFromAsyncAssetBundle(string assetBundlePath, ref BundleStream bundleStream)
+        {
+            AssetBundleCreateRequest assetBundleLoadRequest;
+            int offsetValue = F8GamePrefs.GetInt(nameof(F8GameConfig.AssetBundleOffset));
+            int xorKey = F8GamePrefs.GetInt(nameof(F8GameConfig.AssetBundleXorKey));
+            if (offsetValue != 0)
+            {
+                assetBundleLoadRequest = AssetBundle.LoadFromFileAsync(
+                    assetBundlePath,
+                    0U,
+                    (ulong)offsetValue
+                );
+            }
+            else if (xorKey != 0)
+            {
+                 bundleStream = new BundleStream(
+                    (byte)xorKey,
+                    assetBundlePath,
+                    FileMode.Open,
+                    FileAccess.Read,
+                    FileShare.Read
+                );
+
+                assetBundleLoadRequest = AssetBundle.LoadFromStreamAsync(bundleStream);
+            }
+            else
+            {
+                assetBundleLoadRequest = AssetBundle.LoadFromFileAsync(assetBundlePath);
+            }
+            return assetBundleLoadRequest;
+        }
+
+        public static AssetBundle GetLoadFromAssetBundle(string assetBundlePath, ref BundleStream bundleStream)
+        {
+            AssetBundle assetBundle;
+            int offsetValue = F8GamePrefs.GetInt(nameof(F8GameConfig.AssetBundleOffset));
+            int xorKey = F8GamePrefs.GetInt(nameof(F8GameConfig.AssetBundleXorKey));
+            if (offsetValue != 0)
+            {
+                assetBundle = AssetBundle.LoadFromFile(
+                    assetBundlePath,
+                    0U,
+                    (ulong)offsetValue
+                );
+            }
+            else if (xorKey != 0)
+            {
+                 bundleStream = new BundleStream(
+                    (byte)xorKey,
+                    assetBundlePath,
+                    FileMode.Open,
+                    FileAccess.Read,
+                    FileShare.Read
+                );
+
+                assetBundle = AssetBundle.LoadFromStream(bundleStream);
+            }
+            else
+            {
+                assetBundle = AssetBundle.LoadFromFile(assetBundlePath);
+            }
+            return assetBundle; 
+        }
+        
         // WebGL专用异步加载AssetBundleManifest
         public IEnumerator LoadAssetBundleManifest()
         {
@@ -997,7 +1087,13 @@ namespace F8Framework.Core
 #endif
             if (FileTools.IsLegalURI(manifestPath))
             {
-                DownloadRequest assetBundleDownloadRequest = new DownloadRequest();
+                int offsetValue = F8GamePrefs.GetInt(nameof(F8GameConfig.AssetBundleOffset));
+                int xorKey = F8GamePrefs.GetInt(nameof(F8GameConfig.AssetBundleXorKey));
+                
+                DownloadRequest assetBundleDownloadRequest = new DownloadRequest(
+                    xorKey != 0 || offsetValue != 0 ?
+                    DownloadRequest.DownloadType.FILE :
+                    DownloadRequest.DownloadType.ASSET_BUNDLE);
                 yield return assetBundleDownloadRequest.SendAssetBundleDownloadRequestCoroutine(manifestPath);
                 if (assetBundleDownloadRequest.DownloadedAssetBundle)
                 {
@@ -1012,12 +1108,15 @@ namespace F8Framework.Core
             }
             else
             {
-                var assetBundle = AssetBundle.LoadFromFile(manifestPath);
+                BundleStream bundleStream = null;
+                AssetBundle assetBundle = GetLoadFromAssetBundle(manifestPath, ref bundleStream);
+                
                 if (assetBundle)
                 {
                     manifest = assetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
                     manifest.GetAllAssetBundles();
                     assetBundle.Unload(false);
+                    bundleStream?.Close();
                 }
                 else
                 {
@@ -1038,7 +1137,10 @@ namespace F8Framework.Core
             string manifestPath = GetAssetBundlePathByAbName(URLSetting.GetPlatformName());
             if (manifestPath == null)
                 return;
-            var assetBundle = AssetBundle.LoadFromFile(manifestPath);
+
+            BundleStream bundleStream = null;
+            AssetBundle assetBundle = GetLoadFromAssetBundle(manifestPath, ref bundleStream);
+            
             if (assetBundle)
             {
                 manifest = assetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");

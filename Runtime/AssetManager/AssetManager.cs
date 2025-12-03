@@ -19,9 +19,6 @@ namespace F8Framework.Core
 
         private ResourcesManager _resourcesManager;
         
-        //强制更改资产加载模式为远程（微信小游戏使用）
-        public static bool ForceRemoteAssetBundle = false;
-        
         public const string DirSuffix = "_Directory";
         
         //资产信息
@@ -138,7 +135,7 @@ namespace F8Framework.Core
             public AssetInfo GetAssetInfo(string assetName,
                 AssetAccessMode accessMode = AssetAccessMode.UNKNOWN)
             {
-                if (ForceRemoteAssetBundle)
+                if (F8GamePrefs.GetBool(nameof(F8GameConfig.ForceRemoteAssetBundle)))
                 {
                     accessMode = AssetAccessMode.REMOTE_ASSET_BUNDLE;
                 }
@@ -1769,7 +1766,7 @@ namespace F8Framework.Core
             {
                 if (AssetBundleMap.Mappings.TryGetValue(assetName, out AssetBundleMap.AssetMapping assetmpping))
                 {
-                    if (remote || ForceRemoteAssetBundle)
+                    if (remote || F8GamePrefs.GetBool(nameof(F8GameConfig.ForceRemoteAssetBundle)))
                     {
                         return new AssetInfo(AssetTypeEnum.ASSET_BUNDLE, assetName, assetmpping.AssetPath, AssetBundleManager.GetRemoteAssetBundleCompletePath(), assetmpping.AbName);
                     }

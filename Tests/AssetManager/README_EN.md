@@ -11,6 +11,7 @@
    * Auto-detect platform differences
    * Clean redundant ABs and folders
    * Reduce development cycles in Editor mode
+   * Encrypt AssetBundle
 2. Runtime:
    * Sync/async loading of individual assets
    * Load all assets in a folder or shared AB
@@ -171,22 +172,30 @@ IEnumerator Start()
     FF8.Asset.UnloadAsync("Cube", false, () => { LogF8.Log("Asset unloaded"); });
     
     
-    /*========== 6. Notes: Common Issues ==========*/
+    /*========== 6. Note: Common Issues ==========*/
     
-    // Loading AB packages for different platforms (Android, iOS, WebGL) in editor may cause shaders to turn purple, scene loading to fail, audio loading to fail, etc. (Solution: enable editor mode)
+    // 1. When loading Asset Bundles for different platforms (Android, iOS, WebGL) in the Editor, 
+    //    Shaders may turn magenta, Scenes may fail to load, audio may fail to load, etc.
+    //    (Solution: Enable Editor Mode)
     
-    // When loading scenes, don't forget to load skybox materials, otherwise they may turn purple, and scenes in Resources directory cannot be loaded (need to manually add to Build Settings)
+    // 2. When loading a Scene, remember to load the Skybox material; otherwise, it may turn magenta.
+    //    Also, Scenes cannot be loaded from the Resources directory (they must be manually added to Build Settings).
     
-    // To use sprite atlases, first need to load the atlas
+    // 3. When using images from a Sprite Atlas, you need to load the Sprite Atlas.
+    //    If the Sprite Atlas and the images are set to the same Asset Bundle name, the Sprite Atlas does not need to be loaded separately.
     FF8.Asset.Load("SpriteAtlas");
     
-    // If the atlas and images are set to the same AB name, no need to preload the atlas
-    FF8.Asset.LoadAsync<Sprite>("PackForest_2", sprite =>
+    // 4. Sprite Atlases can also be loaded using SpriteAtlasManager callback listeners.
+    SpriteAtlasManager.atlasRequested += (tag, callback) =>
     {
-        LogF8.Log(sprite);
-    });
+        FF8.Asset.LoadAsync<SpriteAtlas>(tag, (atlas) =>
+        {
+            callback(atlas);
+        });
+    };
     
-    // Be careful to distinguish between Texture2D and Sprite when loading images. If a resource is loaded as Texture2D, it cannot be loaded as Sprite type
+    // 5. Be careful to distinguish between Texture2D and Sprite when loading images.
+    //    If a resource has been loaded as a Texture2D, it cannot be loaded as a Sprite type afterward.
     FF8.Asset.Load<Texture2D>("PackForest_2");
 }
 ```

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -19,6 +20,7 @@ namespace F8Framework.Core
         private AssetBundle assetBundleContent;
         private Object assetObject;
         private Dictionary<string, Object> assetObjects = new Dictionary<string, Object>();
+        private BundleStream bundleStream;
 
         public LoaderType loadType;
         public LoaderType unloadType;
@@ -194,7 +196,13 @@ namespace F8Framework.Core
                     }
                 );
 #else
-                DownloadRequest d = new DownloadRequest(assetBundlePath, hash128);
+                int offsetValue = F8GamePrefs.GetInt(nameof(F8GameConfig.AssetBundleOffset));
+                int xorKey = F8GamePrefs.GetInt(nameof(F8GameConfig.AssetBundleXorKey));
+                
+                DownloadRequest d = new DownloadRequest(assetBundlePath, hash128, 0U,
+                    xorKey != 0 || offsetValue != 0 ?
+                    DownloadRequest.DownloadType.FILE :
+                    DownloadRequest.DownloadType.ASSET_BUNDLE);
                 while (!d.IsFinished) ;
                 assetBundleContent = d.DownloadedAssetBundle;
                 GetAssetPaths();
@@ -202,7 +210,7 @@ namespace F8Framework.Core
             }
             else
             {
-                assetBundleContent = AssetBundle.LoadFromFile(assetBundlePath);
+                assetBundleContent = AssetBundleManager.GetLoadFromAssetBundle(assetBundlePath, ref bundleStream);
                 GetAssetPaths();
             }
 
@@ -229,7 +237,14 @@ namespace F8Framework.Core
                 if (FileTools.IsLegalHTTPURI(assetBundlePath))
                 {
                     loadType = LoaderType.REMOTE_ASYNC;
-                    assetBundleDownloadRequest = new DownloadRequest(assetBundlePath, hash128);
+                    
+                    int offsetValue = F8GamePrefs.GetInt(nameof(F8GameConfig.AssetBundleOffset));
+                    int xorKey = F8GamePrefs.GetInt(nameof(F8GameConfig.AssetBundleXorKey));
+                    assetBundleDownloadRequest = new DownloadRequest(assetBundlePath, hash128, 0U,
+                        xorKey != 0 || offsetValue != 0 ?
+                        DownloadRequest.DownloadType.FILE :
+                        DownloadRequest.DownloadType.ASSET_BUNDLE);
+                    
                     if (assetBundleDownloadRequest == null)
                     {
                         assetBundleLoadState = LoaderState.FINISHED;
@@ -240,7 +255,9 @@ namespace F8Framework.Core
                 else
                 {
                     loadType = LoaderType.LOCAL_ASYNC;
-                    assetBundleLoadRequest = AssetBundle.LoadFromFileAsync(assetBundlePath);
+
+                    assetBundleLoadRequest = AssetBundleManager.GetLoadFromAsyncAssetBundle(assetBundlePath, ref bundleStream);
+                    
                     if (assetBundleLoadRequest == null)
                     {
                         assetBundleLoadState = LoaderState.FINISHED;
@@ -434,6 +451,7 @@ namespace F8Framework.Core
             if (assetBundleContent != null)
             {
                 assetBundleContent.Unload(unloadAllLoadedObjects);
+                bundleStream?.Close();
             }
             if (unloadAllLoadedObjects)
             {
@@ -673,7 +691,7 @@ namespace F8Framework.Core
                     case LoaderType.REMOTE_ASYNC:
                         if (assetBundleDownloadRequest != null)
                         {
-                            if (assetBundleDownloadRequest.IsFinished)
+                            if (assetBundleDownloadRequest.IsFinished && assetBundleDownloadRequest.IsFinishedAssetBundleLoadRequest)
                             {
                                 if (!assetBundleDownloadRequest.DownloadedAssetBundle)
                                 {
@@ -719,6 +737,7 @@ namespace F8Framework.Core
                     onUnloadFinishedImpl != null)
                 {
                     onUnloadFinishedImpl();
+                    bundleStream?.Close();
                 }
             }
         }

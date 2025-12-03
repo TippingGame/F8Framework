@@ -58,6 +58,11 @@ namespace F8Framework.Core.Editor
         public static string[] ExcelToOtherFormats = { "json", "binary" };
         private static bool _forceRebuildAssetBundle = false;
         private static bool _cleanBuildCache = false;
+        private static bool _appendHashToAssetBundleName = false;
+        private static bool _forceRemoteAssetBundle = false;
+        private static bool _disableUnityCacheOnWebGL = false;
+        private static int _assetBundleOffset = 0;
+        private static int _assetBundleXorKey = 0;
         
         private static BuildTarget _buildTarget = BuildTarget.NoTarget;
 
@@ -584,7 +589,7 @@ namespace F8Framework.Core.Editor
                 }
             }
 
-            _buildPath = F8EditorPrefs.GetString(_prefBuildPathKey, "");
+            _buildPath = F8EditorPrefs.GetString(_prefBuildPathKey, _buildPath);
             
             if (_buildPath.IsNullOrEmpty())
             {
@@ -753,6 +758,76 @@ namespace F8Framework.Core.Editor
             {
                 EditorGUILayout.LabelField("※ 如：AssetBundles/UI/UIPanel.prefab，Resources/UI/UIPanel.prefab，勾选后将增加AssetBundleMap.json和ResourceMap.json文件体积", EditorStyles.miniLabel);
             }
+            
+            GUILayout.Space(10);
+            
+            bool appendHashToAssetBundleName = F8GamePrefs.GetBool(nameof(F8GameConfig.AppendHashToAssetBundleName));
+            bool forceRemoteAssetBundle = F8GamePrefs.GetBool(nameof(F8GameConfig.ForceRemoteAssetBundle));
+            bool disableUnityCacheOnWebGL = F8GamePrefs.GetBool(nameof(F8GameConfig.DisableUnityCacheOnWebGL));
+            
+            GUILayout.BeginHorizontal();
+            _appendHashToAssetBundleName = EditorGUILayout.Toggle("打包后AB名加上MD5", appendHashToAssetBundleName);
+            if (appendHashToAssetBundleName != _appendHashToAssetBundleName)
+            {
+                F8GamePrefs.SetBool(nameof(F8GameConfig.AppendHashToAssetBundleName), _appendHashToAssetBundleName);
+            }
+            GUILayout.Space(10);
+            _forceRemoteAssetBundle = EditorGUILayout.Toggle("强制资产加载模式为远程", forceRemoteAssetBundle);
+            if (forceRemoteAssetBundle != _forceRemoteAssetBundle)
+            {
+                F8GamePrefs.SetBool(nameof(F8GameConfig.ForceRemoteAssetBundle), _forceRemoteAssetBundle);
+            }
+            GUILayout.Space(10);
+            _disableUnityCacheOnWebGL = EditorGUILayout.Toggle("禁用缓存系统在WebGL平台", disableUnityCacheOnWebGL);
+            if (disableUnityCacheOnWebGL != _disableUnityCacheOnWebGL)
+            {
+                F8GamePrefs.SetBool(nameof(F8GameConfig.DisableUnityCacheOnWebGL), _disableUnityCacheOnWebGL);
+            }
+            GUILayout.EndHorizontal();
+            
+            GUILayout.Space(10);
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("AssetBundle 偏移加密（Offset）  [1-254]", GUILayout.Width(360));
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+            int assetBundleOffset = F8GamePrefs.GetInt(nameof(F8GameConfig.AssetBundleOffset), 0);
+            if (assetBundleOffset == 0)
+            {
+                assetBundleOffset = _assetBundleOffset;
+            }
+            string inputOffset = EditorGUILayout.TextField(assetBundleOffset.ToString());
+            if (int.TryParse(inputOffset, out int parsedValueOffset))
+            {
+                _assetBundleOffset = Mathf.Clamp(parsedValueOffset, 0, 254);
+            }
+            else
+            {
+                _assetBundleOffset = assetBundleOffset;
+            }
+            F8GamePrefs.SetInt(nameof(F8GameConfig.AssetBundleOffset), _assetBundleOffset);
+            GUILayout.EndHorizontal();
+            GUILayout.Space(5);
+            
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("AssetBundle 异或加密（XOR）    [1-254]", GUILayout.Width(360));
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+            int assetBundleXorKey = F8GamePrefs.GetInt(nameof(F8GameConfig.AssetBundleXorKey), 0);
+            if (assetBundleXorKey == 0)
+            {
+                assetBundleXorKey = _assetBundleXorKey;
+            }
+            string inputXorKey = EditorGUILayout.TextField(assetBundleXorKey.ToString());
+            if (int.TryParse(inputXorKey, out int parsedValueXorKey))
+            {
+                _assetBundleXorKey = Mathf.Clamp(parsedValueXorKey, 0, 254);
+            }
+            else
+            {
+                _assetBundleXorKey = assetBundleXorKey;
+            }
+            F8GamePrefs.SetInt(nameof(F8GameConfig.AssetBundleXorKey), _assetBundleXorKey);
+            GUILayout.EndHorizontal();
             
             GUILayout.Space(5);
             GUILayout.Box("", GUILayout.Height(2), GUILayout.ExpandWidth(true));

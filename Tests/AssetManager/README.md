@@ -12,6 +12,7 @@
    * 自动区分不同平台
    * 清理多余AB和文件夹
    * 编辑器模式下减少开发周期
+   * 加密AssetBundle
 2. 运行时:
    * 同步/异步加载单个资产
    * 展开文件夹或同一AB下所有资产
@@ -169,20 +170,23 @@ IEnumerator Start()
     
     /*========== 6. 注意：常见问题 ==========*/
     
-    // 编辑器下加载不同平台的AB包（Android平台，iOS平台，WebGL平台），Shader会变紫色，Scene会加载失败，音频加载失败等（解决方案：启用编辑器模式）
+    // 1.编辑器下加载不同平台的AB包（Android平台，iOS平台，WebGL平台），Shader会变紫色，Scene会加载失败，音频加载失败等（解决方案：启用编辑器模式）
     
-    // 加载场景，别忘了加载天空盒材质，不然会变紫色，并且不能加载Resources目录中的场景（需要手动放入Build Setting处）
+    // 2.加载场景，别忘了加载天空盒材质，不然会变紫色，并且不能加载Resources目录中的场景（需要手动放入Build Setting处）
     
-    // 使用图集首先需要，加载图集
+    // 3.使用图集里的图片，需要加载图集，将图集与图片改为同一AB名，则无需加载图集
     FF8.Asset.Load("SpriteAtlas");
     
-    // 假如将图集与图片改为同一AB名，则无需预先加载图集
-    FF8.Asset.LoadAsync<Sprite>("PackForest_2", sprite =>
+    // 4.图集也可以使用SpriteAtlasManager监听回调加载
+    SpriteAtlasManager.atlasRequested += (tag, callback) =>
     {
-        LogF8.Log(sprite);
-    });
+        FF8.Asset.LoadAsync<SpriteAtlas>(tag, (atlas) =>
+        {
+            callback(atlas);
+        });
+    };
     
-    // 图片加载需要小心区分Texture2D和Sprite，当资源被当成Texture2D加载后，则加载不出Sprite类型
+    // 5.图片加载需要小心区分Texture2D和Sprite，当资源被当成Texture2D加载后，则加载不出Sprite类型
     FF8.Asset.Load<Texture2D>("PackForest_2");
 }
 ```

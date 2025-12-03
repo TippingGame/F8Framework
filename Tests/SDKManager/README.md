@@ -48,7 +48,7 @@ Unity F8 SDKManager组件，与原生平台交互，接入多个平台或者渠�
     FF8.SDK.SDKToast("Native Toast");
 ```
 
-## 安卓工程使用方法
+## 安卓工程接入方法
 ### 如需要接入隐私政策，或接入安卓端SDK与安卓端交互，可按照下方教程手动操作
 
 * （注意：首先确定你的unity使用什么Gradle版本）[unity文档Gradle版本](https://docs.unity3d.com/2021.3/Documentation/Manual/android-gradle-overview.html)
@@ -95,7 +95,7 @@ Unity F8 SDKManager组件，与原生平台交互，接入多个平台或者渠�
   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20241119233017.png)  
 ---
 
-## iOS工程使用方法
+## iOS工程接入方法
 * 修改这两个文件对接SDK [F8SDKInterfaceUnity.h](https://github.com/TippingGame/F8Framework/blob/main/Plugins/iOS/SDKManager/F8SDKInterfaceUnity.h) 和 [F8SDKInterfaceUnity.mm](https://github.com/TippingGame/F8Framework/blob/main/Plugins/iOS/SDKManager/F8SDKInterfaceUnity.mm)
 
 ---
@@ -112,24 +112,12 @@ Unity F8 SDKManager组件，与原生平台交互，接入多个平台或者渠�
 * 分别给WX-WASM-SDK-V2目录下`Editor`和`Runtime`的两个`.asmdef`文件，添加F8框架的`LitJson`引用  
   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20240524001621.png)
 ---
-* 修改三个变量为true。
-1. [AssetManager.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/AssetManager/AssetManager.cs)
-```C#
-//强制更改资产加载模式为远程（微信小游戏使用）
-public static bool ForceRemoteAssetBundle = false;
-```
-* 使用强制远程加载模式后，需要将工程打包后的 `StreamingAssets` 文件夹下的 `AssetBundles` 目录上传至 CDN  
-![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1752739146608.png)  
-2. [ABBuildTool.cs](https://github.com/TippingGame/F8Framework/blob/main/Editor/AssetManager/ABBuildTool.cs)
-```C#
-// 打包后AB名加上MD5（微信小游戏使用）
-private static bool appendHashToAssetBundleName = false;
-```
-3. [DownloadRequest.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/AssetManager/DownloadRequest/DownloadRequest.cs)
-```C#
-// 禁用Unity缓存系统在WebGL平台（微信小游戏使用）
-public static bool DisableUnityCacheOnWebGL = false;
-```
+* 在 F5 打包工具界面，勾选三个设置选项。
+1. 强制资产加载模式为远程 √
+   * 使用强制远程加载模式后，需要将工程打包后的 `StreamingAssets` 文件夹下的 `AssetBundles` 目录上传至 CDN  
+   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1752739146608.png)  
+2. 打包后AB名加上MD5 √
+3. 禁用缓存系统在WebGL平台 √
 * （注意）由于微信小游戏只能使用远程AB加载，请点击F5，配置好资产远程地址后构建一次游戏。  
   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20241203214539_2.png)  
 * 也可以在此处直接修改 [GameVersion.json](https://github.com/TippingGame/F8Framework/blob/main/AssetMap/Resources/GameVersion.json) 里的 "AssetRemoteAddress" 参数  

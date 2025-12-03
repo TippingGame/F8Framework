@@ -14,10 +14,7 @@ namespace F8Framework.Core.Editor
         private static Dictionary<string, string[]> resourceMapping;
         // AssetBundle名与资产文件名不同时查找
         private static Dictionary<string, string> DiscrepantAssetPathMapping = new Dictionary<string, string>();
-
-        // 打包后AB名加上MD5（微信小游戏使用）
-        private static bool appendHashToAssetBundleName = false;
-
+        
         public static void JenkinsBuildAllAB()
         {
             F8EditorPrefs.SetBool("compilationFinishedBuildAB", false);
@@ -53,7 +50,7 @@ namespace F8Framework.Core.Editor
             options |= BuildAssetBundleOptions.DisableLoadAssetByFileNameWithExtension;
             options |= BuildAssetBundleOptions.ChunkBasedCompression;
             options |= BuildAssetBundleOptions.StrictMode;
-            if (appendHashToAssetBundleName)
+            if (F8GamePrefs.GetBool(nameof(F8GameConfig.AppendHashToAssetBundleName)))
             {
                 options |= BuildAssetBundleOptions.AppendHashToAssetBundleName;
             }
@@ -66,6 +63,9 @@ namespace F8Framework.Core.Editor
             LogF8.LogAsset("打包AssetBundle：" + URLSetting.GetAssetBundlesOutPath() + "  当前打包平台：" + EditorUserBuildSettings.activeBuildTarget);
             
             AssetDatabase.Refresh();
+            
+            // 加密AB
+            AssetBundleEncrypt(strABOutPAthDir);
             
             // 等待AB打包完成，再写入数据
             GenerateAssetNames(true);
@@ -125,7 +125,7 @@ namespace F8Framework.Core.Editor
                         {
                             FileTools.SafeDeleteFile(abpath+ ".manifest" + ".meta");
                         }
-                        if (!appendHashToAssetBundleName)
+                        if (!F8GamePrefs.GetBool(nameof(F8GameConfig.AppendHashToAssetBundleName)))
                         {
                             LogF8.LogAsset("删除多余AB.manifest文件：" + abpath);
                         }
@@ -333,7 +333,7 @@ namespace F8Framework.Core.Editor
                         assetPathsForAbName.Add(assetPath.ToLower());
                         
                         string hash =  null;
-                        if (appendHashToAssetBundleName)
+                        if (F8GamePrefs.GetBool(nameof(F8GameConfig.AppendHashToAssetBundleName)))
                         {
                             BuildPipeline.GetHashForAssetBundle(URLSetting.GetAssetBundlesOutPath() + "/" + abName, out Hash128 hash128);
                             hash = hash128.ToString();
@@ -564,6 +564,108 @@ namespace F8Framework.Core.Editor
             LogF8.LogAsset("写入Resources资产数据 生成：" + ResourceMapPath);
         }
 
+        private static void AssetBundleEncrypt(string sourceDir)
+        {
+            int offsetValue = F8GamePrefs.GetInt(nameof(F8GameConfig.AssetBundleOffset));
+            int xorKey = F8GamePrefs.GetInt(nameof(F8GameConfig.AssetBundleXorKey));
+            if (xorKey == 0 && offsetValue == 0)
+                return;
+
+            if (!Directory.Exists(sourceDir))
+            {
+                LogF8.LogError($"目录不存在: {sourceDir}");
+                return;
+            }
+
+            List<string> excludeExtensions = new List<string> { ".meta", ".manifest", ".DS_Store" };
+            List<string> excludeFileNames = new List<string> { };
+
+            try
+            {
+                string[] allFiles = Directory.GetFiles(sourceDir, "*.*", SearchOption.AllDirectories);
+                int abCount = 0;
+                int encryptedCount = 0;
+
+                foreach (string filePath in allFiles)
+                {
+                    string fileName = Path.GetFileName(filePath);
+                    string fileExtension = Path.GetExtension(filePath);
+
+                    if (excludeExtensions.Contains(fileExtension) ||
+                        excludeFileNames.Contains(fileName))
+                    {
+                        continue;
+                    }
+                    abCount++;
+                    
+                    if (EncryptFile(filePath))
+                        encryptedCount++;
+                }
+
+                LogF8.LogAsset($"加密完成！总共有 {abCount} 个AB文件，加密处理 {encryptedCount} 个文件（不会重复加密）");
+
+                AssetDatabase.Refresh();
+            }
+            catch (Exception e)
+            {
+                LogF8.LogError($"加密过程中发生错误: {e.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 加密单个文件
+        /// </summary>
+        private static bool EncryptFile(string filePath)
+        {
+            try
+            {
+                byte[] fileHeader = new byte[32];
+                using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                {
+                    int bytesRead = fs.Read(fileHeader, 0, fileHeader.Length);
+                    if (bytesRead < 6)
+                    {
+                        LogF8.LogAsset($"文件过小，跳过加密: {filePath}");
+                        return false;
+                    }
+                }
+
+                string headerString = System.Text.Encoding.UTF8.GetString(fileHeader, 0, 6);
+                if (!headerString.StartsWith("Unity"))
+                {
+                    return false;
+                }
+
+                int offsetValue = F8GamePrefs.GetInt(nameof(F8GameConfig.AssetBundleOffset));
+                int xorKey = F8GamePrefs.GetInt(nameof(F8GameConfig.AssetBundleXorKey));
+
+                byte[] plainBytes = File.ReadAllBytes(filePath);
+                
+                if (offsetValue != 0)
+                {
+                    var dst = new byte[plainBytes.Length + offsetValue];
+                    Buffer.BlockCopy(plainBytes, 0, dst, offsetValue, plainBytes.Length);
+                    File.WriteAllBytes(filePath, dst);
+                    return true;
+                }
+                else if (xorKey != 0)
+                {
+                    for (int i = 0; i < plainBytes.Length; i++)
+                    {
+                        plainBytes[i] ^= (byte)xorKey;
+                    }
+                    File.WriteAllBytes(filePath, plainBytes);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception e)
+            {
+                LogF8.LogError($"加密文件失败 {filePath}: {e.Message}");
+                throw;
+            }
+        }
+        
         private static string GetPackage(string path)
         {
             // 使用正则表达式切割地址

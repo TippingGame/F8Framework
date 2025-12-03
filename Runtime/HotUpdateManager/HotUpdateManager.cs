@@ -175,7 +175,7 @@ namespace F8Framework.Core
         /// <param name="overallProgress"></param>
         public void StartHotUpdate(Dictionary<string, string> hotUpdateAssetUrl, Action completed = null, Action failure = null, Action<float> overallProgress = null)
         {
-            if (!GameConfig.LocalGameVersion.EnableHotUpdate || hotUpdateAssetUrl.Count <= 0 || AssetManager.ForceRemoteAssetBundle)
+            if (!GameConfig.LocalGameVersion.EnableHotUpdate || hotUpdateAssetUrl.Count <= 0 || F8GamePrefs.GetBool(nameof(F8GameConfig.ForceRemoteAssetBundle)))
             {
                 WriteVersion();
                 completed?.Invoke();
@@ -275,7 +275,7 @@ namespace F8Framework.Core
         /// <param name="overallProgress"></param>
         public void StartPackageUpdate(List<string> subPackages, Action completed = null, Action failure = null, Action<float> overallProgress = null)
         {
-            if (!GameConfig.LocalGameVersion.EnablePackage || subPackages.Count <= 0 || AssetManager.ForceRemoteAssetBundle)
+            if (!GameConfig.LocalGameVersion.EnablePackage || subPackages.Count <= 0 || F8GamePrefs.GetBool(nameof(F8GameConfig.ForceRemoteAssetBundle)))
             {
                 completed?.Invoke();
                 return;

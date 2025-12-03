@@ -112,24 +112,12 @@ Method 2: Unity → Menu Bar → Window → Package Manager → "+" → Add Pack
 * Add F8 framework's `LitJson` reference to the two `.asmdef` files under the WX-WASM-SDK-V2 directory's `Editor` and `Runtime` respectively  
   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20240524001621.png)
 ---
-* Change three variables to true.
-1. [AssetManager.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/AssetManager/AssetManager.cs)
-```C#
-// Force change asset loading mode to remote (for WeChat Mini Games)
-public static bool ForceRemoteAssetBundle = false;
-```
-* After using forced remote loading mode, you need to upload the `AssetBundles` directory under the packaged project's `StreamingAssets` folder to CDN  
-  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1752739146608.png)
-2. [ABBuildTool.cs](https://github.com/TippingGame/F8Framework/blob/main/Editor/AssetManager/ABBuildTool.cs)
-```C#
-// Append MD5 to AB names after packaging (for WeChat Mini Games)
-private static bool appendHashToAssetBundleName = false;
-```
-3. [DownloadRequest.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/AssetManager/DownloadRequest/DownloadRequest.cs)
-```C#
-// Disable Unity cache system on WebGL platform (for WeChat Mini Games)
-public static bool DisableUnityCacheOnWebGL = false;
-```
+* On the F5 packaging tool interface, select three settings options.
+1. Force change asset loading mode to remote √
+   * After using forced remote loading mode, you need to upload the `AssetBundles` directory under the packaged project's `StreamingAssets` folder to CDN  
+     ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1752739146608.png)
+2. Append MD5 to AB names after packaging √
+3. Disable Unity cache system on WebGL platform √
 * (Note) Since WeChat Mini Games can only use remote AB loading, please press F5, configure the asset remote address, and build the game once.  
   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20241203214539_2.png)
 * You can also directly modify the "AssetRemoteAddress" parameter in [GameVersion.json](https://github.com/TippingGame/F8Framework/blob/main/AssetMap/Resources/GameVersion.json) here  
