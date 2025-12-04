@@ -22,9 +22,27 @@ namespace F8Framework.Core.Editor
             bool enableFullPathAssetLoading = BuildPkgTool.GetArgValue(args, "EnableFullPathAssetLoading-").Equals("true", StringComparison.OrdinalIgnoreCase);
             bool enableFullPathExtensionAssetLoading = BuildPkgTool.GetArgValue(args, "EnableFullPathExtensionAssetLoading-").Equals("true", StringComparison.OrdinalIgnoreCase);
             bool forceRebuildAssetBundle = BuildPkgTool.GetArgValue(args, "ForceRebuildAssetBundle-").Equals("true", StringComparison.OrdinalIgnoreCase);
+            bool appendHashToAssetBundleName = BuildPkgTool.GetArgValue(args, "AppendHashToAssetBundleName-").Equals("true", StringComparison.OrdinalIgnoreCase);
+            bool forceRemoteAssetBundle = BuildPkgTool.GetArgValue(args, "ForceRemoteAssetBundle-").Equals("true", StringComparison.OrdinalIgnoreCase);
+            bool disableUnityCacheOnWebGL = BuildPkgTool.GetArgValue(args, "DisableUnityCacheOnWebGL-").Equals("true", StringComparison.OrdinalIgnoreCase);
+            int assetBundleOffset = 0;
+            if (int.TryParse(BuildPkgTool.GetArgValue(args, "AssetBundleOffset-"), out int intValue))
+            {
+                assetBundleOffset = Math.Clamp(intValue, 0, 245);
+            }
+            int assetBundleXorKey = 0;
+            if (int.TryParse(BuildPkgTool.GetArgValue(args, "AssetBundleXorKey-"), out int intValue2))
+            {
+                assetBundleXorKey = Math.Clamp(intValue2, 0, 245);
+            }
             F8EditorPrefs.SetBool(BuildPkgTool.EnableFullPathAssetLoadingKey, enableFullPathAssetLoading);
             F8EditorPrefs.SetBool(BuildPkgTool.EnableFullPathExtensionAssetLoadingKey, enableFullPathExtensionAssetLoading);
             F8EditorPrefs.SetBool(BuildPkgTool.ForceRebuildAssetBundleKey, forceRebuildAssetBundle);
+            F8GamePrefs.SetBool(nameof(F8GameConfig.AppendHashToAssetBundleName), appendHashToAssetBundleName);
+            F8GamePrefs.SetBool(nameof(F8GameConfig.ForceRemoteAssetBundle), forceRemoteAssetBundle);
+            F8GamePrefs.SetBool(nameof(F8GameConfig.DisableUnityCacheOnWebGL), disableUnityCacheOnWebGL);
+            F8GamePrefs.SetInt(nameof(F8GameConfig.AssetBundleOffset), assetBundleOffset);
+            F8GamePrefs.SetInt(nameof(F8GameConfig.AssetBundleXorKey), assetBundleXorKey);
             BuildAllAB();
         }
 

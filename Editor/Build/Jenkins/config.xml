@@ -85,6 +85,33 @@
           <description>启用完整资源路径带扩展名</description>
           <defaultValue>false</defaultValue>
         </hudson.model.BooleanParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>AppendHashToAssetBundleName</name>
+          <description>打包后AB名加上MD5</description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>ForceRemoteAssetBundle</name>
+          <description>强制更改资产加载模式为远程</description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>DisableUnityCacheOnWebGL</name>
+          <description>禁用Unity缓存系统在WebGL平台</description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>AssetBundleOffset</name>
+          <description>AssetBundle 偏移加密（Offset）  [1-254]</description>
+          <defaultValue>0</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>AssetBundleXorKey</name>
+          <description>AssetBundle 异或加密（XOR）    [1-254]</description>
+          <defaultValue>0</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>AssetRemoteAddress</name>
           <description>资产远程地址/游戏远程版本</description>
@@ -190,7 +217,7 @@
     </org.jenkinsci.plugins.unity3d.Unity3dBuilder>
     <org.jenkinsci.plugins.unity3d.Unity3dBuilder plugin="unity3d-plugin@1.3">
       <unity3dName>unity2021.3.15</unity3dName>
-      <argLine>-quit -nographics -batchmode -projectPath $ProjectPath -executeMethod F8Framework.Core.Editor.ABBuildTool.JenkinsBuildAllAB -logFile $BuildPath\JenkinsBuildUnity.log -buildTarget $Platform EnableFullPathAssetLoading- $EnableFullPathAssetLoading EnableFullPathExtensionAssetLoading- $EnableFullPathExtensionAssetLoading ForceRebuildAssetBundle- $ForceRebuildAssetBundle</argLine>
+      <argLine>-quit -nographics -batchmode -projectPath $ProjectPath -executeMethod F8Framework.Core.Editor.ABBuildTool.JenkinsBuildAllAB -logFile $BuildPath\JenkinsBuildUnity.log -buildTarget $Platform EnableFullPathAssetLoading- $EnableFullPathAssetLoading EnableFullPathExtensionAssetLoading- $EnableFullPathExtensionAssetLoading ForceRebuildAssetBundle- $ForceRebuildAssetBundle AppendHashToAssetBundleName- $AppendHashToAssetBundleName ForceRemoteAssetBundle- $ForceRemoteAssetBundle DisableUnityCacheOnWebGL- $DisableUnityCacheOnWebGL AssetBundleOffset- $AssetBundleOffset AssetBundleXorKey- $AssetBundleXorKey</argLine>
       <unstableReturnCodes></unstableReturnCodes>
     </org.jenkinsci.plugins.unity3d.Unity3dBuilder>
     <org.jenkinsci.plugins.unity3d.Unity3dBuilder plugin="unity3d-plugin@1.3">
