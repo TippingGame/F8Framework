@@ -1023,15 +1023,21 @@ namespace F8Framework.Core
             }
             else if (xorKey != 0)
             {
-                 bundleStream = new BundleStream(
+#if !UNITY_EDITOR && UNITY_ANDROID
+                byte[] abData = SyncStreamingAssetsLoader.Instance.LoadBytes(assetBundlePath.Replace(URLSetting.STREAMINGASSETS_URL, ""));
+                Util.Encryption.XOR_Decrypt(abData, (byte)xorKey);
+                assetBundleLoadRequest = AssetBundle.LoadFromMemoryAsync(abData);
+#else
+                bundleStream = new BundleStream(
                     (byte)xorKey,
                     assetBundlePath,
                     FileMode.Open,
                     FileAccess.Read,
                     FileShare.Read
                 );
-
+                
                 assetBundleLoadRequest = AssetBundle.LoadFromStreamAsync(bundleStream);
+#endif
             }
             else
             {
@@ -1055,15 +1061,21 @@ namespace F8Framework.Core
             }
             else if (xorKey != 0)
             {
-                 bundleStream = new BundleStream(
+#if !UNITY_EDITOR && UNITY_ANDROID
+                byte[] abData = SyncStreamingAssetsLoader.Instance.LoadBytes(assetBundlePath.Replace(URLSetting.STREAMINGASSETS_URL, ""));
+                Util.Encryption.XOR_Decrypt(abData, (byte)xorKey);
+                assetBundle = AssetBundle.LoadFromMemory(abData);
+#else
+                bundleStream = new BundleStream(
                     (byte)xorKey,
                     assetBundlePath,
                     FileMode.Open,
                     FileAccess.Read,
                     FileShare.Read
                 );
-
+                
                 assetBundle = AssetBundle.LoadFromStream(bundleStream);
+#endif
             }
             else
             {
@@ -1146,6 +1158,7 @@ namespace F8Framework.Core
                 manifest = assetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
                 manifest.GetAllAssetBundles();
                 assetBundle.Unload(false);
+                bundleStream?.Close();
             }
             else
             {

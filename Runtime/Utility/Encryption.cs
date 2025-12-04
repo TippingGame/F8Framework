@@ -444,17 +444,23 @@ namespace F8Framework.Core
             /// <returns>加密后的内容</returns>
             public static byte[] XOR_Encrypt(byte[] context, byte[] key)
             {
-                byte[] outputBytes = new byte[context.Length];
-                var cntLength = outputBytes.Length;
                 var keyLength = key.Length;
-                for (int i = 0; i < cntLength; i++)
+                for (int i = 0; i < context.Length; i++)
                 {
-                    outputBytes[i] = (byte)(context[i] ^ key[i % keyLength]);
+                    context[i] ^= key[i % keyLength];
                 }
-
-                return outputBytes;
+                return context;
             }
 
+            public static byte[] XOR_Encrypt(byte[] context, byte key)
+            {
+                for (int i = 0; i < context.Length; i++)
+                {
+                    context[i] ^= key;
+                }
+                return context;
+            }
+            
             //X | Y | Result
             //==============
             //0 | 0 | 0
@@ -470,17 +476,14 @@ namespace F8Framework.Core
             /// <returns>解密后的内容</returns>
             public static byte[] XOR_Decrypt(byte[] context, byte[] key)
             {
-                byte[] outputBytes = new byte[context.Length];
-                var cntLength = outputBytes.Length;
-                var keyLength = key.Length;
-                for (int i = 0; i < cntLength; i++)
-                {
-                    outputBytes[i] = (byte)(context[i] ^ key[i % keyLength]);
-                }
-
-                return outputBytes;
+                return XOR_Encrypt(context, key);
             }
 
+            public static byte[] XOR_Decrypt(byte[] context, byte key)
+            {
+                return XOR_Encrypt(context, key);
+            }
+            
             /// <summary>
             /// Generate MD5
             /// </summary>
