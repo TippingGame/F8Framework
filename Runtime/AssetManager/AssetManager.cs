@@ -374,7 +374,7 @@ namespace F8Framework.Core
                 }
 #endif
                 Load(assetName, null, mode);
-                return SceneManager.LoadScene(info.AssetPath[0], loadSceneParams);
+                return SceneManager.LoadScene(assetName, loadSceneParams);
             }
 
             public Scene LoadScene(string assetName, LoadSceneMode loadSceneMode = LoadSceneMode.Single, AssetAccessMode mode = AssetAccessMode.UNKNOWN)
@@ -406,7 +406,7 @@ namespace F8Framework.Core
                 }
 #endif
                 var sceneLoader2 = new SceneLoader(false);
-                return sceneLoader2.LoadAsync(info.AssetPath[0], loadSceneParams, allowSceneActivation, callback, mode);
+                return sceneLoader2.LoadAsync(assetName, loadSceneParams, allowSceneActivation, callback, mode);
             }
             
             public SceneLoader LoadSceneAsync(string assetName, LoadSceneMode loadSceneMode = LoadSceneMode.Single, bool allowSceneActivation = true,
