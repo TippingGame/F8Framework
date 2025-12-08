@@ -363,12 +363,12 @@ namespace F8Framework.Core
             /// <returns></returns>
             public Scene LoadScene(string assetName, LoadSceneParameters loadSceneParams, AssetAccessMode mode = AssetAccessMode.UNKNOWN)
             {
-                AssetInfo info = GetAssetInfo(assetName, mode);
-                if (!IsLegal(ref info))
-                    return default;
 #if UNITY_EDITOR
                 if (IsEditorMode)
                 {
+                    AssetInfo info = GetAssetInfo(assetName, mode);
+                    if (!IsLegal(ref info))
+                        return default;
                     assetName = info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0];
                     return UnityEditor.SceneManagement.EditorSceneManager.LoadSceneInPlayMode(assetName, loadSceneParams);
                 }
@@ -394,12 +394,12 @@ namespace F8Framework.Core
             public SceneLoader LoadSceneAsync(string assetName, LoadSceneParameters loadSceneParams, bool allowSceneActivation = true,
                 OnSceneObject callback = null, AssetAccessMode mode = AssetAccessMode.UNKNOWN)
             {
-                AssetInfo info = GetAssetInfo(assetName, mode);
-                if (!IsLegal(ref info))
-                    return null;
 #if UNITY_EDITOR
                 if (IsEditorMode)
                 {
+                    AssetInfo info = GetAssetInfo(assetName, mode);
+                    if (!IsLegal(ref info))
+                        return null;
                     assetName = info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0];
                     var sceneLoader = new SceneLoader(true);
                     return sceneLoader.LoadAsync(assetName, loadSceneParams, allowSceneActivation, callback, mode);
