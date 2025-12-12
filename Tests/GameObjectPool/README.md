@@ -54,10 +54,10 @@
         F8GameObjectPool _pool = FF8.GameObjectPool.GetPoolByPrefabName(_gameObjectPrefab.name);
         
         // 对每个池执行操作。
-        FF8.GameObjectPool.ForEachPool(LogF8.Log);
+        FF8.GameObjectPool.ForEachPool((obj) => { });
 
         // 对每个克隆执行操作。
-        FF8.GameObjectPool.ForEachClone(LogF8.Log);
+        FF8.GameObjectPool.ForEachClone((obj) => { });
 
         // 尝试获取克隆的状态（已生成 / 已回收 / 已生成超过容量）。
         PoolableStatus cloneStatus = FF8.GameObjectPool.GetCloneStatus(spawnedClone);
@@ -99,13 +99,13 @@
         _pool.SetWarningsActive(true);
         
         // 对池中的每个克隆执行操作。
-        _pool.ForEachClone(LogF8.Log);
+        _pool.ForEachClone((obj) => { });
         
         // 对池中的每个已生成的克隆执行操作。
-        _pool.ForEachSpawnedClone(LogF8.Log);
+        _pool.ForEachSpawnedClone((obj) => { });
         
         // 对池中的每个已回收的克隆执行操作。
-        _pool.ForEachDespawnedClone(LogF8.Log);
+        _pool.ForEachDespawnedClone((obj) => { });
         
         // 销毁已生成的克隆。
         _pool.DestroySpawnedClones();

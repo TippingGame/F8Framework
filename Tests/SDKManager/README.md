@@ -113,11 +113,12 @@ Unity F8 SDKManager组件，与原生平台交互，接入多个平台或者渠�
   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20240524001621.png)
 ---
 * 在 F5 打包工具界面，勾选三个设置选项。
-1. 强制资产加载模式为远程 √
-   * 使用强制远程加载模式后，需要将工程打包后的 `StreamingAssets` 文件夹下的 `AssetBundles` 目录上传至 CDN  
-   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1752739146608.png)  
-2. 打包后AB名加上MD5 √
+  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1765374924850.png)  
+1. 打包后AB名加上MD5 √
+2. 强制资产加载模式为远程 √
 3. 禁用缓存系统在WebGL平台 √
+    * 使用强制远程加载模式后，需要将工程打包后的 `StreamingAssets` 文件夹下的 `AssetBundles` 目录上传至 CDN  
+      ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1752739146608.png)
 * （注意）由于微信小游戏只能使用远程AB加载，请点击F5，配置好资产远程地址后构建一次游戏。  
   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20241203214539_2.png)  
 * 也可以在此处直接修改 [GameVersion.json](https://github.com/TippingGame/F8Framework/blob/main/AssetMap/Resources/GameVersion.json) 里的 "AssetRemoteAddress" 参数  

@@ -493,7 +493,8 @@ namespace F8Framework.Core.Editor
                 }
                 catch (Exception e)
                 {
-                    throw new Exception("表格生成错误，修改后重试F8：" + kvp.Key + ".cs" + "\n" + e.Message);
+                    LogF8.LogException(e);
+                    throw new Exception("表格生成错误，修改后重试F8：" + kvp.Key + ".cs" + "\n");
                 }
                 
                 LogF8.LogConfig($"已生成代码 " + path + "/<color=#FF9E59>" + kvp.Key + ".cs</color>");
@@ -583,7 +584,7 @@ namespace F8Framework.Core.Editor
                 dict.GetType().GetMethod("Add").Invoke(dict, new System.Object[] { id, t });
             }
 
-            string exportFormat = F8EditorPrefs.GetString(BuildPkgTool.ConvertExcelToOtherFormatsKey, BuildPkgTool.ExcelToOtherFormats[0]);
+            string exportFormat = F8EditorPrefs.GetString(BuildPkgTool.ConvertExcelToOtherFormatsKey, BuildPkgTool.ExcelToOtherFormats[1]);
             if (exportFormat == BuildPkgTool.ExcelToOtherFormats[1])
             {
                 try

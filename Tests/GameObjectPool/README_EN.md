@@ -53,10 +53,10 @@ void Start()
     F8GameObjectPool _pool = FF8.GameObjectPool.GetPoolByPrefabName(_gameObjectPrefab.name);
     
     // Execute action for each pool
-    FF8.GameObjectPool.ForEachPool(LogF8.Log);
+    FF8.GameObjectPool.ForEachPool((obj) => { });
 
     // Execute action for each clone
-    FF8.GameObjectPool.ForEachClone(LogF8.Log);
+    FF8.GameObjectPool.ForEachClone((obj) => { });
 
     // Get clone status (Spawned/Despawned/OverCapacity)
     PoolableStatus cloneStatus = FF8.GameObjectPool.GetCloneStatus(spawnedClone);
@@ -97,13 +97,13 @@ void Start()
     _pool.SetWarningsActive(true);
     
     // Execute action for each clone
-    _pool.ForEachClone(LogF8.Log);
+    _pool.ForEachClone((obj) => { });
     
     // Execute action for spawned clones
-    _pool.ForEachSpawnedClone(LogF8.Log);
+    _pool.ForEachSpawnedClone((obj) => { });
     
     // Execute action for despawned clones
-    _pool.ForEachDespawnedClone(LogF8.Log);
+    _pool.ForEachDespawnedClone((obj) => { });
     
     // Destroy spawned clones
     _pool.DestroySpawnedClones();

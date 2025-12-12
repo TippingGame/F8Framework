@@ -54,7 +54,7 @@ namespace F8Framework.Core.Editor
         private static bool _enableFullPathAssetLoading = false;
         private static bool _enableFullPathExtensionAssetLoading = false;
         private static string _excelPath = "";
-        private static string _convertExcelToOtherFormats = "json";
+        private static string _convertExcelToOtherFormats = "binary";
         public static string[] ExcelToOtherFormats = { "json", "binary" };
         private static bool _forceRebuildAssetBundle = false;
         private static bool _cleanBuildCache = false;
@@ -713,7 +713,7 @@ namespace F8Framework.Core.Editor
             
             if (F8EditorPrefs.GetString(ConvertExcelToOtherFormatsKey, "").IsNullOrEmpty())
             {
-                F8EditorPrefs.SetString(ConvertExcelToOtherFormatsKey, ExcelToOtherFormats[0]);
+                F8EditorPrefs.SetString(ConvertExcelToOtherFormatsKey, ExcelToOtherFormats[1]);
             }
             
             int currentIndex = Array.FindIndex(ExcelToOtherFormats, format => 

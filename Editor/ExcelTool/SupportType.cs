@@ -186,7 +186,7 @@ namespace F8Framework.Core.Editor
 
         private string PropertyEnum(string type, string className = "", string inputPath = "", bool writtenForm = true)
         {
-            if (!type.StartsWith(SupportType.ENUM))
+            if (!type.StartsWith(SupportType.ENUM) || (!type.EndsWith(">") && !type.EndsWith("}")))
                 return "";
 
             // 1. 检查是否有大括号（完整定义）或只有尖括号（简化定义）
@@ -460,7 +460,7 @@ namespace F8Framework.Core.Editor
             source.Append("\t\t\t}\n");
             source.Append("\t\t\tAssetManager.Instance.Unload(name, false);\n");
             
-            string exportFormat = F8EditorPrefs.GetString(BuildPkgTool.ConvertExcelToOtherFormatsKey, BuildPkgTool.ExcelToOtherFormats[0]);
+            string exportFormat = F8EditorPrefs.GetString(BuildPkgTool.ConvertExcelToOtherFormatsKey, BuildPkgTool.ExcelToOtherFormats[1]);
             if (exportFormat == BuildPkgTool.ExcelToOtherFormats[1])
             {
                 source.Append("\t\t\tT obj = Util.BinarySerializer.Deserialize<T>(textAsset.bytes);\n");

@@ -19,7 +19,7 @@ F8 Framework是一个**优雅，轻量，符合直觉的**基于Unity引擎的�
 
 ## 支持版本
 Unity 2021、2022、2023、6000  
-构建可支持：Win / Android / iOS / Mac / Linux / WebGL / 微信小游戏 / 抖音小游戏（[构建文档](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/README.md#%E5%AE%89%E5%8D%93%E5%B7%A5%E7%A8%8B%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95)，[Jenkins集成](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/README.md#%E4%BD%BF%E7%94%A8jenkins%E8%BF%9B%E8%A1%8C%E8%BF%9C%E7%A8%8B%E6%89%93%E5%8C%85)）
+构建可支持：Win / Android / iOS / Mac / Linux / WebGL / 微信小游戏 / 抖音小游戏（[构建文档](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/README.md#%E5%A6%82%E9%9C%80%E8%A6%81%E6%8E%A5%E5%85%A5%E9%9A%90%E7%A7%81%E6%94%BF%E7%AD%96%E6%88%96%E6%8E%A5%E5%85%A5%E5%AE%89%E5%8D%93%E7%AB%AFsdk%E4%B8%8E%E5%AE%89%E5%8D%93%E7%AB%AF%E4%BA%A4%E4%BA%92%E5%8F%AF%E6%8C%89%E7%85%A7%E4%B8%8B%E6%96%B9%E6%95%99%E7%A8%8B%E6%89%8B%E5%8A%A8%E6%93%8D%E4%BD%9C)，[Jenkins集成](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/README.md#%E4%BD%BF%E7%94%A8jenkins%E8%BF%9B%E8%A1%8C%E8%BF%9C%E7%A8%8B%E6%89%93%E5%8C%85)）
 
 ## 文档快速预览 - 1分钟
 ### ----------可选功能----------
@@ -95,7 +95,7 @@ git clone https://github.com/TippingGame/F8Framework.git
 ## 上架游戏
 | 脑光（[TapTap](https://www.taptap.cn/app/725455) / [WebGL](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/h5game/naoguang/index.html)）       | 消除异世界（[微信小游戏](#小程序://消除异界/dZ7HgPPybAOkD2E) / [4399](http://www.4399.com/flash/250713.htm)）                     | 待定                                              | 待定                                             | 
 |-------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|-------------------------------------------------|------------------------------------------------|
-| <img src='https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/naoguang_icon_256.png' width="256"/> | <img src='https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/xcysj_icon_256.png' width="256"/> | <img src='' width="256"/> | <img src='' width="256"/> |
+| <img src='https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/naoguang_icon_256.png' width="256"/> | <img src='https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/xcysj_icon_256.png' width="256"/> | 待定 | 待定 |
 
 
 ## 赞助
@@ -113,7 +113,7 @@ The **F8 Framework** is an **elegant, lightweight, and intuitive** game framewor
 
 ## Supported Versions
 Unity 2021, 2022, 2023, 6000  
-Build targets: Win / Android / iOS / Mac / Linux / WebGL / WeChat Mini Games（[Build Documentation, Jenkins Integration](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/README_EN.md)）
+Build targets: Win / Android / iOS / Mac / Linux / WebGL / WeChat Mini Games（[Build Documentation](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/README.md#%E5%A6%82%E9%9C%80%E8%A6%81%E6%8E%A5%E5%85%A5%E9%9A%90%E7%A7%81%E6%94%BF%E7%AD%96%E6%88%96%E6%8E%A5%E5%85%A5%E5%AE%89%E5%8D%93%E7%AB%AFsdk%E4%B8%8E%E5%AE%89%E5%8D%93%E7%AB%AF%E4%BA%A4%E4%BA%92%E5%8F%AF%E6%8C%89%E7%85%A7%E4%B8%8B%E6%96%B9%E6%95%99%E7%A8%8B%E6%89%8B%E5%8A%A8%E6%93%8D%E4%BD%9C)，[Jenkins Integration](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/README.md#%E4%BD%BF%E7%94%A8jenkins%E8%BF%9B%E8%A1%8C%E8%BF%9C%E7%A8%8B%E6%89%93%E5%8C%85)）
 
 ## Quick Overview – 1 Minute
 ### ----------Optional Features----------
