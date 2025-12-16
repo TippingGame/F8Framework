@@ -52,7 +52,7 @@ Unity 2021、2022、2023、6000
 * [Mirror(内置):KCP](https://github.com/MirrorNetworking/kcp2k)：Reliable UDP
 * [Mirror(内置):Telepathy](https://github.com/MirrorNetworking/Telepathy)：TCP
 * [Mirror(内置):Websockets](https://github.com/MirrorNetworking/SimpleWebTransport)：Websockets
-* [LitJson](https://github.com/LitJSON/litjson)：序列化/反序列化 JSON（已修改字典Key支持byte，short，int，long，float，double，string 类型，增加Unity常用类型：Type，Vector2，Vector3，Vector4，Quaternion，GameObject，Transform，Color，Color32，Bounds，Rect，RectOffset，LayerMask，Vector2Int，Vector3Int，RangeInt，BoundsInt，修复DateTime精度丢失的问题）
+* [LitJson](https://github.com/LitJSON/litjson)：序列化/反序列化 JSON（已修改字典Key支持所有基础和枚举类型，增加Unity常用类型：Type，Vector2，Vector3，Vector4，Quaternion，GameObject，Transform，Color，Color32，Bounds，Rect，RectOffset，LayerMask，Vector2Int，Vector3Int，RangeInt，BoundsInt，修复DateTime精度丢失的问题）
 
 ## 使用步骤
 

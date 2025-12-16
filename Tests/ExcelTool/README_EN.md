@@ -23,7 +23,7 @@ Method 2: Unity → Menu Bar → Window → Package Manager → "+" → Add Pack
 
 1. Under `Assets`, create the `StreamingAssets/config` directory. Follow the Excel Example below to create your Excel file [(Excel Example)](https://github.com/TippingGame/F8Framework/blob/main/Runtime/ExcelTool/StreamingAssets_config/DemoWorkSheet.xlsx) (Excel will be auto-generated after the first F8 execution).
 
-2. Click the **Development Tools** menu → **Import Config Tables**_F8 (shortcut). This generates **.bytes** files under `Assets/AssetBundles/Config/BinConfigData` (**json** or **binary** files can be selected).
+2. Click the **Development Tools** menu → **Import Config Tables**_F8 (shortcut). This generates **.bytes** files under `Assets/AssetBundles/Config/BinConfigData` (**binary** or **json** files can be selected).
 
 3. **Note**: If you don’t want to generate files in the `AssetBundles` directory, modify the BinDataFolder value in [ExcelDataTool.cs](https://github.com/TippingGame/F8Framework/blob/main/Editor/ExcelTool/ExcelDataTool.cs):
     ```C#
@@ -63,7 +63,7 @@ Excel Example (**id** is the unique index and must be included!):
   * Supported:
     * Arrays, Jagged Arrays ([[]](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/arrays), [[][]](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/arrays#jagged-arrays), [[][][]](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/arrays#jagged-arrays))
     * List ([list<>](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1.-ctor?view=net-9.0))
-    * Dictionary ([dict<,> / dictionary<,>](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2.-ctor?view=net-9.0), Note: Keys can only be byte, short, int, long, float, double, str/string.)
+    * Dictionary ([dict<,> / dictionary<,>](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2.-ctor?view=net-9.0), Note: Export 'json' format table key can only be a base type. If you need to support containers and enumerations, you can use 'binary'`)
     * ValueTuple ([valuetuple<,>](https://learn.microsoft.com/en-us/dotnet/api/system.valuetuple?view=net-9.0), Supports up to 7 types).
     * Containers can accept any type (excluding variant types).
 
@@ -170,7 +170,7 @@ I18N.Other.dll\
 I18N.Rare.dll\
 I18N.West.dll\
 [ICSharpCode.SharpZipLib.dll](https://github.com/icsharpcode/SharpZipLib)  
-[LitJson.dll](https://github.com/LitJSON/litjson) (modified to support dictionary keys of byte, short, int, long, float, double, and string types; added support for commonly used Unity types: Type, Vector2, Vector3, Vector4, Quaternion, GameObject, Transform, Color, Color32, Bounds, Rect, RectOffset, LayerMask, Vector2Int, Vector3Int, RangeInt, BoundsInt; fixed the DateTime precision loss issue)
+[LitJson.dll](https://github.com/LitJSON/litjson) (The dictionary key has been modified to support all basic and enumeration types; added support for commonly used Unity types: Type, Vector2, Vector3, Vector4, Quaternion, GameObject, Transform, Color, Color32, Bounds, Rect, RectOffset, LayerMask, Vector2Int, Vector3Int, RangeInt, BoundsInt; fixed the DateTime precision loss issue)
 
 ## Writing to Excel (Optional)
 Use [EPPlus.dll (built-in) ](https://github.com/TippingGame/F8Framework/blob/main/Plugins/EPPlus.dll)(disabled by default; manually select the compilation platform):

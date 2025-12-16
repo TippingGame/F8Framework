@@ -433,7 +433,16 @@ namespace LitJson
                 instance = Activator.CreateInstance (value_type);
                 
                 // 处理字典key为非string的情况
-                Type keyType = t_data.IsDictionary ? value_type.GetGenericArguments()[0] : null;
+                Type keyType = null;
+                Type valueType = null;
+        
+                if (t_data.IsDictionary) {
+                    Type[] genericArgs = value_type.GetGenericArguments();
+                    if (genericArgs.Length >= 2) {
+                        keyType = genericArgs[0];
+                        valueType = genericArgs[1];
+                    }
+                }
                 
                 while (true) {
                     reader.Read ();
@@ -477,13 +486,20 @@ namespace LitJson
                             }
                         }
                         // 处理字典key为非string的情况
-                        if (keyType != null)
-                        {
-                            ((IDictionary)instance).Add(Convert.ChangeType(property, keyType), ReadValue(t_data.ElementType, reader));
+                        object key = property;
+                        
+                        if (keyType != null && keyType.IsEnum) {
+                            key = Enum.Parse(keyType, property);
                         }
-                        else
-                        {
-                            ((IDictionary)instance).Add(property, ReadValue(t_data.ElementType, reader));
+                        else if (keyType != null && keyType != typeof(string)) {
+                            key = Convert.ChangeType(property, keyType, CultureInfo.InvariantCulture);
+                        }
+                        
+                        object value = ReadValue(valueType ?? t_data.ElementType, reader);
+                        
+                        var addMethod = instance.GetType().GetMethod("Add");
+                        if (addMethod != null) {
+                            addMethod.Invoke(instance, new object[] { key, value });
                         }
                     }
 
@@ -807,12 +823,22 @@ namespace LitJson
             if (obj is IDictionary dictionary) {
                 writer.WriteObjectStart ();
                 foreach (DictionaryEntry entry in dictionary) {
-                    var propertyName = entry.Key is string key ?
-                        key
-                        : Convert.ToString(entry.Key, CultureInfo.InvariantCulture);
+                    var key = entry.Key;
+                    string propertyName;
+            
+                    if (key is Enum enumKey) {
+                        Type underlyingType = Enum.GetUnderlyingType(enumKey.GetType());
+                        object numericValue = Convert.ChangeType(enumKey, underlyingType, CultureInfo.InvariantCulture);
+                        propertyName = Convert.ToString(numericValue, CultureInfo.InvariantCulture);
+                    } else {
+                        propertyName = key is string strKey ?
+                            strKey
+                            : Convert.ToString(key, CultureInfo.InvariantCulture);
+                    }
+            
                     writer.WritePropertyName (propertyName);
                     WriteValue (entry.Value, writer, writer_is_private,
-                                depth + 1);
+                        depth + 1);
                 }
                 writer.WriteObjectEnd ();
 
