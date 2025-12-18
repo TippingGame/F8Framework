@@ -85,21 +85,21 @@ namespace F8Framework.Core.Editor
             string[] args = Environment.GetCommandLineArgs();
             string ExcelPath = BuildPkgTool.GetArgValue(args, "ExcelPath-");
             string ConvertExcelToOtherFormats = BuildPkgTool.GetArgValue(args, "ConvertExcelToOtherFormats-");
-            F8EditorPrefs.SetString("ExcelPath", ExcelPath);
+            F8EditorPrefs.SetString(BuildPkgTool.ExcelPathKey, URLSetting.RemoveRootPath(ExcelPath));
             F8EditorPrefs.SetString(BuildPkgTool.ConvertExcelToOtherFormatsKey, ConvertExcelToOtherFormats);
             LoadAllExcelData();
         }
         
         public static void LoadAllExcelData()
         {
-            if (F8EditorPrefs.GetString("ExcelPath", default).IsNullOrEmpty())
+            if (F8EditorPrefs.GetString(BuildPkgTool.ExcelPathKey, default).IsNullOrEmpty())
             {
                 FileTools.CheckDirAndCreateWhenNeeded(Application.dataPath + ExcelPath);
                 string tempExcelPath = Application.dataPath + ExcelPath;
-                F8EditorPrefs.SetString("ExcelPath", tempExcelPath);
+                F8EditorPrefs.SetString(BuildPkgTool.ExcelPathKey, URLSetting.RemoveRootPath(tempExcelPath));
                 LogF8.LogConfig("首次启动，设置Excel存放目录：" + tempExcelPath + " （如要更改请到----上方菜单栏->开发工具->设置Excel存放目录）");
             }
-            string lastExcelPath = F8EditorPrefs.GetString("ExcelPath", default) ?? Application.dataPath + ExcelPath;
+            string lastExcelPath = URLSetting.AddRootPath(F8EditorPrefs.GetString(BuildPkgTool.ExcelPathKey, default)) ?? Application.dataPath + ExcelPath;
             
             string INPUT_PATH = lastExcelPath;
 
@@ -147,7 +147,7 @@ namespace F8Framework.Core.Editor
             FileTools.SafeDeleteFile(URLSetting.CS_STREAMINGASSETS_URL + FileIndexFile + ".meta");
             AssetDatabase.Refresh();
             FileTools.CheckFileAndCreateDirWhenNeeded(URLSetting.CS_STREAMINGASSETS_URL + FileIndexFile);
-            FileTools.SafeCopyDirectory(F8EditorPrefs.GetString("ExcelPath", null) ?? Application.dataPath + ExcelPath,
+            FileTools.SafeCopyDirectory(URLSetting.AddRootPath(F8EditorPrefs.GetString(BuildPkgTool.ExcelPathKey, null)) ?? Application.dataPath + ExcelPath,
                 URLSetting.GetTempExcelPath(), false,
                 new string[] { ".meta", ".DS_Store" }, new string[] { "~$" });
             foreach (string item in files)
@@ -201,7 +201,7 @@ namespace F8Framework.Core.Editor
             string[] args = Environment.GetCommandLineArgs();
             string ExcelPath = BuildPkgTool.GetArgValue(args, "ExcelPath-");
             string ConvertExcelToOtherFormats = BuildPkgTool.GetArgValue(args, "ConvertExcelToOtherFormats-");
-            F8EditorPrefs.SetString("ExcelPath", ExcelPath);
+            F8EditorPrefs.SetString(BuildPkgTool.ExcelPathKey, URLSetting.RemoveRootPath(ExcelPath));
             F8EditorPrefs.SetString(BuildPkgTool.ConvertExcelToOtherFormatsKey, ConvertExcelToOtherFormats);
             F8EditorPrefs.SetBool("compilationFinished", true);
             AllScriptsReloaded();
@@ -223,7 +223,7 @@ namespace F8Framework.Core.Editor
             if (Directory.Exists(BinDataPath)) Directory.Delete(BinDataPath, true); //删除旧的数据文件
             Directory.CreateDirectory(BinDataPath);
             
-            string lastExcelPath = F8EditorPrefs.GetString("ExcelPath", default) ?? Application.dataPath + ExcelPath;
+            string lastExcelPath = URLSetting.AddRootPath(F8EditorPrefs.GetString(BuildPkgTool.ExcelPathKey, default)) ?? Application.dataPath + ExcelPath;
             
             string INPUT_PATH = lastExcelPath;
             var files = Directory.GetFiles(INPUT_PATH, "*.*", SearchOption.AllDirectories)

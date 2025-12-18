@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using System.IO;
+using UnityEngine;
 
 namespace F8Framework.Core
 {
@@ -27,6 +29,47 @@ namespace F8Framework.Core
         public static string GetTempExcelPath()
         {
             return FileTools.FormatToUnityPath(FileTools.TruncatePath(Application.dataPath, 1)) + "/temp_Excel";
+        }
+        
+        public static string RemoveRootPath(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return path;
+            
+            string normalizedPath = FileTools.FormatToUnityPath(path);
+            string rootPath = FileTools.FormatToUnityPath(FileTools.TruncatePath(Application.dataPath, 1));
+            
+            if (!rootPath.EndsWith("/"))
+                rootPath += "/";
+            
+            int index = normalizedPath.IndexOf(rootPath, StringComparison.Ordinal);
+            
+            if (index == 0)
+            {
+                string result = normalizedPath.Remove(0, rootPath.Length);
+                
+                if (result.StartsWith("/"))
+                    result = result.Substring(1);
+            
+                return result;
+            }
+            
+            return path;
+        }
+        
+        public static string AddRootPath(string relativePath)
+        {
+            if (string.IsNullOrEmpty(relativePath) || Path.IsPathRooted(relativePath))
+                return relativePath;
+            
+            string normalizedRelative = FileTools.FormatToUnityPath(relativePath);
+            string rootPath = FileTools.FormatToUnityPath(FileTools.TruncatePath(Application.dataPath, 1));
+            
+            normalizedRelative = normalizedRelative.TrimStart('/');
+            
+            rootPath = rootPath.TrimEnd('/') + "/";
+            
+            return rootPath + normalizedRelative;
         }
 
         public static string GetPlatformName()

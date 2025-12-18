@@ -10,11 +10,11 @@ namespace F8Framework.Core.Editor
         [MenuItem("开发工具/设置Excel存放目录", false, 104)]
         public static void SetExcelPath()
         {
-            string lastExcelPath = F8EditorPrefs.GetString("ExcelPath", default);
+            string lastExcelPath = URLSetting.AddRootPath(F8EditorPrefs.GetString(BuildPkgTool.ExcelPathKey, default));
             string tempExcelPath = EditorUtility.OpenFolderPanel("设置Excel存放目录", lastExcelPath ?? Application.dataPath, "");
             if (!tempExcelPath.IsNullOrEmpty())
             {
-                F8EditorPrefs.SetString("ExcelPath", tempExcelPath);
+                F8EditorPrefs.SetString(BuildPkgTool.ExcelPathKey, URLSetting.RemoveRootPath(tempExcelPath));
             }
             LogF8.LogConfig("设置Excel存放目录：" + tempExcelPath);
         }

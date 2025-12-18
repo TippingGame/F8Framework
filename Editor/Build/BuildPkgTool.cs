@@ -36,7 +36,7 @@ namespace F8Framework.Core.Editor
         private static string _androidKeyAliasPassKey = "AndroidKeyAliasPassKey";
         public static string EnableFullPathAssetLoadingKey = "FullPathAssetLoadingKey";
         public static string EnableFullPathExtensionAssetLoadingKey = "FullPathExtensionAssetLoadingKey";
-        private static string _excelPathKey = "ExcelPath";
+        public static string ExcelPathKey = "ExcelPath";
         public static string ConvertExcelToOtherFormatsKey = "ConvertExcelToOtherFormatsKey";
         public static string ForceRebuildAssetBundleKey = "ForceRebuildAssetBundleKey";
         public static string CleanBuildCacheKey = "CleanBuildCacheKey";
@@ -81,7 +81,7 @@ namespace F8Framework.Core.Editor
         private static string _androidKeyAliasName = "";
         private static string _androidKeyAliasPass = "";
 
-        public static string BuildPath => F8EditorPrefs.GetString(_prefBuildPathKey, null) ?? _buildPath;
+        public static string BuildPath => URLSetting.AddRootPath(F8EditorPrefs.GetString(_prefBuildPathKey, null)) ?? _buildPath;
         public static string ToVersion => F8EditorPrefs.GetString(_toVersionKey, null) ?? _toVersion;
         
         // Jenkins打包专用
@@ -116,7 +116,7 @@ namespace F8Framework.Core.Editor
             F8EditorPrefs.SetBool(_exportCurrentPlatformKey, false);
             F8EditorPrefs.SetString(_exportPlatformKey, platformStr);
             _buildTarget = platform;
-            F8EditorPrefs.SetString(_prefBuildPathKey, buildPath);
+            F8EditorPrefs.SetString(_prefBuildPathKey, URLSetting.RemoveRootPath(buildPath));
             _buildPath = buildPath;
             F8EditorPrefs.SetString(_toVersionKey, version);
             _toVersion = version;
@@ -141,7 +141,7 @@ namespace F8Framework.Core.Editor
             _androidBuildAppBundle = androidBuildAppBundle;
             F8EditorPrefs.SetBool(_androidUseKeystoreKey, androidUseKeystore);
             _androidUseKeystore = androidUseKeystore;
-            F8EditorPrefs.SetString(_androidKeystoreNameKey, androidKeystoreName);
+            F8EditorPrefs.SetString(_androidKeystoreNameKey, URLSetting.RemoveRootPath(androidKeystoreName));
             _androidKeystoreName = androidKeystoreName;
             F8EditorPrefs.SetString(_androidKeystorePassKey, androidKeystorePass);
             _androidKeystorePass = androidKeystorePass;
@@ -171,7 +171,7 @@ namespace F8Framework.Core.Editor
         // 构建热更版本
         public static void BuildUpdate()
         {
-            string buildPath = F8EditorPrefs.GetString(_prefBuildPathKey, "");
+            string buildPath = URLSetting.AddRootPath(F8EditorPrefs.GetString(_prefBuildPathKey, ""));
             
             string toVersion = F8EditorPrefs.GetString(_toVersionKey, "");
             
@@ -251,7 +251,7 @@ namespace F8Framework.Core.Editor
         {
             string appName = Application.productName;
             
-            string buildPath = F8EditorPrefs.GetString(_prefBuildPathKey, "");
+            string buildPath = URLSetting.AddRootPath(F8EditorPrefs.GetString(_prefBuildPathKey, ""));
             
             Array enumValues = Enum.GetValues(typeof(BuildTarget));
             int index = Array.FindIndex((BuildTarget[])enumValues, target => 
@@ -276,7 +276,7 @@ namespace F8Framework.Core.Editor
                     appName += F8EditorPrefs.GetBool(_androidBuildAppBundleKey, false) ? ".aab" : ".apk";
                     EditorUserBuildSettings.buildAppBundle = F8EditorPrefs.GetBool(_androidBuildAppBundleKey, false);
                     PlayerSettings.Android.useCustomKeystore = F8EditorPrefs.GetBool(_androidUseKeystoreKey, false);
-                    PlayerSettings.Android.keystoreName = F8EditorPrefs.GetString(_androidKeystoreNameKey, "");
+                    PlayerSettings.Android.keystoreName = URLSetting.AddRootPath(F8EditorPrefs.GetString(_androidKeystoreNameKey, ""));
                     PlayerSettings.Android.keystorePass = F8EditorPrefs.GetString(_androidKeystorePassKey, "");
                     PlayerSettings.Android.keyaliasName = F8EditorPrefs.GetString(_androidKeyAliasNameKey, "");
                     PlayerSettings.Android.keyaliasPass = F8EditorPrefs.GetString(_androidKeyAliasPassKey, "");
@@ -538,7 +538,7 @@ namespace F8Framework.Core.Editor
                     EditorGUI.indentLevel++;
                     string focusedControlName = GUI.GetNameOfFocusedControl();
                     GUI.SetNextControlName(_androidKeystoreNameKey);
-                    _androidKeystoreName = EditorGUILayout.TextField(F8EditorPrefs.GetString(_androidKeystoreNameKey, ""));
+                    _androidKeystoreName = EditorGUILayout.TextField(URLSetting.AddRootPath(F8EditorPrefs.GetString(_androidKeystoreNameKey, "")));
                     if (GUILayout.Button("浏览..."))
                     {
                         string path = EditorUtility.OpenFilePanel(
@@ -546,7 +546,7 @@ namespace F8Framework.Core.Editor
                         if (!string.IsNullOrEmpty(path))
                         {
                             EditorGUILayout.TextField(path);
-                            F8EditorPrefs.SetString(_androidKeystoreNameKey, path);
+                            F8EditorPrefs.SetString(_androidKeystoreNameKey, URLSetting.RemoveRootPath(path));
                             if (focusedControlName == _androidKeystoreNameKey)
                             {
                                 GUI.FocusControl(null);
@@ -585,11 +585,11 @@ namespace F8Framework.Core.Editor
                 if (!string.IsNullOrEmpty(_buildPath))
                 {
                     BuildPkgTool._buildPath = _buildPath;
-                    F8EditorPrefs.SetString(_prefBuildPathKey, BuildPkgTool._buildPath);
+                    F8EditorPrefs.SetString(_prefBuildPathKey, URLSetting.RemoveRootPath(BuildPkgTool._buildPath));
                 }
             }
 
-            _buildPath = F8EditorPrefs.GetString(_prefBuildPathKey, _buildPath);
+            _buildPath = URLSetting.AddRootPath(F8EditorPrefs.GetString(_prefBuildPathKey, _buildPath));
             
             if (_buildPath.IsNullOrEmpty())
             {
@@ -693,15 +693,15 @@ namespace F8Framework.Core.Editor
                 if (!string.IsNullOrEmpty(excelPath))
                 {
                     _excelPath = excelPath;
-                    F8EditorPrefs.SetString(_excelPathKey, BuildPkgTool._excelPath);
+                    F8EditorPrefs.SetString(ExcelPathKey, URLSetting.RemoveRootPath(_excelPath));
                 }
             }
 
-            if (F8EditorPrefs.GetString(_excelPathKey, "").IsNullOrEmpty())
+            if (F8EditorPrefs.GetString(ExcelPathKey, "").IsNullOrEmpty())
             {
-                F8EditorPrefs.SetString(_excelPathKey, Application.dataPath + ExcelDataTool.ExcelPath);
+                F8EditorPrefs.SetString(ExcelPathKey, URLSetting.RemoveRootPath(Application.dataPath + ExcelDataTool.ExcelPath));
             }
-            _excelPath = F8EditorPrefs.GetString(_excelPathKey, "");
+            _excelPath = URLSetting.AddRootPath(F8EditorPrefs.GetString(ExcelPathKey, ""));
 
             if (_excelPath.IsNullOrEmpty())
             {
@@ -1161,7 +1161,7 @@ namespace F8Framework.Core.Editor
         // 写入资产版本
         public static void WriteAssetVersion()
         {
-            string buildPath = F8EditorPrefs.GetString(_prefBuildPathKey, "");
+            string buildPath = URLSetting.AddRootPath(F8EditorPrefs.GetString(_prefBuildPathKey, ""));
             
             string assetBundleMapPath = Application.dataPath + "/F8Framework/AssetMap/Resources/" + nameof(AssetBundleMap) + ".json";
             FileTools.SafeCopyFile(assetBundleMapPath, buildPath + HotUpdateManager.RemoteDirName + "/" + nameof(AssetBundleMap) + ".json");
@@ -1185,7 +1185,7 @@ namespace F8Framework.Core.Editor
             
             bool _enablePackage = F8EditorPrefs.GetBool(_enablePackageKey, false);
             
-            string buildPath = F8EditorPrefs.GetString(_prefBuildPathKey, "");
+            string buildPath = URLSetting.AddRootPath(F8EditorPrefs.GetString(_prefBuildPathKey, ""));
             
             string gameVersionPath = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/AssetMap/Resources/" + nameof(GameVersion) + ".json";
             FileTools.SafeDeleteFile(gameVersionPath);

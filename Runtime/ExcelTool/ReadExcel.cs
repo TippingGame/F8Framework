@@ -73,7 +73,7 @@ namespace F8Framework.Core
         public void LoadAllExcelData()
         {
 #if UNITY_EDITOR
-        string INPUT_PATH = F8EditorPrefs.GetString("ExcelPath", default);
+        string INPUT_PATH = URLSetting.AddRootPath(F8EditorPrefs.GetString("ExcelPath", default));
 #elif UNITY_STANDALONE
         string INPUT_PATH = URLSetting.CS_STREAMINGASSETS_URL + ExcelPath;
 #elif UNITY_ANDROID
@@ -93,7 +93,7 @@ namespace F8Framework.Core
             }
             
 #if UNITY_EDITOR
-            FileTools.SafeCopyDirectory(F8EditorPrefs.GetString("ExcelPath", null) ?? Application.dataPath + ExcelPath,
+            FileTools.SafeCopyDirectory(URLSetting.AddRootPath(F8EditorPrefs.GetString("ExcelPath", null)) ?? Application.dataPath + ExcelPath,
                 URLSetting.GetTempExcelPath(), false,
                 new string[] { ".meta", ".DS_Store" }, new string[] { "~$" });
 #endif
