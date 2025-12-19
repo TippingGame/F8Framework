@@ -185,36 +185,22 @@ namespace F8Framework.Core
                 return assetBundleContent;
 
             loadType = LoaderType.LOCAL_SYNC;
+#if UNITY_WEBGL
+            LogF8.LogError("WebGL平台下请勿同步加载，已经帮你转为异步了：" + assetBundlePath);
+            LoadAsync();
+#else
             if (FileTools.IsLegalHTTPURI(assetBundlePath))
             {
-#if UNITY_WEBGL
-                LogF8.LogError("WebGL平台下请勿同步加载，已经帮你转为异步了！");
-                LoadAsync(
-                    (ab) => {
-                        assetBundleContent = ab;
-                        GetAssetPaths();
-                    }
-                );
-#else
-                int offsetValue = F8GamePrefs.GetInt(nameof(F8GameConfig.AssetBundleOffset));
-                int xorKey = F8GamePrefs.GetInt(nameof(F8GameConfig.AssetBundleXorKey));
-                
-                DownloadRequest d = new DownloadRequest(assetBundlePath, hash128, 0U,
-                    xorKey != 0 || offsetValue != 0 ?
-                    DownloadRequest.DownloadType.FILE :
-                    DownloadRequest.DownloadType.ASSET_BUNDLE);
-                while (!d.IsFinished) ;
-                assetBundleContent = d.DownloadedAssetBundle;
-                GetAssetPaths();
-#endif
+                LogF8.LogError("加载远程资产请勿同步加载，已经帮你转为异步了：" + assetBundlePath);
+                LoadAsync();
             }
             else
             {
                 assetBundleContent = AssetBundleManager.GetLoadFromAssetBundle(assetBundlePath, ref bundleStream);
                 GetAssetPaths();
+                assetBundleLoadState = LoaderState.FINISHED;
             }
-
-            assetBundleLoadState = LoaderState.FINISHED;
+#endif
             return assetBundleContent;
         }
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.2.221] - 2025-12-19
+1.优化加载AssetBundleManifest和本地化表LocalizedStrings的流程  
+2.完善文档  
+
 ## [2.1.220] - 2025-12-18
 1.优化F8EditorPrefs中的路径在根目录下使用缩写  
 

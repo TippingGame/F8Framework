@@ -43,7 +43,7 @@ namespace F8Framework.Core
                     AssetDatabase.SaveAssets();
                     AssetDatabase.Refresh();
                     
-                    LogF8.Log($"创建配置文件: {GAMECONFIG_PATH}");
+                    LogF8.Log($"创建游戏配置文件: {GAMECONFIG_PATH}");
                 }
             }
             return _config;

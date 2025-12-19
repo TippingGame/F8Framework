@@ -29,6 +29,8 @@ namespace F8Framework.Core
                     FileTools.CheckFileAndCreateDirWhenNeeded(_configPath);
                     AssetDatabase.CreateAsset(_config, _configPath);
                     AssetDatabase.SaveAssets();
+                    
+                    LogF8.Log($"创建编辑器配置文件: {_configPath}");
                 }
             }
             return _config;

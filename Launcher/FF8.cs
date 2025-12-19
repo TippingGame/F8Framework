@@ -45,7 +45,7 @@ namespace F8Framework.Launcher
         
         
         /* ------------------------可选模块------------------------ */
-        // 热更新版本管理-->使用了下载模块-->使用了资产模块
+        // 热更新版本管理-->使用了下载模块
         private static HotUpdateManager _hotUpdateManager;
         
         

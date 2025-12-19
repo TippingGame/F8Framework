@@ -73,7 +73,7 @@ namespace F8Framework.Core
 			// for Timeline Preview
 			if (!Application.isPlaying)
 			{
-				Localization.Instance.Load();
+				Localization.Instance.LoadInEditor();
 				Prepare();
 			}
 #endif

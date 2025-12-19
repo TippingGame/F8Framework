@@ -1084,19 +1084,18 @@ namespace F8Framework.Core
             return assetBundle; 
         }
         
-        // WebGL专用异步加载AssetBundleManifest
         public IEnumerator LoadAssetBundleManifest()
         {
             if (AssetBundleMap.Mappings.Count == 0)
                 yield break;
-            string manifestPath = GetAssetBundlePathByAbName(URLSetting.GetPlatformName());
-            if (manifestPath == null)
-                yield break;
 #if UNITY_EDITOR
-            manifestPath = Path.IsPathRooted(manifestPath) ? "file://" + manifestPath : manifestPath;
             if (AssetManager.Instance.IsEditorMode)
                 yield break;
 #endif
+            string manifestPath = GetAssetBundlePathByAbName(URLSetting.GetPlatformName());
+            if (manifestPath == null)
+                yield break;
+            
             if (FileTools.IsLegalURI(manifestPath))
             {
                 int offsetValue = F8GamePrefs.GetInt(nameof(F8GameConfig.AssetBundleOffset));
@@ -1137,39 +1136,8 @@ namespace F8Framework.Core
             }
         }
         
-        public void LoadAssetBundleManifestSync()
-        {
-#if !UNITY_WEBGL
-            if (AssetBundleMap.Mappings.Count == 0)
-                return;
-#if UNITY_EDITOR
-            if (AssetManager.Instance.IsEditorMode)
-                return;
-#endif
-            string manifestPath = GetAssetBundlePathByAbName(URLSetting.GetPlatformName());
-            if (manifestPath == null)
-                return;
-
-            BundleStream bundleStream = null;
-            AssetBundle assetBundle = GetLoadFromAssetBundle(manifestPath, ref bundleStream);
-            
-            if (assetBundle)
-            {
-                manifest = assetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
-                manifest.GetAllAssetBundles();
-                assetBundle.Unload(false);
-                bundleStream?.Close();
-            }
-            else
-            {
-                LogF8.LogError("AssetBundle清单加载失败：" + manifestPath);
-            }
-#endif
-        }
-        
         public void OnInit(object createParam)
         {
-            LoadAssetBundleManifestSync();
         }
         
         public void OnUpdate()

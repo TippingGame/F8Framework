@@ -26,10 +26,10 @@ namespace F8Framework.Core
             Load();
         }
 
-        public void LoadInEditor(bool force = false)
+        public void LoadInEditor()
         {
 #if UNITY_EDITOR
-            if (LocalizedStrings.Count > 0 && force == false)
+            if (LocalizedStrings.Count > 0)
             {
                 return;
             }
@@ -64,28 +64,16 @@ namespace F8Framework.Core
         /// <summary>
         /// 加载本地化字符串到内存。
         /// </summary>
-        public void Load(bool force = false)
+        public void Load()
         {
-            if (LocalizedStrings.Count > 0 && force == false)
+            if (LocalizedStrings.Count > 0)
             {
                 return;
             }
             LocalizedStrings.Clear();
             
             // 必须先加载本地化配置表
-#if UNITY_WEBGL
             LoadSuccess();
-#else
-            try
-            {
-                Util.Assembly.InvokeMethod("F8DataManager", "LoadLocalizedStrings", new object[] { });
-            }
-            catch
-            {
-                LogF8.LogError("缺少本地化表或加载本地化表失败！");
-            }
-            LoadSuccess();
-#endif
         }
 
         private void LoadSuccess()
