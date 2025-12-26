@@ -61,19 +61,13 @@ namespace F8Framework.Core
     public class ReadExcel : Singleton<ReadExcel>
     {
         private const string CODE_NAMESPACE = "F8Framework.F8ExcelDataClass"; //由表生成的数据类型均在此命名空间内
-        private string ExcelPath = "config"; //需要导表的目录
+        private string ExcelPath = "/StreamingAssets/config"; //需要导表的目录
         private Dictionary<string, List<ConfigData[]>> dataDict; //存放所有数据表内的数据，key：类名  value：数据
-
-        // 设置实时读取Excel路径，只限在StreamingAssets目录下
-        public void SetRunTimeExcelPath(string path)
-        {
-            ExcelPath = path;
-        }
         
         public void LoadAllExcelData()
         {
 #if UNITY_EDITOR
-        string INPUT_PATH = URLSetting.AddRootPath(F8EditorPrefs.GetString("ExcelPath", default));
+        string INPUT_PATH = URLSetting.AddRootPath(F8EditorPrefs.GetString("ExcelPath", null)) ?? Application.dataPath + ExcelPath;
 #elif UNITY_STANDALONE
         string INPUT_PATH = URLSetting.CS_STREAMINGASSETS_URL + ExcelPath;
 #elif UNITY_ANDROID
@@ -93,7 +87,7 @@ namespace F8Framework.Core
             }
             
 #if UNITY_EDITOR
-            FileTools.SafeCopyDirectory(URLSetting.AddRootPath(F8EditorPrefs.GetString("ExcelPath", null)) ?? Application.dataPath + ExcelPath,
+            FileTools.SafeCopyDirectory(INPUT_PATH,
                 URLSetting.GetTempExcelPath(), false,
                 new string[] { ".meta", ".DS_Store" }, new string[] { "~$" });
 #endif

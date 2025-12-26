@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.2.222] - 2025-12-26
+1.修复BaseItem没有调用OnAddUIComponentListener的问题  
+2.优化默认存放Excel的位置  
+
 ## [2.2.221] - 2025-12-19
 1.优化加载AssetBundleManifest和本地化表LocalizedStrings的流程  
 2.完善文档  

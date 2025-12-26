@@ -34,11 +34,11 @@ namespace F8Framework.Core
         {
             OnAwake();
             OnViewTweenInit();
+            OnAddUIComponentListener();
         }
 
         protected virtual void OnAwake()
         {
-            OnAddUIComponentListener();
         }
         
         protected virtual void OnAddUIComponentListener()
