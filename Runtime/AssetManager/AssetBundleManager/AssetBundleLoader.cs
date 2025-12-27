@@ -267,14 +267,17 @@ namespace F8Framework.Core
                 return;
             }
             
-            if (assetBundleExpandState == LoaderState.FINISHED && !assetObjects.ContainsKey(assetPath))
-                assetBundleExpandState = LoaderState.NONE;
+            if (assetBundleExpandState == LoaderState.FINISHED)
+            {
+                bool missingAsset = !assetObjects.ContainsKey(assetPath);
+                bool wrongType = !missingAsset && assetObjects[assetPath].GetType() != assetType;
+                bool missingSubAsset = subAssetName != null && !assetObjects.ContainsKey(subAssetName);
 
-            if (assetBundleExpandState == LoaderState.FINISHED && subAssetName != null && !assetObjects.ContainsKey(subAssetName))
-                assetBundleExpandState = LoaderState.NONE;
-            
-            if (assetBundleExpandState == LoaderState.FINISHED && isLoadAll)
-                assetBundleExpandState = LoaderState.NONE;
+                if (missingAsset || wrongType || missingSubAsset || isLoadAll)
+                {
+                    assetBundleExpandState = LoaderState.NONE;
+                }
+            }
             
             if (assetBundleExpandState == LoaderState.FINISHED)
                 return;
@@ -323,14 +326,17 @@ namespace F8Framework.Core
                 return;
             }
             
-            if (assetBundleExpandState == LoaderState.FINISHED && !assetObjects.ContainsKey(assetPath))
-                assetBundleExpandState = LoaderState.NONE;
+            if (assetBundleExpandState == LoaderState.FINISHED)
+            {
+                bool missingAsset = !assetObjects.ContainsKey(assetPath);
+                bool wrongType = !missingAsset && assetObjects[assetPath].GetType() != assetType;
+                bool missingSubAsset = subAssetName != null && !assetObjects.ContainsKey(subAssetName);
 
-            if (assetBundleExpandState == LoaderState.FINISHED && subAssetName != null && !assetObjects.ContainsKey(subAssetName))
-                assetBundleExpandState = LoaderState.NONE;
-            
-            if (assetBundleExpandState == LoaderState.FINISHED && isLoadAll)
-                assetBundleExpandState = LoaderState.NONE;
+                if (missingAsset || wrongType || missingSubAsset || isLoadAll)
+                {
+                    assetBundleExpandState = LoaderState.NONE;
+                }
+            }
             
             onExpandFinished += callback;
 
@@ -379,14 +385,17 @@ namespace F8Framework.Core
                 yield break;
             }
             
-            if (assetBundleExpandState == LoaderState.FINISHED && !assetObjects.ContainsKey(assetPath))
-                assetBundleExpandState = LoaderState.NONE;
+            if (assetBundleExpandState == LoaderState.FINISHED)
+            {
+                bool missingAsset = !assetObjects.ContainsKey(assetPath);
+                bool wrongType = !missingAsset && assetObjects[assetPath].GetType() != assetType;
+                bool missingSubAsset = subAssetName != null && !assetObjects.ContainsKey(subAssetName);
 
-            if (assetBundleExpandState == LoaderState.FINISHED && subAssetName != null && !assetObjects.ContainsKey(subAssetName))
-                assetBundleExpandState = LoaderState.NONE;
-            
-            if (assetBundleExpandState == LoaderState.FINISHED && isLoadAll)
-                assetBundleExpandState = LoaderState.NONE;
+                if (missingAsset || wrongType || missingSubAsset || isLoadAll)
+                {
+                    assetBundleExpandState = LoaderState.NONE;
+                }
+            }
 
             if (assetBundleExpandState == LoaderState.NONE)
             {

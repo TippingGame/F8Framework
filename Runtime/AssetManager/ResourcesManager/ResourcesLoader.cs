@@ -213,6 +213,17 @@ namespace F8Framework.Core
         public virtual void LoadAsync<T>(OnAssetObject<T> callback = null)
             where T : Object
         {
+            if (resourceLoadState == LoaderState.FINISHED)
+            {
+                bool missingAsset = !resouceObject;
+                bool wrongType = !missingAsset && resouceObject.GetType() != typeof(T);
+
+                if (missingAsset || wrongType)
+                {
+                    resourceLoadState = LoaderState.NONE;
+                }
+            }
+            
             if (resourceLoadState == LoaderState.NONE)
             {
                 loadType = LoaderType.ASYNC;
@@ -247,6 +258,17 @@ namespace F8Framework.Core
 
         public virtual IEnumerator LoadAsyncCoroutine<T>() where T : Object
         {
+            if (resourceLoadState == LoaderState.FINISHED)
+            {
+                bool missingAsset = !resouceObject;
+                bool wrongType = !missingAsset && resouceObject.GetType() != typeof(T);
+
+                if (missingAsset || wrongType)
+                {
+                    resourceLoadState = LoaderState.NONE;
+                }
+            }
+            
             if (resourceLoadState == LoaderState.NONE)
             {
                 loadType = LoaderType.ASYNC;
@@ -277,6 +299,17 @@ namespace F8Framework.Core
         /// <param name="callback">异步加载完成的回调。</param>
         public virtual void LoadAsync(System.Type resourceType, OnAssetObject<Object> callback = null)
         {
+            if (resourceLoadState == LoaderState.FINISHED)
+            {
+                bool missingAsset = !resouceObject;
+                bool wrongType = !missingAsset && resouceObject.GetType() != resourceType;
+
+                if (missingAsset || wrongType)
+                {
+                    resourceLoadState = LoaderState.NONE;
+                }
+            }
+            
             if (resourceLoadState == LoaderState.NONE)
             {
                 loadType = LoaderType.ASYNC;
@@ -317,6 +350,17 @@ namespace F8Framework.Core
 
         public virtual IEnumerator LoadAsyncCoroutine(System.Type resourceType = null)
         {
+            if (resourceLoadState == LoaderState.FINISHED)
+            {
+                bool missingAsset = !resouceObject;
+                bool wrongType = !missingAsset && resouceObject.GetType() != resourceType;
+
+                if (missingAsset || wrongType)
+                {
+                    resourceLoadState = LoaderState.NONE;
+                }
+            }
+            
             if (resourceLoadState == LoaderState.NONE)
             {
                 loadType = LoaderType.ASYNC;
@@ -348,6 +392,16 @@ namespace F8Framework.Core
         /// <param name="callback">异步加载完成的回调。</param>
         public virtual void LoadAsync(OnAssetObject<Object> callback = null)
         {
+            if (resourceLoadState == LoaderState.FINISHED)
+            {
+                bool missingAsset = !resouceObject;
+
+                if (missingAsset)
+                {
+                    resourceLoadState = LoaderState.NONE;
+                }
+            }
+            
             if (resourceLoadState == LoaderState.NONE)
             {
                 loadType = LoaderType.ASYNC;
@@ -379,10 +433,20 @@ namespace F8Framework.Core
         
         public virtual Object LoadAll(System.Type assetType = null, string subAssetName = null, bool isLoadAll = false)
         {
-            if (resourceLoadState == LoaderState.FINISHED && subAssetName != null &&
-                resouceObjects.TryGetValue(subAssetName, out var o))
+            if (resourceLoadState == LoaderState.FINISHED && subAssetName != null)
             {
-                return o;
+                if (resouceObjects.TryGetValue(subAssetName, out var o))
+                {
+                    if (o.GetType() == assetType)
+                    {
+                        return o;
+                    }
+                    resourceLoadState = LoaderState.NONE;
+                }
+                else
+                {
+                    resourceLoadState = LoaderState.NONE;
+                }
             }
             
             loadType = LoaderType.SYNC;

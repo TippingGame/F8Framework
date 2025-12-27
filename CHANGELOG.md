@@ -1,5 +1,8 @@
 # Changelog
 
+## [2.2.223] - 2025-12-28
+1.优化资产模块加载过不同类型时会重新加载资源  
+
 ## [2.2.222] - 2025-12-26
 1.修复BaseItem没有调用OnAddUIComponentListener的问题  
 2.优化默认存放Excel的位置  
