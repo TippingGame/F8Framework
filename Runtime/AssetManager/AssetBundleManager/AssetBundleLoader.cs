@@ -259,7 +259,7 @@ namespace F8Framework.Core
         /// 对于Unity中无法扩展的流场景资产包类型，
         /// 此扩展函数将忽略它，并直接将其标记为已展开。
         /// </summary>
-        public virtual void Expand(string assetPath, System.Type assetType, string subAssetName = null, bool isLoadAll = false)
+        public virtual void Expand(string assetPath, System.Type assetType = null, string subAssetName = null, bool isLoadAll = false)
         {
             if (assetBundleContent == null)
             {
@@ -270,7 +270,7 @@ namespace F8Framework.Core
             if (assetBundleExpandState == LoaderState.FINISHED)
             {
                 bool missingAsset = !assetObjects.ContainsKey(assetPath);
-                bool wrongType = !missingAsset && assetObjects[assetPath].GetType() != assetType;
+                bool wrongType = assetType != null && !missingAsset && assetObjects[assetPath].GetType() != assetType;
                 bool missingSubAsset = subAssetName != null && !assetObjects.ContainsKey(subAssetName);
 
                 if (missingAsset || wrongType || missingSubAsset || isLoadAll)
@@ -318,7 +318,7 @@ namespace F8Framework.Core
         /// 对于无法在Unity中展开的流场景资产束类型，
         /// 此扩展函数将忽略它，并直接将其标记为已扩展。
         /// </summary>
-        public virtual void ExpandAsync(string assetPath, System.Type assetType, string subAssetName = null, OnExpandFinished callback = null, bool isLoadAll = false)
+        public virtual void ExpandAsync(string assetPath, System.Type assetType = null, string subAssetName = null, OnExpandFinished callback = null, bool isLoadAll = false)
         {
             if (assetBundleContent == null)
             {
@@ -329,7 +329,7 @@ namespace F8Framework.Core
             if (assetBundleExpandState == LoaderState.FINISHED)
             {
                 bool missingAsset = !assetObjects.ContainsKey(assetPath);
-                bool wrongType = !missingAsset && assetObjects[assetPath].GetType() != assetType;
+                bool wrongType = assetType != null && !missingAsset && assetObjects[assetPath].GetType() != assetType;
                 bool missingSubAsset = subAssetName != null && !assetObjects.ContainsKey(subAssetName);
 
                 if (missingAsset || wrongType || missingSubAsset || isLoadAll)
@@ -377,7 +377,7 @@ namespace F8Framework.Core
         /// 有机会assetBundle还未加载完，所以就没有展开。
         /// </summary>
         /// <returns></returns>
-        public IEnumerator ExpandAsyncCoroutine(string assetPath, System.Type assetType, string subAssetName = null, bool isLoadAll = false)
+        public IEnumerator ExpandAsyncCoroutine(string assetPath, System.Type assetType = null, string subAssetName = null, bool isLoadAll = false)
         {
             if (assetBundleContent == null)
             {
@@ -388,7 +388,7 @@ namespace F8Framework.Core
             if (assetBundleExpandState == LoaderState.FINISHED)
             {
                 bool missingAsset = !assetObjects.ContainsKey(assetPath);
-                bool wrongType = !missingAsset && assetObjects[assetPath].GetType() != assetType;
+                bool wrongType = assetType != null && !missingAsset && assetObjects[assetPath].GetType() != assetType;
                 bool missingSubAsset = subAssetName != null && !assetObjects.ContainsKey(subAssetName);
 
                 if (missingAsset || wrongType || missingSubAsset || isLoadAll)

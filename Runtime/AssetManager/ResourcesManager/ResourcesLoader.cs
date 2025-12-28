@@ -149,7 +149,7 @@ namespace F8Framework.Core
         {
             if (resourceLoadState == LoaderState.FINISHED)
             {
-                if (resouceObject is T)
+                if (resouceObject&& resouceObject.GetType() == typeof(T))
                 {
                     return resouceObject as T;
                 }
@@ -171,7 +171,7 @@ namespace F8Framework.Core
         {
             if (resourceLoadState == LoaderState.FINISHED)
             {
-                if (resouceObject)
+                if (resouceObject&& resouceObject.GetType() == resourceType)
                 {
                     return resouceObject;
                 }
