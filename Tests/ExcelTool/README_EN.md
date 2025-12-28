@@ -96,7 +96,7 @@ Excel Example:
 | Value4                                                             | Value4            | 202                                                                     |
 
 ```C#
-// 设置变体名
+// Set variant name
 FF8.Config.VariantName = "English";
 ```
 | string | variant<desc,English> | variant<desc,Korean> | int    | variant<attack,English> | variant<attack,Korean> |

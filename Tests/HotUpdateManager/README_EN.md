@@ -44,8 +44,9 @@ Method 2: Unity → Menu Bar → Window → Package Manager → "+" → Add Pack
 ```C#
 IEnumerator Start()
 {
-    // Required modules for startup, hot update version management -->used download module
+    // Required modules for startup, hot update version management -->used asset module -->used download module
     FF8.HotUpdate = ModuleCenter.CreateModule<HotUpdateManager>();
+    FF8.Asset = ModuleCenter.CreateModule<AssetManager>();
     FF8.Download = ModuleCenter.CreateModule<DownloadManager>();
     
     // Initialize local version

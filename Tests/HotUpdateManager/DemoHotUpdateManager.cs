@@ -10,8 +10,9 @@ namespace F8Framework.Tests
     {
         IEnumerator Start()
         {
-            // 启动必须要的模块，热更新版本管理-->使用了下载模块
+            // 启动必须要的模块，热更新版本管理-->使用了资产模块-->使用了下载模块
             FF8.HotUpdate = ModuleCenter.CreateModule<HotUpdateManager>();
+            FF8.Asset = ModuleCenter.CreateModule<AssetManager>();
             FF8.Download = ModuleCenter.CreateModule<DownloadManager>();
             
             // 初始化本地版本
