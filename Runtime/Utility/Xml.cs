@@ -69,7 +69,7 @@ namespace F8Framework.Core
                 try
                 {
                     var serializer = new XmlSerializer(typeof(T));
-                    using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read))
+                    using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                     {
                         result = (T)serializer.Deserialize(stream);
                     }

@@ -21,7 +21,7 @@ namespace F8Framework.Core
         {
             try
             {
-                using (FileStream file = new FileStream(filename, FileMode.Open))
+                using (FileStream file = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 {
                     using (MD5 md5 = MD5.Create())
                     {

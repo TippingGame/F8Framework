@@ -61,13 +61,13 @@ namespace F8Framework.Core
     public class ReadExcel : Singleton<ReadExcel>
     {
         private const string CODE_NAMESPACE = "F8Framework.F8ExcelDataClass"; //由表生成的数据类型均在此命名空间内
-        private string ExcelPath = "/StreamingAssets/config"; //需要导表的目录
+        private string ExcelPath = "config"; //需要导表的目录
         private Dictionary<string, List<ConfigData[]>> dataDict; //存放所有数据表内的数据，key：类名  value：数据
         
         public void LoadAllExcelData()
         {
 #if UNITY_EDITOR
-        string INPUT_PATH = URLSetting.AddRootPath(F8EditorPrefs.GetString("ExcelPath", null)) ?? Application.dataPath + ExcelPath;
+        string INPUT_PATH = URLSetting.AddRootPath(F8EditorPrefs.GetString("ExcelPath", null)) ?? URLSetting.CS_STREAMINGASSETS_URL + ExcelPath;
 #elif UNITY_STANDALONE
         string INPUT_PATH = URLSetting.CS_STREAMINGASSETS_URL + ExcelPath;
 #elif UNITY_ANDROID
@@ -86,18 +86,11 @@ namespace F8Framework.Core
                 throw new Exception("请先设置数据表路径！");
             }
             
-#if UNITY_EDITOR
-            FileTools.SafeCopyDirectory(INPUT_PATH,
-                URLSetting.GetTempExcelPath(), true,
-                new string[] { ".meta", ".DS_Store" }, new string[] { "~$" });
-#endif
-            
 #if !UNITY_EDITOR && UNITY_ANDROID
             var files = SyncStreamingAssetsLoader.Instance.ReadAllLines(INPUT_PATH + "/fileindex.txt");
 #else
             var files = Directory.GetFiles(INPUT_PATH, "*.*", SearchOption.AllDirectories)
                 .Where(s => (s.EndsWith(".xls") || s.EndsWith(".xlsx")) && !Path.GetFileName(s).StartsWith("~$"))
-                .Select(file => FileTools.FormatToUnityPath(Path.GetRelativePath(INPUT_PATH, file)))
                 .ToArray();
 #endif
             if (files == null || files.Length == 0)
@@ -120,9 +113,6 @@ namespace F8Framework.Core
                 step++;
                 GetExcelData(item);
             }
-#if UNITY_EDITOR
-            FileTools.SafeDeleteDir(URLSetting.GetTempExcelPath());
-#endif
             
 #if !UNITY_EDITOR && UNITY_ANDROID
             SyncStreamingAssetsLoader.Instance.Close();
@@ -164,9 +154,6 @@ namespace F8Framework.Core
 
         private void GetExcelData(string inputPath)
         {
-#if UNITY_EDITOR
-            inputPath = URLSetting.GetTempExcelPath() + "/" + inputPath;
-#endif
             FileStream stream = null;
             IExcelDataReader excelReader = null;
             try
@@ -184,7 +171,7 @@ namespace F8Framework.Core
                     excelReader = ExcelReaderFactory.CreateOpenXmlReader(excelData);
                 }
 #else
-                stream = File.Open(inputPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                stream = File.Open(inputPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
                 if (inputPath.EndsWith(".xls")) excelReader = ExcelReaderFactory.CreateBinaryReader(stream);
                 else if (inputPath.EndsWith(".xlsx")) excelReader = ExcelReaderFactory.CreateOpenXmlReader(stream);

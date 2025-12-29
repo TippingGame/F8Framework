@@ -1033,7 +1033,7 @@ namespace F8Framework.Core
                     assetBundlePath,
                     FileMode.Open,
                     FileAccess.Read,
-                    FileShare.Read
+                    FileShare.ReadWrite
                 );
                 
                 assetBundleLoadRequest = AssetBundle.LoadFromStreamAsync(bundleStream);
@@ -1071,7 +1071,7 @@ namespace F8Framework.Core
                     assetBundlePath,
                     FileMode.Open,
                     FileAccess.Read,
-                    FileShare.Read
+                    FileShare.ReadWrite
                 );
                 
                 assetBundle = AssetBundle.LoadFromStream(bundleStream);

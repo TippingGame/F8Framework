@@ -398,7 +398,7 @@ namespace F8Framework.Core
             {
                 if (!File.Exists(fileFullPath))
                     throw new IOException("ReadBinaryFile path not exist !" + fileFullPath);
-                using (FileStream stream = File.Open(fileFullPath, FileMode.Open))
+                using (FileStream stream = File.Open(fileFullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 {
                     using (BinaryReader reader = new BinaryReader(stream, utf8Encoding))
                     {
@@ -417,7 +417,7 @@ namespace F8Framework.Core
                 if (!File.Exists(fileFullPath))
                     throw new IOException("ReadTextFileContent path not exist !" + fileFullPath);
                 string result = string.Empty;
-                using (FileStream stream = File.Open(fileFullPath, FileMode.Open))
+                using (FileStream stream = File.Open(fileFullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 {
                     using (StreamReader reader = new StreamReader(stream, utf8Encoding))
                     {

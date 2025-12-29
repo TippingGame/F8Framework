@@ -67,6 +67,14 @@ namespace F8Framework.Core
             GameObject notifyGo = new GameObject("LayerNotify");
             GameObject guideGo = new GameObject("LayerGuide");
 
+            var layerMask = LayerMask.NameToLayer("UI");
+            gameGo.layer = layerMask;
+            uiGo.layer = layerMask;
+            popupGo.layer = layerMask;
+            dialogGo.layer = layerMask;
+            notifyGo.layer = layerMask;
+            guideGo.layer = layerMask;
+            
             gameGo.SetParent(transform);
             uiGo.SetParent(transform);
             popupGo.SetParent(transform);

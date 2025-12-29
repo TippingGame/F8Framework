@@ -11,12 +11,6 @@ using UnityEditor;
 using Excel;
 using UnityEditor.Compilation;
 using Assembly = System.Reflection.Assembly;
-#if UNITY_WEBGL
-using LitJson;
-#else
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
-#endif
 
 namespace F8Framework.Core.Editor
 {
@@ -109,7 +103,6 @@ namespace F8Framework.Core.Editor
             
             var files = Directory.GetFiles(INPUT_PATH, "*.*", SearchOption.AllDirectories)
                 .Where(s => (s.EndsWith(".xls") || s.EndsWith(".xlsx")) && !Path.GetFileName(s).StartsWith("~$"))
-                .Select(file => FileTools.FormatToUnityPath(Path.GetRelativePath(INPUT_PATH, file)))
                 .ToArray();
             if (files == null || files.Length == 0)
             {
@@ -123,7 +116,6 @@ namespace F8Framework.Core.Editor
                     lastExcelPath + "/Localization.xlsx");
                 files = Directory.GetFiles(INPUT_PATH, "*.*", SearchOption.AllDirectories)
                     .Where(s => (s.EndsWith(".xls") || s.EndsWith(".xlsx")) && !Path.GetFileName(s).StartsWith("~$"))
-                    .Select(file => FileTools.FormatToUnityPath(Path.GetRelativePath(INPUT_PATH, file)))
                     .ToArray();
                 LogF8.LogError("暂无可以导入的数据表！自动为你创建：【DemoWorkSheet.xlsx / Localization.xlsx】两个表格！" + lastExcelPath + " 目录");
             }
@@ -151,9 +143,7 @@ namespace F8Framework.Core.Editor
             FileTools.SafeDeleteFile(URLSetting.CS_STREAMINGASSETS_URL + FileIndexFile + ".meta");
             
             FileTools.CheckFileAndCreateDirWhenNeeded(URLSetting.CS_STREAMINGASSETS_URL + FileIndexFile);
-            FileTools.SafeCopyDirectory(URLSetting.AddRootPath(F8EditorPrefs.GetString(BuildPkgTool.ExcelPathKey, null)) ?? Application.dataPath + ExcelPath,
-                URLSetting.GetTempExcelPath(), true,
-                new string[] { ".meta", ".DS_Store" }, new string[] { "~$" });
+            
             foreach (string item in files)
             {
                 GetExcelData(item);
@@ -232,7 +222,6 @@ namespace F8Framework.Core.Editor
             string INPUT_PATH = lastExcelPath;
             var files = Directory.GetFiles(INPUT_PATH, "*.*", SearchOption.AllDirectories)
                 .Where(s => (s.EndsWith(".xls") || s.EndsWith(".xlsx")) && !Path.GetFileName(s).StartsWith("~$"))
-                .Select(file => FileTools.FormatToUnityPath(Path.GetRelativePath(INPUT_PATH, file)))
                 .ToArray();
             if (codeList == null)
             {
@@ -263,7 +252,7 @@ namespace F8Framework.Core.Editor
                 //序列化数据
                 Serialize(container, temp, each.Value, BinDataPath);
             }
-            FileTools.SafeDeleteDir(URLSetting.GetTempExcelPath());
+            
             LogF8.LogConfig("<color=yellow>导表成功!</color>");
             
             // 如果 Unity 检测到任何脚本更改，则会重新加载 C# 域。这样做的原因是可能已创建新的脚本化导入器 (Scripted Importer)，
@@ -337,12 +326,11 @@ namespace F8Framework.Core.Editor
         
         private static void GetExcelData(string inputPath)
         {
-            inputPath = URLSetting.GetTempExcelPath() + "/" + inputPath;
             FileStream stream = null;
             IExcelDataReader excelReader = null;
             try
             {
-                stream = File.Open(inputPath, FileMode.Open, FileAccess.Read);
+                stream = File.Open(inputPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 
                 if (inputPath.EndsWith(".xls")) excelReader = ExcelReaderFactory.CreateBinaryReader(stream);
                 else if (inputPath.EndsWith(".xlsx")) excelReader = ExcelReaderFactory.CreateOpenXmlReader(stream);

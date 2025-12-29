@@ -146,7 +146,7 @@
             GetStream(Path.Combine(this._xlPath, $"sharedStrings.{this._format}"));
 
         private static Stream GetStream(string filePath) => 
-            !File.Exists(filePath) ? null : File.Open(filePath, FileMode.Open, FileAccess.Read);
+            !File.Exists(filePath) ? null : File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
         public Stream GetStylesStream() => 
             GetStream(Path.Combine(this._xlPath, $"styles.{this._format}"));

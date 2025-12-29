@@ -35,7 +35,7 @@ namespace F8Framework.Core
 
             public static T Deserialize<T>(string filePath)
             {
-                using (var stream = new FileStream(filePath, FileMode.Open))
+                using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 {
                     return (T)DeserializeFromStream(typeof(T), stream);
                 }

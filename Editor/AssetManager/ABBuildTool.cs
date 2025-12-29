@@ -638,7 +638,7 @@ namespace F8Framework.Core.Editor
             try
             {
                 byte[] fileHeader = new byte[32];
-                using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 {
                     int bytesRead = fs.Read(fileHeader, 0, fileHeader.Length);
                     if (bytesRead < 6)
