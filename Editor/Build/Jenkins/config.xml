@@ -65,13 +65,19 @@
           <defaultValue>G:\Work\unity2021315f1pj\F8Framework\Assets\StreamingAssets\config</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>ExcelBinDataFolder</name>
+          <description>设置导出配置表目录（注意：每次导表会清空该目录）</description>
+          <defaultValue>G:\Work\unity2021315f1pj\F8Framework\Assets\AssetBundles\Config\BinConfigData</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
           <name>ConvertExcelToOtherFormats</name>
           <description>选择配置表格式</description>
           <choices class="java.util.Arrays$ArrayList">
             <a class="string-array">
-              <string>json</string>
               <string>binary</string>
+              <string>json</string>
             </a>
           </choices>
         </hudson.model.ChoiceParameterDefinition>
@@ -202,12 +208,12 @@
   <builders>
     <org.jenkinsci.plugins.unity3d.Unity3dBuilder plugin="unity3d-plugin@1.3">
       <unity3dName>unity2021.3.15</unity3dName>
-      <argLine>-quit -nographics -batchmode -projectPath $ProjectPath -executeMethod F8Framework.Core.Editor.ExcelDataTool.JenkinsLoadAllExcelData -logFile $BuildPath\JenkinsBuildUnity.log -buildTarget $Platform ExcelPath- $ExcelPath ConvertExcelToOtherFormats- $ConvertExcelToOtherFormats</argLine>
+      <argLine>-quit -nographics -batchmode -projectPath $ProjectPath -executeMethod F8Framework.Core.Editor.ExcelDataTool.JenkinsLoadAllExcelData -logFile $BuildPath\JenkinsBuildUnity.log -buildTarget $Platform ExcelPath- $ExcelPath ConvertExcelToOtherFormats- $ConvertExcelToOtherFormats ExcelBinDataFolder- $ExcelBinDataFolder</argLine>
       <unstableReturnCodes></unstableReturnCodes>
     </org.jenkinsci.plugins.unity3d.Unity3dBuilder>
     <org.jenkinsci.plugins.unity3d.Unity3dBuilder plugin="unity3d-plugin@1.3">
       <unity3dName>unity2021.3.15</unity3dName>
-      <argLine>-quit -nographics -batchmode -projectPath $ProjectPath -executeMethod F8Framework.Core.Editor.ExcelDataTool.JenkinsAllScriptsReloaded -logFile $BuildPath\JenkinsBuildUnity.log -buildTarget $Platform ExcelPath- $ExcelPath ConvertExcelToOtherFormats- $ConvertExcelToOtherFormats</argLine>
+      <argLine>-quit -nographics -batchmode -projectPath $ProjectPath -executeMethod F8Framework.Core.Editor.ExcelDataTool.JenkinsAllScriptsReloaded -logFile $BuildPath\JenkinsBuildUnity.log -buildTarget $Platform ExcelPath- $ExcelPath ConvertExcelToOtherFormats- $ConvertExcelToOtherFormats ExcelBinDataFolder- $ExcelBinDataFolder</argLine>
       <unstableReturnCodes></unstableReturnCodes>
     </org.jenkinsci.plugins.unity3d.Unity3dBuilder>
     <org.jenkinsci.plugins.unity3d.Unity3dBuilder plugin="unity3d-plugin@1.3">

@@ -24,7 +24,7 @@ namespace F8Framework.Core.Editor
     {
         public const string CODE_NAMESPACE = "F8Framework.F8ExcelDataClass"; //由表生成的数据类型均在此命名空间内
 
-        public const string BinDataFolder = "/AssetBundles/Config/BinConfigData"; //序列化的数据文件都会放在此文件夹内,此文件夹位于AssetBundles或Resources文件夹下用于读取数据
+        public const string BinDataFolder = "/AssetBundles/Config/BinConfigData"; //序列化的数据文件默认目录，可在F5打包界面修改
         public const string DataManagerFolder = "/F8Framework/ConfigData/F8DataManager"; //Data代码路径
         public const string DataManagerName = "F8DataManager.cs"; //Data代码脚本名
         public const string ExcelPath = "/StreamingAssets/config"; //需要导表的目录
@@ -85,28 +85,32 @@ namespace F8Framework.Core.Editor
             string[] args = Environment.GetCommandLineArgs();
             string ExcelPath = BuildPkgTool.GetArgValue(args, "ExcelPath-");
             string ConvertExcelToOtherFormats = BuildPkgTool.GetArgValue(args, "ConvertExcelToOtherFormats-");
+            string ExcelBinDataFolder = BuildPkgTool.GetArgValue(args, "ExcelBinDataFolder-");
             F8EditorPrefs.SetString(BuildPkgTool.ExcelPathKey, URLSetting.RemoveRootPath(ExcelPath));
             F8EditorPrefs.SetString(BuildPkgTool.ConvertExcelToOtherFormatsKey, ConvertExcelToOtherFormats);
+            F8EditorPrefs.SetString(BuildPkgTool.ExcelBinDataFolderKey, URLSetting.RemoveRootPath(ExcelBinDataFolder));
             LoadAllExcelData();
         }
         
         public static void LoadAllExcelData()
         {
-            if (F8EditorPrefs.GetString(BuildPkgTool.ExcelPathKey, default).IsNullOrEmpty())
+            if (F8EditorPrefs.GetString(BuildPkgTool.ExcelPathKey, null).IsNullOrEmpty())
             {
                 FileTools.CheckDirAndCreateWhenNeeded(Application.dataPath + ExcelPath);
                 string tempExcelPath = Application.dataPath + ExcelPath;
                 F8EditorPrefs.SetString(BuildPkgTool.ExcelPathKey, URLSetting.RemoveRootPath(tempExcelPath));
                 LogF8.LogConfig("首次启动，设置Excel存放目录：" + tempExcelPath + " （如要更改请到----上方菜单栏->开发工具->设置Excel存放目录）");
             }
-            string lastExcelPath = URLSetting.AddRootPath(F8EditorPrefs.GetString(BuildPkgTool.ExcelPathKey, default)) ?? Application.dataPath + ExcelPath;
+            string lastExcelPath = URLSetting.AddRootPath(F8EditorPrefs.GetString(BuildPkgTool.ExcelPathKey, null)) ?? Application.dataPath + ExcelPath;
             
             string INPUT_PATH = lastExcelPath;
 
             FileTools.CheckDirAndCreateWhenNeeded(INPUT_PATH);
             
             var files = Directory.GetFiles(INPUT_PATH, "*.*", SearchOption.AllDirectories)
-                .Where(s => (s.EndsWith(".xls") || s.EndsWith(".xlsx")) && !Path.GetFileName(s).StartsWith("~$")).ToArray();
+                .Where(s => (s.EndsWith(".xls") || s.EndsWith(".xlsx")) && !Path.GetFileName(s).StartsWith("~$"))
+                .Select(file => FileTools.FormatToUnityPath(Path.GetRelativePath(INPUT_PATH, file)))
+                .ToArray();
             if (files == null || files.Length == 0)
             {
                 FileTools.SafeCopyFile(
@@ -118,11 +122,11 @@ namespace F8Framework.Core.Editor
                     "/Runtime/Localization/StreamingAssets_config/Localization.xlsx",
                     lastExcelPath + "/Localization.xlsx");
                 files = Directory.GetFiles(INPUT_PATH, "*.*", SearchOption.AllDirectories)
-                    .Where(s => (s.EndsWith(".xls") || s.EndsWith(".xlsx")) && !Path.GetFileName(s).StartsWith("~$")).ToArray();
+                    .Where(s => (s.EndsWith(".xls") || s.EndsWith(".xlsx")) && !Path.GetFileName(s).StartsWith("~$"))
+                    .Select(file => FileTools.FormatToUnityPath(Path.GetRelativePath(INPUT_PATH, file)))
+                    .ToArray();
                 LogF8.LogError("暂无可以导入的数据表！自动为你创建：【DemoWorkSheet.xlsx / Localization.xlsx】两个表格！" + lastExcelPath + " 目录");
             }
-            
-            AssetDatabase.Refresh();
             
             if (codeList == null)
             {
@@ -145,10 +149,10 @@ namespace F8Framework.Core.Editor
             FileIndex.Clear();
             FileTools.SafeDeleteFile(URLSetting.CS_STREAMINGASSETS_URL + FileIndexFile);
             FileTools.SafeDeleteFile(URLSetting.CS_STREAMINGASSETS_URL + FileIndexFile + ".meta");
-            AssetDatabase.Refresh();
+            
             FileTools.CheckFileAndCreateDirWhenNeeded(URLSetting.CS_STREAMINGASSETS_URL + FileIndexFile);
             FileTools.SafeCopyDirectory(URLSetting.AddRootPath(F8EditorPrefs.GetString(BuildPkgTool.ExcelPathKey, null)) ?? Application.dataPath + ExcelPath,
-                URLSetting.GetTempExcelPath(), false,
+                URLSetting.GetTempExcelPath(), true,
                 new string[] { ".meta", ".DS_Store" }, new string[] { "~$" });
             foreach (string item in files)
             {
@@ -166,7 +170,7 @@ namespace F8Framework.Core.Editor
             FileTools.SafeClearDir(F8ExcelDataClassPath);
             LogF8.LogConfig("清空目录：" + F8ExcelDataClassPath);
             FileTools.CheckDirAndCreateWhenNeeded(F8ExcelDataClassPath);
-            AssetDatabase.Refresh();
+            
             // 编译代码,生成包含所有数据表内数据类型的dll
             GenerateCodeFiles(codeList);
             
@@ -174,7 +178,7 @@ namespace F8Framework.Core.Editor
             FileTools.SafeClearDir(F8DataManagerPath);
             LogF8.LogConfig("清空目录：" + F8DataManagerPath);
             FileTools.CheckDirAndCreateWhenNeeded(F8DataManagerPath);
-            AssetDatabase.Refresh();
+            
             // 生成F8DataManager.cs
             ScriptGenerator.CreateDataManager(codeList);
             
@@ -184,9 +188,7 @@ namespace F8Framework.Core.Editor
             FileTools.SafeDeleteFile(F8ExcelDataClassPathDLL + ".meta");
             FileTools.SafeDeleteFile(Application.dataPath + DataManagerFolder + "/F8DataManager.asmref");
             CreateAsmdefFile();
-            AssetDatabase.Refresh();
             
-            AssetDatabase.SaveAssets();
             AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
             // 等待脚本编译完成
             CompilationPipeline.compilationFinished += (object s) =>
@@ -201,8 +203,10 @@ namespace F8Framework.Core.Editor
             string[] args = Environment.GetCommandLineArgs();
             string ExcelPath = BuildPkgTool.GetArgValue(args, "ExcelPath-");
             string ConvertExcelToOtherFormats = BuildPkgTool.GetArgValue(args, "ConvertExcelToOtherFormats-");
+            string ExcelBinDataFolder = BuildPkgTool.GetArgValue(args, "ExcelBinDataFolder-");
             F8EditorPrefs.SetString(BuildPkgTool.ExcelPathKey, URLSetting.RemoveRootPath(ExcelPath));
             F8EditorPrefs.SetString(BuildPkgTool.ConvertExcelToOtherFormatsKey, ConvertExcelToOtherFormats);
+            F8EditorPrefs.SetString(BuildPkgTool.ExcelBinDataFolderKey, URLSetting.RemoveRootPath(ExcelBinDataFolder));
             F8EditorPrefs.SetBool("compilationFinished", true);
             AllScriptsReloaded();
         }
@@ -219,15 +223,17 @@ namespace F8Framework.Core.Editor
             LogF8.LogConfig("<color=#FF9E59>导表后脚本编译完成!</color>");
             Assembly assembly = Util.Assembly.GetAssembly(CODE_NAMESPACE);
             //准备序列化数据
-            string BinDataPath = Application.dataPath + BinDataFolder; //序列化后的数据存放路径
+            string BinDataPath = URLSetting.AddRootPath(F8EditorPrefs.GetString(BuildPkgTool.ExcelBinDataFolderKey, null)) ?? Application.dataPath + BinDataFolder;
             if (Directory.Exists(BinDataPath)) Directory.Delete(BinDataPath, true); //删除旧的数据文件
             Directory.CreateDirectory(BinDataPath);
             
-            string lastExcelPath = URLSetting.AddRootPath(F8EditorPrefs.GetString(BuildPkgTool.ExcelPathKey, default)) ?? Application.dataPath + ExcelPath;
+            string lastExcelPath = URLSetting.AddRootPath(F8EditorPrefs.GetString(BuildPkgTool.ExcelPathKey, null)) ?? Application.dataPath + ExcelPath;
             
             string INPUT_PATH = lastExcelPath;
             var files = Directory.GetFiles(INPUT_PATH, "*.*", SearchOption.AllDirectories)
-                .Where(s => (s.EndsWith(".xls") || s.EndsWith(".xlsx")) && !Path.GetFileName(s).StartsWith("~$")).ToArray();
+                .Where(s => (s.EndsWith(".xls") || s.EndsWith(".xlsx")) && !Path.GetFileName(s).StartsWith("~$"))
+                .Select(file => FileTools.FormatToUnityPath(Path.GetRelativePath(INPUT_PATH, file)))
+                .ToArray();
             if (codeList == null)
             {
                 codeList = new Dictionary<string, ScriptGenerator>();
@@ -331,7 +337,7 @@ namespace F8Framework.Core.Editor
         
         private static void GetExcelData(string inputPath)
         {
-            inputPath = URLSetting.GetTempExcelPath() + "/" + Path.GetFileName(inputPath);
+            inputPath = URLSetting.GetTempExcelPath() + "/" + inputPath;
             FileStream stream = null;
             IExcelDataReader excelReader = null;
             try

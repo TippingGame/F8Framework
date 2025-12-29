@@ -33,15 +33,12 @@ Unity 读取 Excel 的工具
 2. 点击菜单的**开发工具**项 -> **导入配置表**\_F8（快捷键），在 `Assets/AssetBundles/Config/BinConfigData` 下生成 **binary** 文件（也可选择 **json** 文件）  
 
 
-3. **注意**：如果你不想生成在`AssetBundles`目录下，在代码 [ExcelDataTool.cs](https://github.com/TippingGame/F8Framework/blob/main/Editor/ExcelTool/ExcelDataTool.cs) 中修改 "BinDataFolder" 的值
-    ```C#
-    // 序列化的数据文件都会放在此文件夹内,此文件夹位于AssetBundles或Resources文件夹下用于读取数据
-    public const string BinDataFolder = "/AssetBundles/Config/BinConfigData";
-    ```
+3. **注意**：如果你不想生成在`AssetBundles`目录下，可在 F5 打包工具设置导表目录  
 
 
 4. 如无意外，根目录下会生成 `Assets/F8Framework/ConfigData/` 目录和相关文件，（注意：F8后会清除框架自带的，并重新生成，一切报错均来自这些代码的冲突）  
    ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/ExcelTool/ui_20241112212632.png)
+
 
 5. （可选项）更改Excel存放目录，**开发工具**项 -> **设置Excel存放目录**  
 
@@ -55,7 +52,7 @@ Unity 读取 Excel 的工具
 * 1.[C# 基础类型支持](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/built-in-types)（bool，byte，short，int，long，float，double，decimal，str / string，obj / object，[datetime](https://learn.microsoft.com/en-us/dotnet/api/system.datetime.-ctor?view=net-9.0)，sbyte，ushort，uint，ulong）  
 Unity基础类型支持（[vec2 / vector2](https://docs.unity3d.com/ScriptReference/Vector2-ctor.html)，[vec3 / vector3](https://docs.unity3d.com/ScriptReference/Vector3-ctor.html)，[vec4 / vector4](https://docs.unity3d.com/ScriptReference/Vector4-ctor.html)，[vec2int / vector2int](https://docs.unity3d.com/ScriptReference/Vector2Int-ctor.html)，[vec3int / vector3int](https://docs.unity3d.com/ScriptReference/Vector3Int.html)，[quat / quaternion](https://docs.unity3d.com/ScriptReference/Quaternion-ctor.html)，[color](https://docs.unity3d.com/ScriptReference/Color.html)）  
 
-Excel 示例：（id 是唯一索引，必须添加！）  
+Excel 示例：（id 是唯一索引，值类型，必须添加！）  
 
 | int | long       | bool  | float    | double      | str         | vector3           | color              | datetime                          |
 | --- | ---------- |-------|----------|-------------|-------------|-------------------|--------------------|-----------------------------------|
@@ -66,7 +63,7 @@ Excel 示例：（id 是唯一索引，必须添加！）
 * 2.容器类型支持
   * 数组，交错数组（[[]](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/arrays) / [[][]](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/arrays#jagged-arrays) / [[][][]](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/arrays#jagged-arrays)）
   * 列表（[list<>](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1.-ctor?view=net-9.0)）
-  * 字典（[dict<,> / dictionary<,>](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2.-ctor?view=net-9.0)，注意：导出`json`格式表key只能为基础类型，如需要支持容器和枚举可使用`binary`）
+  * 字典（[dict<,> / dictionary<,>](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2.-ctor?view=net-9.0)，注意：导出`json`格式表key只能为基础类型和枚举，如需要支持容器可使用`binary`）
   * 值元组（[valuetuple<,>](https://learn.microsoft.com/en-us/dotnet/api/system.valuetuple?view=net-9.0)，最高支持7个类型）  
   * 容器内可以填写任意的类型（变体类型除外）  
 

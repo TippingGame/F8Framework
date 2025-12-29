@@ -40,6 +40,7 @@ namespace F8Framework.Core.Editor
         public static string ConvertExcelToOtherFormatsKey = "ConvertExcelToOtherFormatsKey";
         public static string ForceRebuildAssetBundleKey = "ForceRebuildAssetBundleKey";
         public static string CleanBuildCacheKey = "CleanBuildCacheKey";
+        public static string ExcelBinDataFolderKey = "ExcelBinDataFolderKey";
         
         private static string _buildPath = "";
         private static string _toVersion = "1.0.0";
@@ -63,6 +64,7 @@ namespace F8Framework.Core.Editor
         private static bool _disableUnityCacheOnWebGL = false;
         private static int _assetBundleOffset = 0;
         private static int _assetBundleXorKey = 0;
+        private static string _excelBinDataFolder = "";
         
         private static BuildTarget _buildTarget = BuildTarget.NoTarget;
 
@@ -708,6 +710,31 @@ namespace F8Framework.Core.Editor
                 EditorGUILayout.HelpBox("未设置Excel目录", MessageType.Warning);
             }
             GUILayout.Label(_excelPath);
+            GUILayout.EndHorizontal();
+            GUILayout.Space(10);
+            
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("设置导表目录", NormalWidth, ButtonHeight))
+            {
+                string excelPath = EditorUtility.OpenFolderPanel("设置导出配置表目录（注意：每次导表会清空该目录）", _excelBinDataFolder, _excelBinDataFolder);
+                if (!string.IsNullOrEmpty(excelPath))
+                {
+                    _excelBinDataFolder = excelPath;
+                    F8EditorPrefs.SetString(ExcelBinDataFolderKey, URLSetting.RemoveRootPath(_excelBinDataFolder));
+                }
+            }
+
+            if (F8EditorPrefs.GetString(ExcelBinDataFolderKey, "").IsNullOrEmpty())
+            {
+                F8EditorPrefs.SetString(ExcelBinDataFolderKey, URLSetting.RemoveRootPath(Application.dataPath + ExcelDataTool.BinDataFolder));
+            }
+            _excelBinDataFolder = URLSetting.AddRootPath(F8EditorPrefs.GetString(ExcelBinDataFolderKey, ""));
+
+            if (_excelBinDataFolder.IsNullOrEmpty())
+            {
+                EditorGUILayout.HelpBox("未设置导表目录", MessageType.Warning);
+            }
+            GUILayout.Label(_excelBinDataFolder);
             GUILayout.EndHorizontal();
             GUILayout.Space(10);
             

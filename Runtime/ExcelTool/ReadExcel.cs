@@ -88,7 +88,7 @@ namespace F8Framework.Core
             
 #if UNITY_EDITOR
             FileTools.SafeCopyDirectory(INPUT_PATH,
-                URLSetting.GetTempExcelPath(), false,
+                URLSetting.GetTempExcelPath(), true,
                 new string[] { ".meta", ".DS_Store" }, new string[] { "~$" });
 #endif
             
@@ -96,7 +96,9 @@ namespace F8Framework.Core
             var files = SyncStreamingAssetsLoader.Instance.ReadAllLines(INPUT_PATH + "/fileindex.txt");
 #else
             var files = Directory.GetFiles(INPUT_PATH, "*.*", SearchOption.AllDirectories)
-                .Where(s => (s.EndsWith(".xls") || s.EndsWith(".xlsx")) && !Path.GetFileName(s).StartsWith("~$")).ToArray();
+                .Where(s => (s.EndsWith(".xls") || s.EndsWith(".xlsx")) && !Path.GetFileName(s).StartsWith("~$"))
+                .Select(file => FileTools.FormatToUnityPath(Path.GetRelativePath(INPUT_PATH, file)))
+                .ToArray();
 #endif
             if (files == null || files.Length == 0)
             {
@@ -163,7 +165,7 @@ namespace F8Framework.Core
         private void GetExcelData(string inputPath)
         {
 #if UNITY_EDITOR
-            inputPath = URLSetting.GetTempExcelPath() + "/" + Path.GetFileName(inputPath);
+            inputPath = URLSetting.GetTempExcelPath() + "/" + inputPath;
 #endif
             FileStream stream = null;
             IExcelDataReader excelReader = null;

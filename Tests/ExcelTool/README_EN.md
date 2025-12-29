@@ -23,17 +23,16 @@ Method 2: Unity → Menu Bar → Window → Package Manager → "+" → Add Pack
 
 1. Under `Assets`, create the `StreamingAssets/config` directory. Follow the Excel Example below to create your Excel file [(Excel Example)](https://github.com/TippingGame/F8Framework/blob/main/Runtime/ExcelTool/StreamingAssets_config/DemoWorkSheet.xlsx) (Excel will be auto-generated after the first F8 execution).
 
+
 2. Click the **Development Tools** menu → **Import Config Tables**_F8 (shortcut). This generates **.bytes** files under `Assets/AssetBundles/Config/BinConfigData` (**binary** or **json** files can be selected).
 
-3. **Note**: If you don’t want to generate files in the `AssetBundles` directory, modify the BinDataFolder value in [ExcelDataTool.cs](https://github.com/TippingGame/F8Framework/blob/main/Editor/ExcelTool/ExcelDataTool.cs):
-    ```C#
-    // Serialized data files will be placed in this folder, located under AssetBundles or Resources for data reading.
-    public const string BinDataFolder = "/AssetBundles/Config/BinConfigData";
-    ```
+
+3. **Note**: If you don’t want to generate files in the `AssetBundles` directory, You can set the export table directory in the F5 packaging tool.
 
 
 4. If successful, the `Assets/F8Framework/ConfigData/` directory and related files will be generated in the root directory. (**Note**: F8 execution will clear the framework's default files and regenerate them. Any errors will stem from conflicts in this code.)
    ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/ExcelTool/ui_20241112212632.png)
+
 
 5. **(Optional)** Change the Excel storage directory: Development Tools → Set Excel Storage Directory.
 
@@ -51,7 +50,7 @@ Method 2: Unity → Menu Bar → Window → Package Manager → "+" → Add Pack
 * 1.[C# Basic Types](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/built-in-types)（bool，byte，short，int，long，float，double，decimal，str / string，obj / object，[datetime](https://learn.microsoft.com/en-us/dotnet/api/system.datetime.-ctor?view=net-9.0)，sbyte，ushort，uint，ulong）  
   UnityBasic Types（[vec2 / vector2](https://docs.unity3d.com/ScriptReference/Vector2-ctor.html)，[vec3 / vector3](https://docs.unity3d.com/ScriptReference/Vector3-ctor.html)，[vec4 / vector4](https://docs.unity3d.com/ScriptReference/Vector4-ctor.html)，[vec2int / vector2int](https://docs.unity3d.com/ScriptReference/Vector2Int-ctor.html)，[vec3int / vector3int](https://docs.unity3d.com/ScriptReference/Vector3Int.html)，[quat / quaternion](https://docs.unity3d.com/ScriptReference/Quaternion-ctor.html)，[color](https://docs.unity3d.com/ScriptReference/Color.html)）  
 
-Excel Example (**id** is the unique index and must be included!):  
+Excel Example (**id** is a unique index, value type, must be added!):  
 
 | int | long       | bool  | float    | double      | str        | vector3           | color              | datetime                          |
 | --- | ---------- |-------|----------|-------------|------------|-------------------|--------------------|-----------------------------------|
@@ -63,7 +62,7 @@ Excel Example (**id** is the unique index and must be included!):
   * Supported:
     * Arrays, Jagged Arrays ([[]](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/arrays), [[][]](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/arrays#jagged-arrays), [[][][]](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/arrays#jagged-arrays))
     * List ([list<>](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1.-ctor?view=net-9.0))
-    * Dictionary ([dict<,> / dictionary<,>](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2.-ctor?view=net-9.0), Note: Export 'json' format table key can only be a base type. If you need to support containers and enumerations, you can use 'binary'`)
+    * Dictionary ([dict<,> / dictionary<,>](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2.-ctor?view=net-9.0), Note: Export 'json' format table key can only be a base type and enumerations. If you need to support containers, you can use 'binary'`)
     * ValueTuple ([valuetuple<,>](https://learn.microsoft.com/en-us/dotnet/api/system.valuetuple?view=net-9.0), Supports up to 7 types).
     * Containers can accept any type (excluding variant types).
 

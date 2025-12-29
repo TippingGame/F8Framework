@@ -54,6 +54,9 @@ namespace F8Framework.Core
         {
             if (_handlers.TryGetValue(type, out var handler))
                 return handler;
+            
+            if (type == typeof(object))
+                return new ObjectTypeHandler();
 
             if (IsValueTuple(type))
             {
@@ -86,6 +89,43 @@ namespace F8Framework.Core
                 return new ObjectHandler();
 
             throw new NotSupportedException($"Type {type} is not supported");
+        }
+        
+        private class ObjectTypeHandler : TypeHandler
+        {
+            public override void Serialize(BinaryWriter writer, object value)
+            {
+                if (value == null)
+                {
+                    writer.Write((byte)0);
+                    return;
+                }
+                
+                writer.Write((byte)1);
+                
+                Type actualType = value.GetType();
+                
+                writer.Write(actualType.FullName);
+                
+                var handler = TypeHandlerFactory.GetHandler(actualType);
+                handler.Serialize(writer, value);
+            }
+
+            public override object Deserialize(BinaryReader reader, Type type)
+            {
+                var isNotNull = reader.ReadByte();
+                if (isNotNull == 0)
+                    return null;
+
+                string typeName = reader.ReadString();
+                Type actualType = Type.GetType(typeName);
+        
+                if (actualType == null)
+                    throw new InvalidOperationException($"无法找到类型: {typeName}");
+
+                var handler = TypeHandlerFactory.GetHandler(actualType);
+                return handler.Deserialize(reader, actualType);
+            }
         }
 
         private static bool IsValueTuple(Type type)
