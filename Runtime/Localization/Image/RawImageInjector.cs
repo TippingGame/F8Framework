@@ -22,16 +22,9 @@ namespace F8Framework.Core
 			}
 			else if (localizedData is string textIDValue)
 			{
-				AssetManager.Instance.LoadAsync(textIDValue, (asset) =>
+				AssetManager.Instance.LoadAsync<Texture>(textIDValue, (asset) =>
 				{
-					if (asset is Sprite sprite)
-					{
-						Texture texture = sprite.texture;
-						rawImage.texture = texture;
-						LogF8.LogAsset("本地化图片类型错误，已自动转换：" + asset);
-						return;
-					}
-					rawImage.texture = asset as Texture;
+					rawImage.texture = asset;
 				});
 			}
 		}

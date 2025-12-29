@@ -26,11 +26,6 @@ namespace F8Framework.Core
             return Application.dataPath + "/StreamingAssets/" + AssetBundlesName + "/" + GetPlatformName();
         }
         
-        public static string GetTempExcelPath()
-        {
-            return FileTools.FormatToUnityPath(FileTools.TruncatePath(Application.dataPath, 1)) + "/temp_Excel";
-        }
-        
         public static string RemoveRootPath(string path)
         {
             if (string.IsNullOrEmpty(path))

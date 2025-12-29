@@ -199,6 +199,11 @@ namespace F8Framework.Core
                 assetBundleContent = AssetBundleManager.GetLoadFromAssetBundle(assetBundlePath, ref bundleStream);
                 GetAssetPaths();
                 assetBundleLoadState = LoaderState.FINISHED;
+                if (onLoadFinishedImpl != null)
+                {
+                    onLoadFinishedImpl(assetBundleContent);
+                    onLoadFinishedImpl = null;
+                }
             }
 #endif
             return assetBundleContent;
@@ -310,6 +315,12 @@ namespace F8Framework.Core
             expandCount = assetPaths.Count;
 
             assetBundleExpandState = LoaderState.FINISHED;
+            if (onExpandFinishedImpl != null)
+            {
+                onExpandFinishedImpl();
+                onExpandFinishedImpl = null;
+                base.OnComplete();
+            }
             return;
         }
 
