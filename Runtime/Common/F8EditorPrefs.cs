@@ -40,7 +40,7 @@ namespace F8Framework.Core
         {
             if (IsBuilding) return;
             EditorUtility.SetDirty(_config);
-            AssetDatabase.SaveAssets();
+            AssetDatabase.SaveAssetIfDirty(_config);
         }
         
         public static string GetString(string key, string defaultValue = default)

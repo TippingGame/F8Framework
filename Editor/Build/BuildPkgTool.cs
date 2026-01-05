@@ -873,7 +873,6 @@ namespace F8Framework.Core.Editor
             GUILayout.EndHorizontal();
             
             GUILayout.BeginHorizontal();
-            GUILayout.Space(10);
             string assetRemoteAddressValue = F8EditorPrefs.GetString(_assetRemoteAddressKey, "");
             if (string.IsNullOrEmpty(assetRemoteAddressValue))
             {
@@ -881,6 +880,7 @@ namespace F8Framework.Core.Editor
             }
             _assetRemoteAddress = EditorGUILayout.TextField(assetRemoteAddressValue);
             F8EditorPrefs.SetString(_assetRemoteAddressKey, _assetRemoteAddress);
+            bool originalGUIEnabled = GUI.enabled;
             // 不可编辑的后缀（灰色）
             GUI.enabled = false;
             string suffix = " + Remote/" + URLSetting.GetPlatformName();
@@ -888,6 +888,7 @@ namespace F8Framework.Core.Editor
             float suffixWidth = textFieldStyle.CalcSize(new GUIContent(suffix)).x + 5;
             EditorGUILayout.TextField(suffix, GUILayout.Width(suffixWidth));
             GUI.enabled = true;
+            GUI.enabled = originalGUIEnabled;
             GUILayout.EndHorizontal();
             GUILayout.Space(10);
             

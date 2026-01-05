@@ -56,7 +56,7 @@ namespace F8Framework.Core
             if (_config != null)
             {
                 EditorUtility.SetDirty(_config);
-                AssetDatabase.SaveAssets();
+                AssetDatabase.SaveAssetIfDirty(_config);
             }
         }
         

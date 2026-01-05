@@ -30,6 +30,7 @@ namespace F8Framework.Core
 		private static bool _isDirtyLate = false;
 		private static bool _isDirtyFixed = false;
 		private static long _frame = 0;
+		private static int _lastUpdateFrame = -1;
 
 		/// <summary>
 		/// 初始化框架
@@ -72,7 +73,15 @@ namespace F8Framework.Core
 		/// </summary>
 		public static void Update()
 		{
-			_frame++;
+			if (_frame < 2)
+			{
+				if (_lastUpdateFrame == Time.frameCount)
+				{
+					LogF8.LogError("ModuleCenter.Update 请勿重复调用");
+				}
+				_lastUpdateFrame = Time.frameCount;
+				_frame++;
+			}
 			
 			// 如果有新模块需要重新排序
 			if (_isDirty)

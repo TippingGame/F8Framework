@@ -23,6 +23,7 @@ namespace F8Framework.Core.Editor
         private Vector2 scrollPosition;
         private void OnGUI()
         {
+            EditorGUI.BeginDisabledGroup(EditorApplication.isCompiling || BuildPipeline.isBuildingPlayer);
             scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition, GUILayout.Height(Mathf.Min(1080, position.height)));
             GUILayout.BeginHorizontal();
             GUILayout.Space(20);
@@ -36,6 +37,7 @@ namespace F8Framework.Core.Editor
             GUILayout.EndVertical();
             GUILayout.EndHorizontal();
             EditorGUILayout.EndScrollView();
+            EditorGUI.EndDisabledGroup();
         }
     }
 }
