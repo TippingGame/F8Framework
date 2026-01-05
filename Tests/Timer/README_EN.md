@@ -43,6 +43,12 @@ void Start()
     FF8.Timer.AddTimerFrame(1f, () => { });
     FF8.Timer.AddTimerFrame(1f, false, () => { });
     FF8.Timer.AddTimerFrame(1f, 1, () => { }, () => { });
+    // More expansion methods
+    this.AttachTimerF8(1f, () => { }, () => { }, false);
+    this.DelayTimerF8(1f, () => { });
+    this.IntervalTimerF8(1f, () => { });
+    this.RepeatTimerF8(1f, 5, () => { });
+    this.UntilTimerF8(1f,  () => true, () => { });
 
     // Stop the timer with the specified timeid
     FF8.Timer.RemoveTimer(timeid);
