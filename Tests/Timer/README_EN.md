@@ -20,43 +20,48 @@ Method 2: Unity → Menu Bar → Window → Package Manager → "+" → Add Pack
 ```C#
 void Start()
 {
-    // Standard Timer - Attached to this object
-    // Triggers every 1 second, starts immediately (0 delay), executes 3 times (-1 would loop infinitely)
-    int timeid = FF8.Timer.AddTimer(this, 1f, 0f, 3, () =>
-    {
-        LogF8.Log("tick"); // Tick callback
-    }, () =>
-    {
-        LogF8.Log("Timer completed"); // Completion callback
-    }, ignoreTimeScale: false);
+    // Normal Timer: pass 'this' as context, executes every 1 second, 
+    // starts after 0 seconds delay, repeats 3 times (-1 means infinite loop)
+    int timeid = FF8.Timer.AddTimer(this, 1f, 0f, 3,
+        () => { LogF8.Log("tick"); },
+        () => { LogF8.Log("completed"); },
+        ignoreTimeScale: false);
+
+    // Extension methods
+    FF8.Timer.AddTimer(1f, () => { });
+    FF8.Timer.AddTimer(1f, false, () => { });
+    FF8.Timer.AddTimer(1f, 1, () => { }, () => { });
+
+    // Frame Timer: pass 'this' as context, executes every 1 frame,
+    // starts after 0 frames delay, loops infinitely (-1 means infinite loop)
+    timeid = FF8.Timer.AddTimerFrame(this, 1f, 0f, -1,
+        () => { LogF8.Log("tick"); },
+        () => { LogF8.Log("completed"); },
+        ignoreTimeScale: false);
     
-    // FrameTimer - Attached to this object
-    // Triggers every frame, starts immediately (0 frame delay), loops infinitely (-1)
-    timeid = FF8.Timer.AddTimerFrame(this, 1f, 0f, -1, () =>
-    {
-        LogF8.Log("frame tick"); // Per-frame callback
-    }, () =>
-    {
-        LogF8.Log("Timer completed"); // Completion callback
-    }, ignoreTimeScale: false);
-    
-    // Stop a specific timer by its ID
+    // Extension methods
+    FF8.Timer.AddTimerFrame(1f, () => { });
+    FF8.Timer.AddTimerFrame(1f, false, () => { });
+    FF8.Timer.AddTimerFrame(1f, 1, () => { }, () => { });
+
+    // Stop the timer with the specified timeid
     FF8.Timer.RemoveTimer(timeid);
-    
-    // Automatically pause/resume timers when application loses/gains focus
+
+    // Listen for application focus events to automatically pause/resume all timers
     FF8.Timer.AddListenerApplicationFocus();
-    
-    // Manual timer control
-    FF8.Timer.Pause();    // Pause all timers
-    FF8.Timer.Resume();   // Resume all paused timers
-    FF8.Timer.Restart();  // Restart all timers
-    
-    // Server time synchronization (for online games)
-    FF8.Timer.SetServerTime(1702573904000); // Synchronize with server time (milliseconds)
-    long serverTime = FF8.Timer.GetServerTime(); // Get synchronized server time
-    
-    // Get total elapsed game time
-    float totalGameTime = FF8.Timer.GetTime();
+
+    // Manually pause or resume all timers (or specific timer by id)
+    FF8.Timer.Pause();
+    FF8.Timer.Resume();
+    // Restart all timers (or specific timer by id)
+    FF8.Timer.Restart();
+
+    // For online games: sync with server time (unit: milliseconds)
+    FF8.Timer.SetServerTime(1702573904000);
+    FF8.Timer.GetServerTime();
+
+    // Get total elapsed time in the game
+    FF8.Timer.GetTime();
 }
 ```
 
