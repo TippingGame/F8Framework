@@ -1,5 +1,8 @@
 # Changelog
 
+## [2.3.233] - 2025-01-17
+1.修复资产模块Expand少资源的问题  
+
 ## [2.3.232] - 2025-01-17
 1.移除资产模块LoadAsyncCoroutine方法  
 2.修复LoadSceneAsync栈溢出的问题  
