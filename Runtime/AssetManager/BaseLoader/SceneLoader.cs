@@ -74,7 +74,7 @@ namespace F8Framework.Core
             {
                 _progress = 1f;
                 _isDone = true;
-                _onAssetScene(SceneObject);
+                _onAssetScene?.Invoke(SceneObject);
                 OnComplete();
             }
             else
@@ -105,7 +105,7 @@ namespace F8Framework.Core
             {
                 _progress = 1f;
                 _isDone = true;
-                _onAssetScene(SceneObject);
+                _onAssetScene?.Invoke(SceneObject);
                 OnComplete();
             }
             else

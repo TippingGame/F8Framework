@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.3.232] - 2025-01-17
+1.移除资产模块LoadAsyncCoroutine方法  
+2.修复LoadSceneAsync栈溢出的问题  
+
 ## [2.3.231] - 2025-01-05
 1.新增Timer模块更多的拓展方法  
 

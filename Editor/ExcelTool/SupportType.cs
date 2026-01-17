@@ -474,7 +474,7 @@ namespace F8Framework.Core.Editor
             source.Append("\t\t[Preserve]\n");
             source.Append("\t\tpublic IEnumerator LoadAsync<T>(string name, Action<T> callback)\n");
             source.Append("\t\t{\n");
-            source.Append("\t\t\tvar load = AssetManager.Instance.LoadAsyncCoroutine<TextAsset>(name);\n");
+            source.Append("\t\t\tvar load = AssetManager.Instance.LoadAsync<TextAsset>(name);\n");
             source.Append("\t\t\tyield return load;\n");
             source.Append("\t\t\tTextAsset textAsset = AssetManager.Instance.GetAssetObject<TextAsset>(name);\n");
             source.Append("\t\t\tif (textAsset != null)\n");

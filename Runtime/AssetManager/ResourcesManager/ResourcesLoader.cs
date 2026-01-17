@@ -256,42 +256,6 @@ namespace F8Framework.Core
             }
         }
 
-        public virtual IEnumerator LoadAsyncCoroutine<T>() where T : Object
-        {
-            if (resourceLoadState == LoaderState.FINISHED)
-            {
-                bool missingAsset = !resouceObject;
-                bool wrongType = !missingAsset && resouceObject.GetType() != typeof(T);
-
-                if (missingAsset || wrongType)
-                {
-                    resourceLoadState = LoaderState.NONE;
-                }
-            }
-            
-            if (resourceLoadState == LoaderState.NONE)
-            {
-                loadType = LoaderType.ASYNC;
-                resourceLoadState = LoaderState.WORKING;
-                resourceLoadRequest = Resources.LoadAsync<T>(resourcePath);
-
-                // Wait until the resource is loaded
-                yield return resourceLoadRequest;
-
-                resouceObject = resourceLoadRequest.asset;
-                resourceLoadState = LoaderState.FINISHED;
-                
-                // 返回加载完成的资源对象
-                yield return resouceObject;
-            }
-            else if (resourceLoadState == LoaderState.WORKING)
-            {
-                loadType = LoaderType.ASYNC;
-                yield return new WaitUntil(() => IsLoadFinished);
-                yield return resouceObject;
-            }
-        }
-
         /// <summary>
         /// 异步加载资源。
         /// </summary>
@@ -345,44 +309,6 @@ namespace F8Framework.Core
                 if (callback != null)
                     callback(o);
                 base.OnComplete();
-            }
-        }
-
-        public virtual IEnumerator LoadAsyncCoroutine(System.Type resourceType = null)
-        {
-            if (resourceLoadState == LoaderState.FINISHED)
-            {
-                bool missingAsset = !resouceObject;
-                bool wrongType = !missingAsset && resouceObject.GetType() != resourceType;
-
-                if (missingAsset || wrongType)
-                {
-                    resourceLoadState = LoaderState.NONE;
-                }
-            }
-            
-            if (resourceLoadState == LoaderState.NONE)
-            {
-                loadType = LoaderType.ASYNC;
-                resourceLoadState = LoaderState.WORKING;
-                resourceLoadRequest = resourceType == null ?
-                    Resources.LoadAsync(resourcePath):
-                    Resources.LoadAsync(resourcePath, resourceType);
-
-                // Wait until the resource is loaded
-                yield return resourceLoadRequest;
-
-                resouceObject = resourceLoadRequest.asset;
-                resourceLoadState = LoaderState.FINISHED;
-                
-                // 返回加载完成的资源对象
-                yield return resouceObject;
-            }
-            else if (resourceLoadState == LoaderState.WORKING)
-            {
-                loadType = LoaderType.ASYNC;
-                yield return new WaitUntil(() => IsLoadFinished);
-                yield return resouceObject;
             }
         }
         

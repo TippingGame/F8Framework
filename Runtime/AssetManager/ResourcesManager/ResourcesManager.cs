@@ -122,23 +122,6 @@ namespace F8Framework.Core
             loader.LoadAsync<T>(callback);
             return loader;
         }
-
-        public IEnumerator LoadAsyncCoroutine<T>(string resourcePath) where T : Object
-        {
-            ResourcesLoader loader;
-            if (resourceLoaders.TryGetValue(resourcePath, out var resourceLoader))
-            {
-                loader = resourceLoader;
-            }
-            else
-            {
-                loader = new ResourcesLoader();
-                loader.Init(resourcePath);
-                resourceLoaders.Add(resourcePath, loader);
-            }
-
-            yield return loader.LoadAsyncCoroutine<T>();
-        }
         
         /// <summary>
         /// 通过相对资源名称异步加载。
@@ -166,23 +149,6 @@ namespace F8Framework.Core
 
             loader.LoadAsync(resourceType, callback);
             return loader;
-        }
-
-        public IEnumerator LoadAsyncCoroutine(string resourcePath, System.Type resourceType = null)
-        {
-            ResourcesLoader loader;
-            if (resourceLoaders.TryGetValue(resourcePath, out var resourceLoader))
-            {
-                loader = resourceLoader;
-            }
-            else
-            {
-                loader = new ResourcesLoader();
-                loader.Init(resourcePath);
-                resourceLoaders.Add(resourcePath, loader);
-            }
-
-            yield return loader.LoadAsyncCoroutine(resourceType);
         }
         
         /// <summary>

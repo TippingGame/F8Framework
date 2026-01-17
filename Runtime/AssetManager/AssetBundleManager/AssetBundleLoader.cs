@@ -381,68 +381,6 @@ namespace F8Framework.Core
                 }
             }
         }
-
-        /// <summary>
-        /// 协程展开资源，
-        /// 这里会比update快一点，有必要的话要等待一帧，获取资源时已经有容错处理。
-        /// 有机会assetBundle还未加载完，所以就没有展开。
-        /// </summary>
-        /// <returns></returns>
-        public IEnumerator ExpandAsyncCoroutine(string assetPath, System.Type assetType = null, string subAssetName = null, bool isLoadAll = false)
-        {
-            if (assetBundleContent == null)
-            {
-                assetBundleExpandState = LoaderState.NONE;
-                yield break;
-            }
-            
-            if (assetBundleExpandState == LoaderState.FINISHED)
-            {
-                bool missingAsset = !assetObjects.ContainsKey(assetPath);
-                bool wrongType = assetType != null && !missingAsset && assetObjects[assetPath].GetType() != assetType;
-                bool missingSubAsset = subAssetName != null && !assetObjects.ContainsKey(subAssetName);
-
-                if (missingAsset || wrongType || missingSubAsset || isLoadAll)
-                {
-                    assetBundleExpandState = LoaderState.NONE;
-                }
-            }
-
-            if (assetBundleExpandState == LoaderState.NONE)
-            {
-                expandCount = 0;
-                assetBundleExpandState = LoaderState.WORKING;
-                if (isLoadAll)
-                {
-                    for (int i = 0; i < assetPaths.Count; i++)
-                    {
-                        if (assetPaths[i].Equals(assetPath))
-                        {
-                            LoadAssetObjectAsync(assetPaths[i], assetType, subAssetName, OnExpandCallBack, isLoadAll);
-                        }
-                        else
-                        {
-                            LoadAssetObjectAsync(assetPaths[i], null, subAssetName, OnExpandCallBack, isLoadAll);
-                        }
-                    }
-                }
-                else
-                {
-                    for (int i = 0; i < assetPaths.Count; i++)
-                    {
-                        if (assetPaths[i].Equals(assetPath))
-                        {
-                            LoadAssetObjectAsync(assetPaths[i], assetType, subAssetName, OnOneExpandCallBack, isLoadAll);
-                        }
-                    }
-                }
-                yield return new WaitUntil(() => ExpandProgress >= 1f);
-            }
-            else if (assetBundleExpandState == LoaderState.WORKING)
-            {
-                yield return new WaitUntil(() => ExpandProgress >= 1f);
-            }
-        }
         
         /// <summary>
         /// 同步卸载资产。

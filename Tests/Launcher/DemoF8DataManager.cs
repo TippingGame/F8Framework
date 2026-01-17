@@ -165,7 +165,7 @@ namespace F8Framework.Tests
 		[Preserve]
 		public IEnumerator LoadAsync<T>(string name, Action<T> callback)
 		{
-			var load = AssetManager.Instance.LoadAsyncCoroutine<TextAsset>(name);
+			var load = AssetManager.Instance.LoadAsync<TextAsset>(name);
 			yield return load;
 			TextAsset textAsset = AssetManager.Instance.GetAssetObject<TextAsset>(name);
 			if (textAsset != null)

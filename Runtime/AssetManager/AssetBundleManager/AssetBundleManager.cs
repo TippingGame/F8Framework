@@ -152,65 +152,6 @@ namespace F8Framework.Core
             }
             return lastLoader;
         }
-
-        public IEnumerator LoadAsyncCoroutine(string assetName, System.Type assetType, AssetManager.AssetInfo info, string subAssetName = null, bool isLoadAll = false)
-        {
-            List<string> assetBundlePaths = new List<string>(GetDependenciedAssetBundles(info.AbName));
-
-            for (int i = 0; i < assetBundlePaths.Count; i++)
-            {
-                assetBundlePaths[i] = GetAssetBundlePathByAbName(assetBundlePaths[i]);
-            }
-            AssetBundleLoader lastLoader = null;
-            assetBundlePaths.Add(info.AssetBundlePath);
-            int endIndex = assetBundlePaths.Count - 1;
-            for (int i = endIndex; i >= 0; i--)
-            {
-                string assetBundlePath = assetBundlePaths[i];
-                AssetBundleLoader loader;
-                if (assetBundleLoaders.ContainsKey(assetBundlePath))
-                {
-                    loader = assetBundleLoaders[assetBundlePath];
-                    loader.AddParentBundle(info.AssetBundlePath);
-                }
-                else
-                {
-                    loader = new AssetBundleLoader();
-                    loader.Init(assetBundlePath);
-                    loader.AddParentBundle(info.AssetBundlePath);
-
-                    assetBundleLoaders.Add(assetBundlePath, loader);
-                }
-                if (lastLoader == null)
-                {
-                    lastLoader = loader; // 获取最后一个 loader
-                    for (int j = 0; j < assetBundlePaths.Count; j++)
-                    {
-                        loader.AddDependentNames(assetBundlePaths[j]);
-                    }
-                }
-                loader.LoadAsync((ab) =>
-                {
-                    lastLoader.AddDependentNames(assetBundlePath, true);
-                });
-            }
-            
-            yield return new WaitUntil(() =>
-            {
-                int finishedCount = 0;
-                for (int j = 0; j < assetBundlePaths.Count; j++)
-                {
-                    if (!assetBundleLoaders.TryGetValue(assetBundlePaths[j], out AssetBundleLoader value)) continue;
-                    if (value.IsLoadFinished)
-                    {
-                        finishedCount += 1;
-                    }
-                }
-                return finishedCount > endIndex;
-            });
-            
-            yield return lastLoader!.ExpandAsyncCoroutine(info.AssetPath[0], assetType, subAssetName, isLoadAll);
-        }
         
         /// <summary>
         /// 通过资源包路径同步卸载。
