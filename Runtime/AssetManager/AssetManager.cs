@@ -1158,7 +1158,17 @@ namespace F8Framework.Core
                 
                 return null;
             }
-            
+
+            public IEnumerator LoadAsyncCoroutine<T>(string assetName, string subAssetName = null, AssetAccessMode mode = AssetAccessMode.UNKNOWN) where T : Object
+            {
+                yield return null;
+            }
+
+            public IEnumerator LoadAsyncCoroutine(string assetName, System.Type assetType = null, string subAssetName = null, AssetAccessMode mode = AssetAccessMode.UNKNOWN)
+            {
+                yield return null;
+            }
+
             /// <summary>
             /// 异步加载资产文件夹。
             /// </summary>
