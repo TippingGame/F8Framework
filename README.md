@@ -93,8 +93,8 @@ git clone https://github.com/TippingGame/F8Framework.git
 * Discord聊天组：[https://discord.gg/AHRb7Hwy9R](https://discord.gg/dwWQ8EHz)  
 
 ## 上架游戏
-| 脑光（[TapTap](https://www.taptap.cn/app/725455) / [WebGL](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/h5game/naoguang/index.html)）       | 消除异世界（[微信小游戏](#小程序://消除异界/dZ7HgPPybAOkD2E) / [4399](http://www.4399.com/flash/250713.htm)）                     | 待定                                              | 待定                                             | 
-|-------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|-------------------------------------------------|------------------------------------------------|
+| 脑光（[TapTap](https://www.taptap.cn/app/725455) / [WebGL](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/h5game/naoguang/index.html)）       | 重生骑士传（[微信小游戏](#小程序://消除异界/dZ7HgPPybAOkD2E) / [4399](http://www.4399.com/flash/250713.htm) / [WebGL](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/h5game/RebirthKnight/index.html)）                          | 待定                                              | 待定                                             | 
+|-------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|-------------------------------------------------|------------------------------------------------|
 | <img src='https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/naoguang_icon_256.png' width="256"/> | <img src='https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/xcysj_icon_256.png' width="256"/> | 待定 | 待定 |
 
 

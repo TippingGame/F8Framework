@@ -333,7 +333,7 @@ namespace F8Framework.Core
                 "UnityEngine.UI.ScrollRect"
             };
 
-            return Array.Exists(listenerTypes, type => componentType.Contains(type));
+            return Array.Exists(listenerTypes, componentType.Equals);
         }
 
         // 生成监听事件字段
@@ -341,31 +341,31 @@ namespace F8Framework.Core
         {
             string normalizedFieldName = fieldName.Replace("[", "_").Replace("]", "_");
 
-            if (componentType.Contains("UnityEngine.UI.Button"))
+            if (componentType.Equals("UnityEngine.UI.Button"))
             {
                 return $"private UnityAction unityAction_{normalizedFieldName};";
             }
-            else if (componentType.Contains("UnityEngine.UI.Slider"))
+            else if (componentType.Equals("UnityEngine.UI.Slider"))
             {
                 return $"private UnityAction<float> unityAction_{normalizedFieldName};";
             }
-            else if (componentType.Contains("UnityEngine.UI.Scrollbar"))
+            else if (componentType.Equals("UnityEngine.UI.Scrollbar"))
             {
                 return $"private UnityAction<float> unityAction_{normalizedFieldName};";
             }
-            else if (componentType.Contains("UnityEngine.UI.Dropdown"))
+            else if (componentType.Equals("UnityEngine.UI.Dropdown"))
             {
                 return $"private UnityAction<int> unityAction_{normalizedFieldName};";
             }
-            else if (componentType.Contains("UnityEngine.UI.Toggle"))
+            else if (componentType.Equals("UnityEngine.UI.Toggle"))
             {
                 return $"private UnityAction<bool> unityAction_{normalizedFieldName};";
             }
-            else if (componentType.Contains("UnityEngine.UI.InputField"))
+            else if (componentType.Equals("UnityEngine.UI.InputField"))
             {
                 return $"private UnityAction<string> unityAction_{normalizedFieldName};";
             }
-            else if (componentType.Contains("UnityEngine.UI.ScrollRect"))
+            else if (componentType.Equals("UnityEngine.UI.ScrollRect"))
             {
                 return $"private UnityAction<Vector2> unityAction_{normalizedFieldName};";
             }
@@ -378,17 +378,17 @@ namespace F8Framework.Core
         {
             string normalizedFieldName = fieldName.Replace("[", "_").Replace("]", "_");
 
-            if (componentType.Contains("UnityEngine.UI.Button"))
+            if (componentType.Equals("UnityEngine.UI.Button"))
             {
                 return 
                     $"unityAction_{normalizedFieldName} = () => ButtonClick({fieldName});\n\t\t{fieldName}?.onClick.AddListener(unityAction_{normalizedFieldName});";
             }
-            else if (componentType.Contains("UnityEngine.UI.Slider") ||
-                     componentType.Contains("UnityEngine.UI.Scrollbar") ||
-                     componentType.Contains("UnityEngine.UI.Dropdown") ||
-                     componentType.Contains("UnityEngine.UI.Toggle") ||
-                     componentType.Contains("UnityEngine.UI.InputField") ||
-                     componentType.Contains("UnityEngine.UI.ScrollRect"))
+            else if (componentType.Equals("UnityEngine.UI.Slider") ||
+                     componentType.Equals("UnityEngine.UI.Scrollbar") ||
+                     componentType.Equals("UnityEngine.UI.Dropdown") ||
+                     componentType.Equals("UnityEngine.UI.Toggle") ||
+                     componentType.Equals("UnityEngine.UI.InputField") ||
+                     componentType.Equals("UnityEngine.UI.ScrollRect"))
             {
                 return
                     $"unityAction_{normalizedFieldName} = (value) => ValueChange({fieldName}, value);\n\t\t{fieldName}?.onValueChanged.AddListener(unityAction_{normalizedFieldName});";
