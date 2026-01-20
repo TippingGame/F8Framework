@@ -6,9 +6,8 @@ using UnityEngine;
 
 namespace F8Framework.Core.Editor
 {
-    public class BuildManager
+    public class BuildManager : Singleton<BuildManager>
     {
-        public Preset SelectedBuildPreset;
         public Preset[] PlayerSettingsPresetsInProject;
 
         public void OpenBuildWindow()

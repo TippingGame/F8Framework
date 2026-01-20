@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace F8Framework.Core.Editor
 {
-    public class PlayModeManager
+    public class PlayModeManager : Singleton<PlayModeManager>
     {
         public SceneAsset SelectedScene;
         public List<SceneAsset> ScenesInProject;
@@ -176,18 +176,6 @@ namespace F8Framework.Core.Editor
             var fullPathBuilder = new List<string>(targetPath.Split('/'));
             fullPathBuilder[fullPathBuilder.Count - 1] = System.IO.Path.GetFileNameWithoutExtension(targetPath);
             return string.Join(" > ", fullPathBuilder);
-        }
-
-        public List<string> GeneratePlayModeSettingsList()
-        {
-            _playmodeSettings = new[]
-            {
-                "Default (Reload Domain, Reload Scene)", "Disable Reload Domain", "Disable Reload Scene", "Disable All"
-            };
-
-            var playModeSettingsList = new List<string>(_playmodeSettings);
-
-            return playModeSettingsList;
         }
     }
 
