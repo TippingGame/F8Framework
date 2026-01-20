@@ -18,6 +18,11 @@ namespace F8Framework.Core.Editor
 
             static ToolbarInitializer()
             {
+                  EditorApplication.delayCall += InitializeToolbar;
+            }
+
+            private static void InitializeToolbar()
+            {
                   ToolbarConfiguration config = ScriptableObject.CreateInstance<ToolbarConfiguration>();
                   
                   var controlsGroup = new ToolbarGroup { groupName = "Controls", side = ToolbarSide.Left };
