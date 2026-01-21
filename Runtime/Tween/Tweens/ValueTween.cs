@@ -49,6 +49,7 @@ namespace F8Framework.Core
                 bool shouldComplete = !HandleLoop();
                 if (shouldComplete)
                     onComplete();
+                return;
             }
             
             float normalizedProgress = currentTime >= duration ? 1.0f : currentTime / duration;
