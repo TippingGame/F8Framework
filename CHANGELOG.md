@@ -1,5 +1,8 @@
 # Changelog
 
+## [2.3.238] - 2025-01-21
+1.优化Tween模块ignoreTimeScale重置变量  
+
 ## [2.3.237] - 2025-01-21
 1.优化Tween模块完成后的return  
 

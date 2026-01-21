@@ -301,6 +301,7 @@ namespace F8Framework.Core
             IsComplete = false;
             isPause = false;
             CanRecycle = true;
+            ignoreTimeScale = false;
             
             onUpdate = null;
             onUpdateVector3 = null;
