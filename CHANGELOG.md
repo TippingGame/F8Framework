@@ -1,5 +1,8 @@
 # Changelog
 
+## [2.3.239] - 2025-01-22
+1.优化AssetBundleManifest为空时的提示  
+
 ## [2.3.238] - 2025-01-21
 1.优化Tween模块ignoreTimeScale重置变量  
 

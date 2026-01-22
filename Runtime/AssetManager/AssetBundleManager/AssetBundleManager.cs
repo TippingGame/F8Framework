@@ -888,16 +888,16 @@ namespace F8Framework.Core
         
         private string[] GetDependenciedAssetBundles(string abName)
         {
-            if (manifest == null)
-                return new string[] {};
-            return manifest.GetAllDependencies(abName);
+            if (manifest != null) return manifest.GetAllDependencies(abName);
+            LogF8.LogError("AssetBundleManifest 为空，需在初始化框架时调用 LoadAssetBundleManifest，参考 GameLauncher.cs");
+            return new string[] { };
         }
 
         public Hash128 GetAssetBundleHash(string abName)
         {
-            if (manifest == null)
-                return default(Hash128);
-            return manifest.GetAssetBundleHash(abName);
+            if (manifest != null) return manifest.GetAssetBundleHash(abName);
+            LogF8.LogError("AssetBundleManifest 为空，需在初始化框架时调用 LoadAssetBundleManifest，参考 GameLauncher.cs");
+            return default(Hash128);
         }
         
         private List<AssetBundleLoader> GetRelatedLoaders(string assetBundlePath)
