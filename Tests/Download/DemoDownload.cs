@@ -63,7 +63,19 @@ namespace F8Framework.Tests
 
             // 计算进度百分比
             float progress = currentTaskIndex / taskCount * 100f;
-            // LogF8.Log(progress);
+            
+            // 已下载大小（字节）
+            ulong downloadedBytes = eventArgs.DownloadInfo.DownloadedLength;
+    
+            // 下载速度计算（字节/秒）
+            double speedBytesPerSecond = downloadedBytes / eventArgs.DownloadInfo.DownloadTimeSpan.TotalSeconds;
+    
+            // 单位转换：字节 -> MB
+            double downloadedMB = downloadedBytes / (1024.0 * 1024.0);
+            double speedMBPerSecond = speedBytesPerSecond / (1024.0 * 1024.0);
+    
+            // 日志输出：进度，速度
+            LogF8.Log($"进度：{downloadedMB:F2}MB, 速度：{speedMBPerSecond:F2}MB/s");
         }
         
         // 下载成功

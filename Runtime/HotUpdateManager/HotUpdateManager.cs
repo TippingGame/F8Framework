@@ -173,7 +173,7 @@ namespace F8Framework.Core
         /// <param name="completed"></param>
         /// <param name="failure"></param>
         /// <param name="overallProgress"></param>
-        public void StartHotUpdate(Dictionary<string, string> hotUpdateAssetUrl, Action completed = null, Action failure = null, Action<float> overallProgress = null)
+        public void StartHotUpdate(Dictionary<string, string> hotUpdateAssetUrl, Action completed = null, Action failure = null, Action<DonwloadUpdateEventArgs> overallProgress = null)
         {
             if (!GameConfig.LocalGameVersion.EnableHotUpdate || hotUpdateAssetUrl.Count <= 0 || F8GamePrefs.GetBool(nameof(F8GameConfig.ForceRemoteAssetBundle)))
             {
@@ -201,13 +201,7 @@ namespace F8Framework.Core
             };
             hotUpdateDownloader.OnDownloadOverallProgress += (eventArgs) =>
             {
-                float currentTaskIndex = (float)eventArgs.CurrentDownloadTaskIndex;
-                float taskCount = (float)eventArgs.DownloadTaskCount;
-
-                // 计算进度百分比
-                float progress = currentTaskIndex / taskCount * 100f;
-                // LogF8.LogVersion(progress);
-                overallProgress?.Invoke(progress);
+                overallProgress?.Invoke(eventArgs);
             };
             hotUpdateDownloader.OnAllDownloadTaskCompleted += (eventArgs) =>
             {
@@ -271,7 +265,7 @@ namespace F8Framework.Core
         /// <param name="completed"></param>
         /// <param name="failure"></param>
         /// <param name="overallProgress"></param>
-        public void StartPackageUpdate(List<string> subPackages, Action completed = null, Action failure = null, Action<float> overallProgress = null)
+        public void StartPackageUpdate(List<string> subPackages, Action completed = null, Action failure = null, Action<DonwloadUpdateEventArgs> overallProgress = null)
         {
             if (!GameConfig.LocalGameVersion.EnablePackage || subPackages.Count <= 0 || F8GamePrefs.GetBool(nameof(F8GameConfig.ForceRemoteAssetBundle)))
             {
@@ -301,13 +295,7 @@ namespace F8Framework.Core
             };
             packageDownloader.OnDownloadOverallProgress += (eventArgs) =>
             {
-                float currentTaskIndex = (float)eventArgs.CurrentDownloadTaskIndex;
-                float taskCount = (float)eventArgs.DownloadTaskCount;
-
-                // 计算进度百分比
-                float progress = currentTaskIndex / taskCount * 100f;
-                // LogF8.LogVersion(progress);
-                overallProgress?.Invoke(progress);
+                overallProgress?.Invoke(eventArgs);
             };
             packageDownloader.OnAllDownloadTaskCompleted += (eventArgs) =>
             {

@@ -1,5 +1,8 @@
 # Changelog
 
+## [2.4.240] - 2025-01-24
+1.优化HotUpdate模块返回完整的进度信息  
+
 ## [2.3.239] - 2025-01-22
 1.优化AssetBundleManifest为空时的提示  
 

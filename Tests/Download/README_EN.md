@@ -71,13 +71,26 @@ void OnDownloadStart(DownloadStartEventArgs eventArgs)
 // Progress update callback
 void OnDownloadOverall(DownloadUpdateEventArgs eventArgs)
 {
-    // Note: Some downloads may not know total file size, limiting progress accuracy
+    // Some download tasks only have download URLs and cannot obtain the binary length, 
+    // making it impossible to use more precise progress tracking.
     float currentTaskIndex = (float)eventArgs.CurrentDownloadTaskIndex;
     float taskCount = (float)eventArgs.DownloadTaskCount;
 
-    // Calculate percentage progress
+    // Calculate progress percentage
     float progress = currentTaskIndex / taskCount * 100f;
-    // LogF8.Log(progress);
+    
+    // Downloaded size (bytes)
+    ulong downloadedBytes = eventArgs.DownloadInfo.DownloadedLength;
+    
+    // Download speed calculation (bytes/second)
+    double speedBytesPerSecond = downloadedBytes / eventArgs.DownloadInfo.DownloadTimeSpan.TotalSeconds;
+    
+    // Unit conversion: bytes → MB
+    double downloadedMB = downloadedBytes / (1024.0 * 1024.0);
+    double speedMBPerSecond = speedBytesPerSecond / (1024.0 * 1024.0);
+    
+    // Log output: Progress and speed
+    LogF8.Log($"Progress: {downloadedMB:F2}MB, Speed: {speedMBPerSecond:F2}MB/s");
 }
 
 // Download success callback

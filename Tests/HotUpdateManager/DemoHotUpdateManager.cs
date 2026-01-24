@@ -36,9 +36,24 @@ namespace F8Framework.Tests
             }, () =>
             {
                 LogF8.Log("失败");
-            }, progress =>
+            }, eventArgs =>
             {
-                LogF8.Log("进度：" + progress);
+                // 已下载大小（字节）
+                ulong downloadedBytes = eventArgs.DownloadInfo.DownloadedLength;
+    
+                // 总大小（字节）- 需要累加之前已完成的任务大小
+                long totalBytes = allSize;
+    
+                // 下载速度计算（字节/秒）
+                double speedBytesPerSecond = downloadedBytes / eventArgs.DownloadInfo.DownloadTimeSpan.TotalSeconds;
+    
+                // 单位转换：字节 -> MB
+                double downloadedMB = downloadedBytes / (1024.0 * 1024.0);
+                double totalMB = totalBytes / (1024.0 * 1024.0);
+                double speedMBPerSecond = speedBytesPerSecond / (1024.0 * 1024.0);
+    
+                // 日志输出：进度，速度
+                LogF8.Log($"进度：{downloadedMB:F2}MB/{totalMB:F2}MB, 速度：{speedMBPerSecond:F2}MB/s");
             });
 
             // 检查未加载的分包
@@ -51,9 +66,9 @@ namespace F8Framework.Tests
             }, () =>
             {
                 LogF8.Log("失败");
-            }, progress =>
+            }, eventArgs =>
             {
-                LogF8.Log("进度：" + progress);
+                // 同上
             });
         }
     }

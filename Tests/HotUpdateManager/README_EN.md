@@ -70,9 +70,24 @@ IEnumerator Start()
     }, () =>
     {
         LogF8.Log("Failed"); 
-    }, progress =>
+    }, eventArgs =>
     {
-        LogF8.Log("Progress: " + progress);
+        // Downloaded size in bytes
+        ulong downloadedBytes = eventArgs.DownloadInfo.DownloadedLength;
+        
+        // Total size in bytes - needs to accumulate sizes of previously completed tasks
+        long totalBytes = allSize;
+        
+        // Download speed calculation in bytes/second
+        double speedBytesPerSecond = downloadedBytes / eventArgs.DownloadInfo.DownloadTimeSpan.TotalSeconds;
+        
+        // Unit conversion: bytes → MB
+        double downloadedMB = downloadedBytes / (1024.0 * 1024.0);
+        double totalMB = totalBytes / (1024.0 * 1024.0);
+        double speedMBPerSecond = speedBytesPerSecond / (1024.0 * 1024.0);
+        
+        // Log output: Progress and speed
+        LogF8.Log($"Progress: {downloadedMB:F2}MB/{totalMB:F2}MB, Speed: {speedMBPerSecond:F2}MB/s");
     });
 
     // Check unloaded subpackages  
@@ -85,9 +100,9 @@ IEnumerator Start()
     }, () =>
     {
         LogF8.Log("Failed");
-    }, progress =>
+    }, eventArgs =>
     {
-        LogF8.Log("Progress: " + progress);
+        // Same as above
     });
 }
 ```
