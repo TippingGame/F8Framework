@@ -50,6 +50,16 @@ namespace F8Framework.Core
         protected bool ignoreTimeScale = false;
         #endregion
 
+        public float CurrentTime 
+        { 
+            get => currentTime;
+            set => SetCurrentTime(value);
+        }
+        public float Progress
+        {
+            get => currentTime >= duration ? 1.0f : currentTime / duration;
+            set => SetProgress(value);
+        }
         public object CustomId
         {
             get => customId;
@@ -60,8 +70,8 @@ namespace F8Framework.Core
             get => id;
             set => id = value;
         }
-        public bool IsComplete 
-        { 
+        public bool IsComplete
+        {
             get => isComplete;
             set => isComplete = value;
         }
@@ -108,7 +118,7 @@ namespace F8Framework.Core
         /// <summary>
         /// Called to update this tween
         /// </summary>
-        public virtual void Update(float deltaTime)
+        internal virtual void Update(float deltaTime)
         {
             timeSinceStart += deltaTime;
 
@@ -120,6 +130,34 @@ namespace F8Framework.Core
 
             if(onUpdate != null)
                 onUpdate();
+        }
+        
+        public BaseTween Complete()
+        {
+            SetEndValue(true);
+            onComplete();
+            return this;
+        }
+        
+        public BaseTween SetProgress(float progress)
+        {
+            float clampedValue = Mathf.Clamp01(progress);
+            currentTime = clampedValue * duration;
+            SetEndValue(false);
+            return this;
+        }
+        
+        public BaseTween SetCurrentTime(float time)
+        {
+            currentTime = time;
+            SetEndValue(false);
+            return this;
+        }
+        
+        public BaseTween SetAutoKill(bool autoKill)
+        {
+            CanRecycle = autoKill;
+            return this;
         }
         
         public BaseTween SetCustomId(object customId)
@@ -146,14 +184,19 @@ namespace F8Framework.Core
             return this;
         }
 
-        public virtual void ReplayReset()
+        public virtual BaseTween ReplayReset()
         {
             IsComplete = false;
             isPause = false;
             currentTime = 0.0f;
+            return this;
+        }
+        
+        internal virtual void SetEndValue(bool isEnd = false)
+        {
         }
 
-        public void ClearOnCompleteSequence()
+        internal void ClearOnCompleteSequence()
         {
             onCompleteSequence = null;
         }
@@ -284,7 +327,7 @@ namespace F8Framework.Core
         /// <summary>
         /// Restore all fields to default
         /// </summary>
-        public virtual void Reset()
+        internal virtual void Reset()
         {
             id = 0;
             CustomId = null;

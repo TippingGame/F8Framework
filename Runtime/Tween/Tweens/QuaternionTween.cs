@@ -13,7 +13,7 @@ namespace F8Framework.Core
             Init(from, to, t);
         }
 
-        public void Init(Quaternion from, Quaternion to, float t)
+        internal void Init(Quaternion from, Quaternion to, float t)
         {
             this.from = from;
             this.to = to;
@@ -24,7 +24,7 @@ namespace F8Framework.Core
         /// <summary>
         /// 每帧执行的更新逻辑
         /// </summary>
-        public override void Update(float deltaTime)
+        internal override void Update(float deltaTime)
         {
             if(isPause || IsComplete || IsRecycle)
                 return;
@@ -43,8 +43,7 @@ namespace F8Framework.Core
             // 检查是否完成当前周期
             if (currentTime >= duration)
             {
-                if (onUpdateQuaternion != null)
-                    onUpdateQuaternion(to);
+                this.SetEndValue(true);
                 
                 bool shouldComplete = !HandleLoop();
                 if (shouldComplete)
@@ -52,30 +51,45 @@ namespace F8Framework.Core
                 return;
             }
             
-            float normalizedProgress = currentTime >= duration ? 1.0f : currentTime / duration;
-            // 通过曲线函数计算缓动进度
-            float curveProgress = GetCurveProgress(normalizedProgress);
-            
-            // 基于缓动算法计算当前值
-            float v = EasingFunctions.ChangeFloat(0.0f, 1.0f, curveProgress, ease);
-            Quaternion value = Quaternion.SlerpUnclamped(from , to , v);
-            
-            // 触发值更新回调
-            if (onUpdateQuaternion != null)
-                onUpdateQuaternion(value);
+            this.SetEndValue(false);
         }
 
-        public override void Reset()
+        internal override void SetEndValue(bool isEnd = false)
+        {
+            base.SetEndValue(isEnd);
+            if (isEnd)
+            {
+                if (onUpdateQuaternion != null)
+                    onUpdateQuaternion(to);
+            }
+            else
+            {
+                float normalizedProgress = currentTime >= duration ? 1.0f : currentTime / duration;
+                // 通过曲线函数计算缓动进度
+                float curveProgress = GetCurveProgress(normalizedProgress);
+            
+                // 基于缓动算法计算当前值
+                float v = EasingFunctions.ChangeFloat(0.0f, 1.0f, curveProgress, ease);
+                Quaternion value = Quaternion.SlerpUnclamped(from , to , v);
+            
+                // 触发值更新回调
+                if (onUpdateQuaternion != null)
+                    onUpdateQuaternion(value);
+            }
+        }
+        
+        internal override void Reset()
         {
             base.Reset();
             from = Quaternion.identity;
             to = Quaternion.identity;
         }
 
-        public override void ReplayReset()
+        public override BaseTween ReplayReset()
         {
             base.ReplayReset();
             Init(from, to, duration);
+            return this;
         }
         
         private float GetCurveProgress(float normalizedProgress)

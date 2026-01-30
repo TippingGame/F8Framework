@@ -26,7 +26,7 @@ namespace F8Framework.Core
         /// <summary>
         /// 每帧执行的更新逻辑
         /// </summary>
-        public override void Update(float deltaTime)
+        internal override void Update(float deltaTime)
         {
             if(isPause || IsComplete || IsRecycle)
                 return;
@@ -45,37 +45,52 @@ namespace F8Framework.Core
             // 检查是否完成当前周期
             if (currentTime >= duration)
             {
-                if (onUpdateColor != null)
-                    onUpdateColor(to);
+                this.SetEndValue(true);
+                
                 bool shouldComplete = !HandleLoop();
                 if (shouldComplete)
                     onComplete();
                 return;
             }
-            
-            float normalizedProgress = currentTime >= duration ? 1.0f : currentTime / duration;
-            // 通过曲线函数计算缓动进度
-            float curveProgress = GetCurveProgress(normalizedProgress);
-            
-            // 基于缓动算法计算当前值
-            Color color = Color.LerpUnclamped(from, to, EasingFunctions.ChangeFloat(0f, 1f, curveProgress, ease));
-            
-            // 触发值更新回调
-            if (onUpdateColor != null)
-                onUpdateColor(color);
+
+            this.SetEndValue(false);
         }
 
-        public override void Reset()
+        internal override void SetEndValue(bool isEnd = false)
+        {
+            base.SetEndValue(isEnd);
+            if (isEnd)
+            {
+                if (onUpdateColor != null)
+                    onUpdateColor(to);
+            }
+            else
+            {
+                float normalizedProgress = currentTime >= duration ? 1.0f : currentTime / duration;
+                // 通过曲线函数计算缓动进度
+                float curveProgress = GetCurveProgress(normalizedProgress);
+            
+                // 基于缓动算法计算当前值
+                Color color = Color.LerpUnclamped(from, to, EasingFunctions.ChangeFloat(0f, 1f, curveProgress, ease));
+            
+                // 触发值更新回调
+                if (onUpdateColor != null)
+                    onUpdateColor(color);
+            }
+        }
+        
+        internal override void Reset()
         {
             base.Reset();
             from = Color.white;
             to = Color.white;
         }
 
-        public override void ReplayReset()
+        public override BaseTween ReplayReset()
         {
             base.ReplayReset();
             Init(from, to, duration);
+            return this;
         }
         
         private float GetCurveProgress(float normalizedProgress)

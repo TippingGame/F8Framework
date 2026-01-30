@@ -71,7 +71,7 @@ namespace F8Framework.Core
         /// <summary>
         /// 每帧执行的更新逻辑
         /// </summary>
-        public override void Update(float deltaTime)
+        internal override void Update(float deltaTime)
         {
             if (isPause || IsComplete || IsRecycle || targetTransform == null || pathCalculator == null)
                 return;
@@ -91,11 +91,24 @@ namespace F8Framework.Core
             if (currentTime >= duration)
             {
                 // 确保到达终点
-                UpdateTransform(1f);
+                this.SetEndValue(true);
                 
                 bool shouldComplete = !HandleLoop();
                 if (shouldComplete)
                     onComplete();
+            }
+            else
+            {
+                this.SetEndValue(false);
+            }
+        }
+
+        internal override void SetEndValue(bool isEnd = false)
+        {
+            base.SetEndValue(isEnd);
+            if (isEnd)
+            {
+                UpdateTransform(1f);
             }
             else
             {
@@ -107,7 +120,7 @@ namespace F8Framework.Core
                 UpdateTransform(curveProgress);
             }
         }
-
+        
         /// <summary>
         /// 更新位置和旋转
         /// </summary>
@@ -182,14 +195,14 @@ namespace F8Framework.Core
         /// <summary>
         /// 设置是否闭合路径
         /// </summary>
-        public PathTween SetClosePath(bool close)
+        internal PathTween SetClosePath(bool close)
         {
             this.closePath = close;
             InitializePathCalculator(); // 重新初始化计算器
             return this;
         }
 
-        public override void Reset()
+        internal override void Reset()
         {
             base.Reset();
             targetTransform = null;
@@ -201,13 +214,14 @@ namespace F8Framework.Core
             closePath = false;
         }
 
-        public override void ReplayReset()
+        public override BaseTween ReplayReset()
         {
             base.ReplayReset();
             if (targetTransform != null && path != null)
             {
                 Init(targetTransform, path, duration, pathType, pathMode, resolution, closePath);
             }
+            return this;
         }
         
         private float GetCurveProgress(float normalizedProgress)

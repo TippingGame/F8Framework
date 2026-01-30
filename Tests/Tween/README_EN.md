@@ -15,13 +15,13 @@ Method 2: Unity → Menu Bar → Window → Package Manager → "+" → Add Pack
 
 ### Code Examples
 ```C#
-// Reference to Canvas RectTransform
+// Canvas RectTransform
 public RectTransform canvasRect;
 
 void Start()
 {
-    /*----------------------------------------- Basic Usage -----------------------------------------*/
-    // Play animation, set Ease type, and set OnComplete callback
+    /*-----------------------------------------Basic Usage-----------------------------------------*/
+    // Play animation, set Ease curve, set OnComplete callback
     int id = gameObject.ScaleTween(Vector3.one, 1f).SetEase(Ease.Linear).SetOnComplete(OnViewOpen).ID;
 
     void OnViewOpen()
@@ -31,7 +31,7 @@ void Start()
 
     // Rotation
     gameObject.RotateTween(Vector3.one, 1f);
-    // Position movement
+    // Movement
     gameObject.Move(Vector3.one, 1f);
     gameObject.MoveAtSpeed(Vector3.one, 2f);
     gameObject.LocalMove(Vector3.one, 1f);
@@ -43,7 +43,7 @@ void Start()
     gameObject.GetComponent<Image>().ColorTween(Color.green, 1f);
     // Fill amount
     gameObject.GetComponent<Image>().FillAmountTween(1f, 1f);
-    // Shaking effects
+    // Shake effects
     gameObject.ShakePosition(Vector3.one, shakeCount: 8, t: 0.05f, fadeOut: false);
     gameObject.ShakeRotation(Vector3.one);
     gameObject.ShakeScale(Vector3.one);
@@ -52,55 +52,72 @@ void Start()
     gameObject.PathTween(new Vector3[] { Vector3.zero, Vector3.one * 100f, Vector3.one * 200f }, duration: 1f, pathType: PathType.CatmullRom,
         pathMode: PathMode.Ignore, resolution: 10, closePath: false);
     gameObject.LocalPathTween(new Vector3[] { Vector3.zero, Vector3.one * 100f, Vector3.one * 200f }, duration: 1f);
-    
+
     // Method chaining
-    gameObject.Move(Vector3.one, 1f)
-        .SetEase(Ease.EaseOutQuad) // Set easing type
+    BaseTween baseTween = gameObject.Move(Vector3.one, 10f)
+        .SetEase(Ease.EaseOutQuad) // Set Ease curve
         .SetOnComplete(OnViewOpen) // Set completion callback
         .SetDelay(2f) // Set delay
-        .SetEvent(OnViewOpen, 2.5f) // Set event to trigger at specific time
-        .SetLoopType(LoopType.Yoyo, 3) // Set loop type (Restart, Flip, Incremental, Yoyo) and count
-        .SetUpdateMode(UpdateMode.Update) // Set update mode (default is Update)
+        .SetEvent(OnViewOpen, 2.5f) // Set event to be called at specific time
+        .SetLoopType(LoopType.Yoyo, 3) // Set loop type (Restart, Flip, Incremental, Yoyo) and loop count
+        .SetUpdateMode(UpdateMode.Update) // Set update mode, default is Update
         .SetOwner(gameObject) // Set animation owner
-        .SetIsPause(false); // Set pause state
-        .SetIgnoreTimeScale(true); // Set whether to ignore timeScale
-        .SetCustomId("customId"); // Set custom ID
+        .SetIsPause(false) // Set pause state
+        .SetIgnoreTimeScale(true) // Set whether to ignore time scale
+        .SetCustomId("customId") // Set custom ID
+        .SetCurrentTime(5f) // Set current time
+        .SetProgress(0.5f) // Set current progress
+        .SetAutoKill(false) // Default is true, automatically recycles after use, held BaseTween may have been reused
+        .Complete() // Complete animation immediately
+        .ReplayReset(); // Replay animation
     
+    baseTween.CurrentTime = 5f;  // Set or get current time
+    baseTween.Progress = 0.5f;  // Set or get current progress
+    
+    // Only use ID to control animations, because animations auto-recycle by default. Use SetAutoKill(false) to disable auto-recycle
     // Set custom ID
     FF8.Tween.SetCustomId(id, "customId");
     
-    // Pause control
+    // Set current time (using id, customId, or gameObject)
+    FF8.Tween.SetCurrentTime(id, 5f);
+    FF8.Tween.SetCurrentTime("customId", 5f);
+    FF8.Tween.SetCurrentTime(gameObject, 5f);
+    
+    // Set current progress (same as above)
+    FF8.Tween.SetProgress(id, 0.5f);
+    
+    // Complete animation immediately (same as above)
+    FF8.Tween.Complete(id);
+    
+    // Replay animation (same as above)
+    FF8.Tween.ReplayReset(id);
+    
+    // Set pause state (same as above)
     FF8.Tween.SetIsPause(id, true);
-    FF8.Tween.SetIsPause("customId", true);
     
-    // Set whether to ignore timeScale
+    // Set ignore time scale (same as above)
     FF8.Tween.SetIgnoreTimeScale(id, true);
-    FF8.Tween.SetIgnoreTimeScale("customId", true);
     
-    // Alternative usage with OnUpdate
+    // Cancel animation (same as above)
+    int id2 = baseTween.ID;
+    FF8.Tween.CancelTween(id2);
+    gameObject.CancelTween(id2);
+    gameObject.CancelAllTweens();
+    
+    // You can also use it like this, setting OnUpdate
     // Numeric value tweening
     BaseTween valueTween = FF8.Tween.ValueTween(0f, 100f, 3f).SetOnUpdateFloat((float v) =>
     {
         LogF8.Log(v);
     });
     
-    // Cancel animation by ID (base tween will be recycled but ID remains unique)
-    int id2 = valueTween.ID;
-    FF8.Tween.CancelTween(id2);
-    FF8.Tween.CancelTween("customId");
-    
-    // Object movement
+    // GameObject movement
     BaseTween gameObjectTween = FF8.Tween.Move(gameObject, Vector3.one, 3f).SetOnUpdateVector3((Vector3 v) =>
     {
         LogF8.Log(v);
     });
-        
-    // Alternative cancellation using owner object
-    gameObjectTween.SetOwner(gameObject);
-    FF8.Tween.CancelTween(gameObject);
-    gameObject.CancelAllTweens();
     
-    // UI movement using relative coordinates
+    // Move UI based on relative coordinates
     // (0.0 , 1.0) _______________________(1.0 , 1.0)
     //            |                      |
     //            |                      |                  
@@ -111,29 +128,29 @@ void Start()
         .SetEase(Ease.EaseOutBounce);
     
     
-    /*----------------------------------------- Animation Sequences -----------------------------------------*/
-    // Initialize sequence (sequential/parallel execution with callbacks)
+    /*-----------------------------------------Animation Sequences-----------------------------------------*/
+    // Initialize, execute animations sequentially/parallel, with callbacks
     var sequence = SequenceManager.GetSequence();
     
     sequence.Append(valueTween); // First animation
-    sequence.Join(gameObjectTween);   // Runs concurrently with first animation
-    sequence.Append(valueTween); // Runs after first animation completes
-    sequence.Append(() => LogF8.Log("Complete!")); // Callback after sequence
-    sequence.SetOnComplete(() => LogF8.Log("Sequence complete"));
-    sequence.SetIgnoreTimeScale(true); // Set whether to ignore timeScale
+    sequence.Join(gameObjectTween);   // Execute simultaneously with first animation
+    sequence.Append(valueTween); // Execute after second animation completes
+    sequence.Append(() => LogF8.Log("Completed!")); // Callback after animation sequence ends
+    sequence.SetOnComplete(() => LogF8.Log("Sequence completed"));
+    sequence.SetIgnoreTimeScale(true); // Set whether to ignore time scale
     
-    // Set loop count (-1 for infinite)
+    // Set loop count, -1 represents infinite loops
     sequence.SetLoops(3);
     
-    // Schedule events/animations at specific times
-    sequence.RunAtTime(() => LogF8.Log("Mid-sequence event"), 1.5f); // Callback at 1.5s
-    sequence.RunAtTime(gameObjectTween, 2.0f); // Start animation at 2.0s
+    // Run events or animations at specific times
+    sequence.RunAtTime(() => LogF8.Log("Midway event"), 1.5f); // Execute callback at 1.5 seconds
+    sequence.RunAtTime(gameObjectTween, 2.0f); // Start specific animation at 2 seconds
     
-    // Recycle sequence and stop all animations
+    // Recycle Sequence and stop all animations
     SequenceManager.KillSequence(sequence);
 }
 
-/*-------------------------------------Coroutine Animation Control-------------------------------------*/
+/*-----------------------------------------Using Coroutines to Wait for Animations and Sequences-----------------------------------------*/
 IEnumerator Coroutine() {
     yield return gameObject.Move(Vector3.one, 1f);
     
@@ -143,7 +160,7 @@ IEnumerator Coroutine() {
     yield return sequence;
 }
 
-/*-------------------------------------Async Animation Control-------------------------------------*/
+/*-----------------------------------------Using async/await to Wait for Animations and Sequences-----------------------------------------*/
 async void Async() {
     await gameObject.Move(Vector3.one, 1f);
     

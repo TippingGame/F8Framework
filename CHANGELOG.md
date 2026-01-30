@@ -1,5 +1,8 @@
 # Changelog
 
+## [2.4.241] - 2025-01-30
+1.新增Tween模块的SetCurrentTime，SetProgress，SetAutoKill，Complete，ReplayReset方法  
+
 ## [2.4.240] - 2025-01-24
 1.优化HotUpdate模块返回完整的进度信息  
 

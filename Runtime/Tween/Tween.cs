@@ -89,6 +89,7 @@ namespace F8Framework.Core
         {
             for (int i = 0; i < tweens.Count; i++)
             {
+                tweens[i].CanRecycle = true;
                 tweens[i].IsRecycle = true;
             }
             tweens.Clear();
@@ -98,7 +99,7 @@ namespace F8Framework.Core
 
         #endregion
 
-        public void ProcessConnection(BaseTween tween)
+        internal void ProcessConnection(BaseTween tween)
         {
             if (tweenConnections.TryGetValue(tween.Owner, out var idList))
             {
@@ -116,6 +117,154 @@ namespace F8Framework.Core
             }
         }
         
+        public void SetProgress(GameObject owner, float time)
+        {
+            if (tweenConnections.TryGetValue(owner, out var idList))
+            {
+                if (idList == null)
+                    return;
+
+                for (int n = 0; n < idList.Count; n++)
+                {
+                    SetProgress(idList[n], time);
+                }
+            }
+        }
+        
+        public void SetProgress(object customId, float time)
+        {
+            for (int n = 0; n < tweens.Count; n++)
+            {
+                if (tweens[n].CustomId == customId)
+                {
+                    tweens[n].SetProgress(time);
+                }
+            }
+        }
+        
+        public void SetProgress(int id, float time)
+        {
+            for (int n = 0; n < tweens.Count; n++)
+            {
+                if (tweens[n].ID == id)
+                {
+                    tweens[n].SetProgress(time);
+                    break;
+                }
+            }
+        }
+        
+        public void SetCurrentTime(GameObject owner, float time)
+        {
+            if (tweenConnections.TryGetValue(owner, out var idList))
+            {
+                if (idList == null)
+                    return;
+
+                for (int n = 0; n < idList.Count; n++)
+                {
+                    SetCurrentTime(idList[n], time);
+                }
+            }
+        }
+        
+        public void SetCurrentTime(object customId, float time)
+        {
+            for (int n = 0; n < tweens.Count; n++)
+            {
+                if (tweens[n].CustomId == customId)
+                {
+                    tweens[n].SetCurrentTime(time);
+                }
+            }
+        }
+        
+        public void SetCurrentTime(int id, float time)
+        {
+            for (int n = 0; n < tweens.Count; n++)
+            {
+                if (tweens[n].ID == id)
+                {
+                    tweens[n].SetCurrentTime(time);
+                    break;
+                }
+            }
+        }
+        
+        public void ReplayReset(GameObject owner)
+        {
+            if (tweenConnections.TryGetValue(owner, out var idList))
+            {
+                if (idList == null)
+                    return;
+
+                for (int n = 0; n < idList.Count; n++)
+                {
+                    ReplayReset(idList[n]);
+                }
+            }
+        }
+        
+        public void ReplayReset(object customId)
+        {
+            for (int n = 0; n < tweens.Count; n++)
+            {
+                if (tweens[n].CustomId == customId)
+                {
+                    tweens[n].ReplayReset();
+                }
+            }
+        }
+        
+        public void ReplayReset(int id)
+        {
+            for (int n = 0; n < tweens.Count; n++)
+            {
+                if (tweens[n].ID == id)
+                {
+                    tweens[n].ReplayReset();
+                    break;
+                }
+            }
+        }
+        
+        public void Complete(GameObject owner)
+        {
+            if (tweenConnections.TryGetValue(owner, out var idList))
+            {
+                if (idList == null)
+                    return;
+
+                for (int n = 0; n < idList.Count; n++)
+                {
+                    Complete(idList[n]);
+                }
+            }
+        }
+        
+        public void Complete(object customId)
+        {
+            for (int n = 0; n < tweens.Count; n++)
+            {
+                if (tweens[n].CustomId == customId)
+                {
+                    tweens[n].Complete();
+                }
+            }
+        }
+        
+        public void Complete(int id)
+        {
+            for (int n = 0; n < tweens.Count; n++)
+            {
+                if (tweens[n].ID == id)
+                {
+                    tweens[n].Complete();
+                    break;
+                }
+            }
+        }
+        
         public void SetCustomId(int id, object customId)
         {
             for (int n = 0; n < tweens.Count; n++)
@@ -124,6 +273,20 @@ namespace F8Framework.Core
                 {
                     tweens[n].SetCustomId(customId);
                     break;
+                }
+            }
+        }
+        
+        public void SetIgnoreTimeScale(GameObject owner, bool ignoreTimeScale)
+        {
+            if (tweenConnections.TryGetValue(owner, out var idList))
+            {
+                if (idList == null)
+                    return;
+
+                for (int n = 0; n < idList.Count; n++)
+                {
+                    SetIgnoreTimeScale(idList[n], ignoreTimeScale);
                 }
             }
         }
@@ -147,6 +310,20 @@ namespace F8Framework.Core
                 {
                     tweens[n].SetIgnoreTimeScale(ignoreTimeScale);
                     break;
+                }
+            }
+        }
+        
+        public void SetIsPause(GameObject owner, bool isPause)
+        {
+            if (tweenConnections.TryGetValue(owner, out var idList))
+            {
+                if (idList == null)
+                    return;
+
+                for (int n = 0; n < idList.Count; n++)
+                {
+                    SetIsPause(idList[n], isPause);
                 }
             }
         }
@@ -180,6 +357,7 @@ namespace F8Framework.Core
             {
                 if (tweens[n].CustomId == customId)
                 {
+                    tweens[n].CanRecycle = true;
                     tweens[n].IsRecycle = true;
                 }
             }
@@ -191,6 +369,7 @@ namespace F8Framework.Core
             {
                 if (tweens[n].ID == id)
                 {
+                    tweens[n].CanRecycle = true;
                     tweens[n].IsRecycle = true;
                     break;
                 }
@@ -201,7 +380,10 @@ namespace F8Framework.Core
         private void CancelTween(BaseTween tween)
         {
             if (tween != null)
+            {
+                tween.CanRecycle = true;
                 tween.IsRecycle = true;
+            }
         }
 
         public void CancelTween(GameObject owner)
