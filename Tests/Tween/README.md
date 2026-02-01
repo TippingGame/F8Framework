@@ -53,7 +53,9 @@ void Start()
     gameObject.PathTween(new Vector3[] { Vector3.zero, Vector3.one * 100f, Vector3.one * 200f }, duration: 1f, pathType: PathType.CatmullRom,
         pathMode: PathMode.Ignore, resolution: 10, closePath: false);
     gameObject.LocalPathTween(new Vector3[] { Vector3.zero, Vector3.one * 100f, Vector3.one * 200f }, duration: 1f);
-
+    // 字符串动画
+    gameObject.GetComponent<Text>().StringTween("", "Hello World!", 1f, richTextEnabled: true, ScrambleMode.Custom, scrambleChars: "*");
+    
     // 链式调用
     BaseTween baseTween = gameObject.Move(Vector3.one, 10f)
         .SetEase(Ease.EaseOutQuad) // 设置Ease

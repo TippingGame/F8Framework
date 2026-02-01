@@ -2,7 +2,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.ComponentModel;
 
 namespace F8Framework.Core
@@ -49,7 +48,24 @@ namespace F8Framework.Core
         protected int tempLoopCount = 0;
         protected bool ignoreTimeScale = false;
         #endregion
+        
+        #region EVENTS
+        protected Action onComplete = null;
+        protected Action onCompleteSequence = null;
+        protected Action onUpdate = null;
+        protected Action<string> onUpdateString = null;
+        protected Action<Vector3> onUpdateVector3 = null;
+        protected Action<float> onUpdateFloat = null;
+        protected Action<Color> onUpdateColor = null;
+        protected Action<Vector2> onUpdateVector2 = null;
+        protected Action<Quaternion> onUpdateQuaternion = null;
+        protected List<TimeEvent> events = new List<TimeEvent>();
+        protected Action PauseReset = null;
+        #endregion
 
+        internal bool CanRecycle = true;
+        internal bool IsRecycle = false;
+        
         public float CurrentTime 
         { 
             get => currentTime;
@@ -75,25 +91,10 @@ namespace F8Framework.Core
             get => isComplete;
             set => isComplete = value;
         }
-        
-        #region EVENTS
-        protected Action onComplete = null;
-        protected Action onCompleteSequence = null;
-        protected Action onUpdate = null;
-        protected Action<Vector3> onUpdateVector3 = null;
-        protected Action<float> onUpdateFloat = null;
-        protected Action<Color> onUpdateColor = null;
-        protected Action<Vector2> onUpdateVector2 = null;
-        protected Action<Quaternion> onUpdateQuaternion = null;
-        protected List<TimeEvent> events = new List<TimeEvent>();
-        protected Action PauseReset = null;
-        #endregion
-
         public GameObject Owner => owner;
         public UpdateMode UpdateMode => updateMode;
-        public bool CanRecycle = true;
-        public bool IsRecycle = false;
         public bool IgnoreTimeScale => ignoreTimeScale;
+        public bool IsAutoKill => CanRecycle;
 
         public BaseTween()
         {
@@ -122,10 +123,13 @@ namespace F8Framework.Core
         {
             timeSinceStart += deltaTime;
 
-            if (events.Count > 0 && timeSinceStart >= events[0].Time)
+            for (int i = 0; i < events.Count; i++)
             {
-                events[0].Action();
-                events.RemoveAt(0);
+                if (!events[i].IsComplete && timeSinceStart >= events[i].Time)
+                {
+                    events[i].IsComplete = true;
+                    events[i].Action();
+                }
             }
 
             if(onUpdate != null)
@@ -134,7 +138,7 @@ namespace F8Framework.Core
         
         public BaseTween Complete()
         {
-            SetEndValue(true);
+            UpdateValue(true);
             onComplete();
             return this;
         }
@@ -143,14 +147,14 @@ namespace F8Framework.Core
         {
             float clampedValue = Mathf.Clamp01(progress);
             currentTime = clampedValue * duration;
-            SetEndValue(false);
+            UpdateValue(false);
             return this;
         }
         
         public BaseTween SetCurrentTime(float time)
         {
             currentTime = time;
-            SetEndValue(false);
+            UpdateValue(false);
             return this;
         }
         
@@ -189,10 +193,24 @@ namespace F8Framework.Core
             IsComplete = false;
             isPause = false;
             currentTime = 0.0f;
+            timeSinceStart = 0.0f;
+            tempLoopCount = loopCount;
+            for (int i = 0; i < events.Count; i++)
+            {
+                events[i].IsComplete = false;
+            }
+            return this;
+        }
+
+        public virtual BaseTween LoopReset()
+        {
+            IsComplete = false;
+            isPause = false;
+            currentTime = 0.0f;
             return this;
         }
         
-        internal virtual void SetEndValue(bool isEnd = false)
+        internal virtual void UpdateValue(bool isEnd = false)
         {
         }
 
@@ -214,12 +232,7 @@ namespace F8Framework.Core
         public BaseTween SetEvent(Action action, float t)
         {
             events.Add(new TimeEvent(action, t));
-
-            //sort this list
-            if (events.Count > 1)
-                events = events.OrderBy(o => o.Time).ToList();
-
-
+            
             return this;
         }
 
@@ -257,6 +270,12 @@ namespace F8Framework.Core
             return this;
         }
 
+        public BaseTween SetOnUpdateString(Action<string> action)
+        {
+            onUpdateString += action;
+            return this;
+        }
+        
         public BaseTween SetOnUpdateVector2(Action<Vector2> action)
         {
             onUpdateVector2 += action;
@@ -345,7 +364,8 @@ namespace F8Framework.Core
             isPause = false;
             CanRecycle = true;
             ignoreTimeScale = false;
-            
+
+            onUpdateString = null;
             onUpdate = null;
             onUpdateVector3 = null;
             onUpdateFloat = null;
@@ -398,11 +418,13 @@ namespace F8Framework.Core
     {
         public Action Action;
         public float Time;
+        public bool IsComplete;
 
         public TimeEvent(Action action, float t)
         {
             Action = action;
             Time = t;
+            IsComplete = false;
         }
     }
 

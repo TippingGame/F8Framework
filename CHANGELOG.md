@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.242] - 2025-02-01
+1.新增Tween模块的StringTween字符串动画  
+2.修复Tween模块Yoyo循环模式终点位置不在起点的问题  
+3.修复Tween模块Incremental循环模式重播动画时起点和终点位置被修改的问题  
+4.修复Tween模块重播动画后事件不会重新执行的问题  
+5.明确Excel模块能选择忽略行或列  
+
 ## [2.4.241] - 2025-01-30
 1.新增Tween模块的SetCurrentTime，SetProgress，SetAutoKill，Complete，ReplayReset方法  
 

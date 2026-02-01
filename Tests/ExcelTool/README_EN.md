@@ -84,7 +84,7 @@ Excel Example:
     * Enables one-click switching of configuration table variants, thereby supporting multi-language/multi-version configurations
 
 Excel Example:  
-(Optional parameters: int type (default), Flags attribute, cross-sheet access: Sheet1.name)
+(Optional parameters: int type (default), Flags attribute, can cross-sheet access: Sheet1.name)
 
 | enum<name,int,Flags>{Value1 = 1,Value2 = 2,Value3 = 4,Value4 = 8,} | enum<Sheet1.name> | enum<Status,long>{OK = 200,Success = 200,Created = 201,Accepted = 202,} |
 |--------------------------------------------------------------------|-------------------|-------------------------------------------------------------------------|
@@ -106,7 +106,11 @@ FF8.Config.VariantName = "English";
 | 中文3    | Chinese 3             | 중국어 3                | 1000    | 800                     | 300                    |
 | 中文4    | Chinese 4             | 중국어 4                | 1000    | 800                     | 300                    |
 
-(You can extend other types: [ReadExcel.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/ExcelTool/ReadExcel.cs))
+(You can extend other types: [ReadExcel.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/ExcelTool/ReadExcel.cs))  
+
+* Additional Notes:
+  * To skip an entire row: Leave `id` blank
+  * To skip an entire column: Leave `type` or `name` blank
 
 ## Usage Examples
 

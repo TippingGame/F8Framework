@@ -85,7 +85,7 @@ Excel 示例：
     * 可实现一键切换配置表变体，以此实现多语言/多版本配置
 
 Excel 示例：  
-（可选参数：int类型(默认)，Flags特性，标志枚举：Value1, Value2，跨表访问：Sheet1.name）  
+（可选参数：int类型(默认)，Flags特性，标志枚举：Value1, Value2，可跨表访问：Sheet1.name）  
 
 | enum<name,int,Flags>{Value1 = 1,Value2 = 2,Value3 = 4,Value4 = 8,} | enum<Sheet1.name> | enum<Status,long>{OK = 200,Success = 200,Created = 201,Accepted = 202,} |
 |--------------------------------------------------------------------|-------------------|-------------------------------------------------------------------------|
@@ -107,7 +107,12 @@ FF8.Config.VariantName = "English";
 | 中文3    | Chinese 3             | 중국어 3                | 1000    | 800                     | 300                    |
 | 中文4    | Chinese 4             | 중국어 4                | 1000    | 800                     | 300                    |
 
-（你还可以拓展其他类型：[ReadExcel.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/ExcelTool/ReadExcel.cs)）
+（你还可以拓展其他类型：[ReadExcel.cs](https://github.com/TippingGame/F8Framework/blob/main/Runtime/ExcelTool/ReadExcel.cs)）  
+
+* 额外说明：
+  * 整行不导出：`id`留空
+  * 整列不导出：`type`留空或`name`留空
+
 ## 使用范例
 
 **在使用 Excel 数据前，需要执行**：

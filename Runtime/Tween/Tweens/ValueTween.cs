@@ -6,6 +6,8 @@ namespace F8Framework.Core
     {
         private float from = 0.0f;
         private float to = 0.0f;
+        private float originalTo = 0.0f;
+        private float originalFrom = 0.0f;
         
         public ValueTween(float from, float to, float t, int id)
         {
@@ -17,6 +19,8 @@ namespace F8Framework.Core
         {
             this.from = from;
             this.to = to;
+            this.originalTo = to;
+            this.originalFrom = from;
             this.duration = t;
             this.PauseReset = () => this.Init(from, to, t);
         }
@@ -43,7 +47,7 @@ namespace F8Framework.Core
             // 检查是否完成当前周期
             if (currentTime >= duration)
             {
-                this.SetEndValue(true);
+                this.UpdateValue(true);
                 
                 bool shouldComplete = !HandleLoop();
                 if (shouldComplete)
@@ -51,16 +55,16 @@ namespace F8Framework.Core
                 return;
             }
 
-            this.SetEndValue(false);
+            this.UpdateValue(false);
         }
 
-        internal override void SetEndValue(bool isEnd = false)
+        internal override void UpdateValue(bool isEnd = false)
         {
-            base.SetEndValue(isEnd);
+            base.UpdateValue(isEnd);
             if (isEnd)
             {
                 if (onUpdateFloat != null)
-                    onUpdateFloat(to);
+                    onUpdateFloat(loopType == LoopType.Yoyo ? from : to);
             }
             else
             {
@@ -80,14 +84,23 @@ namespace F8Framework.Core
         internal override void Reset()
         {
             base.Reset();
-            from = 0;
-            to = 0;
+            from = 0.0f;
+            to = 0.0f;
+            originalTo = 0.0f;
+            originalFrom = 0.0f;
         }
 
         public override BaseTween ReplayReset()
         {
             base.ReplayReset();
-            Init(from, to, duration);
+            to = originalTo;
+            from = originalFrom;
+            return this;
+        }
+        
+        public override BaseTween LoopReset()
+        {
+            base.LoopReset();
             return this;
         }
         
@@ -105,17 +118,17 @@ namespace F8Framework.Core
         
         private bool HandleLoop()
         {
-            if (this.loopType == LoopType.None || this.tempLoopCount == 0)
+            if (loopType == LoopType.None || tempLoopCount == 0)
             {
                 return false;
             }
             else
             {
-                if (this.tempLoopCount > 0)
+                if (tempLoopCount > 0)
                 {
-                    this.tempLoopCount -= 1;
+                    tempLoopCount -= 1;
                 }
-                switch (this.loopType)
+                switch (loopType)
                 {
                     case LoopType.Restart:
                         break;
@@ -132,8 +145,8 @@ namespace F8Framework.Core
                     case LoopType.Yoyo:
                         break;
                 }
-                this.ReplayReset();
-                return this.tempLoopCount > 0 || this.tempLoopCount == -1;
+                this.LoopReset();
+                return tempLoopCount > 0 || tempLoopCount == -1;
             }
         }
     }

@@ -559,6 +559,26 @@ namespace F8Framework.Core
         {
             return Tween.Instance.LocalPathTween(transform, localPath, duration, pathType, pathMode, resolution, closePath);
         }
+        
+        public static BaseTween StringTween(this Text text, string to, float time, bool richTextEnabled = false, ScrambleMode scrambleMode = ScrambleMode.None, string scrambleChars = null)
+        {
+            return Tween.Instance.StringTween(text, to, time, richTextEnabled, scrambleMode, scrambleChars);
+        }
+        
+        public static BaseTween StringTween(this Text text, string from, string to, float time, bool richTextEnabled = false, ScrambleMode scrambleMode = ScrambleMode.None, string scrambleChars = null)
+        {
+            return Tween.Instance.StringTween(text, from, to, time, richTextEnabled, scrambleMode, scrambleChars);
+        }
+        
+        public static BaseTween StringTweenAtSpeed(this Text text, string to, float speed, bool richTextEnabled = false, ScrambleMode scrambleMode = ScrambleMode.None, string scrambleChars = null)
+        {
+            return Tween.Instance.StringTweenAtSpeed(text, to, speed, richTextEnabled, scrambleMode, scrambleChars);
+        }
+        
+        public static BaseTween StringTweenAtSpeed(this Text text, string from, string to, float speed, bool richTextEnabled = false, ScrambleMode scrambleMode = ScrambleMode.None, string scrambleChars = null)
+        {
+            return Tween.Instance.StringTweenAtSpeed(text, from, to, speed, richTextEnabled, scrambleMode, scrambleChars);
+        }
 
         public static void CancelAllTweens(this GameObject go)
         {

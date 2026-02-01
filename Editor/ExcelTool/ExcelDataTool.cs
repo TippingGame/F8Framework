@@ -527,6 +527,10 @@ namespace F8Framework.Core.Editor
                     }
                     else
                     {
+                        if (data.Name.IsNullOrEmpty())
+                        {
+                            continue;
+                        }
                         FieldInfo info = temp.GetField(data.Name);
                         // FieldInfo.SetValue 设置对象内指定名称的字段的值
                         if (info != null)

@@ -892,7 +892,7 @@ namespace F8Framework.Core
             return tween;
         }
         #endregion
-
+        
         #region VECTOR_TWEEN
         public BaseTween VectorTween(Vector2 from, Vector2 to, float t)
         {
@@ -919,8 +919,7 @@ namespace F8Framework.Core
         }
 
         #endregion
-
-
+        
         #region VALUE_TWEEN
         public BaseTween ValueTween(float from, float to, float t)
         {
@@ -1374,6 +1373,66 @@ namespace F8Framework.Core
             
             return PathTween(target, worldPath, duration, pathType, pathMode, resolution, closePath);
         }
+        #endregion
+        
+        #region STRING_TWEEN
+
+        public BaseTween StringTween(Text text, string to, float time, bool richTextEnabled = false, ScrambleMode scrambleMode = ScrambleMode.None, string scrambleChars = null)
+        {
+            return StringTween(text, string.Empty, to, time, richTextEnabled, scrambleMode, scrambleChars);
+        }
+        
+        public BaseTween StringTween(Text text, string from, string to, float time, bool richTextEnabled = false, ScrambleMode scrambleMode = ScrambleMode.None, string scrambleChars = null)
+        {
+            StringTween tween = TweenPool.GetStringTween(from, to, time, richTextEnabled, scrambleMode, scrambleChars);
+            tween.SetOnUpdateString((string s) =>
+            {
+                if (text == null)
+                {
+                    CancelTween(tween);
+                    return;
+                }
+
+                text.text = s;
+            });
+            return tween;
+        }
+        
+        public BaseTween StringTweenAtSpeed(Text text, string to, float speed, bool richTextEnabled = false, ScrambleMode scrambleMode = ScrambleMode.None, string scrambleChars = null)
+        {
+            float t = to.Length / speed;
+            return StringTween(text, to, t, richTextEnabled, scrambleMode, scrambleChars);
+        }
+        
+        public BaseTween StringTweenAtSpeed(Text text, string from, string to, float speed, bool richTextEnabled = false, ScrambleMode scrambleMode = ScrambleMode.None, string scrambleChars = null)
+        {
+            float t = Math.Abs(to.Length - from.Length) / speed;
+            return StringTween(text, from, to, t, richTextEnabled, scrambleMode, scrambleChars);
+        }
+        
+        public BaseTween StringTween(string to, float time, bool richTextEnabled = false, ScrambleMode scrambleMode = ScrambleMode.None, string scrambleChars = null)
+        {
+            return StringTween(string.Empty, to, time, richTextEnabled, scrambleMode, scrambleChars);
+        }
+        
+        public BaseTween StringTween(string from, string to, float time, bool richTextEnabled = false, ScrambleMode scrambleMode = ScrambleMode.None, string scrambleChars = null)
+        {
+            StringTween tween = TweenPool.GetStringTween(from, to, time, richTextEnabled, scrambleMode, scrambleChars);
+            return tween;
+        }
+        
+        public BaseTween StringTweenAtSpeed(string to, float speed, bool richTextEnabled = false, ScrambleMode scrambleMode = ScrambleMode.None, string scrambleChars = null)
+        {
+            float t = to.Length / speed;
+            return StringTween(string.Empty, to, t, richTextEnabled, scrambleMode, scrambleChars);
+        }
+        
+        public BaseTween StringTweenAtSpeed(string from, string to, float speed, bool richTextEnabled = false, ScrambleMode scrambleMode = ScrambleMode.None, string scrambleChars = null)
+        {
+            float t = Math.Abs(to.Length - from.Length) / speed;
+            return StringTween(from, to, t, richTextEnabled, scrambleMode, scrambleChars);
+        }
+        
         #endregion
     }
 

@@ -6,6 +6,7 @@ namespace F8Framework.Core
 {
     public static class TweenPool
     {
+        static List<StringTween> stringTweens = new List<StringTween>();
         static List<ValueTween> valueTweens = new List<ValueTween>();
         static List<Vector2Tween> vector2Tweens = new List<Vector2Tween>();
         static List<Vector3Tween> vector3Tweens = new List<Vector3Tween>();
@@ -33,6 +34,9 @@ namespace F8Framework.Core
         {
             switch (tween)
             {
+                case StringTween stringTween:
+                    stringTweens.Add(stringTween);
+                    break;
                 case ValueTween valueTween:
                     valueTweens.Add(valueTween);
                     break;
@@ -72,6 +76,23 @@ namespace F8Framework.Core
             }
         }
 
+        internal static StringTween GetStringTween(string from, string to, float t, bool richTextEnabled, ScrambleMode scrambleMode, string scrambleChars)
+        {
+            StringTween tween;
+            if (TryGetTween(stringTweens, out tween))
+            {
+                tween.Reset();
+                tween.Init(from, to, t, richTextEnabled, scrambleMode, scrambleChars);
+                tween.ID = GenerateId();
+            }
+            else
+            {
+                tween = new StringTween(from, to, t, richTextEnabled, scrambleMode, scrambleChars, GenerateId());
+            }
+            Tween.Instance.tweens.Add(tween);
+            return tween;
+        }
+        
         public static ValueTween GetValueTween(float start, float end, float t)
         {
             ValueTween tween;
