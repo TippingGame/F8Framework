@@ -6,7 +6,7 @@
 
 ## Introduction (Simply press F8 to start game development without distractions)
 **Unity F8 StorageManager Component**  
-Local Data Storage & Loading
+Local Data Storage & Loading & Encryption
 
 ## Plugin Installation (Requires Core Framework First)
 Note! Built into → F8Framework Core: https://github.com/TippingGame/F8Framework.git  

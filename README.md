@@ -33,7 +33,7 @@ Unity 2021、2022、2023、6000
 * [5. 声音管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Audio/README.md) - 声音的播放/暂停/停止/进度控制，音量控制/保存，全局暂停/恢复。Audio分为三大类：**背景音乐、人声、特效声**。
 * [6. 事件管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Event/README.md) - 发送消息事件，事件监听，防止**消息死循环**，自动释放事件。
 * [7. 时间管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Timer/README.md) - 提供Timer、FrameTimer两种计时器，暂停/恢复，自动释放Timer。
-* [8. 补间动画（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Tween/README.md) - 播放/终止动画，**自由组合**动画，有旋转/位移/缩放/渐变/填充/震动动画，可根据UI的**相对布局**位移动画。
+* [8. 补间动画（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Tween/README.md) - 播放/终止动画，**自由组合**动画，有旋转/位移/缩放/渐变/填充/震动/字符串动画，可根据UI的**相对布局**位移动画。
 * [9. 引用池管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/ReferencePool/README.md) - 引用池管理，C# 对象，入池/取出/回收/清空。
 * [10. 游戏对象池（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/GameObjectPool/README.md) - 游戏对象池管理，GameObject 预加载池化，生成/销毁/延迟销毁，生命周期事件监听。
 * [11. 本地化管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Localization/README.md) - 本地化 Text / TextMeshPro / Image / RawImage / SpriteRenderer / Renderer / Audio / Timeline 等组件，使用 **Excel** 作为多语言翻译表。
@@ -42,7 +42,7 @@ Unity 2021、2022、2023、6000
 * [14. UI界面管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/UI/README.md) - 处理界面加载、打开、关闭、查询、层级控制、自定义动画、自动获取组件索引。UI界面分为三大类：**普通UI、模态弹窗、非模态弹窗**，内置各种常用组件。
 * [15. 输入系统管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Input/README.md) - 使用同一套代码，通过自定义输入设备，适配多平台，可热切换输入设备，或同时启用多套输入设备。
 * [16. 游戏流程管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Procedure/README.md) - 自定义流程节点 ProcedureNode，控制游戏流程的，添加/运行/轮询/移除。
-* [17. 本地数据存储（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Storage/README.md) - 本地数据存储/读取。
+* [17. 本地数据存储（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Storage/README.md) - 本地数据存储/读取/加密。
 * [18. SDK接入管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/README.md) - 与**原生平台交互**，接入多个平台或者渠道SDK，登录/退出/切换/支付/视频广告/退出游戏/原生Toast。
 * [19. 网络连接与通信（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Network/README.md) - 使用 KCP / TCP / WebSocket 网络通讯协议建立长连接通道，支持Client端和Server端。
 ### ----------第三方库（注意冲突）----------
@@ -127,7 +127,7 @@ Build targets: Win / Android / iOS / Mac / Linux / WebGL / WeChat Mini Games（[
 * [5. Sound Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Audio/README_EN.md) - Play/pause/stop/seek controls, volume settings/saving, global pause/resume. Three audio types: **BGM, Voice, SFX**.
 * [6. Event Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Event/README_EN.md) - Event dispatch/listening, **dead-loop prevention**, and auto-cleanup.
 * [7. Time Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Timer/README_EN.md) - Offers Timer and FrameTimer with pause/resume and auto-release.
-* [8. Tween Animation (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Tween/README_EN.md) - Play/stop tweens, **composite animations**, including rotation/translation/scale/fade/fill/shake, and **UI-relative** motion.
+* [8. Tween Animation (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Tween/README_EN.md) - Play/stop tweens, **composite animations**, including rotation/translation/scale/fade/fill/shake/string, and **UI-relative** motion.
 * [9. Reference Pool Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/ReferencePool/README_EN.md) - C# object pooling: get/release/clear.
 * [10. GameObject Pool (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/GameObjectPool/README_EN.md) - GameObject pooling with preloading, spawn/destroy/delayed-destroy, and lifecycle events.
 * [11. Localization Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Localization/README_EN.md) - Localizes Text/TextMeshPro/Image/RawImage/SpriteRenderer/Renderer/Audio/Timeline using **Excel** for translations.
@@ -136,7 +136,7 @@ Build targets: Win / Android / iOS / Mac / Linux / WebGL / WeChat Mini Games（[
 * [14. UI interface manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/UI/README_EN.md) - Handles loading/opening/closing/querying/layering/custom animations/auto-component indexing. UI types: **Standard UI, Modal Popup, Non-Modal Popup**, with built-in common components.
 * [15. Input System Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Input/README_EN.md) - Unified multi-platform input via customizable devices, with hot-swapping or multi-device support.
 * [16. Game Procedure Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Procedure/README_EN.md) - Custom ProcedureNode for flow control: add/run/poll/remove.
-* [17. Local data storage (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Storage/README_EN.md) - Local data save/load.
+* [17. Local data storage (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Storage/README_EN.md) - Local data save/load/encryption.
 * [18. SDK Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/README_EN.md) - **Native platform interoperability**: Supports integration with multiple platform/channel SDKs for login/logout/account switching/payments/video ads/game exit/native toast notifications.
 * [19. Network Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Network/README_EN.md) - Long connections via KCP/TCP/WebSocket for Client/Server.
 ### ----------Third-Party Libraries (Watch for Conflicts)----------

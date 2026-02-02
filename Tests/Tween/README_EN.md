@@ -6,7 +6,7 @@
 
 ## Introduction (Simply press F8 to start game development without distractions)
 **Unity F8 Tween Component**  
-Play/Pause/Cancel Animations, Freely Combine animations including rotation/position/scale/fade/fill/shake effects, with layout-relative motion animations for UI.
+Play/Pause/Cancel Animations, Freely Combine animations including rotation/position/scale/fade/fill/shake/string effects, with layout-relative motion animations for UI.
 
 ## Plugin Installation (Requires Core Framework First)
 Note! Built into → F8Framework Core: https://github.com/TippingGame/F8Framework.git  

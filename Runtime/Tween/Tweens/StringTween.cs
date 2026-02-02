@@ -29,8 +29,8 @@ namespace F8Framework.Core
         public int startValueStrippedLength = 0;
         public int changeValueStrippedLength = 0;
 
-        private readonly StringBuilder _buffer = new StringBuilder(256);
-        private readonly List<TagInfo> _openedTags = new List<TagInfo>(8);
+        private static readonly StringBuilder _buffer = new StringBuilder(256);
+        private static readonly List<TagInfo> _openedTags = new List<TagInfo>(8);
         
         private struct TagInfo
         {
