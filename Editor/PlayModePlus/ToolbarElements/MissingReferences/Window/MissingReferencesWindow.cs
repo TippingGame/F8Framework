@@ -359,11 +359,9 @@ namespace F8Framework.Core.Editor
             string itemKey = $"{go.GetInstanceID()}_missing_script";
             bool isSelected = _selectedItems.Contains(itemKey);
 
-            isSelected = EditorGUILayout.Toggle(isSelected, GUILayout.Width(16));
-            UpdateSelection(itemKey, isSelected);
-
             string countText = infos.Count > 1 ? $" ({infos.Count})" : "";
-            EditorGUILayout.LabelField($"❌ Missing Script{countText}", EditorStyles.label);
+            isSelected = EditorGUILayout.ToggleLeft($"❌ Missing Script{countText}", isSelected, EditorStyles.label);
+            UpdateSelection(itemKey, isSelected);
 
             GUILayout.FlexibleSpace();
 
@@ -391,10 +389,8 @@ namespace F8Framework.Core.Editor
                 bool isSelected = _selectedItems.Contains(itemKey);
 
                 EditorGUI.indentLevel++;
-                isSelected = EditorGUILayout.Toggle(isSelected, GUILayout.Width(16));
+                isSelected = EditorGUILayout.ToggleLeft($"⚠️ Field: {info.FieldName}", isSelected, EditorStyles.label);
                 UpdateSelection(itemKey, isSelected);
-
-                EditorGUILayout.LabelField($"⚠️ Field: {info.FieldName}", EditorStyles.label);
 
                 GUILayout.FlexibleSpace();
 

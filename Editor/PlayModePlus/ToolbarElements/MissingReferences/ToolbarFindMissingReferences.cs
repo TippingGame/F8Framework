@@ -151,23 +151,26 @@ namespace F8Framework.Core.Editor
 
                 while (property.NextVisible(true))
                 {
-                    if (property.propertyType != SerializedPropertyType.ObjectReference ||
-                        property.objectReferenceValue != null)
+                    if (property.propertyType != SerializedPropertyType.ObjectReference)
                     {
                         continue;
                     }
-
-                    if (IgnoredFieldNames.Contains(property.name))
+                    
+                    if (property.objectReferenceValue == null && 
+                        property.objectReferenceInstanceIDValue != 0)
                     {
-                        continue;
+                        if (IgnoredFieldNames.Contains(property.name))
+                        {
+                            continue;
+                        }
+
+                        AddResult(go, new MissingReferenceInfo
+                        {
+                            ComponentName = component.GetType().Name,
+                            FieldName = property.displayName,
+                            IsScriptMissing = false
+                        }, results);
                     }
-
-                    AddResult(go, new MissingReferenceInfo
-                    {
-                        ComponentName = component.GetType().Name,
-                        FieldName = property.displayName,
-                        IsScriptMissing = false
-                    }, results);
                 }
             }
         }
