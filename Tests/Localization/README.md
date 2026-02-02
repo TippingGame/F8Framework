@@ -9,6 +9,7 @@
 1. 多组件本地化支持：
     * Text
     * TextMeshPro
+    * Font
     * Image / RawImage
     * SpriteRenderer
     * Material Renderer

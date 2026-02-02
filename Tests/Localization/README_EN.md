@@ -10,6 +10,7 @@ Multi-language Localization System with Excel Integration
 1. Multi-Component Localization Support:
    * Text
    * TextMeshPro
+   * Font
    * Image/RawImage
    * SpriteRenderer
    * Material Renderer

@@ -36,7 +36,7 @@ Unity 2021、2022、2023、6000
 * [8. 补间动画（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Tween/README.md) - 播放/终止动画，**自由组合**动画，有旋转/位移/缩放/渐变/填充/震动/字符串动画，可根据UI的**相对布局**位移动画。
 * [9. 引用池管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/ReferencePool/README.md) - 引用池管理，C# 对象，入池/取出/回收/清空。
 * [10. 游戏对象池（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/GameObjectPool/README.md) - 游戏对象池管理，GameObject 预加载池化，生成/销毁/延迟销毁，生命周期事件监听。
-* [11. 本地化管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Localization/README.md) - 本地化 Text / TextMeshPro / Image / RawImage / SpriteRenderer / Renderer / Audio / Timeline 等组件，使用 **Excel** 作为多语言翻译表。
+* [11. 本地化管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Localization/README.md) - 本地化 Text / TextMeshPro / Font / Image / RawImage / SpriteRenderer / Renderer / Audio / Timeline 等组件，使用 **Excel** 作为多语言翻译表。
 * [12. 有限状态机（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/FSM/README.md) - 自定义有限状态机 FSMState / FSMSwitch，创建/切换状态/轮询/销毁。
 * [13. 下载管理器（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Download/README.md) - 支持localhost与http地址文件的下载，可**本地写入、监听下载进度、断点续传**，支持动态添加、移除、暂停、恢复下载。
 * [14. UI界面管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/UI/README.md) - 处理界面加载、打开、关闭、查询、层级控制、自定义动画、自动获取组件索引。UI界面分为三大类：**普通UI、模态弹窗、非模态弹窗**，内置各种常用组件。
@@ -130,7 +130,7 @@ Build targets: Win / Android / iOS / Mac / Linux / WebGL / WeChat Mini Games（[
 * [8. Tween Animation (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Tween/README_EN.md) - Play/stop tweens, **composite animations**, including rotation/translation/scale/fade/fill/shake/string, and **UI-relative** motion.
 * [9. Reference Pool Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/ReferencePool/README_EN.md) - C# object pooling: get/release/clear.
 * [10. GameObject Pool (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/GameObjectPool/README_EN.md) - GameObject pooling with preloading, spawn/destroy/delayed-destroy, and lifecycle events.
-* [11. Localization Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Localization/README_EN.md) - Localizes Text/TextMeshPro/Image/RawImage/SpriteRenderer/Renderer/Audio/Timeline using **Excel** for translations.
+* [11. Localization Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Localization/README_EN.md) - Localizes Text/TextMeshPro/Font/Image/RawImage/SpriteRenderer/Renderer/Audio/Timeline using **Excel** for translations.
 * [12. Finite state machine (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/FSM/README_EN.md) - Custom FSMState/FSMSwitch for state creation/switching/polling/destruction.
 * [13. Download Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Download/README_EN.md) - Supports localhost/HTTP downloads with **local write, progress tracking, and resumable transfers**. Dynamic add/remove/pause/resume.
 * [14. UI interface manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/UI/README_EN.md) - Handles loading/opening/closing/querying/layering/custom animations/auto-component indexing. UI types: **Standard UI, Modal Popup, Non-Modal Popup**, with built-in common components.

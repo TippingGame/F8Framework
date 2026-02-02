@@ -35,9 +35,9 @@ namespace F8Framework.Core
                 return;
 
             // 处理启动延迟
-            if (delay > 0.0f)
+            if (tempDelay > 0.0f)
             {
-                delay -= deltaTime;
+                tempDelay -= deltaTime;
                 return;
             }
 

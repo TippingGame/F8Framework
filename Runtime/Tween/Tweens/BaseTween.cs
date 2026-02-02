@@ -35,6 +35,7 @@ namespace F8Framework.Core
         protected int id = 0;
         protected object customId = null;
         protected float delay = 0.0f;
+        protected float tempDelay = 0.0f;
         protected float duration = 0.0f;
         protected float currentTime = 0.0f;
         protected Ease ease = Ease.EaseOutQuad;
@@ -195,6 +196,7 @@ namespace F8Framework.Core
             currentTime = 0.0f;
             timeSinceStart = 0.0f;
             tempLoopCount = loopCount;
+            tempDelay = delay;
             for (int i = 0; i < events.Count; i++)
             {
                 events[i].IsComplete = false;
@@ -207,6 +209,12 @@ namespace F8Framework.Core
             IsComplete = false;
             isPause = false;
             currentTime = 0.0f;
+            timeSinceStart = 0.0f;
+            tempDelay = delay;
+            for (int i = 0; i < events.Count; i++)
+            {
+                events[i].IsComplete = false;
+            }
             return this;
         }
         
@@ -261,6 +269,7 @@ namespace F8Framework.Core
         public BaseTween SetDelay(float t)
         {
             delay = t;
+            tempDelay = t;
             return this;
         }
 
@@ -351,6 +360,7 @@ namespace F8Framework.Core
             id = 0;
             CustomId = null;
             delay = 0.0f;
+            tempDelay = 0.0f;
             duration = 0.0f;
             currentTime = 0.0f;
             ease = Ease.EaseOutQuad;

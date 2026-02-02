@@ -140,9 +140,9 @@ namespace F8Framework.Core
             if (isPause || IsComplete || IsRecycle)
                 return;
                 
-            if (delay > 0.0f)
+            if (tempDelay > 0.0f)
             {
-                delay -= deltaTime;
+                tempDelay -= deltaTime;
                 return;
             }
             
