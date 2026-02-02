@@ -614,6 +614,26 @@ namespace F8Framework.Core
             return RotateTween(t, toRotation, time);
         }
 
+        public BaseTween RotateTween(GameObject go, Quaternion to, float time)
+        {
+            return RotateTween(go.transform, to, time);
+        }
+        
+        public BaseTween RotateTween(GameObject go, Vector3 to, float time)
+        {
+            return RotateTween(go.transform, to, time);
+        }
+        
+        public BaseTween RotateTween(RectTransform go, Quaternion to, float time)
+        {
+            return RotateTween(go.transform, to, time);
+        }
+        
+        public BaseTween RotateTween(RectTransform go, Vector3 to, float time)
+        {
+            return RotateTween(go.transform, to, time);
+        }
+
         public BaseTween RotateTween(Transform t, Vector3 axis, float to, float time)
         {
             Quaternion toRotation = Quaternion.Euler(axis * to);
@@ -632,6 +652,134 @@ namespace F8Framework.Core
 
         #endregion
 
+        #region LOCAL_ROTATE_TWEENS
+
+        public BaseTween LocalRotateTween(Transform t, Quaternion to, float time)
+        {
+            QuaternionTween tween = TweenPool.GetQuaternionTween(t.localRotation, to, time);
+            tween.SetOnUpdateQuaternion((Quaternion v) =>
+            {
+                if (t != null)
+                {
+                    t.localRotation = v;
+                }
+                else
+                {
+                    CancelTween(tween);
+                }
+            });
+    
+            return tween;
+        }
+
+        public BaseTween LocalRotateTween(Transform t, Vector3 to, float time)
+        {
+            Quaternion toRotation = Quaternion.Euler(to);
+            return LocalRotateTween(t, toRotation, time);
+        }
+
+        public BaseTween LocalRotateTween(GameObject go, Quaternion to, float time)
+        {
+            return LocalRotateTween(go.transform, to, time);
+        }
+
+        public BaseTween LocalRotateTween(GameObject go, Vector3 to, float time)
+        {
+            return LocalRotateTween(go.transform, to, time);
+        }
+
+        public BaseTween LocalRotateTween(RectTransform rect, Quaternion to, float time)
+        {
+            return LocalRotateTween(rect.transform, to, time);
+        }
+
+        public BaseTween LocalRotateTween(RectTransform rect, Vector3 to, float time)
+        {
+            return LocalRotateTween(rect.transform, to, time);
+        }
+
+        public BaseTween LocalRotateTween(Transform t, Vector3 axis, float to, float time)
+        {
+            Quaternion toRotation = Quaternion.Euler(axis * to);
+            return LocalRotateTween(t, toRotation, time);
+        }
+
+        public BaseTween LocalRotateTween(GameObject go, Vector3 axis, float to, float time)
+        {
+            return LocalRotateTween(go.transform, axis, to, time);
+        }
+
+        public BaseTween LocalRotateTween(RectTransform rect, Vector3 axis, float to, float time)
+        {
+            return LocalRotateTween(rect.transform, axis, to, time);
+        }
+
+        #endregion
+        
+        #region EULERANGLES_TWEENS
+
+        public BaseTween EulerAnglesTween(Transform t, Vector3 to, float time)
+        {
+            Vector3Tween tween = TweenPool.GetVector3Tween(t.eulerAngles, to, time);
+            tween.SetOnUpdateVector3((Vector3 v) =>
+            {
+                if (t != null)
+                {
+                    t.eulerAngles = v;
+                }
+                else
+                {
+                    CancelTween(tween);
+                }
+            });
+            
+            return tween;
+        }
+        
+        public BaseTween EulerAnglesTween(GameObject go, Vector3 to, float time)
+        {
+            return EulerAnglesTween(go.transform, to, time);
+        }
+        
+        public BaseTween EulerAnglesTween(RectTransform go, Vector3 to, float time)
+        {
+            return EulerAnglesTween(go.transform, to, time);
+        }
+
+        #endregion
+        
+        #region LOCAL_EULERANGLES_TWEENS
+
+        public BaseTween LocalEulerAnglesTween(Transform t, Vector3 to, float time)
+        {
+            Vector3Tween tween = TweenPool.GetVector3Tween(t.localEulerAngles, to, time);
+            tween.SetOnUpdateVector3((Vector3 v) =>
+            {
+                if (t != null)
+                {
+                    t.localEulerAngles = v;
+                }
+                else
+                {
+                    CancelTween(tween);
+                }
+            });
+    
+            return tween;
+        }
+
+        public BaseTween LocalEulerAnglesTween(GameObject go, Vector3 to, float time)
+        {
+            return LocalEulerAnglesTween(go.transform, to, time);
+        }
+
+        public BaseTween LocalEulerAnglesTween(RectTransform rect, Vector3 to, float time)
+        {
+            return LocalEulerAnglesTween(rect.transform, to, time);
+        }
+
+        #endregion
+        
         #region FADE_TWEENS
 
         public BaseTween FadeOut(CanvasGroup cg, float t)

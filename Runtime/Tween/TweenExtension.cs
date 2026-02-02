@@ -143,7 +143,7 @@ namespace F8Framework.Core
 
         public static BaseTween RotateTween(this GameObject go, Vector3 to, float time)
         {
-            return Tween.Instance.RotateTween(go.transform, to, time);
+            return Tween.Instance.RotateTween(go, to, time);
         }
 
         public static BaseTween RotateTween(this GameObject go, Vector3 axis, float to, float time)
@@ -153,7 +153,7 @@ namespace F8Framework.Core
 
         public static BaseTween RotateTween(this GameObject go, Quaternion to, float time)
         {
-            return Tween.Instance.RotateTween(go.transform, to, time);
+            return Tween.Instance.RotateTween(go, to, time);
         }
 
         public static BaseTween RotateTween(this RectTransform rect, Vector3 to, float time)
@@ -169,6 +169,81 @@ namespace F8Framework.Core
         public static BaseTween RotateTween(this RectTransform rect, Vector3 axis, float to, float time)
         {
             return Tween.Instance.RotateTween(rect, axis, to, time);
+        }
+        
+        public static BaseTween LocalRotateTween(this Transform t, Vector3 axis, float to, float time)
+        {
+            return Tween.Instance.LocalRotateTween(t, axis, to, time);
+        }
+
+        public static BaseTween LocalRotateTween(this Transform t, Vector3 to, float time)
+        {
+            return Tween.Instance.LocalRotateTween(t, to, time);
+        }
+
+        public static BaseTween LocalRotateTween(this Transform t, Quaternion to, float time)
+        {
+            return Tween.Instance.LocalRotateTween(t, to, time);
+        }
+
+        public static BaseTween LocalRotateTween(this GameObject go, Vector3 to, float time)
+        {
+            return Tween.Instance.LocalRotateTween(go, to, time);
+        }
+
+        public static BaseTween LocalRotateTween(this GameObject go, Vector3 axis, float to, float time)
+        {
+            return Tween.Instance.LocalRotateTween(go, axis, to, time);
+        }
+
+        public static BaseTween LocalRotateTween(this GameObject go, Quaternion to, float time)
+        {
+            return Tween.Instance.LocalRotateTween(go, to, time);
+        }
+
+        public static BaseTween LocalRotateTween(this RectTransform rect, Vector3 to, float time)
+        {
+            return Tween.Instance.LocalRotateTween(rect, to, time);
+        }
+
+        public static BaseTween LocalRotateTween(this RectTransform rect, Quaternion to, float time)
+        {
+            return Tween.Instance.LocalRotateTween(rect, to, time);
+        }
+
+        public static BaseTween LocalRotateTween(this RectTransform rect, Vector3 axis, float to, float time)
+        {
+            return Tween.Instance.LocalRotateTween(rect, axis, to, time);
+        }
+        
+        public static BaseTween EulerAnglesTween(this Transform t, Vector3 to, float time)
+        {
+            return Tween.Instance.EulerAnglesTween(t, to, time);
+        }
+
+        public static BaseTween EulerAnglesTween(this GameObject go, Vector3 to, float time)
+        {
+            return Tween.Instance.EulerAnglesTween(go, to, time);
+        }
+
+        public static BaseTween EulerAnglesTween(this RectTransform rect, Vector3 to, float time)
+        {
+            return Tween.Instance.EulerAnglesTween(rect, to, time);
+        }
+        
+        public static BaseTween LocalEulerAnglesTween(this Transform t, Vector3 to, float time)
+        {
+            return Tween.Instance.LocalEulerAnglesTween(t, to, time);
+        }
+
+        public static BaseTween LocalEulerAnglesTween(this GameObject go, Vector3 to, float time)
+        {
+            return Tween.Instance.LocalEulerAnglesTween(go, to, time);
+        }
+
+        public static BaseTween LocalEulerAnglesTween(this RectTransform rect, Vector3 to, float time)
+        {
+            return Tween.Instance.LocalEulerAnglesTween(rect, to, time);
         }
 
         public static BaseTween FadeOutAtSpeed(this CanvasGroup cg, float speed)
