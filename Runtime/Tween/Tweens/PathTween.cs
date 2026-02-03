@@ -15,14 +15,15 @@ namespace F8Framework.Core
         private PathCalculator pathCalculator;
         private Vector3 tempValue = Vector3.zero;
         private Quaternion tempRotation = Quaternion.identity;
+        private bool isLocalPath = false;
         
-        public PathTween(Transform target, IList<Vector3> path, float duration, PathType pathType, PathMode pathMode, int resolution, bool closePath, int id)
+        public PathTween(Transform target, IList<Vector3> path, float duration, PathType pathType, PathMode pathMode, int resolution, bool closePath, bool isLocalPath, int id)
         {
             this.id = id;
-            Init(target, path, duration, pathType, pathMode, resolution, closePath);
+            Init(target, path, duration, pathType, pathMode, resolution, closePath, isLocalPath);
         }
 
-        internal void Init(Transform target, IList<Vector3> path, float duration, PathType pathType, PathMode pathMode, int resolution, bool closePath)
+        internal void Init(Transform target, IList<Vector3> path, float duration, PathType pathType, PathMode pathMode, int resolution, bool closePath, bool isLocalPath = false)
         {
             this.targetTransform = target;
             if (path is Vector3[] array)
@@ -42,11 +43,12 @@ namespace F8Framework.Core
             this.pathMode = pathMode;
             this.resolution = Mathf.Max(2, resolution);
             this.closePath = closePath;
+            this.isLocalPath = isLocalPath;
             
             // 初始化路径计算器
             InitializePathCalculator();
             
-            this.PauseReset = () => this.Init(target, path, duration, pathType, pathMode, resolution, closePath);
+            this.PauseReset = () => this.Init(target, path, duration, pathType, pathMode, resolution, closePath, isLocalPath);
         }
 
         /// <summary>
@@ -140,7 +142,14 @@ namespace F8Framework.Core
                 newPosition = pathCalculator.GetPoint(progress);
             }
             tempValue = newPosition;
-            targetTransform.position = newPosition;
+            if (isLocalPath)
+            {
+                targetTransform.localPosition = newPosition;
+            }
+            else
+            {
+                targetTransform.position = newPosition;
+            }
             
             // 处理朝向
             UpdateRotation(progress, newPosition);
@@ -170,14 +179,28 @@ namespace F8Framework.Core
                 case PathMode.Full3D:
                     // 3D朝向，Z轴指向移动方向
                     tempRotation = Quaternion.LookRotation(direction);
-                    targetTransform.rotation = tempRotation;
+                    if (isLocalPath)
+                    {
+                        targetTransform.localRotation = tempRotation;
+                    }
+                    else
+                    {
+                        targetTransform.rotation = tempRotation;
+                    }
                     break;
                     
                 case PathMode.TopDown2D:
                     // 俯视2D，在XY平面内旋转
                     float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
                     tempRotation = Quaternion.Euler(0, 0, angle - 90);
-                    targetTransform.rotation = tempRotation;
+                    if (isLocalPath)
+                    {
+                        targetTransform.localRotation = tempRotation;
+                    }
+                    else
+                    {
+                        targetTransform.rotation = tempRotation;
+                    }
                     break;
                     
                 case PathMode.Sidescroller2D:
@@ -220,6 +243,7 @@ namespace F8Framework.Core
             pathMode = PathMode.Ignore;
             resolution = 10;
             closePath = false;
+            isLocalPath = false;
         }
 
         public override BaseTween ReplayReset()

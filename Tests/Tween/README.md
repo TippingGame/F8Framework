@@ -32,6 +32,7 @@ void Start()
 
     // 旋转
     gameObject.RotateTween(Vector3.one, 1f);
+    gameObject.EulerAnglesTween(Vector3.one * 360f, 1f);
     // 位移
     gameObject.Move(Vector3.one, 1f);
     gameObject.MoveAtSpeed(Vector3.one, 2f);

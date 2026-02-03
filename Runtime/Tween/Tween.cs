@@ -716,6 +716,116 @@ namespace F8Framework.Core
 
         #endregion
         
+        #region ROTATE_TWEEN_AT_SPEED
+
+        public BaseTween RotateTweenAtSpeed(Transform t, Quaternion to, float speed)
+        {
+            float angle = Quaternion.Angle(t.rotation, to);
+            float time = angle / speed;
+            return RotateTween(t, to, time);
+        }
+
+        public BaseTween RotateTweenAtSpeed(Transform t, Vector3 to, float speed)
+        {
+            Quaternion toRotation = Quaternion.Euler(to);
+            return RotateTweenAtSpeed(t, toRotation, speed);
+        }
+
+        public BaseTween RotateTweenAtSpeed(GameObject go, Quaternion to, float speed)
+        {
+            return RotateTweenAtSpeed(go.transform, to, speed);
+        }
+
+        public BaseTween RotateTweenAtSpeed(GameObject go, Vector3 to, float speed)
+        {
+            return RotateTweenAtSpeed(go.transform, to, speed);
+        }
+
+        public BaseTween RotateTweenAtSpeed(RectTransform rect, Quaternion to, float speed)
+        {
+            return RotateTweenAtSpeed(rect.transform, to, speed);
+        }
+
+        public BaseTween RotateTweenAtSpeed(RectTransform rect, Vector3 to, float speed)
+        {
+            return RotateTweenAtSpeed(rect.transform, to, speed);
+        }
+
+        public BaseTween RotateTweenAtSpeed(Transform t, Vector3 axis, float toAngle, float speed)
+        {
+            float time = Mathf.Abs(toAngle) / speed;
+            return RotateTween(t, axis, toAngle, time);
+        }
+
+        public BaseTween RotateTweenAtSpeed(GameObject go, Vector3 axis, float toAngle, float speed)
+        {
+            float time = Mathf.Abs(toAngle) / speed;
+            return RotateTween(go.transform, axis, toAngle, time);
+        }
+
+        public BaseTween RotateTweenAtSpeed(RectTransform rect, Vector3 axis, float toAngle, float speed)
+        {
+            float time = Mathf.Abs(toAngle) / speed;
+            return RotateTween(rect.transform, axis, toAngle, time);
+        }
+
+        #endregion
+
+        #region LOCAL_ROTATE_TWEEN_AT_SPEED
+
+        public BaseTween LocalRotateTweenAtSpeed(Transform t, Quaternion to, float speed)
+        {
+            float angle = Quaternion.Angle(t.localRotation, to);
+            float time = angle / speed;
+            return LocalRotateTween(t, to, time);
+        }
+
+        public BaseTween LocalRotateTweenAtSpeed(Transform t, Vector3 to, float speed)
+        {
+            Quaternion toRotation = Quaternion.Euler(to);
+            return LocalRotateTweenAtSpeed(t, toRotation, speed);
+        }
+
+        public BaseTween LocalRotateTweenAtSpeed(GameObject go, Quaternion to, float speed)
+        {
+            return LocalRotateTweenAtSpeed(go.transform, to, speed);
+        }
+
+        public BaseTween LocalRotateTweenAtSpeed(GameObject go, Vector3 to, float speed)
+        {
+            return LocalRotateTweenAtSpeed(go.transform, to, speed);
+        }
+
+        public BaseTween LocalRotateTweenAtSpeed(RectTransform rect, Quaternion to, float speed)
+        {
+            return LocalRotateTweenAtSpeed(rect.transform, to, speed);
+        }
+
+        public BaseTween LocalRotateTweenAtSpeed(RectTransform rect, Vector3 to, float speed)
+        {
+            return LocalRotateTweenAtSpeed(rect.transform, to, speed);
+        }
+
+        public BaseTween LocalRotateTweenAtSpeed(Transform t, Vector3 axis, float toAngle, float speed)
+        {
+            float time = Mathf.Abs(toAngle) / speed;
+            return LocalRotateTween(t, axis, toAngle, time);
+        }
+
+        public BaseTween LocalRotateTweenAtSpeed(GameObject go, Vector3 axis, float toAngle, float speed)
+        {
+            float time = Mathf.Abs(toAngle) / speed;
+            return LocalRotateTween(go.transform, axis, toAngle, time);
+        }
+
+        public BaseTween LocalRotateTweenAtSpeed(RectTransform rect, Vector3 axis, float toAngle, float speed)
+        {
+            float time = Mathf.Abs(toAngle) / speed;
+            return LocalRotateTween(rect.transform, axis, toAngle, time);
+        }
+
+        #endregion
+
         #region EULERANGLES_TWEENS
 
         public BaseTween EulerAnglesTween(Transform t, Vector3 to, float time)
@@ -776,6 +886,48 @@ namespace F8Framework.Core
         public BaseTween LocalEulerAnglesTween(RectTransform rect, Vector3 to, float time)
         {
             return LocalEulerAnglesTween(rect.transform, to, time);
+        }
+
+        #endregion
+        
+        #region EULERANGLES_TWEEN_AT_SPEED
+
+        public BaseTween EulerAnglesTweenAtSpeed(Transform t, Vector3 to, float speed)
+        {
+            float angle = Vector3.Distance(t.eulerAngles, to);
+            float time = angle / speed;
+            return EulerAnglesTween(t, to, time);
+        }
+
+        public BaseTween EulerAnglesTweenAtSpeed(GameObject go, Vector3 to, float speed)
+        {
+            return EulerAnglesTweenAtSpeed(go.transform, to, speed);
+        }
+
+        public BaseTween EulerAnglesTweenAtSpeed(RectTransform rect, Vector3 to, float speed)
+        {
+            return EulerAnglesTweenAtSpeed(rect.transform, to, speed);
+        }
+
+        #endregion
+
+        #region LOCAL_EULERANGLES_TWEEN_AT_SPEED
+
+        public BaseTween LocalEulerAnglesTweenAtSpeed(Transform t, Vector3 to, float speed)
+        {
+            float angle = Vector3.Distance(t.localEulerAngles, to);
+            float time = angle / speed;
+            return LocalEulerAnglesTween(t, to, time);
+        }
+
+        public BaseTween LocalEulerAnglesTweenAtSpeed(GameObject go, Vector3 to, float speed)
+        {
+            return LocalEulerAnglesTweenAtSpeed(go.transform, to, speed);
+        }
+
+        public BaseTween LocalEulerAnglesTweenAtSpeed(RectTransform rect, Vector3 to, float speed)
+        {
+            return LocalEulerAnglesTweenAtSpeed(rect.transform, to, speed);
         }
 
         #endregion
@@ -971,6 +1123,12 @@ namespace F8Framework.Core
             return tween;
         }
 
+        public BaseTween ColorTweenAtSpeed(Material material, Color to, float speed)
+        {
+            float t = CalculateColorDistance(material.color, to) / speed;
+            return ColorTween(material, to, t);
+        }
+        
         public BaseTween ColorTweenAtSpeed(SpriteRenderer sprite, Color to, float speed)
         {
             float t = CalculateColorDistance(sprite.color, to) / speed;
@@ -1445,28 +1603,6 @@ namespace F8Framework.Core
         
         #region PATH_TWEEN
 
-        public BaseTween PathTween(GameObject target, IList<Vector3> path, float duration,
-            PathType pathType = PathType.CatmullRom, PathMode pathMode = PathMode.Ignore, int resolution = 10, bool closePath = false)
-        {
-            
-            return PathTween(target.transform, path, duration, pathType, pathMode, resolution, closePath);
-        }
-        
-        public BaseTween PathTweenAtSpeed(GameObject target, IList<Vector3> path, float speed, 
-            PathType pathType = PathType.CatmullRom, PathMode pathMode = PathMode.Ignore, int resolution = 10, bool closePath = false)
-        {
-            return PathTweenAtSpeed(target.transform, path, speed, pathType, pathMode, resolution, closePath);
-        }
-        
-        public BaseTween LocalPathTween(GameObject target, IList<Vector3> localPath, float duration, 
-            PathType pathType = PathType.CatmullRom, PathMode pathMode = PathMode.Ignore, int resolution = 10, bool closePath = false)
-        {
-            return PathTween(target, localPath, duration, pathType, pathMode, resolution, closePath);
-        }
-        
-        /// <summary>
-        /// 创建路径动画
-        /// </summary>
         public BaseTween PathTween(Transform target, IList<Vector3> path, float duration, 
             PathType pathType = PathType.CatmullRom, PathMode pathMode = PathMode.Ignore, int resolution = 10, bool closePath = false)
         {
@@ -1476,33 +1612,42 @@ namespace F8Framework.Core
                 return null;
             }
             
-            PathTween tween = TweenPool.GetPathTween(target, path, duration, pathType, pathMode, resolution, closePath);
-            return tween;
+            return TweenPool.GetPathTween(target, path, duration, pathType, pathMode, resolution, closePath, false);
         }
-
-        /// <summary>
-        /// 创建路径动画（根据速度计算时间）
-        /// </summary>
+        
+        public BaseTween PathTween(GameObject target, IList<Vector3> path, float duration,
+            PathType pathType = PathType.CatmullRom, PathMode pathMode = PathMode.Ignore, int resolution = 10, bool closePath = false)
+        {
+            return PathTween(target.transform, path, duration, pathType, pathMode, resolution, closePath);
+        }
+        
         public BaseTween PathTweenAtSpeed(Transform target, IList<Vector3> path, float speed, 
             PathType pathType = PathType.CatmullRom, PathMode pathMode = PathMode.Ignore, int resolution = 10, bool closePath = false)
         {
             if (path == null || path.Count < 2)
                 return null;
-                
-            // 估算路径长度
+            
             float estimatedLength = 0f;
             for (int i = 0; i < path.Count - 1; i++)
             {
                 estimatedLength += Vector3.Distance(path[i], path[i + 1]);
             }
             
+            if (closePath && path.Count > 2)
+            {
+                estimatedLength += Vector3.Distance(path[^1], path[0]);
+            }
+            
             float duration = estimatedLength / speed;
             return PathTween(target, path, duration, pathType, pathMode, resolution, closePath);
         }
-
-        /// <summary>
-        /// 创建本地坐标路径动画
-        /// </summary>
+        
+        public BaseTween PathTweenAtSpeed(GameObject target, IList<Vector3> path, float speed, 
+            PathType pathType = PathType.CatmullRom, PathMode pathMode = PathMode.Ignore, int resolution = 10, bool closePath = false)
+        {
+            return PathTweenAtSpeed(target.transform, path, speed, pathType, pathMode, resolution, closePath);
+        }
+        
         public BaseTween LocalPathTween(Transform target, IList<Vector3> localPath, float duration, 
             PathType pathType = PathType.CatmullRom, PathMode pathMode = PathMode.Ignore, int resolution = 10, bool closePath = false)
         {
@@ -1512,15 +1657,45 @@ namespace F8Framework.Core
                 return null;
             }
             
-            // 将本地坐标转换为世界坐标
-            Vector3[] worldPath = new Vector3[localPath.Count];
-            for (int i = 0; i < localPath.Count; i++)
+            return TweenPool.GetPathTween(target, localPath, duration, pathType, pathMode, resolution, closePath, true);
+        }
+        
+        public BaseTween LocalPathTween(GameObject target, IList<Vector3> localPath, float duration, 
+            PathType pathType = PathType.CatmullRom, PathMode pathMode = PathMode.Ignore, int resolution = 10, bool closePath = false)
+        {
+            return LocalPathTween(target.transform, localPath, duration, pathType, pathMode, resolution, closePath);
+        }
+        
+        public BaseTween LocalPathTweenAtSpeed(Transform target, IList<Vector3> localPath, float speed, 
+            PathType pathType = PathType.CatmullRom, PathMode pathMode = PathMode.Ignore, int resolution = 10, bool closePath = false)
+        {
+            if (target == null || localPath == null || localPath.Count < 2)
             {
-                worldPath[i] = target.TransformPoint(localPath[i]);
+                LogF8.LogError("LocalPathTweenAtSpeed: Target or path is invalid!");
+                return null;
             }
             
-            return PathTween(target, worldPath, duration, pathType, pathMode, resolution, closePath);
+            float estimatedLength = 0f;
+            for (int i = 0; i < localPath.Count - 1; i++)
+            {
+                estimatedLength += Vector3.Distance(localPath[i], localPath[i + 1]);
+            }
+            
+            if (closePath && localPath.Count > 2)
+            {
+                estimatedLength += Vector3.Distance(localPath[^1], localPath[0]);
+            }
+    
+            float duration = estimatedLength / speed;
+            return LocalPathTween(target, localPath, duration, pathType, pathMode, resolution, closePath);
         }
+
+        public BaseTween LocalPathTweenAtSpeed(GameObject target, IList<Vector3> localPath, float speed, 
+            PathType pathType = PathType.CatmullRom, PathMode pathMode = PathMode.Ignore, int resolution = 10, bool closePath = false)
+        {
+            return LocalPathTweenAtSpeed(target.transform, localPath, speed, pathType, pathMode, resolution, closePath);
+        }
+        
         #endregion
         
         #region STRING_TWEEN

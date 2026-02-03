@@ -1,5 +1,8 @@
 # Changelog
 
+## [2.4.247] - 2025-02-03
+1.新增Tween模块的RotateTweenAtSpeed，LocalRotateTweenAtSpeed，LocalPathTween，LocalPathTweenAtSpeed方法  
+
 ## [2.4.246] - 2025-02-03
 1.新增Tween模块的LocalRotateTween，EulerAnglesTween，LocalEulerAnglesTween方法  
 

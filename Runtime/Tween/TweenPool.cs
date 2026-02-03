@@ -179,18 +179,18 @@ namespace F8Framework.Core
         }
         
         internal static PathTween GetPathTween(Transform target, IList<Vector3> path, float duration, 
-            PathType pathType, PathMode pathMode, int resolution, bool closePath)
+            PathType pathType, PathMode pathMode, int resolution, bool closePath, bool isLocalPath)
         {
             PathTween tween;
             if (TryGetTween(pathTweens, out tween))
             {
                 tween.Reset();
-                tween.Init(target, path, duration, pathType, pathMode, resolution, closePath);
+                tween.Init(target, path, duration, pathType, pathMode, resolution, closePath, isLocalPath);
                 tween.ID = GenerateId();
             }
             else
             {
-                tween = new PathTween(target, path, duration, pathType, pathMode, resolution, closePath, GenerateId());
+                tween = new PathTween(target, path, duration, pathType, pathMode, resolution, closePath, isLocalPath, GenerateId());
             }
             Tween.Instance.tweens.Add(tween);
             return tween;
