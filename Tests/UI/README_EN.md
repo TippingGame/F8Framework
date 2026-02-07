@@ -136,8 +136,9 @@ IEnumerator Start()
     FF8.UI.Close(UIID.UIMain, true);
     FF8.UI.Close(1, true);
     
-    // Close all UIs (except Notify type), optional parameter: isDestroy
+    // Clear all UIs (except those of Notify type), optional parameter: isDestroy
     FF8.UI.Clear(true);
+    FF8.UI.Clear(LayerType.Notify, true);
 }
 
 

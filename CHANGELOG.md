@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.4.248] - 2025-02-07
+1.修复UI模块Close方法不能对Notify层UI使用的问题  
+2.修复ModuleMono模板里缺少Mono字符  
+
 ## [2.4.247] - 2025-02-03
 1.新增Tween模块的RotateTweenAtSpeed，LocalRotateTweenAtSpeed，LocalPathTween，LocalPathTweenAtSpeed方法  
 

@@ -62,6 +62,8 @@ namespace F8Framework.Core
                 }
                 gameObject.transform.SetParent(null, false);
             }
+            
+            UIManager.Instance.CurrentUIs.Remove(viewParams);
         }
 
         private void OnDestroy()

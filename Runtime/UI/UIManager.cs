@@ -38,7 +38,7 @@ namespace F8Framework.Core
         private LayerGuide _layerGuide;
 
         private Dictionary<int, UIConfig> _configs = new Dictionary<int, UIConfig>();
-        private List<int> _currentUIids = new List<int>();
+        internal readonly List<ViewParams> CurrentUIs = new List<ViewParams>();
         
         // 将所有的层放入一个字典中
         private Dictionary<LayerType, LayerUI> _layers;
@@ -228,7 +228,7 @@ namespace F8Framework.Core
             if (!_configs.TryGetValue(uiId, out UIConfig config))
             {
                 LogF8.LogView($"打开 ID 为 {uiId} 的 UI 失败，未找到配置。");
-                return default;
+                return null;
             }
             return _layerNotify.Show(uiId, config, content, callbacks);
         }
@@ -245,14 +245,25 @@ namespace F8Framework.Core
             if (!_configs.TryGetValue(uiId, out UIConfig config))
             {
                 LogF8.LogView($"打开 ID 为 {uiId} 的 UI 失败，未找到配置。");
-                return default;
+                return null;
             }
             return _layerNotify.ShowAsync(uiId, config, content, callbacks);
         }
         
+        public List<ViewParams> GetCurrentUIs()
+        {
+            return CurrentUIs;
+        }
+        
         public List<int> GetCurrentUIids()
         {
-            return _currentUIids;
+            List<int> currentUIids = new List<int>(CurrentUIs.Count);
+            for (int i = 0; i < CurrentUIs.Count; i++)
+            {
+                var viewParams = CurrentUIs[i];
+                currentUIids.Add(viewParams.UIid);
+            }
+            return currentUIids;
         }
 
         // 同步加载，使用枚举作为参数
@@ -268,7 +279,7 @@ namespace F8Framework.Core
             if (!_configs.TryGetValue(uiId, out UIConfig config))
             {
                 LogF8.LogView($"打开 ID 为 {uiId} 的 UI 失败，未找到配置。");
-                return default;
+                return null;
             }
             
             switch (config.Layer)
@@ -287,7 +298,7 @@ namespace F8Framework.Core
                     return _layerGuide.Add(uiId, config, uiArgs, callbacks);
             }
 
-            return default;
+            return null;
         }
 
         // 异步加载，使用枚举作为参数
@@ -423,13 +434,13 @@ namespace F8Framework.Core
             return null;
         }
 
-        public void Close<T>(T eventName, bool isDestroy = false, string guid = default) where T : Enum, IConvertible
+        public void Close<T>(T eventName, bool isDestroy = false, string guid = null) where T : Enum, IConvertible
         {
             int uiId = (int)(object)eventName;
             Close(uiId, isDestroy, guid);
         }
 
-        public void Close(int uiId = default, bool isDestroy = false, string guid = default)
+        public void Close(int uiId, bool isDestroy = false, string guid = null)
         {
             if (!_configs.TryGetValue(uiId, out UIConfig config))
             {
@@ -452,25 +463,18 @@ namespace F8Framework.Core
                     _layerDialog.Close(config.AssetName, isDestroy);
                     break;
                 case LayerType.Notify:
-                    _layerNotify.CloseByGuid(guid, true);
+                    if (guid.IsNullOrEmpty())
+                    {
+                        _layerNotify.Close(config.AssetName, isDestroy);
+                    }
+                    else
+                    {
+                        _layerNotify.CloseByGuid(guid, isDestroy);
+                    }
                     break;
                 case LayerType.Guide:
                     _layerGuide.Close(config.AssetName, isDestroy);
                     break;
-            }
-
-            RemoveAtUIid(uiId);
-        }
-
-        private void RemoveAtUIid(int uiId)
-        {
-            for (int i = _currentUIids.Count - 1; i >= 0; i--)
-            {
-                if (_currentUIids[i] == uiId)
-                {
-                    _currentUIids.RemoveAt(i);
-                    break; // 退出循环
-                }
             }
         }
         
@@ -481,7 +485,31 @@ namespace F8Framework.Core
             _layerPopUp.Clear(isDestroy);
             _layerDialog.Clear(isDestroy);
             _layerGuide.Clear(isDestroy);
-            _currentUIids.Clear();
+        }
+        
+        public void Clear(LayerType layerType, bool isDestroy = false)
+        {
+            switch (layerType)
+            {
+                case LayerType.Game:
+                    _layerGame.Clear(isDestroy);
+                    break;
+                case LayerType.UI:
+                    _layerUI.Clear(isDestroy);
+                    break;
+                case LayerType.PopUp:
+                    _layerPopUp.Clear(isDestroy);
+                    break;
+                case LayerType.Dialog:
+                    _layerDialog.Clear(isDestroy);
+                    break;
+                case LayerType.Notify:
+                    _layerNotify.Clear(isDestroy);
+                    break;
+                case LayerType.Guide:
+                    _layerGuide.Clear(isDestroy);
+                    break;
+            }
         }
     }
 }

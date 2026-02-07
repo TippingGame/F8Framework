@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace F8Framework.Core
 {
@@ -35,12 +36,29 @@ namespace F8Framework.Core
         
         protected new ViewParams GetOrCreateViewParams(string prefabPath, string guid)
         {
-            if (!uiViews.TryGetValue(prefabPath, out var viewParams))
+            if (!uiViews.TryGetValue(guid, out var viewParams))
             {
-                if (!uiCache.TryGetValue(prefabPath, out viewParams))
+                string lastKey = "";
+                using (var enumerator = uiCache.GetEnumerator())
+                {
+                    while (enumerator.MoveNext())
+                    {
+                        if (enumerator.Current.Value.PrefabPath == prefabPath)
+                        {
+                            lastKey = enumerator.Current.Key;
+                        }
+                    }
+                }
+                if (uiCache.TryGetValue(lastKey, out ViewParams value))
+                {
+                    viewParams = value;
+                    uiCache.Remove(lastKey);
+                }
+                else
                 {
                     viewParams = new ViewParams();
                 }
+                uiCache.Remove(lastKey);
                 viewParams.Guid = guid;
                 viewParams.PrefabPath = prefabPath;
                 uiViews.Add(viewParams.Guid, viewParams);
@@ -64,11 +82,11 @@ namespace F8Framework.Core
             {
                 if (isDestroy)
                 {
-                    RemoveCache(viewParams.PrefabPath);
+                    RemoveCache(viewParams.Guid);
                 }
                 else
                 {
-                    uiCache[viewParams.PrefabPath] = viewParams;
+                    uiCache[viewParams.Guid] = viewParams;
                 }
                 var comp = viewParams.DelegateComponent;
                 comp.Remove(isDestroy);
@@ -76,7 +94,79 @@ namespace F8Framework.Core
                 return viewParams.UIid;
             }
 
-            return default;
+            return 0;
+        }
+        
+        protected new void RemoveCache(string guid)
+        {
+            if (uiCache.TryGetValue(guid, out var viewParams))
+            {
+                uiViews.Remove(guid);
+                uiCache.Remove(guid);
+                var childNode = viewParams.Go;
+                Destroy(childNode);
+            }
+        }
+        
+        public new void Close(string prefabPath, bool isDestroy)
+        {
+            var values = new List<ViewParams>();
+            foreach (var viewParams in uiViews.Values)
+            {
+                if (viewParams.PrefabPath == prefabPath)
+                {
+                    values.Add(viewParams);
+                }
+            }
+
+            foreach (var viewParams in values)
+            {
+                if (isDestroy)
+                {
+                    RemoveCache(viewParams.Guid);
+                }
+                else
+                {
+                    uiCache[viewParams.Guid] = viewParams;
+                }
+                uiViews.Remove(viewParams.Guid);
+                var comp = viewParams.DelegateComponent;
+                comp.Remove(isDestroy);
+                viewParams.Valid = false;
+            }
+        }
+        
+        public new void Clear(bool isDestroy)
+        {
+            if (isDestroy)
+            {
+                foreach (var value in uiCache.Values)
+                {
+                    var childNode = value.Go;
+                    if (childNode != null)
+                    {
+                        Destroy(childNode);
+                    }
+                }
+                uiCache.Clear();
+            }
+            
+            foreach (var value in uiViews.Values)
+            {
+                if (!isDestroy)
+                {
+                    uiCache[value.Guid] = value;
+                }
+        
+                var comp = value.DelegateComponent;
+                if (comp != null)
+                {
+                    comp.Remove(isDestroy);
+                }
+                value.Valid = false;
+            }
+    
+            uiViews.Clear();
         }
     }
 }

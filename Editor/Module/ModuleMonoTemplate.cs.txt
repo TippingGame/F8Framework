@@ -7,7 +7,7 @@ using F8Framework.Core;
 [UpdateRefresh]
 [LateUpdateRefresh]
 [FixedUpdateRefresh]
-public class #SCRIPTNAME# : ModuleSingleton<#SCRIPTNAME#>, IModule
+public class #SCRIPTNAME# : ModuleSingletonMono<#SCRIPTNAME#>, IModule
 {
     // 模块创建初始化
     public void OnInit(object createParam)

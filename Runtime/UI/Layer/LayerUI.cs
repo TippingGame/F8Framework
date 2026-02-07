@@ -137,10 +137,9 @@ namespace F8Framework.Core
 
         protected void Load(ViewParams viewParams)
         {
-            var vp = uiCache.GetValueOrDefault(viewParams.PrefabPath);
-            if (vp != null && vp.Go != null)
+            if (viewParams != null && viewParams.Go != null)
             {
-                CreateNode(vp);
+                CreateNode(viewParams);
             }
             else
             {
@@ -163,10 +162,9 @@ namespace F8Framework.Core
 
         protected UILoader LoadAsync(ViewParams viewParams)
         {
-            var vp = uiCache.GetValueOrDefault(viewParams.PrefabPath);
-            if (vp != null && vp.Go != null)
+            if (viewParams != null && viewParams.Go != null)
             {
-                return CreateNode(vp);
+                return CreateNode(viewParams);
             }
             else
             {
@@ -192,7 +190,7 @@ namespace F8Framework.Core
         
         public UILoader CreateNode(ViewParams viewParams)
         {
-            UIManager.Instance.GetCurrentUIids().Add(viewParams.UIid);
+            UIManager.Instance.CurrentUIs.Add(viewParams);
             
             viewParams.Valid = true;
 
@@ -266,10 +264,7 @@ namespace F8Framework.Core
             {
                 if (comp.ViewParams != null && comp.ViewParams.UIid == uiid)
                 {
-                    if (nodeList == null)
-                    {
-                        nodeList = new List<GameObject>();
-                    }
+                    nodeList ??= new List<GameObject>();
                     nodeList.Add(comp.gameObject);
                 }
             }
@@ -298,7 +293,7 @@ namespace F8Framework.Core
             for (var i = 0; i < children; i++)
             {
                 var comp = gameObject.transform.GetChild(i).GetComponent<DelegateComponent>();
-                if (comp != null && comp.ViewParams != null && comp.ViewParams.Valid && comp.isActiveAndEnabled)
+                if (comp != null && comp.isActiveAndEnabled && comp.ViewParams is { Valid: true })
                 {
                     result.Add(comp);
                 }
@@ -311,31 +306,32 @@ namespace F8Framework.Core
         {
             if (isDestroy)
             {
-                foreach (var value in uiViews.Values)
-                {
-                    var comp = value.DelegateComponent;
-                    comp.Remove(true);
-                    value.Valid = false;
-                }
-                
                 foreach (var value in uiCache.Values)
                 {
                     var childNode = value.Go;
-                    Destroy(childNode);
+                    if (childNode != null)
+                    {
+                        Destroy(childNode);
+                    }
                 }
                 uiCache.Clear();
             }
-            else
+            
+            foreach (var value in uiViews.Values)
             {
-                foreach (var value in uiViews.Values)
+                if (!isDestroy)
                 {
                     uiCache[value.PrefabPath] = value;
-                    var comp = value.DelegateComponent;
-                    comp.Remove(false);
-                    value.Valid = false;
                 }
+        
+                var comp = value.DelegateComponent;
+                if (comp != null)
+                {
+                    comp.Remove(isDestroy);
+                }
+                value.Valid = false;
             }
-            
+    
             uiViews.Clear();
         }
     }

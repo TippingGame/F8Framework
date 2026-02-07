@@ -100,8 +100,9 @@ namespace F8Framework.Tests
             FF8.UI.Close(UIID.UIMain, true);
             FF8.UI.Close(1, true);
             
-            // 关闭所有UI（除了Notify类），可选参数：isDestroy
+            // 清理所有UI（除了Notify类），可选参数：isDestroy
             FF8.UI.Clear(true);
+            FF8.UI.Clear(LayerType.Notify, true);
         }
     }
 
