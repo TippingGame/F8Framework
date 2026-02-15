@@ -5,6 +5,20 @@ using UnityEngine;
 
 namespace F8Framework.Core
 {
+    internal class CharHandler : TypeHandler
+    {
+        public override void Serialize(BinaryWriter writer, object value)
+        {
+            char charValue = (char)value;
+            writer.Write(charValue);
+        }
+
+        public override object Deserialize(BinaryReader reader, Type type)
+        {
+            return reader.ReadChar();
+        }
+    }
+    
     internal class NullableHandler : TypeHandler
     {
         private readonly Type _underlyingType;

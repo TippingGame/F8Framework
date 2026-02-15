@@ -16,6 +16,7 @@ namespace F8Framework.Core
         private static readonly Dictionary<Type, TypeHandler> _handlers = new Dictionary<Type, TypeHandler>
         {
             // 基础类型
+            { typeof(char), new CharHandler() },
             { typeof(bool), new BoolHandler() },
             { typeof(byte), new ByteHandler() },
             { typeof(sbyte), new SByteHandler() },

@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.4.249] - 2025-02-15
+1.修复Litjson对long字段序列化报错的问题  
+2.新增配置表模块char类型  
+
 ## [2.4.248] - 2025-02-07
 1.修复UI模块Close方法不能对Notify层UI使用的问题  
 2.修复ModuleMono模板里缺少Mono字符  

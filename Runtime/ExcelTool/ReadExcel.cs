@@ -15,6 +15,7 @@ namespace F8Framework.Core
     public class SupportType
     {
         // 基础类型
+        public const string CHAR = "char";
         public const string BOOL = "bool";
         public const string BYTE = "byte";
         public const string SHORT = "short";
@@ -573,6 +574,16 @@ namespace F8Framework.Core
                 {
                     switch (type)
                     {
+                        case SupportType.CHAR:
+                            if (data.StartsWith("\'") && data.EndsWith("\'"))
+                            {
+                                o = data.Trim('\'')[0];
+                            }
+                            else
+                            {
+                                o = data[0];
+                            }
+                            break;
                         case SupportType.BOOL:
                             string trueString = "true";
                             string trueString2 = "1";
@@ -618,7 +629,7 @@ namespace F8Framework.Core
                             if (long.TryParse(data, out LONG_long) == false)
                             {
                                 DebugError(type, data, classname);
-                                o = 0;
+                                o = 0L;
                                 break;
                             }
 
@@ -876,7 +887,7 @@ namespace F8Framework.Core
                             if (sbyte.TryParse(data, out SBYTE_sbyte) == false)
                             {
                                 DebugError(type, data, classname);
-                                o = 0f;
+                                o = 0;
                                 break;
                             }
 
@@ -887,7 +898,7 @@ namespace F8Framework.Core
                             if (ushort.TryParse(data, out USHORT_ushort) == false)
                             {
                                 DebugError(type, data, classname);
-                                o = 0f;
+                                o = 0;
                                 break;
                             }
 
@@ -898,7 +909,7 @@ namespace F8Framework.Core
                             if (uint.TryParse(data, out UINT_uint) == false)
                             {
                                 DebugError(type, data, classname);
-                                o = 0f;
+                                o = 0U;
                                 break;
                             }
 
@@ -909,7 +920,7 @@ namespace F8Framework.Core
                             if (ulong.TryParse(data, out ULONG_ulong) == false)
                             {
                                 DebugError(type, data, classname);
-                                o = 0f;
+                                o = 0UL;
                                 break;
                             }
 
@@ -1070,6 +1081,9 @@ namespace F8Framework.Core
         {
             switch (type)
             {
+                case SupportType.CHAR:
+                    type = "System.Char";
+                    break;
                 case SupportType.BOOL:
                     type = "System.Boolean";
                     break;
