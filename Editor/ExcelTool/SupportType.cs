@@ -75,14 +75,17 @@ namespace F8Framework.Core.Editor
             classSource.Append("\n");
             classSource.Append("using System;\n");
             classSource.Append("using System.Collections.Generic;\n");
+            classSource.Append("using F8Framework.Core;\n");
             classSource.Append("using UnityEngine.Scripting;\n");
             classSource.Append("using UnityEngine;\n\n");
             classSource.Append("namespace " + ExcelDataTool.CODE_NAMESPACE + "\n");
             classSource.Append("{\n");
-            classSource.Append("\t[Serializable]\n");
             classSource.Append("\tpublic class " + ClassName + "Item\n"); //表里每一条数据的类型名为表类型名加Item
             classSource.Append("\t{\n");
             enumSource.Clear();
+
+            string exportFormat = F8EditorPrefs.GetString(BuildPkgTool.ConvertExcelToOtherFormatsKey, BuildPkgTool.ExcelToOtherFormats[1]);
+            Dictionary<string, string> binaryRegisters = exportFormat == BuildPkgTool.ExcelToOtherFormats[1] ? new Dictionary<string, string>() : null;
             
             //设置成员
             for (int i = 0; i < fields.Length; ++i)
@@ -92,32 +95,32 @@ namespace F8Framework.Core.Editor
                 {
                     if (ConfigDatas[i].VariantInfo.HasVariant != true) continue;
                     
-                    string fieldType = ReadExcel.GetTrueType(types[i], ClassName, InputPath);
+                    string fieldType = ReadExcel.GetTrueType(types[i], ClassName, InputPath, true, binaryRegisters);
                     classSource.Append("\t\t[Preserve]\n");
                     classSource.Append("\t\tpublic Dictionary<System.String, " + fieldType + "> _" + fields[i] + "Variants = new Dictionary<System.String, " + fieldType + ">();\n");
                     classSource.Append("\t\t[F8Framework.Core.BinaryIgnore]\n");
                     classSource.Append("\t\t[LitJson.JsonIgnore]\n");
                     classSource.Append("\t\t[Preserve]\n");
                     classSource.Append("\t\tpublic " + fieldType + " " + fields[i] + " => _" + fields[i] + "Variants.GetValueOrDefault(F8DataManager.Instance.VariantName ?? string.Empty, _" + fields[i] + "Variants[string.Empty]);\n");
+                    binaryRegisters?.TryAdd("System.Collections.Generic.Dictionary<System.String, " + fieldType + ">", SupportType.DICTIONARY);
                 }
                 else
                 {
                     // 普通字段
-                    classSource.Append(PropertyString(types[i], fields[i]));
+                    classSource.Append(PropertyString(types[i], fields[i], binaryRegisters));
                 }
                 
                 // 枚举定义
                 if (!string.IsNullOrEmpty(types[i]) && !string.IsNullOrEmpty(fields[i]))
                 {
-                    enumSource.Append(PropertyEnum(types[i], ClassName, InputPath));
+                    enumSource.Append(PropertyEnum(types[i], ClassName, InputPath, true, binaryRegisters));
                 }
             }
-
+            
             classSource.Append("\t}\n");
 
             //生成Container
             classSource.Append("\t\n");
-            classSource.Append("\t[Serializable]\n");
             classSource.Append("\tpublic class " + ClassName + "\n");
             classSource.Append("\t{\n");
             string idType = "";
@@ -129,10 +132,71 @@ namespace F8Framework.Core.Editor
                     break;
                 }
             }
-
+            
             classSource.Append("\t\t[Preserve]\n");
-            classSource.Append("\t\tpublic " + "Dictionary<" + idType + ", " + ClassName + "Item" + "> " + "Dict" +
-                               " = new Dictionary<" + idType + ", " + ClassName + "Item" + ">();\n");
+            classSource.Append("\t\tpublic static void PreRegister()\n");
+            classSource.Append("\t\t{\n");
+            binaryRegisters?.TryAdd($"{ExcelDataTool.CODE_NAMESPACE}.{ClassName}Item", SupportType.OBJ);
+            binaryRegisters?.TryAdd($"System.Collections.Generic.Dictionary<{idType}, {ExcelDataTool.CODE_NAMESPACE}.{ClassName}Item>", SupportType.DICTIONARY);
+            binaryRegisters?.TryAdd($"{ExcelDataTool.CODE_NAMESPACE}.{ClassName}", SupportType.OBJ);
+            if (binaryRegisters != null)
+            {
+                foreach (var item in binaryRegisters)
+                {
+                    if (item.Value == SupportType.ARRAY)
+                    {
+                        string arrayType = item.Key; // 例如 "float[]"
+                        string elementType = arrayType.EndsWith("[]") 
+                            ? arrayType.Substring(0, arrayType.Length - 2) 
+                            : arrayType;
+                        classSource.AppendLine(
+                            $"\t\t\tTypeHandlerFactory.PreRegister<{arrayType}>(new F8Framework.Core.ArrayHandler<{elementType}>());");
+                    }
+                    else if (item.Value == SupportType.LIST)
+                    {
+                        string listType = item.Key; // 例如 "List<int>"
+                        int start = listType.IndexOf('<') + 1;
+                        int end = listType.LastIndexOf('>');
+                        string elementType = listType.Substring(start, end - start);
+                        classSource.AppendLine(
+                            $"\t\t\tTypeHandlerFactory.PreRegister<{listType}>(new F8Framework.Core.ListHandler<{elementType}>());");
+                    }
+                    else if (item.Value == SupportType.DICTIONARY)
+                    {
+                        string dictType = item.Key; // 例如 "Dictionary<int, LocalizedStringsItem>"
+                        int start = dictType.IndexOf('<') + 1;
+                        int end = dictType.LastIndexOf('>');
+                        string inner = dictType.Substring(start, end - start);
+                        string[] parts = inner.Split(new char[] { ',' }, 2);
+                        string keyType = parts[0].Trim();
+                        string valueType = parts[1].Trim();
+                        classSource.AppendLine(
+                            $"\t\t\tTypeHandlerFactory.PreRegister<{dictType}>(new F8Framework.Core.DictionaryHandler<{keyType}, {valueType}>());");
+                    }
+                    else if (item.Value == SupportType.ENUM)
+                    {
+                        string enumType = item.Key; // 例如 "Sheet11.MyEnum"
+                        classSource.AppendLine(
+                            $"\t\t\tTypeHandlerFactory.PreRegister<{enumType}>(new F8Framework.Core.EnumHandler<{enumType}>());");
+                    }
+                    else if (item.Value == SupportType.VALUETUPLE)
+                    {
+                        string tupleType = item.Key; // 例如 "ValueTuple<int, string>"
+                        classSource.AppendLine(
+                            $"\t\t\tTypeHandlerFactory.PreRegister<{tupleType}>(new F8Framework.Core.ValueTupleHandler<{tupleType}>());");
+                    }
+                    else if (item.Value == SupportType.OBJ)
+                    {
+                        string classType = item.Key; // 自定义类
+                        classSource.AppendLine(
+                            $"\t\t\tTypeHandlerFactory.PreRegister<{classType}>(new F8Framework.Core.ObjectHandler<{classType}>());");
+                    }
+                }
+            }
+            classSource.Append("\t\t}\n");
+            classSource.Append("\t\t[Preserve]\n");
+            classSource.Append("\t\tpublic " + "Dictionary<" + idType + ", " + ExcelDataTool.CODE_NAMESPACE + "." + ClassName + "Item" + "> " + "Dict" +
+                               " = new Dictionary<" + idType + ", " + ExcelDataTool.CODE_NAMESPACE + "." + ClassName + "Item" + ">();\n");
             if (enumSource.Length > 0)
             {
                 classSource.Append(enumSource.ToString());
@@ -163,12 +227,12 @@ namespace F8Framework.Core.Editor
              */
         }
 
-        private string PropertyString(string type, string propertyName)
+        private string PropertyString(string type, string propertyName, Dictionary<string, string> binaryRegisters)
         {
             if (string.IsNullOrEmpty(type) || string.IsNullOrEmpty(propertyName))
                 return null;
             
-            type = ReadExcel.GetTrueType(type, ClassName, InputPath);
+            type = ReadExcel.GetTrueType(type, ClassName, InputPath, true, binaryRegisters);
             if (!string.IsNullOrEmpty(type))
             {
                 StringBuilder sbProperty = new StringBuilder();
@@ -184,7 +248,7 @@ namespace F8Framework.Core.Editor
             }
         }
 
-        private string PropertyEnum(string type, string className = "", string inputPath = "", bool writtenForm = true)
+        private string PropertyEnum(string type, string className = "", string inputPath = "", bool writtenForm = true, Dictionary<string, string> binaryRegisters = null)
         {
             if (!type.StartsWith(SupportType.ENUM) || (!type.EndsWith(">") && !type.EndsWith("}")))
                 return "";
@@ -281,6 +345,7 @@ namespace F8Framework.Core.Editor
 
             sb.AppendLine("\t\t}");
 
+            binaryRegisters?.TryAdd($"{ExcelDataTool.CODE_NAMESPACE}.{className}.{enumName}", SupportType.ENUM);
             return sb.ToString();
         }
         

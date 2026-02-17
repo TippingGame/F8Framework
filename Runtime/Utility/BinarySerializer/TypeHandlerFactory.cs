@@ -1,165 +1,136 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 
 namespace F8Framework.Core
 {
-    internal abstract class TypeHandler
+    public static class TypeHandlerFactory
     {
-        public abstract void Serialize(BinaryWriter writer, object value);
-        public abstract object Deserialize(BinaryReader reader, Type type);
-    }
+        // 存储非泛型 TypeHandler，但实际存储的是泛型实例
+        private static readonly Dictionary<Type, TypeHandler> _handlers = new Dictionary<Type, TypeHandler>();
 
-    internal static class TypeHandlerFactory
-    {
-        private static readonly Dictionary<Type, TypeHandler> _handlers = new Dictionary<Type, TypeHandler>
+        // 静态构造函数初始化基础类型
+        static TypeHandlerFactory()
         {
             // 基础类型
-            { typeof(char), new CharHandler() },
-            { typeof(bool), new BoolHandler() },
-            { typeof(byte), new ByteHandler() },
-            { typeof(sbyte), new SByteHandler() },
-            { typeof(short), new ShortHandler() },
-            { typeof(ushort), new UShortHandler() },
-            { typeof(int), new IntHandler() },
-            { typeof(uint), new UIntHandler() },
-            { typeof(long), new LongHandler() },
-            { typeof(ulong), new ULongHandler() },
-            { typeof(float), new FloatHandler() },
-            { typeof(double), new DoubleHandler() },
-            { typeof(decimal), new DecimalHandler() },
-            { typeof(string), new StringHandler() },
+            PreRegister<char>(new CharHandler());
+            PreRegister<bool>(new BoolHandler());
+            PreRegister<byte>(new ByteHandler());
+            PreRegister<sbyte>(new SByteHandler());
+            PreRegister<short>(new ShortHandler());
+            PreRegister<ushort>(new UShortHandler());
+            PreRegister<int>(new IntHandler());
+            PreRegister<uint>(new UIntHandler());
+            PreRegister<long>(new LongHandler());
+            PreRegister<ulong>(new ULongHandler());
+            PreRegister<float>(new FloatHandler());
+            PreRegister<double>(new DoubleHandler());
+            PreRegister<decimal>(new DecimalHandler());
+            PreRegister<string>(new StringHandler());
 
             // 时间类型
-            { typeof(DateTime), new DateTimeHandler() },
-            { typeof(DateTimeOffset), new DateTimeOffsetHandler() },
-            { typeof(TimeSpan), new TimeSpanHandler() },
+            PreRegister<DateTime>(new DateTimeHandler());
+            PreRegister<DateTimeOffset>(new DateTimeOffsetHandler());
+            PreRegister<TimeSpan>(new TimeSpanHandler());
 
             // Unity 数学类型
-            { typeof(Vector2), new Vector2Handler() },
-            { typeof(Vector3), new Vector3Handler() },
-            { typeof(Vector4), new Vector4Handler() },
-            { typeof(Vector2Int), new Vector2IntHandler() },
-            { typeof(Vector3Int), new Vector3IntHandler() },
-            { typeof(Quaternion), new QuaternionHandler() },
-            { typeof(Color), new ColorHandler() },
-            { typeof(Color32), new Color32Handler() },
-            { typeof(Rect), new RectHandler() },
-            { typeof(RectInt), new RectIntHandler() },
-            { typeof(Bounds), new BoundsHandler() },
-            { typeof(BoundsInt), new BoundsIntHandler() },
-        };
+            PreRegister<Vector2>(new Vector2Handler());
+            PreRegister<Vector3>(new Vector3Handler());
+            PreRegister<Vector4>(new Vector4Handler());
+            PreRegister<Vector2Int>(new Vector2IntHandler());
+            PreRegister<Vector3Int>(new Vector3IntHandler());
+            PreRegister<Quaternion>(new QuaternionHandler());
+            PreRegister<Color>(new ColorHandler());
+            PreRegister<Color32>(new Color32Handler());
+            PreRegister<Rect>(new RectHandler());
+            PreRegister<RectInt>(new RectIntHandler());
+            PreRegister<Bounds>(new BoundsHandler());
+            PreRegister<BoundsInt>(new BoundsIntHandler());
 
-        public static TypeHandler GetHandler(Type type)
+            // object 类型单独注册（非泛型）
+            _handlers[typeof(object)] = new ObjectTypeHandler();
+        }
+        
+        public static void PreRegisterType(Type type, TypeHandler typeHandler)
         {
-            if (_handlers.TryGetValue(type, out var handler))
-                return handler;
-            
-            if (type == typeof(object))
-                return new ObjectTypeHandler();
+            if (!_handlers.TryAdd(type, typeHandler)) return;
+        }
+        
+        public static void PreRegister<T>(TypeHandler typeHandler) => PreRegisterType(typeof(T), typeHandler);
 
-            if (IsValueTuple(type))
+        internal static TypeHandler CreateHandler(Type type)
+        {
+            if (type.IsGenericType)
             {
-                var genericArgs = type.GetGenericArguments();
-                if (genericArgs.Length == 1)
-                    return new SingleValueTupleHandler();
-                else
-                    return new ValueTupleHandler();
-            }
-
-            if (IsNullableType(type))
-            {
-                var underlyingType = Nullable.GetUnderlyingType(type);
-                return new NullableHandler(underlyingType);
+                var genericDef = type.GetGenericTypeDefinition();
+                if (genericDef == typeof(Nullable<>))
+                {
+                    var underlyingType = Nullable.GetUnderlyingType(type);
+                    var handlerType = typeof(NullableHandler<>).MakeGenericType(underlyingType);
+                    return (TypeHandler)Activator.CreateInstance(handlerType);
+                }
+                if (genericDef == typeof(List<>))
+                {
+                    var elementType = type.GetGenericArguments()[0];
+                    var handlerType = typeof(ListHandler<>).MakeGenericType(elementType);
+                    return (TypeHandler)Activator.CreateInstance(handlerType);
+                }
+                if (genericDef == typeof(Dictionary<,>))
+                {
+                    var args = type.GetGenericArguments();
+                    var handlerType = typeof(DictionaryHandler<,>).MakeGenericType(args[0], args[1]);
+                    return (TypeHandler)Activator.CreateInstance(handlerType);
+                }
+                if (type.FullName.StartsWith("System.ValueTuple"))
+                {
+                    var args = type.GetGenericArguments();
+                    if (args.Length == 1)
+                    {
+                        var handlerType = typeof(SingleValueTupleHandler<>).MakeGenericType(type);
+                        return (TypeHandler)Activator.CreateInstance(handlerType);
+                    }
+                    else
+                    {
+                        var handlerType = typeof(ValueTupleHandler<>).MakeGenericType(type);
+                        return (TypeHandler)Activator.CreateInstance(handlerType);
+                    }
+                }
             }
 
             if (type.IsEnum)
-                return new EnumHandler();
+            {
+                var handlerType = typeof(EnumHandler<>).MakeGenericType(type);
+                return (TypeHandler)Activator.CreateInstance(handlerType);
+            }
 
             if (type.IsArray)
-                return new ArrayHandler();
-
-            if (IsGenericList(type))
-                return new ListHandler();
-
-            if (IsGenericDictionary(type))
-                return new DictionaryHandler();
+            {
+                var elementType = type.GetElementType();
+                var handlerType = typeof(ArrayHandler<>).MakeGenericType(elementType);
+                return (TypeHandler)Activator.CreateInstance(handlerType);
+            }
 
             if (type.IsClass || (type.IsValueType && !type.IsPrimitive && !type.IsEnum))
-                return new ObjectHandler();
-
-            throw new NotSupportedException($"Type {type} is not supported");
-        }
-        
-        private class ObjectTypeHandler : TypeHandler
-        {
-            public override void Serialize(BinaryWriter writer, object value)
             {
-                if (value == null)
-                {
-                    writer.Write((byte)0);
-                    return;
-                }
-                
-                writer.Write((byte)1);
-                
-                Type actualType = value.GetType();
-                
-                writer.Write(actualType.FullName);
-                
-                var handler = TypeHandlerFactory.GetHandler(actualType);
-                handler.Serialize(writer, value);
+                var handlerType = typeof(ObjectHandler<>).MakeGenericType(type);
+                return (TypeHandler)Activator.CreateInstance(handlerType);
             }
 
-            public override object Deserialize(BinaryReader reader, Type type)
-            {
-                var isNotNull = reader.ReadByte();
-                if (isNotNull == 0)
-                    return null;
-
-                string typeName = reader.ReadString();
-                Type actualType = Type.GetType(typeName);
-        
-                if (actualType == null)
-                    throw new InvalidOperationException($"无法找到类型: {typeName}");
-
-                var handler = TypeHandlerFactory.GetHandler(actualType);
-                return handler.Deserialize(reader, actualType);
-            }
+            return null;
         }
 
-        private static bool IsValueTuple(Type type)
+        internal static TypeHandler GetHandler(Type type)
         {
-            return type.IsGenericType && type.FullName != null && type.FullName.StartsWith("System.ValueTuple");
-        }
+            if (_handlers.TryGetValue(type, out var handler))
+                return handler;
 
-        private static bool IsNullableType(Type type)
-        {
-            return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
-        }
-
-        private static bool IsGenericList(Type type)
-        {
-            if (!type.IsGenericType) return false;
-            var genericDef = type.GetGenericTypeDefinition();
-            return genericDef == typeof(List<>) || genericDef == typeof(IList<>) || genericDef == typeof(ICollection<>);
-        }
-
-        private static bool IsGenericDictionary(Type type)
-        {
-            if (!type.IsGenericType) return false;
-            var genericDef = type.GetGenericTypeDefinition();
-            return genericDef == typeof(Dictionary<,>) || genericDef == typeof(IDictionary<,>);
+            handler = CreateHandler(type);
+            _handlers[type] = handler ??
+                              throw new NotSupportedException($"Cannot create handler for type {type}");
+            return handler;
         }
     }
-    
-    /// <summary>
-    /// 跳过序列化的标签
-    /// </summary>
+
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false)]
-    public sealed class BinaryIgnore : Attribute
-    {
-
-    }
+    public sealed class BinaryIgnore : Attribute { }
 }

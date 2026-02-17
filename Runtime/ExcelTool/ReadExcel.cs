@@ -41,6 +41,7 @@ namespace F8Framework.Core
         public const string QUATERNION = "quat";
         public const string QUATERNIONFULL = "quaternion";
         public const string COLOR = "color";
+        public const string COLOR32 = "color32";
         public const string DATETIME = "datetime";
         public const string SBYTE = "sbyte";
         public const string USHORT = "ushort";
@@ -837,6 +838,23 @@ namespace F8Framework.Core
                                 classname);
                             o = color1;
                             break;
+                        case SupportType.COLOR32:
+                            data = RemoveOuterBracketsIfPaired(data); // 移除最外层的 '[' 和 ']' '{' 和 '}'
+                            var color32 = Regex.Matches(data, "(?:\"(?:[^\"]|\"\")*\"|[^,]+)") //逗号分隔
+                                .Cast<Match>()
+                                .Select(m => m.Value)
+                                .ToArray();
+                            var color2 = new Color32();
+                            color2.r = (byte)ParseValue(SupportType.BYTE, color32.Length >= 1 ? color32[0] : "0",
+                                classname);
+                            color2.g = (byte)ParseValue(SupportType.BYTE, color32.Length >= 2 ? color32[1] : "0",
+                                classname);
+                            color2.b = (byte)ParseValue(SupportType.BYTE, color32.Length >= 3 ? color32[2] : "0",
+                                classname);
+                            color2.a = (byte)ParseValue(SupportType.BYTE, color32.Length >= 4 ? color32[3] : "0",
+                                classname);
+                            o = color2;
+                            break;
                         case SupportType.DATETIME:
                             data = RemoveOuterBracketsIfPaired(data); // 移除最外层的 '[' 和 ']' '{' 和 '}'
                             if (string.IsNullOrEmpty(data))
@@ -965,34 +983,40 @@ namespace F8Framework.Core
             }
         }
         
-        public static string GetTrueType(string type, string className = "", string inputPath = "", bool writtenForm = true)
+        public static string GetTrueType(string type, string className = "", string inputPath = "", bool writtenForm = true, Dictionary<string, string> collectedTypes = null)
         {
+            string result;
+            
             if (type.EndsWith(SupportType.ARRAY))
             {
                 string innerType = type.Substring(0, type.Length - 2);
-                string trueInnerType = GetTrueType(innerType, className, inputPath, writtenForm);
+                string trueInnerType = GetTrueType(innerType, className, inputPath, writtenForm, collectedTypes);
                 if (writtenForm)
                 {
-                    return trueInnerType + "[]";
+                    result = trueInnerType + "[]";
                 }
                 else
                 {
                     var elementType = SystemGetType(trueInnerType);
-                    return elementType.FullName + "[]";
+                    result = elementType.FullName + "[]";
                 }
+                collectedTypes?.TryAdd(result, SupportType.ARRAY);
+                return result;
             }
             else if (type.StartsWith(SupportType.LIST) && type.EndsWith(">"))
             {
                 string innerType = type.Substring(5, type.Length - 6);
                 if (writtenForm)
                 {
-                    return "System.Collections.Generic.List<" + GetTrueType(innerType, className, inputPath, writtenForm) + ">";
+                    result = "System.Collections.Generic.List<" + GetTrueType(innerType, className, inputPath, writtenForm, collectedTypes) + ">";
                 }
                 else
                 {
-                    var assemblyQualifiedName = SystemGetType(GetTrueType(innerType, className, inputPath, writtenForm)).AssemblyQualifiedName;
-                    return "System.Collections.Generic.List`1[[" + assemblyQualifiedName + "]]";
+                    var assemblyQualifiedName = SystemGetType(GetTrueType(innerType, className, inputPath, writtenForm, collectedTypes)).AssemblyQualifiedName;
+                    result = "System.Collections.Generic.List`1[[" + assemblyQualifiedName + "]]";
                 }
+                collectedTypes?.TryAdd(result, SupportType.LIST);
+                return result;
             }
             else if ((type.StartsWith(SupportType.DICTIONARY) || type.StartsWith(SupportType.DICTIONARYFULL)) && type.EndsWith(">"))
             {
@@ -1013,14 +1037,16 @@ namespace F8Framework.Core
                 string valueType = type.Substring(commaIndex + 1, type.Length - commaIndex - 2);
                 if (writtenForm)
                 {
-                    return "System.Collections.Generic.Dictionary<" + GetTrueType(keyType, className, inputPath, writtenForm) + "," + GetTrueType(valueType, className, inputPath, writtenForm) + ">";
+                    result = "System.Collections.Generic.Dictionary<" + GetTrueType(keyType, className, inputPath, writtenForm, collectedTypes) + "," + GetTrueType(valueType, className, inputPath, writtenForm, collectedTypes) + ">";
                 }
                 else
                 {
-                    var keyTypeName = SystemGetType(GetTrueType(keyType, className, inputPath, writtenForm)).AssemblyQualifiedName;
-                    var valueTypeName = SystemGetType(GetTrueType(valueType, className, inputPath, writtenForm)).AssemblyQualifiedName;
-                    return "System.Collections.Generic.Dictionary`2[[" + keyTypeName + "],[" + valueTypeName + "]]";
+                    var keyTypeName = SystemGetType(GetTrueType(keyType, className, inputPath, writtenForm, collectedTypes)).AssemblyQualifiedName;
+                    var valueTypeName = SystemGetType(GetTrueType(valueType, className, inputPath, writtenForm, collectedTypes)).AssemblyQualifiedName;
+                    result = "System.Collections.Generic.Dictionary`2[[" + keyTypeName + "],[" + valueTypeName + "]]";
                 }
+                collectedTypes?.TryAdd(result, SupportType.DICTIONARY);
+                return result;
             }
             else if (type.StartsWith(SupportType.ENUM) && (type.EndsWith(">") || type.EndsWith("}")))
             {
@@ -1030,9 +1056,13 @@ namespace F8Framework.Core
                     .Trim();             // 移除前后空格
                 if (writtenForm)
                 {
-                    if (!innerContent.Contains('.'))
+                    if (innerContent.Contains('.'))
                     {
-                        innerContent = $"{className}.{innerContent}";
+                        innerContent = $"{CODE_NAMESPACE}.{innerContent}";
+                    }
+                    else
+                    {
+                        innerContent = $"{CODE_NAMESPACE}.{className}.{innerContent}";
                     }
                 }
                 else
@@ -1049,7 +1079,9 @@ namespace F8Framework.Core
                         innerContent = SystemGetType(innerContent).AssemblyQualifiedName;
                     }
                 }
-                return innerContent;
+                result = innerContent;
+                collectedTypes?.TryAdd(result, SupportType.ENUM);
+                return result;
             }
             else if (type.StartsWith(SupportType.VALUETUPLE) && type.EndsWith(">"))
             {
@@ -1058,18 +1090,20 @@ namespace F8Framework.Core
                 
                 if (writtenForm)
                 {
-                    string processedTypeArgs = string.Join(",", typeArgs.Select(t => GetTrueType(t, className, inputPath, writtenForm)));
-                    return $"System.ValueTuple<{processedTypeArgs}>";
+                    string processedTypeArgs = string.Join(",", typeArgs.Select(t => GetTrueType(t, className, inputPath, writtenForm, collectedTypes)));
+                    result = $"System.ValueTuple<{processedTypeArgs}>";
                 }
                 else
                 {
                     string processedTypeArgs = string.Join(",", 
                         typeArgs.Select(t => 
-                            $"[{SystemGetType(GetTrueType(t, className, inputPath, writtenForm)).AssemblyQualifiedName}]"
+                            $"[{SystemGetType(GetTrueType(t, className, inputPath, writtenForm, collectedTypes)).AssemblyQualifiedName}]"
                         )
                     );
-                    return $"System.ValueTuple`{typeArgs.Length}[{processedTypeArgs}]";
+                    result = $"System.ValueTuple`{typeArgs.Length}[{processedTypeArgs}]";
                 }
+                collectedTypes?.TryAdd(result, SupportType.VALUETUPLE);
+                return result;
             }
             else
             {
@@ -1134,6 +1168,9 @@ namespace F8Framework.Core
                     break;
                 case SupportType.COLOR:
                     type = "UnityEngine.Color";
+                    break;
+                case SupportType.COLOR32:
+                    type = "UnityEngine.Color32";
                     break;
                 case SupportType.DATETIME:
                     type = "System.DateTime";
