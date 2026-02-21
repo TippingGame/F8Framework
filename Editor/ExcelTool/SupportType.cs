@@ -86,7 +86,7 @@ namespace F8Framework.Core.Editor
 
             string exportFormat = F8EditorPrefs.GetString(BuildPkgTool.ConvertExcelToOtherFormatsKey, BuildPkgTool.ExcelToOtherFormats[1]);
             Dictionary<string, string> binaryRegisters = exportFormat == BuildPkgTool.ExcelToOtherFormats[1] ? new Dictionary<string, string>() : null;
-            
+            bool hasVariant = false;
             //设置成员
             for (int i = 0; i < fields.Length; ++i)
             {
@@ -94,14 +94,14 @@ namespace F8Framework.Core.Editor
                 if (ConfigDatas[i].VariantInfo != null)
                 {
                     if (ConfigDatas[i].VariantInfo.HasVariant != true) continue;
-                    
+                    hasVariant = true;
                     string fieldType = ReadExcel.GetTrueType(types[i], ClassName, InputPath, true, binaryRegisters);
                     classSource.Append("\t\t[Preserve]\n");
                     classSource.Append("\t\tpublic Dictionary<System.String, " + fieldType + "> _" + fields[i] + "Variants = new Dictionary<System.String, " + fieldType + ">();\n");
                     classSource.Append("\t\t[F8Framework.Core.BinaryIgnore]\n");
                     classSource.Append("\t\t[LitJson.JsonIgnore]\n");
                     classSource.Append("\t\t[Preserve]\n");
-                    classSource.Append("\t\tpublic " + fieldType + " " + fields[i] + " => _" + fields[i] + "Variants.GetValueOrDefault(F8DataManager.Instance.VariantName ?? string.Empty, _" + fields[i] + "Variants[string.Empty]);\n");
+                    classSource.Append($"\t\tpublic {fieldType} {fields[i] } => _{fields[i]}Variants.GetValueOrDefault(!string.IsNullOrEmpty({ExcelDataTool.CODE_NAMESPACE}.{ClassName}.VariantName) ? {ExcelDataTool.CODE_NAMESPACE}.{ClassName}.VariantName : (F8DataManager.Instance.VariantName ?? string.Empty), _{fields[i]}Variants[string.Empty]);\n");
                     binaryRegisters?.TryAdd("System.Collections.Generic.Dictionary<System.String, " + fieldType + ">", SupportType.DICTIONARY);
                 }
                 else
@@ -132,7 +132,12 @@ namespace F8Framework.Core.Editor
                     break;
                 }
             }
-            
+
+            if (hasVariant)
+            {
+                classSource.Append("\t\t[Preserve]\n");
+                classSource.Append("\t\tpublic static string VariantName;\n");
+            }
             classSource.Append("\t\t[Preserve]\n");
             classSource.Append("\t\tpublic static void PreRegister()\n");
             classSource.Append("\t\t{\n");
@@ -375,7 +380,7 @@ namespace F8Framework.Core.Editor
             source.Append("\tpublic class F8DataManager : ModuleSingleton<F8DataManager>, IModule\n");
             source.Append("\t{\n");
 
-            source.Append("\t\tpublic string VariantName { get; set; }\n");
+            source.Append("\t\tpublic string VariantName;\n");
             //定义变量
             foreach (string t in types)
             {

@@ -98,6 +98,9 @@ Excel 示例：
 ```C#
 // 设置变体名
 FF8.Config.VariantName = "English";
+
+// 设置单个表变体名（更优先）
+Sheet1.VariantName = "English";
 ```
 | string | variant<desc,English> | variant<desc,Korean> | int    | variant<attack,English> | variant<attack,Korean> |
 |--------|-----------------------|----------------------|--------|-------------------------|------------------------|

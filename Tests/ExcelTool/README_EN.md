@@ -97,6 +97,9 @@ Excel Example:
 ```C#
 // Set variant name
 FF8.Config.VariantName = "English";
+
+// Set a single sheet variant name (higher priority)
+Sheet1.VariantName = "English";
 ```
 | string | variant<desc,English> | variant<desc,Korean> | int    | variant<attack,English> | variant<attack,Korean> |
 |--------|-----------------------|----------------------|--------|-------------------------|------------------------|
