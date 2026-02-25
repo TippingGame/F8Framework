@@ -16,6 +16,9 @@ namespace F8Framework.Core
         public const byte AssetBundleOffset = 0;
         public const byte AssetBundleXorKey = 0;
         
+        // 分包压缩密码
+        public const string OptionalPackagePassword = "";
+        
         [System.Serializable]
         public class ConfigEntry
         {

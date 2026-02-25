@@ -77,6 +77,11 @@ namespace F8Framework.Core
             Debug.Log(sb.ToString());
         }
         
+        public static void Log(string s)
+        {
+            Debug.Log(s);
+        }
+        
         public static void Log(object o)
         {
             Debug.Log(o);
@@ -322,6 +327,11 @@ namespace F8Framework.Core
         public static void LogError(string s, params object[] p)
         {
             Debug.LogError((p != null && p.Length > 0 ? string.Format(s, p) : s));
+        }
+        
+        public static void LogError(string s)
+        {
+            Debug.LogError(s);
         }
         
         public static void LogError(object o)

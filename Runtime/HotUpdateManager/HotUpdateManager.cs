@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -282,7 +283,6 @@ namespace F8Framework.Core
             packageDownloader.OnDownloadSuccess += (eventArgs) =>
             {
                 LogF8.LogVersion($"获取分包资源完成！：{eventArgs.DownloadInfo.DownloadUrl}");
-                downloadPaths.Add(eventArgs.DownloadInfo.DownloadPath);
             };
             packageDownloader.OnDownloadFailure += (eventArgs) =>
             {
@@ -322,6 +322,7 @@ namespace F8Framework.Core
                 // 断点续传
                 packageDownloader.AddDownload(GameConfig.LocalGameVersion.AssetRemoteAddress + "/" + PackageSplit + package + ".zip",
                     persistentPackagePath, fileSizeInBytes, true);
+                downloadPaths.Add(persistentPackagePath);
             }
             
             packageDownloader.LaunchDownload();
@@ -329,11 +330,11 @@ namespace F8Framework.Core
         
         public IEnumerator UnZipPackagePathsCo(List<string> downloadPaths, Action completed = null)
         {
+            string optionalPackagePassword = F8GamePrefs.GetString(nameof(F8GameConfig.OptionalPackagePassword), "");
             foreach (var downloadPath in downloadPaths)
             {
-                // 使用协程
                 yield return Util.ZipHelper.UnZipFileCoroutine(downloadPath,
-                    Application.persistentDataPath, null, true);
+                    Application.persistentDataPath, optionalPackagePassword, true);
                 string package = Path.GetFileNameWithoutExtension(downloadPath).Replace(PackageSplit, "");
                 int subPackageCount = GameConfig.LocalGameVersion.SubPackage.Count;
                 for (int i = subPackageCount - 1; i >= 0; i--)
@@ -352,22 +353,27 @@ namespace F8Framework.Core
         
         public async Task UnZipPackagePaths(List<string> downloadPaths, Action completed = null)
         {
-            foreach (var downloadPath in downloadPaths)
+            string optionalPackagePassword = F8GamePrefs.GetString(nameof(F8GameConfig.OptionalPackagePassword), "");
+            var tasks = downloadPaths.Select(async path =>
             {
-                // 使用多线程
-                await Util.ZipHelper.UnZipFileAsync(downloadPath, Application.persistentDataPath, null, true);
-                string package = Path.GetFileNameWithoutExtension(downloadPath).Replace(PackageSplit, "");
-                int subPackageCount = GameConfig.LocalGameVersion.SubPackage.Count;
-                for (int i = subPackageCount - 1; i >= 0; i--)
+                await Util.ZipHelper.UnZipFileAsync(path, Application.persistentDataPath, optionalPackagePassword, true);
+                return Path.GetFileNameWithoutExtension(path).Replace(PackageSplit, "");
+            }).ToList();
+            
+            string[] packages = await Task.WhenAll(tasks);
+            
+            for (int i = GameConfig.LocalGameVersion.SubPackage.Count - 1; i >= 0; i--)
+            {
+                string subPkg = GameConfig.LocalGameVersion.SubPackage[i];
+                if (packages.Contains(subPkg))
                 {
-                    if (GameConfig.LocalGameVersion.SubPackage[i] == package)
-                    {
-                        GameConfig.LocalGameVersion.SubPackage.RemoveAt(i);
-                    }
+                    GameConfig.LocalGameVersion.SubPackage.RemoveAt(i);
                 }
-                FileTools.SafeWriteAllText(Application.persistentDataPath + "/" + nameof(GameVersion) + ".json",
-                    Util.LitJson.ToJson(GameConfig.LocalGameVersion));
             }
+            
+            FileTools.SafeWriteAllText(Application.persistentDataPath + "/" + nameof(GameVersion) + ".json",
+                Util.LitJson.ToJson(GameConfig.LocalGameVersion));
+
             completed?.Invoke();
         }
         

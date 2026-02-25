@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using ICSharpCode.SharpZipLib.Zip;
@@ -13,137 +14,76 @@ namespace F8Framework.Core
         /// </summary>
         public static class ZipHelper
         {
-            private const int BufferSize = 2048;
-            
+            private const int BufferSize = 65536; // 64KB 缓冲区
+
             // 压缩回调接口
             public interface IZipCallback
             {
-                bool OnPreZip(ZipEntry entry); //true表示继续执行
+                bool OnPreZip(ZipEntry entry); // true 继续，false 跳过
                 void OnPostZip(ZipEntry entry);
                 void OnFinished(string result);
             }
-            
+
+            // 默认回调实现（过滤 .meta 和 .ds_store）
             public class ZipResult : IZipCallback
             {
                 public bool OnPreZip(ZipEntry entry)
                 {
                     if (entry.IsFile)
                     {
-                        string extension = Path.GetExtension(entry.Name).ToLower();
-                        if (extension == ".meta" || extension == ".ds_store")
+                        string ext = Path.GetExtension(entry.Name).ToLower();
+                        if (ext == ".meta" || ext == ".ds_store")
                             return false;
                     }
-
                     return true;
                 }
 
-                public void OnPostZip(ZipEntry entry)
-                {
-                    // LogF8.LogUtil("OnPostZip : " + _entry.Name);
-                }
-
-                public void OnFinished(string result)
-                {
-                    LogF8.LogUtil("Zip Finished : " + result);
-                }
+                public void OnPostZip(ZipEntry entry) { }
+                public void OnFinished(string result) => LogF8.Log("Zip Finished : " + result);
             }
-            
+
+            #region 解压（同步版本）
             /// <summary>
-            /// 解压缩Zip文件
+            /// 解压缩 Zip 文件
             /// </summary>
             public static bool UnZipFile(string sourceFile, string destinationDirectory = null,
                 string password = null, bool coverFile = false)
             {
-                bool result = false;
-
                 if (!File.Exists(sourceFile))
                 {
                     LogF8.LogError("要解压的文件不存在：" + sourceFile);
-                    return result;
+                    return false;
                 }
 
                 if (string.IsNullOrWhiteSpace(destinationDirectory))
-                {
                     destinationDirectory = Path.GetDirectoryName(sourceFile);
-                }
 
-                FileTools.CheckDirAndCreateWhenNeeded(destinationDirectory);
+                Directory.CreateDirectory(destinationDirectory); // 自动创建目录
 
                 try
                 {
-                    using (ZipInputStream zipStream = new ZipInputStream(File.Open(sourceFile, FileMode.Open,
-                               FileAccess.Read, FileShare.Read)))
+                    using (var zipStream = new ZipInputStream(File.Open(sourceFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
                     {
                         zipStream.Password = password;
-                        ZipEntry zipEntry = zipStream.GetNextEntry();
-
-                        while (zipEntry != null)
+                        ZipEntry entry;
+                        while ((entry = zipStream.GetNextEntry()) != null)
                         {
-                            if (zipEntry.IsDirectory) //如果是文件夹则创建
-                            {
-                                var path = Path.Combine(destinationDirectory, Path.GetDirectoryName(zipEntry.Name));
-
-                                FileTools.CheckDirAndCreateWhenNeeded(path);
-                            }
-                            else
-                            {
-                                string fileName = Path.GetFileName(zipEntry.Name);
-                                if (!string.IsNullOrEmpty(fileName) && fileName.Trim().Length > 0)
-                                {
-                                    var path = Path.Combine(destinationDirectory, zipEntry.Name);
-                                    if (File.Exists(path))
-                                    {
-                                        if (coverFile)
-                                        {
-                                            FileTools.SafeDeleteFile(path);
-                                        }
-                                        else
-                                        {
-                                            zipEntry = zipStream.GetNextEntry();
-                                            continue;
-                                        }
-                                    }
-
-                                    if (!File.Exists(path))
-                                    {
-                                        FileInfo fileItem = new FileInfo(path);
-                                        using (FileStream writeStream = fileItem.Create())
-                                        {
-                                            byte[] buffer = new byte[BufferSize];
-                                            int readLength = 0;
-
-                                            do
-                                            {
-                                                readLength = zipStream.Read(buffer, 0, BufferSize);
-                                                writeStream.Write(buffer, 0, readLength);
-                                            } while (readLength == BufferSize);
-
-                                            writeStream.Flush();
-                                            writeStream.Close();
-                                        }
-                                    }
-                                }
-                            }
-
-                            zipEntry = zipStream.GetNextEntry(); //获取下一个文件
+                            if (!ProcessEntry(entry, zipStream, destinationDirectory, coverFile))
+                                continue; // 跳过（目录或已被过滤）
                         }
-
-                        zipStream.Close();
                     }
-
-                    result = true;
+                    LogF8.Log("Zip解压完成：" + sourceFile);
+                    return true;
                 }
-                catch (System.Exception ex)
+                catch (Exception ex)
                 {
-                    GC.Collect();
-                    LogF8.LogError("文件解压发生错误：" + ex);
-                    return result;
+                    LogF8.LogException(ex);
+                    return false;
                 }
-                LogF8.LogUtil("Zip解压完成：" + sourceFile);
-                GC.Collect();
-                return result;
             }
+            #endregion
 
+            #region 解压（协程版本）
             public static IEnumerator UnZipFileCoroutine(string sourceFile, string destinationDirectory = null,
                 string password = null, bool coverFile = false)
             {
@@ -154,240 +94,228 @@ namespace F8Framework.Core
                 }
 
                 if (string.IsNullOrWhiteSpace(destinationDirectory))
-                {
                     destinationDirectory = Path.GetDirectoryName(sourceFile);
-                }
 
-                FileTools.CheckDirAndCreateWhenNeeded(destinationDirectory);
+                Directory.CreateDirectory(destinationDirectory);
 
-                using (ZipInputStream zipStream = new ZipInputStream(File.Open(sourceFile, FileMode.Open,
-                           FileAccess.Read, FileShare.Read)))
+                using (var zipStream = new ZipInputStream(File.Open(sourceFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
                 {
                     zipStream.Password = password;
-                    ZipEntry zipEntry = zipStream.GetNextEntry();
-
-                    while (zipEntry != null)
+                    ZipEntry entry;
+                    while ((entry = zipStream.GetNextEntry()) != null)
                     {
-                        if (zipEntry.IsDirectory) //如果是文件夹则创建
+                        try
                         {
-                            var path = Path.Combine(destinationDirectory, Path.GetDirectoryName(zipEntry.Name));
-
-                            FileTools.CheckDirAndCreateWhenNeeded(path);
+                            ProcessEntry(entry, zipStream, destinationDirectory, coverFile);
                         }
-                        else
+                        catch (Exception ex)
                         {
-                            string fileName = Path.GetFileName(zipEntry.Name);
-                            if (!string.IsNullOrEmpty(fileName) && fileName.Trim().Length > 0)
-                            {
-                                var path = Path.Combine(destinationDirectory, zipEntry.Name);
-                                if (File.Exists(path))
-                                {
-                                    if (coverFile)
-                                    {
-                                        FileTools.SafeDeleteFile(path);
-                                    }
-                                    else
-                                    {
-                                        zipEntry = zipStream.GetNextEntry();
-                                        continue;
-                                    }
-                                }
-
-                                if (!File.Exists(path))
-                                {
-                                    try
-                                    {
-                                        FileInfo fileItem = new FileInfo(path);
-                                        using (FileStream writeStream = fileItem.Create())
-                                        {
-                                            byte[] buffer = new byte[BufferSize];
-                                            int readLength = 0;
-
-                                            do
-                                            {
-                                                readLength = zipStream.Read(buffer, 0, BufferSize);
-                                                writeStream.Write(buffer, 0, readLength);
-                                            } while (readLength == BufferSize);
-
-                                            writeStream.Flush();
-                                            writeStream.Close();
-                                        }
-                                    }
-                                    catch (System.Exception ex)
-                                    {
-                                        LogF8.LogError("文件解压发生错误：" + ex);
-                                    }
-                                    // 解压一个等待一帧，注意耗时
-                                    yield return null;
-                                }
-                            }
+                            LogF8.LogException(ex);
                         }
-
-                        zipEntry = zipStream.GetNextEntry(); //获取下一个文件
+                        yield return null; // 每处理一个文件等待一帧
                     }
-
-                    zipStream.Close();
                 }
-                LogF8.LogUtil("Zip解压完成：" + sourceFile);
-                GC.Collect();
+                LogF8.Log("Zip解压完成：" + sourceFile);
             }
-            
+            #endregion
+
+            #region 解压（异步版本）
             public static async Task UnZipFileAsync(string sourceFile, string destinationDirectory = null,
                 string password = null, bool coverFile = false)
             {
-                await Task.Run(() =>
-                {
-                    UnZipFile(sourceFile, destinationDirectory, password, coverFile);
-                });
+                // 使用 Task.Run 将同步解压放到线程池执行（保持非阻塞）
+                await Task.Run(() => UnZipFile(sourceFile, destinationDirectory, password, coverFile));
             }
+            #endregion
 
-            //压缩文件和文件夹
-            public static bool Zip(string[] pFileOrDirArray, //需要压缩的文件和文件夹
-                string pZipFilePath, //输出的zip文件完整路径
-                string pPassword = null, //密码
-                IZipCallback callback = null, //回调
-                int pZipLevel = 6) //压缩等级
+            #region 压缩
+            /// <summary>
+            /// 压缩文件和文件夹
+            /// </summary>
+            public static bool Zip(string[] fileOrDirArray, string zipFilePath,
+                string password = null, IZipCallback callback = null, int zipLevel = 6)
             {
-                if (null == pFileOrDirArray)
+                if (fileOrDirArray == null || fileOrDirArray.Length == 0)
                 {
                     callback?.OnFinished("输入路径为空");
                     return false;
                 }
-
-                if (string.IsNullOrEmpty(pZipFilePath))
+                if (string.IsNullOrEmpty(zipFilePath))
                 {
                     callback?.OnFinished("输出路径为空");
                     return false;
                 }
-                
-                var zipOutputStream = new ZipOutputStream(File.Create(pZipFilePath));
-                zipOutputStream.SetLevel(pZipLevel); // 6 压缩质量和压缩速度的平衡点
-                zipOutputStream.Password = pPassword;
 
-                foreach (string fileOrDirectory in pFileOrDirArray)
+                FileTools.SafeDeleteFile(zipFilePath);
+                using (var zipStream = new ZipOutputStream(File.Create(zipFilePath)))
                 {
-                    var result = false;
+                    zipStream.SetLevel(zipLevel);
+                    zipStream.Password = password;
 
-                    if (Directory.Exists(fileOrDirectory))
-                        result = ZipDirectory(fileOrDirectory, string.Empty, zipOutputStream, callback);
-                    else if (File.Exists(fileOrDirectory))
-                        result = ZipFile(fileOrDirectory, string.Empty, zipOutputStream, callback);
-
-                    if (!result)
+                    foreach (string path in fileOrDirArray)
                     {
-                        GC.Collect();
-                        callback?.OnFinished($"压缩失败：{fileOrDirectory}");
+                        bool success;
+                        if (Directory.Exists(path))
+                            success = ZipDirectory(path, "", zipStream, callback);
+                        else if (File.Exists(path))
+                            success = ZipFile(path, "", zipStream, callback);
+                        else
+                            success = false;
+
+                        if (!success)
+                        {
+                            callback?.OnFinished($"压缩失败：{path}");
+                            return false;
+                        }
+                    }
+
+                    zipStream.Finish();
+                }
+
+                callback?.OnFinished($"压缩完成：{zipFilePath}");
+                return true;
+            }
+
+            // 压缩单个文件（流式读写）
+            private static bool ZipFile(string fileName, string parentPath, ZipOutputStream zipStream, IZipCallback callback)
+            {
+                string entryName = parentPath + Path.GetFileName(fileName);
+                var entry = new ZipEntry(entryName) { DateTime = DateTime.Now };
+
+                if (callback != null && !callback.OnPreZip(entry))
+                    return true; // 跳过
+
+                try
+                {
+                    using (var fs = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                    {
+                        entry.Size = fs.Length;
+                        zipStream.PutNextEntry(entry);
+
+                        byte[] buffer = new byte[BufferSize];
+                        int bytesRead;
+                        while ((bytesRead = fs.Read(buffer, 0, buffer.Length)) > 0)
+                        {
+                            zipStream.Write(buffer, 0, bytesRead);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LogF8.LogException(ex);
+                    return false;
+                }
+
+                callback?.OnPostZip(entry);
+                return true;
+            }
+
+            // 压缩文件夹（递归）
+            private static bool ZipDirectory(string dirPath, string parentPath, ZipOutputStream zipStream, IZipCallback callback)
+            {
+                string entryName = Path.Combine(parentPath, GetDirName(dirPath)).Replace('\\', '/');
+                var entry = new ZipEntry(entryName) { DateTime = DateTime.Now, Size = 0 };
+
+                if (callback != null && !callback.OnPreZip(entry))
+                    return true; // 跳过
+
+                try
+                {
+                    zipStream.PutNextEntry(entry);
+                    zipStream.Flush();
+
+                    // 压缩文件夹内所有文件
+                    foreach (string file in Directory.GetFiles(dirPath))
+                        if (!ZipFile(file, Path.Combine(parentPath, GetDirName(dirPath)), zipStream, callback))
+                            return false;
+
+                    // 递归处理子文件夹
+                    foreach (string subDir in Directory.GetDirectories(dirPath))
+                        if (!ZipDirectory(subDir, Path.Combine(parentPath, GetDirName(dirPath)), zipStream, callback))
+                            return false;
+                }
+                catch (Exception ex)
+                {
+                    LogF8.LogException(ex);
+                    return false;
+                }
+
+                callback?.OnPostZip(entry);
+                return true;
+            }
+
+            private static string GetDirName(string path)
+            {
+                if (!Directory.Exists(path)) return "";
+                path = path.Replace("\\", "/").TrimEnd('/');
+                return Path.GetFileName(path) + "/";
+            }
+            #endregion
+
+            #region 私有辅助方法
+            /// <summary>
+            /// 处理单个 ZipEntry（解压逻辑核心）
+            /// </summary>
+            private static bool ProcessEntry(ZipEntry entry, ZipInputStream zipStream, string destDir, bool coverFile)
+            {
+                if (entry.IsDirectory)
+                {
+                    // 创建目录（注意防止 Zip Slip）
+                    string dirPath = GetSafePath(destDir, entry.Name);
+                    Directory.CreateDirectory(dirPath);
+                    return false; // 目录不产生文件，返回 false 表示跳过后续文件写入
+                }
+
+                // 跳过空文件名
+                string fileName = Path.GetFileName(entry.Name);
+                if (string.IsNullOrEmpty(fileName))
+                    return false;
+
+                // 获取安全的最终路径
+                string targetFile = GetSafePath(destDir, entry.Name);
+
+                // 处理已存在文件
+                if (File.Exists(targetFile))
+                {
+                    if (coverFile)
+                    {
+                        FileTools.SafeDeleteFile(targetFile);
+                    }
+                    else
+                    {
                         return false;
                     }
                 }
 
-                zipOutputStream.Finish();
-                zipOutputStream.Close();
-                zipOutputStream = null;
+                // 确保目标目录存在
+                Directory.CreateDirectory(Path.GetDirectoryName(targetFile));
 
-                GC.Collect();
-                callback?.OnFinished($"压缩完成：{string.Join("，", pFileOrDirArray)}");
-                return true;
-            }
-
-            //压缩文件
-            private static bool ZipFile(string pFileName, //需要压缩的文件名
-                string pParentPath, //相对路径
-                ZipOutputStream pZipOutputStream, //压缩输出流
-                IZipCallback callback = null) //回调
-            {
-                ZipEntry entry = null;
-                FileStream fileStream = null;
-                try
+                // 写入文件
+                using (var fs = new FileStream(targetFile, FileMode.Create, FileAccess.Write, FileShare.None))
                 {
-                    string path = pParentPath + Path.GetFileName(pFileName);
-                    entry = new ZipEntry(path) { DateTime = DateTime.Now };
-
-                    if (null != callback && !callback.OnPreZip(entry))
-                        return true; // 过滤
-
-                    fileStream = File.OpenRead(pFileName);
-                    var buffer = new byte[fileStream.Length];
-                    fileStream.Read(buffer, 0, buffer.Length);
-                    fileStream.Close();
-
-                    entry.Size = buffer.Length;
-
-                    pZipOutputStream.PutNextEntry(entry);
-                    pZipOutputStream.Write(buffer, 0, buffer.Length);
-                }
-                catch (Exception e)
-                {
-                    LogF8.LogError("压缩文件夹失败：" + e);
-                    return false;
-                }
-                finally
-                {
-                    if (null != fileStream)
+                    byte[] buffer = new byte[BufferSize];
+                    int bytesRead;
+                    while ((bytesRead = zipStream.Read(buffer, 0, buffer.Length)) > 0)
                     {
-                        fileStream.Close();
-                        fileStream.Dispose();
+                        fs.Write(buffer, 0, bytesRead);
                     }
                 }
 
-                callback?.OnPostZip(entry);
-
                 return true;
             }
 
-            //压缩文件夹
-            private static bool ZipDirectory(string pDirPath, //文件夹路径
-                string pParentPath, //相对路径
-                ZipOutputStream pZipOutputStream, //压缩输出流
-                IZipCallback callback = null) //回调
+            /// <summary>
+            /// 防止 Zip Slip 漏洞：确保最终路径在目标目录内
+            /// </summary>
+            private static string GetSafePath(string destDir, string entryName)
             {
-                ZipEntry entry = null;
-                string path = Path.Combine(pParentPath, GetDirName(pDirPath));
-                try
-                {
-                    entry = new ZipEntry(path)
-                    {
-                        DateTime = DateTime.Now,
-                        Size = 0
-                    };
-
-                    if (null != callback && !callback.OnPreZip(entry))
-                        return true; // 过滤
-
-                    pZipOutputStream.PutNextEntry(entry);
-                    pZipOutputStream.Flush();
-
-                    var files = Directory.GetFiles(pDirPath);
-                    foreach (string file in files)
-                        ZipFile(file, Path.Combine(pParentPath, GetDirName(pDirPath)), pZipOutputStream, callback);
-                }
-                catch (Exception e)
-                {
-                    LogF8.LogError("压缩文件夹失败：" + e);
-                    return false;
-                }
-
-                var directories = Directory.GetDirectories(pDirPath);
-                foreach (string dir in directories)
-                    if (!ZipDirectory(dir, Path.Combine(pParentPath, GetDirName(pDirPath)), pZipOutputStream, callback))
-                        return false;
-
-                callback?.OnPostZip(entry);
-
-                return true;
+                string fullDest = Path.GetFullPath(Path.Combine(destDir, entryName));
+                string fullDestDir = Path.GetFullPath(destDir + Path.DirectorySeparatorChar);
+                if (!fullDest.StartsWith(fullDestDir, StringComparison.OrdinalIgnoreCase))
+                    throw new InvalidOperationException("试图解压到目标目录之外，已阻止: " + entryName);
+                return fullDest;
             }
-
-            private static string GetDirName(string pPath)
-            {
-                if (!Directory.Exists(pPath))
-                    return string.Empty;
-
-                pPath = pPath.Replace("\\", "/");
-                var ss = pPath.Split('/');
-                if (string.IsNullOrEmpty(ss[ss.Length - 1]))
-                    return ss[ss.Length - 2] + "/";
-                return ss[ss.Length - 1] + "/";
-            }
+            #endregion
         }
     }
 }

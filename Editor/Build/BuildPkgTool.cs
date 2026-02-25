@@ -50,6 +50,7 @@ namespace F8Framework.Core.Editor
         private static bool _enableOptionalPackage = false;
         private static bool _enableNullPackage = false;
         private static string _optionalPackage = "0_1_2_3";
+        private static string _optionalPackagePassword = "";
         private static string _assetRemoteAddress = ""; //"http://127.0.0.1:6789/"
         private static bool _enablePackage = false;
         private static bool _enableFullPathAssetLoading = false;
@@ -114,6 +115,7 @@ namespace F8Framework.Core.Editor
             string androidKeyAliasName = GetArgValue(args, "AndroidKeyAliasName-");
             string androidKeyAliasPass = GetArgValue(args, "AndroidKeyAliasPass-");
             bool cleanBuildCache = GetArgValue(args, "CleanBuildCache-").Equals("true", StringComparison.OrdinalIgnoreCase);
+            string optionalPackagePassword = GetArgValue(args, "OptionalPackagePassword-");
 
             F8EditorPrefs.SetBool(_exportCurrentPlatformKey, false);
             F8EditorPrefs.SetString(_exportPlatformKey, platformStr);
@@ -152,6 +154,8 @@ namespace F8Framework.Core.Editor
             F8EditorPrefs.SetString(_androidKeyAliasPassKey, androidKeyAliasPass);
             _androidKeyAliasPass = androidKeyAliasPass;
             F8EditorPrefs.SetBool(CleanBuildCacheKey, cleanBuildCache);
+            F8GamePrefs.SetString(nameof(F8GameConfig.OptionalPackagePassword), optionalPackagePassword);
+            _optionalPackagePassword = optionalPackagePassword;
             
             WriteGameVersion();
             Build();
@@ -267,6 +271,8 @@ namespace F8Framework.Core.Editor
             
             string optionalPackage = F8EditorPrefs.GetString(_optionalPackageKey, "");
             
+            string optionalPackagePassword = F8GamePrefs.GetString(nameof(F8GameConfig.OptionalPackagePassword), "");
+            
             switch (buildTarget)
             {
                 case BuildTarget.StandaloneWindows:
@@ -351,7 +357,7 @@ namespace F8Framework.Core.Editor
                     Util.ZipHelper.IZipCallback zipCb = new Util.ZipHelper.ZipResult();
                     string[] paths = { packagePath };
                     string zipName = packagePath + HotUpdateManager.Separator + package + ".zip";
-                    Util.ZipHelper.Zip(paths, zipName, null, zipCb);
+                    Util.ZipHelper.Zip(paths, zipName, optionalPackagePassword, zipCb);
 
                     FileTools.SafeDeleteDir(packagePath);
                     LogF8.LogVersion("分包输出目录：" + zipName + " ，手动上传至CDN资源服务器。");
@@ -900,13 +906,23 @@ namespace F8Framework.Core.Editor
             }
             GUILayout.Space(10);
 
+            GUILayout.BeginHorizontal();
             bool enablePackageValue = F8EditorPrefs.GetBool(_enablePackageKey, false);
-            _enablePackage = EditorGUILayout.Toggle("启用分包", enablePackageValue);
+            _enablePackage = EditorGUILayout.Toggle("启用分包", enablePackageValue, GUILayout.Width(180));
             if (enablePackageValue != _enablePackage)
             {
                 F8EditorPrefs.SetBool(_enablePackageKey, _enablePackage);
             }
-
+            GUILayout.Label("分包zip加密：", GUILayout.Width(90));
+            string optionalPackagePasswordValue = F8GamePrefs.GetString(nameof(F8GameConfig.OptionalPackagePassword), "");
+            if (string.IsNullOrEmpty(optionalPackagePasswordValue))
+            {
+                optionalPackagePasswordValue = _optionalPackagePassword;
+            }
+            _optionalPackagePassword = EditorGUILayout.TextField(optionalPackagePasswordValue);
+            F8GamePrefs.SetString(nameof(F8GameConfig.OptionalPackagePassword), _optionalPackagePassword);
+            GUILayout.EndHorizontal();
+            
             GUILayout.Space(5);
             GUILayout.Box("", GUILayout.Height(2), GUILayout.ExpandWidth(true));
             GUILayout.Space(5);
