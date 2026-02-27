@@ -71,14 +71,13 @@ namespace F8Framework.Core
         public string Add(int uiId, UIConfig config, object[] parameters = null, UICallbacks callbacks = null)
         {
             var prefabPath = config.AssetName;
-            var guid = Guid.NewGuid().ToString();
 
             if (IsDuplicateLoad(prefabPath, out var viewParams))
             {
                 return string.Empty;
             }
 
-            viewParams = GetOrCreateViewParams(prefabPath, guid);
+            viewParams = GetOrCreateViewParams(prefabPath);
 
             viewParams.UIid = uiId;
             viewParams.Params = parameters;
@@ -87,20 +86,19 @@ namespace F8Framework.Core
 
             Load(viewParams);
 
-            return guid;
+            return viewParams.Guid;
         }
 
         public UILoader AddAsync(int uiId, UIConfig config, object[] parameters = null, UICallbacks callbacks = null)
         {
             var prefabPath = config.AssetName;
-            var guid = Guid.NewGuid().ToString();
 
             if (IsDuplicateLoad(prefabPath, out var viewParams))
             {
                 return viewParams.UILoader;
             }
 
-            viewParams = GetOrCreateViewParams(prefabPath, guid);
+            viewParams = GetOrCreateViewParams(prefabPath);
 
             viewParams.UIid = uiId;
             viewParams.Params = parameters;
@@ -120,15 +118,15 @@ namespace F8Framework.Core
             return false;
         }
 
-        protected ViewParams GetOrCreateViewParams(string prefabPath, string guid)
+        protected ViewParams GetOrCreateViewParams(string prefabPath, string guid = null)
         {
             if (!uiViews.TryGetValue(prefabPath, out var viewParams))
             {
                 if (!uiCache.TryGetValue(prefabPath, out viewParams))
                 {
                     viewParams = new ViewParams();
+                    viewParams.Guid = guid ?? Guid.NewGuid().ToString();
                 }
-                viewParams.Guid = guid;
                 viewParams.PrefabPath = prefabPath;
                 uiViews.Add(viewParams.PrefabPath, viewParams);
             }

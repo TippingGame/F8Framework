@@ -24,13 +24,12 @@ namespace F8Framework.Core
                 dialogQueue = new Queue<DialogParam>();
                 dialogParams[uiId] = dialogQueue;
             }
-            string guid = Guid.NewGuid().ToString(); // 生成一个唯一的ID
             dialogQueue.Enqueue(new DialogParam
             {
                 config = config,
                 parameters = parameters,
                 callbacks = callbacks,
-                guid = guid,
+                guid = null,
                 uiLoader = null,
             });
             if (dialogQueue.Count > 1)
@@ -50,13 +49,12 @@ namespace F8Framework.Core
                 dialogQueue = new Queue<DialogParam>();
                 dialogParams[uiId] = dialogQueue;
             }
-            string guid = Guid.NewGuid().ToString(); // 生成一个唯一的ID
             dialogQueue.Enqueue(new DialogParam
             {
                 config = config,
                 parameters = parameters,
                 callbacks = callbacks,
-                guid = guid,
+                guid = null,
                 uiLoader = null,
             });
             if (dialogQueue.Count > 1)

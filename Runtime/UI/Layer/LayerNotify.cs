@@ -57,9 +57,9 @@ namespace F8Framework.Core
                 else
                 {
                     viewParams = new ViewParams();
+                    viewParams.Guid = guid;
                 }
                 uiCache.Remove(lastKey);
-                viewParams.Guid = guid;
                 viewParams.PrefabPath = prefabPath;
                 uiViews.Add(viewParams.Guid, viewParams);
             }
@@ -88,6 +88,7 @@ namespace F8Framework.Core
                 {
                     uiCache[viewParams.Guid] = viewParams;
                 }
+                uiViews.Remove(guid);
                 var comp = viewParams.DelegateComponent;
                 comp.Remove(isDestroy);
                 viewParams.Valid = false;
