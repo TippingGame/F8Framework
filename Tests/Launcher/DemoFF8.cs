@@ -255,7 +255,7 @@ namespace F8Framework.Tests
             get
             {
                 if (_localization == null)
-                    _localization = ModuleCenter.CreateModule<Localization>();
+                    _localization = ModuleCenter.CreateModule<Localization>(DemoF8DataManager.Instance.GetLocalizedStrings());
                 return _localization;
             }
             set

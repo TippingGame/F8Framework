@@ -256,7 +256,7 @@ namespace F8Framework.Launcher
             get
             {
                 if (_localization == null)
-                    _localization = ModuleCenter.CreateModule<Localization>();
+                    _localization = ModuleCenter.CreateModule<Localization>(F8DataManager.Instance.GetLocalizedStrings());
                 return _localization;
             }
             set

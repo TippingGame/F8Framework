@@ -455,13 +455,7 @@ namespace F8Framework.Core
             get
             {
 #if UNITY_EDITOR
-            #if UNITY_5_6_OR_NEWER
-                return (UnityEngine.Profiling.Profiler.usedHeapSizeLong / 1024).ToString() + " kb";
-            #elif UNITY_5_5_OR_NEWER
-                return (UnityEngine.Profiling.Profiler.usedHeapSize / 1024).ToString() + " kb";
-            #else
-                return (Profiler.usedHeapSize / 1024).ToString() + " kb";
-            #endif
+            return Util.Converter.FormatBytes(UnityEngine.Profiling.Profiler.GetMonoUsedSizeLong());
 #else
             return "0";
 #endif

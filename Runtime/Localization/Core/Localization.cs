@@ -23,7 +23,7 @@ namespace F8Framework.Core
         
         public void OnInit(object createParam)
         {
-            Load();
+            Load(createParam as IDictionary);
         }
 
         public void LoadInEditor()
@@ -34,12 +34,13 @@ namespace F8Framework.Core
                 return;
             }
             LocalizedStrings.Clear();
-            
+            IDictionary tb = null;
             if (Application.isPlaying)
             {
                 try
                 {
                     Util.Assembly.InvokeMethod("F8DataManager", "LoadLocalizedStrings", new object[] { });
+                    tb = Util.Assembly.InvokeMethod("F8DataManager", "GetLocalizedStrings", new object[] { }) as IDictionary;
                 }
                 catch
                 {
@@ -50,21 +51,23 @@ namespace F8Framework.Core
             {
                 try
                 {
-                    Util.Assembly.InvokeMethod("F8DataManager", "GetLocalizedStrings", new object[] { });
+                    ReadExcel.Instance.LoadAllExcelData();
+                    tb = Util.Assembly.InvokeMethod("F8DataManager", "GetLocalizedStrings", new object[] { }) as IDictionary;
                 }
                 catch
                 {
-                    ReadExcel.Instance.LoadAllExcelData();
+                    LogF8.LogError("缺少本地化表或加载本地化表失败！");
                 }
             }
-            LoadSuccess();
+            
+            LoadSuccess(tb);
 #endif
         }
         
         /// <summary>
         /// 加载本地化字符串到内存。
         /// </summary>
-        public void Load()
+        public void Load(IDictionary createParam)
         {
             if (LocalizedStrings.Count > 0)
             {
@@ -73,13 +76,16 @@ namespace F8Framework.Core
             LocalizedStrings.Clear();
             
             // 必须先加载本地化配置表
-            LoadSuccess();
+            LoadSuccess(createParam);
         }
 
-        private void LoadSuccess()
+        private void LoadSuccess(IDictionary tb)
         {
-            var tb = Util.Assembly.InvokeMethod("F8DataManager", "GetLocalizedStrings", new object[] { }) as IDictionary;
-            
+            if (tb == null)
+            {
+                LogF8.LogError("缺少本地化表，需在初始化本地化模块时传入，参考 GameLauncher.cs");
+                return;
+            }
             LogF8.LogConfig("<color=green>获取本地化表格成功！</color>");
             
             foreach (var item in tb.Values)

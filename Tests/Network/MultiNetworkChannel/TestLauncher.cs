@@ -31,7 +31,7 @@ namespace F8Framework.Tests
             FF8.Tween = ModuleCenter.CreateModule<Tween>();
             FF8.UI = ModuleCenter.CreateModule<UIManager>();
             yield return DemoF8DataManager.Instance.LoadLocalizedStringsIEnumerator(); // 加载 LocalizedStrings 配置表，必须在 Localization 模块上面
-            FF8.Local = ModuleCenter.CreateModule<Localization>();
+            FF8.Local = ModuleCenter.CreateModule<Localization>(DemoF8DataManager.Instance.GetLocalizedStrings());
             FF8.SDK = ModuleCenter.CreateModule<SDKManager>();
             FF8.Download = ModuleCenter.CreateModule<DownloadManager>();
             FF8.LogWriter = ModuleCenter.CreateModule<F8LogWriter>();

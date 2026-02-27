@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace F8Framework.Core
 {
+    [Serializable]
     public class GameVersion
     {
         public string Version;

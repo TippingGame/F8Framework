@@ -1,5 +1,4 @@
-// code generation.
-
+using System;
 using System.Collections.Generic;
 using UnityEngine.Scripting;
 
@@ -7,6 +6,7 @@ namespace F8Framework.Core
 {
    public static class AssetBundleMap
    {
+       [Serializable]
        [Preserve]
        public class AssetMapping
        {

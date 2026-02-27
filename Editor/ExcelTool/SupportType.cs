@@ -80,6 +80,7 @@ namespace F8Framework.Core.Editor
             classSource.Append("using UnityEngine;\n\n");
             classSource.Append("namespace " + ExcelDataTool.CODE_NAMESPACE + "\n");
             classSource.Append("{\n");
+            classSource.Append("\t[Serializable]\n");
             classSource.Append("\tpublic class " + ClassName + "Item\n"); //表里每一条数据的类型名为表类型名加Item
             classSource.Append("\t{\n");
             enumSource.Clear();
@@ -121,6 +122,7 @@ namespace F8Framework.Core.Editor
 
             //生成Container
             classSource.Append("\t\n");
+            classSource.Append("\t[Serializable]\n");
             classSource.Append("\tpublic class " + ClassName + "\n");
             classSource.Append("\t{\n");
             string idType = "";
@@ -410,7 +412,9 @@ namespace F8Framework.Core.Editor
                 source.Append("\t\t[Preserve]\n");
                 source.Append("\t\tpublic Dictionary<" + sg.GetIdType() + ", " + typeName + ">" + " Get" + typeNameNotItem + "()\n");
                 source.Append("\t\t{\n");
-                source.Append("\t\t\treturn p_" + t + ".Dict;\n");
+                source.Append("\t\t\tif (p_" + t + " != null) return p_" + t + ".Dict;\n");
+                source.Append("\t\t\tLogF8.LogError(\"未加载配置表： " + t + "\");\n");
+                source.Append("\t\t\treturn null;\n");
                 source.Append("\t\t}\n\n");
                 if (t == "LocalizedStrings")
                 {
