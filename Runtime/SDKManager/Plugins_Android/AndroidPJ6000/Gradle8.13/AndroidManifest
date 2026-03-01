@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+<application
+    android:allowBackup="true"
+    android:supportsRtl="true"
+    android:networkSecurityConfig="@xml/network_security_config"
+    android:exported="true">
+
+    <activity android:name="com.TippingGame.UnityAndroidDemo.MoeNativeActivity"
+        android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale|layoutDirection|density"
+        android:theme="@style/UnityThemeSelector"
+        android:exported="true">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+        <meta-data
+            android:name="unityplayer.UnityActivity"
+            android:value="true" />
+    </activity>
+
+    <activity
+        android:name="com.TippingGame.UnityAndroidDemo.MainActivity"
+        android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale|layoutDirection|density"
+        android:theme="@style/UnityThemeSelector"
+        android:exported="true">
+    </activity>
+
+</application>
+
+</manifest>

@@ -59,8 +59,9 @@ Unity F8 SDKManager组件，与原生平台交互，接入多个平台或者渠�
   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20241120134325.png)  
 * unity2023各个版本（2023.1：Gradle7.6）  
   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20241121004145.png)  
-* unity6000各个版本（怀疑8.7.2写错，目前8.11最高支持8.4.2）  
-  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20241120134329_2.png)  
+* unity6000各个版本  
+  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1772342014471.png)  
+  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1772342960260.png)  
 ------------------------------
 * 根据你版本，选择正确的目录，复制下面这两个文件到工程 `Assets/Plugins/Android` 目录  
 * 给文件 [AndroidManifest.xml](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/Gradle6.1.1/AndroidManifest) 添加上后缀`.xml`  
@@ -72,17 +73,18 @@ Unity F8 SDKManager组件，与原生平台交互，接入多个平台或者渠�
 ------------------------------
 * （可选）使用安卓工程打包aar [UnityAndroidDemo2021.3.15f1.zip](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/UnityAndroidDemo2021.3.15f1.zip)，用作导出 [UnityAndroidDemo-release.aar](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/Gradle6.1.1/UnityAndroidDemo-release) 和 [AndroidManifest.xml](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/Gradle6.1.1/AndroidManifest)
   1. 下载 [Android Studio](https://developer.android.google.cn/studio/archive/) （网页右上角语言改为英文）
-  2. 选择版本：
-     * Unity 2022 / 2023：`android-studio-2022.2.1.20-windows`
-     * Unity 2023 / 6000：`2023.3.1.20-windows`
-  3. 解压工程打开后，在 **Settings -> Build -> Build Tool -> Gradle -> Gradle JDK**，修改 JDK 为unity安装路径自带的（如：`C:\Program Files\Unity\Hub\Editor\6000.1.5f1\Editor\Data\PlaybackEngines\AndroidPlayer\OpenJDK`）
-  4. 在 **Project Structure -> Project / SDK Location**，修改 Gradle 版本，修改 SDK 为unity安装路径自带的（如：`C:\Program Files\Unity\Hub\Editor\6000.1.5f1\Editor\Data\PlaybackEngines\AndroidPlayer\SDK`）
-  5. 上方菜单栏 **Build -> Rebuild Project** 导出后会生成aar文件
-  6. 使用可以读取zip的压缩软件，删除aar里 `libs/classes.jar` 文件
-  7. 再打开根目录的 `classes.jar` ，删除里面的 `UnityPlayerActivity.java` 文件（unity2023 / 6000不需要此步骤）
+  2. 如何选择版本（[取决于Gradle的版本](https://developer.android.com/studio/releases?hl=zh-cn#android_gradle_plugin_and_android_studio_compatibility)）：
+     * Unity 2021 / 2022 / 2023：`android-studio-2022.2.1.20-windows`
+     * Unity 6000 / 6000.3：`2025.3.1 Patch 1`
+  3. 解压工程打开后，在 **Settings -> Build -> Build Tool -> Gradle -> Gradle JDK**，修改 JDK 为unity安装路径自带的（如：`C:\Program Files\Unity\Hub\Editor\6000.3.10f1\Editor\Data\PlaybackEngines\AndroidPlayer\OpenJDK`）
+  4. 在 **Project Structure -> Project / SDK Location**，修改 Gradle 版本，修改 SDK 为unity安装路径自带的（如：`C:\Program Files\Unity\Hub\Editor\6000.3.10f1\Editor\Data\PlaybackEngines\AndroidPlayer\SDK`）
+  5. 替换 libs 目录下的 `classes.jar` 文件为（`C:\Program Files\Unity\Hub\Editor\6000.3.10f1\Editor\Data\PlaybackEngines\AndroidPlayer\Variations\mono\Release\Classes\classes.jar`）
+  6. 上方菜单栏 **Build -> Rebuild Project** 导出后会生成`UnityAndroidDemo-release.aar`文件（2025版本按钮改为Assemble Module）
+  7. 使用可以读取zip的压缩软件，删除aar里 `libs/classes.jar` 文件
+  8. 再打开根目录的 `classes.jar` ，删除里面的 `UnityPlayerActivity.java` 文件（unity2023 / 6000不需要此步骤）
 ------------------------------
 
-* 提供四个unity版本的安卓工程
+* 仅提供四个unity版本的安卓工程（如果需要其他版本，请自行修改）
   1. unity2021.3.15f1：[UnityAndroidDemo2021.3.15f1.zip](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/UnityAndroidDemo2021.3.15f1.zip)  
   2. unity2022.3.52f1：[UnityAndroidDemo2022.3.52f1.zip](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2022/UnityAndroidDemo2022.3.52f1.zip)  
   3. unity2023.2.20f1（2023已被unity弃用）：[UnityAndroidDemo2023.2.20f1.zip](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2023/UnityAndroidDemo2023.2.20f1.zip)

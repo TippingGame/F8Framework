@@ -58,8 +58,9 @@ Method 2: Unity → Menu Bar → Window → Package Manager → "+" → Add Pack
   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20241120134325.png)
 * Unity 2023 versions（2023.1：Gradle7.6）  
   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20241121004145.png)
-* Unity 6000 versions（Suspected typo in 8.7.2; currently, 8.4.2 is the highest supported version）  
-  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20241120134329_2.png)
+* Unity 6000 versions  
+  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1772342014471.png)  
+  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1772342960260.png)
 ------------------------------
 * Based on your version, select the correct directory and copy the following two files to your project's `Assets/Plugins/Android` folder.
 * Add the `.xml` extension to the file [AndroidManifest.xml](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/Gradle6.1.1/AndroidManifest)
@@ -72,17 +73,18 @@ Method 2: Unity → Menu Bar → Window → Package Manager → "+" → Add Pack
 * (Optional) Build an AAR using an Android project: 
 * Download [UnityAndroidDemo2021.3.15f1.zip](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/UnityAndroidDemo2021.3.15f1.zip) to export [UnityAndroidDemo-release.aar](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/Gradle6.1.1/UnityAndroidDemo-release) and [AndroidManifest.xml](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/Gradle6.1.1/AndroidManifest)
     1. Download [Android Studio](https://developer.android.google.cn/studio/archive/) (change the language to English in the top-right corner).
-    2. Select the version: 
-       * Unity 2022 / 2023: `android-studio-2022.2.1.20-windows`
-       * Unity 2023 / 6000: `2023.3.1.20-windows`
-    3. After unzipping and opening the project, go to **Settings → Build → Build Tools → Gradle → Gradle JDK** and set the JDK to the one included with Unity (`C:\Program Files\Unity\Hub\Editor\6000.1.5f1\Editor\Data\PlaybackEngines\AndroidPlayer\OpenJDK`)
-    4. In **Project Structure → Project / SDK Location**, modify the Gradle version and set the SDK to Unity's built-in SDK (`C:\Program Files\Unity\Hub\Editor\6000.1.5f1\Editor\Data\PlaybackEngines\AndroidPlayer\SDK`).
-    5. From the top menu, select **Build → Rebuild Project**. After exporting, an AAR file will be generated.
-    6. Use a ZIP-capable compression tool to delete the `libs/classes.jar` file inside the AAR.
-    7. Open the root directory's `classes.jar` and delete the `UnityPlayerActivity.java` file (not required for Unity 2023 / 6000).
+    2. How to choose a version ([depends on the Gradle version](https://developer.android.com/studio/releases?hl=zh-cn#android_gradle_plugin_and_android_studio_compatibility)):
+    * Unity 2021 / 2022 / 2023：`android-studio-2022.2.1.20-windows`
+    * Unity 6000 / 6000.3：`2025.3.1 Patch 1`
+    3. After unzipping and opening the project, go to **Settings → Build → Build Tools → Gradle → Gradle JDK** and set the JDK to the one included with Unity (`C:\Program Files\Unity\Hub\Editor\6000.3.10f1\Editor\Data\PlaybackEngines\AndroidPlayer\OpenJDK`)
+    4. In **Project Structure → Project / SDK Location**, modify the Gradle version and set the SDK to Unity's built-in SDK (`C:\Program Files\Unity\Hub\Editor\6000.3.10f1\Editor\Data\PlaybackEngines\AndroidPlayer\SDK`).
+    5. Replace the `classes.jar` file in the libs directory with (`C:\Program Files\Unity\Hub\Editor\6000.3.10f1\Editor\Data\PlaybackEngines\AndroidPlayer\Variations\mono\Release\Classes\classes.jar`)
+    6. From the top menu, select **Build → Rebuild Project**. After exporting, an `UnityAndroidDemo-release.aar` file will be generated.(Starting from the 2025 version, the button has been changed to Assemble Module)
+    7. Use a ZIP-capable compression tool to delete the `libs/classes.jar` file inside the AAR.
+    8. Open the root directory's `classes.jar` and delete the `UnityPlayerActivity.java` file (not required for Unity 2023 / 6000).
 ------------------------------
 
-* Prebuilt Android projects for four Unity versions:
+* Only four Unity versions of Android projects are provided (if you need other versions, please modify them yourself)
     1. Unity 2021.3.15f1: [UnityAndroidDemo2021.3.15f1.zip](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2021/UnityAndroidDemo2021.3.15f1.zip)
     2. Unity 2022.3.52f1: [UnityAndroidDemo2022.3.52f1.zip](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2022/UnityAndroidDemo2022.3.52f1.zip)
     3. Unity 2023.2.20f1 (deprecated by Unity): [UnityAndroidDemo2023.2.20f1.zip](https://github.com/TippingGame/F8Framework/blob/main/Runtime/SDKManager/Plugins_Android/AndroidPJ2023/UnityAndroidDemo2023.2.20f1.zip)
