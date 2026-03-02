@@ -4,6 +4,7 @@ using Microsoft.CSharp;
 using System.CodeDom.Compiler;
 using System.IO;
 using System;
+using System.Collections;
 using System.Linq;
 using System.Text;
 using UnityEngine;
@@ -255,55 +256,42 @@ namespace F8Framework.Core.Editor
             
             LogF8.LogConfig("<color=yellow>导表成功!</color>");
             
-            // 如果 Unity 检测到任何脚本更改，则会重新加载 C# 域。这样做的原因是可能已创建新的脚本化导入器 (Scripted Importer)，
-            // 它们的逻辑可能会影响“刷新”队列中的资源导入结果。此步骤会重新启动 Refresh() 以确保所有新的脚本化导入器生效。
-            UnityEditor.EditorApplication.delayCall += () =>
+            EditorCoroutine.Start(CompilationFinishedNext());
+        }
+
+        private static IEnumerator CompilationFinishedNext()
+        {
+            AssetDatabase.Refresh();
+            if (F8EditorPrefs.GetBool("compilationFinishedHotUpdateDll", false) == true)
             {
-                AssetDatabase.Refresh();
-                if (F8EditorPrefs.GetBool("compilationFinishedHotUpdateDll", false) == true)
-                {
-                    F8Helper.GenerateCopyHotUpdateDll();
-                }
                 F8EditorPrefs.SetBool("compilationFinishedHotUpdateDll", false);
-            };
-            
-            UnityEditor.EditorApplication.delayCall += () =>
+                F8Helper.GenerateCopyHotUpdateDll();
+            }
+            yield return null;
+            if (F8EditorPrefs.GetBool("compilationFinishedBuildAB", false) == true)
             {
-                AssetDatabase.Refresh();
-                if (F8EditorPrefs.GetBool("compilationFinishedBuildAB", false) == true)
-                {
-                    ABBuildTool.BuildAllAB();
-                }
                 F8EditorPrefs.SetBool("compilationFinishedBuildAB", false);
-            };
-            
-            UnityEditor.EditorApplication.delayCall += () =>
+                ABBuildTool.BuildAllAB();
+            }
+            yield return null;
+            if (F8EditorPrefs.GetBool("compilationFinishedBuildPkg", false) == true)
             {
-                if (F8EditorPrefs.GetBool("compilationFinishedBuildPkg", false) == true)
-                {
-                    BuildPkgTool.Build();
-                    BuildPkgTool.WriteAssetVersion();
-                }
                 F8EditorPrefs.SetBool("compilationFinishedBuildPkg", false);
-            };
-            
-            UnityEditor.EditorApplication.delayCall += () =>
+                BuildPkgTool.Build();
+                BuildPkgTool.WriteAssetVersion();
+            }
+            yield return null;
+            if (F8EditorPrefs.GetBool("compilationFinishedBuildRun", false) == true)
             {
-                if (F8EditorPrefs.GetBool("compilationFinishedBuildRun", false) == true)
-                {
-                    BuildPkgTool.RunExportedGame();
-                }
                 F8EditorPrefs.SetBool("compilationFinishedBuildRun", false);
-            };
-            
-            UnityEditor.EditorApplication.delayCall += () =>
+                BuildPkgTool.RunExportedGame();
+            }
+            yield return null;
+            if (F8EditorPrefs.GetBool("compilationFinishedBuildUpdate", false) == true)
             {
-                if (F8EditorPrefs.GetBool("compilationFinishedBuildUpdate", false) == true)
-                {
-                    BuildPkgTool.BuildUpdate();
-                }
                 F8EditorPrefs.SetBool("compilationFinishedBuildUpdate", false);
-            };
+                BuildPkgTool.BuildUpdate();
+            }
         }
         
         [UnityEditor.MenuItem("开发工具/运行时读取Excel _F7", false, 101)]
