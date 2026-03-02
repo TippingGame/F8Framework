@@ -143,7 +143,7 @@ await FF8.Config.LoadAllAsyncTask();
 运行时读取Excel的方式（如没有需求请谨慎使用）：
 
 ```C#
-ReadExcel.Instance.LoadAllExcelData(); // 运行时加载 Excel 最新文件
+FF8.Config.RuntimeLoadAll(); // 运行时加载 Excel 最新文件
 ```
 
 **打印数据**：

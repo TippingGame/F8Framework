@@ -338,7 +338,7 @@ namespace F8Framework.Core.Editor
             // 分包
             if (enableOptionalPackage)
             {
-                string toPath = FileTools.TruncatePath(Application.dataPath, 1) + "/temp_OptionalPackage";
+                string toPath = FileTools.TruncatePath(Application.dataPath, 1) + "/Library/F8BuildOptionalPackage";
                 FileTools.SafeDeleteDir(toPath);
                 Dictionary<string, AssetBundleMap.AssetMapping> mappings = 
                     Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(Resources.Load<TextAsset>(nameof(AssetBundleMap)).ToString());
@@ -402,7 +402,7 @@ namespace F8Framework.Core.Editor
                 FileTools.CheckFileAndCreateDirWhenNeeded(assetBundleMapPath);
                 FileTools.SafeWriteAllText(assetBundleMapPath, Util.LitJson.ToJson(resAssetBundleMappings));
                 
-                string toPath = FileTools.TruncatePath(Application.dataPath, 1) + "/temp_NullPackage";
+                string toPath = FileTools.TruncatePath(Application.dataPath, 1) + "/Library/F8BuildNullPackage";
                 FileTools.SafeDeleteDir(toPath);
                 FileTools.SafeCopyDirectory(URLSetting.GetAssetBundlesStreamPath(), toPath, true, new[] { URLSetting.GetPlatformName(), URLSetting.GetPlatformName() + ".manifest" });
                 FileTools.SafeDeleteDir(URLSetting.GetAssetBundlesStreamPath(),

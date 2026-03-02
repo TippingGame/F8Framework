@@ -97,6 +97,11 @@ namespace F8Framework.Core
             LogColor("[工具日志]", color10, s, p);
         }
         
+        public static void LogUtil(string s)
+        {
+            LogColor("[工具日志]", color10, s);
+        }
+        
         public static void LogUtil(object o)
         {
             LogColor("[工具日志]", color10, o);
@@ -110,6 +115,11 @@ namespace F8Framework.Core
         public static void LogVersion(string s, params object[] p)
         {
             LogColor("[版本日志]", color9, s, p);
+        }
+        
+        public static void LogVersion(string s)
+        {
+            LogColor("[版本日志]", color9, s);
         }
         
         public static void LogVersion(object o)
@@ -127,6 +137,11 @@ namespace F8Framework.Core
             LogColor("[SDK日志]", color8, s, p);
         }
         
+        public static void LogSDK(string s)
+        {
+            LogColor("[SDK日志]", color8, s);
+        }
+        
         public static void LogSDK(object o)
         {
             LogColor("[SDK日志]", color8, o);
@@ -140,6 +155,11 @@ namespace F8Framework.Core
         public static void LogModule(string s, params object[] p)
         {
             LogColor("[模块日志]", color1, s, p);
+        }
+        
+        public static void LogModule(string s)
+        {
+            LogColor("[模块日志]", color1, s);
         }
         
         public static void LogModule(object o)
@@ -157,6 +177,11 @@ namespace F8Framework.Core
             LogColor("[网络日志]", color5, s, p);
         }
         
+        public static void LogNet(string s)
+        {
+            LogColor("[网络日志]", color5, s);
+        }
+        
         public static void LogNet(object o)
         {
             LogColor("[网络日志]", color5, o);
@@ -170,6 +195,11 @@ namespace F8Framework.Core
         public static void LogConfig(string s, params object[] p)
         {
             LogColor("[配置日志]", color7, s, p);
+        }
+        
+        public static void LogConfig(string s)
+        {
+            LogColor("[配置日志]", color7, s);
         }
         
         public static void LogConfig(object o)
@@ -187,6 +217,11 @@ namespace F8Framework.Core
             LogColor("[视图日志]", color12, s, p);
         }
         
+        public static void LogView(string s)
+        {
+            LogColor("[视图日志]", color12, s);
+        }
+        
         public static void LogView(object o)
         {
             LogColor("[视图日志]", color12, o);
@@ -200,6 +235,11 @@ namespace F8Framework.Core
         public static void LogEvent(string s, params object[] p)
         {
             LogColor("[事件日志]", color13, s, p);
+        }
+        
+        public static void LogEvent(string s)
+        {
+            LogColor("[事件日志]", color13, s);
         }
         
         public static void LogEvent(object o)
@@ -217,6 +257,11 @@ namespace F8Framework.Core
             LogColor("[实体日志]", color3, s, p);
         }
         
+        public static void LogEntity(string s)
+        {
+            LogColor("[实体日志]", color3, s);
+        }
+        
         public static void LogEntity(object o)
         {
             LogColor("[实体日志]", color3, o);
@@ -230,6 +275,11 @@ namespace F8Framework.Core
         public static void LogAsset(string s, params object[] p)
         {
             LogColor("[资产日志]", color14, s, p);
+        }
+        
+        public static void LogAsset(string s)
+        {
+            LogColor("[资产日志]", color14, s);
         }
         
         public static void LogAsset(object o)
@@ -299,6 +349,11 @@ namespace F8Framework.Core
             Debug.LogAssertion((p != null && p.Length > 0 ? string.Format(s, p) : s));
         }
         
+        public static void LogAssertion(string s)
+        {
+            Debug.LogAssertion(s);
+        }
+        
         public static void LogAssertion(object o)
         {
             Debug.LogAssertion(o);
@@ -312,6 +367,11 @@ namespace F8Framework.Core
         public static void LogWarning(string s, params object[] p)
         {
             Debug.LogWarning((p != null && p.Length > 0 ? string.Format(s, p) : s));
+        }
+        
+        public static void LogWarning(string s)
+        {
+            Debug.LogWarning(s);
         }
         
         public static void LogWarning(object o)

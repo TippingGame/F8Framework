@@ -7,30 +7,29 @@ namespace F8Framework.Core
     public static class F8EditorPrefs
     {
         private static F8EditorConfig _config;
-        private static readonly string _configPath = "Assets/F8Framework/Editor/F8EditorConfig.asset";
-        private static bool IsBuilding => BuildPipeline.isBuildingPlayer;
+        private const string ConfigPath = "Assets/F8Framework/Editor/F8EditorConfig.asset";
         
         private static F8EditorConfig LoadConfig()
         {
-            if (IsBuilding)
+            if (BuildPipeline.isBuildingPlayer)
             {
                 if (_config == null)
                 {
-                    _config = AssetDatabase.LoadAssetAtPath<F8EditorConfig>(_configPath);
+                    _config = AssetDatabase.LoadAssetAtPath<F8EditorConfig>(ConfigPath);
                 }
                 return _config ?? ScriptableObject.CreateInstance<F8EditorConfig>();
             }
             if (_config == null)
             {
-                _config = AssetDatabase.LoadAssetAtPath<F8EditorConfig>(_configPath);
+                _config = AssetDatabase.LoadAssetAtPath<F8EditorConfig>(ConfigPath);
                 if (_config == null)
                 {
                     _config = ScriptableObject.CreateInstance<F8EditorConfig>();
-                    FileTools.CheckFileAndCreateDirWhenNeeded(_configPath);
-                    AssetDatabase.CreateAsset(_config, _configPath);
+                    FileTools.CheckFileAndCreateDirWhenNeeded(ConfigPath);
+                    AssetDatabase.CreateAsset(_config, ConfigPath);
                     AssetDatabase.SaveAssets();
                     
-                    LogF8.Log($"创建编辑器配置文件: {_configPath}");
+                    LogF8.Log($"创建编辑器配置文件: {ConfigPath}");
                 }
             }
             return _config;
@@ -38,7 +37,7 @@ namespace F8Framework.Core
         
         private static void SaveConfig()
         {
-            if (IsBuilding) return;
+            if (BuildPipeline.isBuildingPlayer) return;
             EditorUtility.SetDirty(_config);
             AssetDatabase.SaveAssetIfDirty(_config);
         }
@@ -52,7 +51,7 @@ namespace F8Framework.Core
 
         public static void SetString(string key, string value)
         {
-            if (IsBuilding) return;
+            if (BuildPipeline.isBuildingPlayer) return;
             var entry = LoadConfig().GetOrCreateEntry(key);
             if (entry.valueType == F8EditorConfig.ConfigEntry.ValueType.String && entry.stringValue == value)
             {
@@ -72,7 +71,7 @@ namespace F8Framework.Core
 
         public static void SetBool(string key, bool value)
         {
-            if (IsBuilding) return;
+            if (BuildPipeline.isBuildingPlayer) return;
             var entry = LoadConfig().GetOrCreateEntry(key);
             if (entry.valueType == F8EditorConfig.ConfigEntry.ValueType.Bool && entry.boolValue == value)
             {
@@ -92,7 +91,7 @@ namespace F8Framework.Core
 
         public static void SetInt(string key, int value)
         {
-            if (IsBuilding) return;
+            if (BuildPipeline.isBuildingPlayer) return;
             var entry = LoadConfig().GetOrCreateEntry(key);
             if (entry.valueType == F8EditorConfig.ConfigEntry.ValueType.Int && entry.intValue == value)
             {
@@ -112,7 +111,7 @@ namespace F8Framework.Core
 
         public static void SetFloat(string key, float value)
         {
-            if (IsBuilding) return;
+            if (BuildPipeline.isBuildingPlayer) return;
             var entry = LoadConfig().GetOrCreateEntry(key);
             if (entry.valueType == F8EditorConfig.ConfigEntry.ValueType.Float && entry.floatValue == value)
             {

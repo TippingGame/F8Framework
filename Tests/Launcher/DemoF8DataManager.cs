@@ -93,8 +93,13 @@ namespace F8Framework.Tests
 		}
 
 		[Preserve]
-		public void RuntimeLoadAll(Dictionary<String, System.Object> objs)
+		public void RuntimeLoadAll(Dictionary<String, System.Object> objs = null)
 		{
+			if (objs == null)
+			{
+				objs = new Dictionary<string, object>();
+				ReadExcel.Instance.LoadAllExcelData(objs);
+			}
 			p_Sheet1 = objs["Sheet1"] as DemoSheet1;
 			p_Sheet2 = objs["Sheet2"] as DemoSheet2;
 			p_LocalizedStrings = objs["LocalizedStrings"] as DemoLocalizedStrings;
@@ -109,7 +114,7 @@ namespace F8Framework.Tests
 #if UNITY_EDITOR
 			if (AssetManager.Instance.IsEditorMode)
 			{
-				ReadExcel.Instance.LoadAllExcelData();
+				RuntimeLoadAll();
 			}
 #endif
 		}
@@ -123,7 +128,7 @@ namespace F8Framework.Tests
 #if UNITY_EDITOR
 			if (AssetManager.Instance.IsEditorMode)
 			{
-				ReadExcel.Instance.LoadAllExcelData();
+				RuntimeLoadAll();
 			}
 #endif
 		}
@@ -143,7 +148,7 @@ namespace F8Framework.Tests
 #if UNITY_EDITOR
 			if (AssetManager.Instance.IsEditorMode)
 			{
-				ReadExcel.Instance.LoadAllExcelData();
+				RuntimeLoadAll();
 			}
 #endif
 			onLoadComplete?.Invoke();

@@ -327,7 +327,7 @@ namespace F8Framework.Core.Editor
             }
 
             sb.AppendLine("\t\t[Preserve]");
-
+            sb.AppendLine("\t\t[Serializable]");
             sb.Append("\t\tpublic enum ").Append(enumName).Append(" : ").Append(ReadExcel.GetTrueType(underlyingType, className, inputPath, writtenForm)) .AppendLine();
             sb.AppendLine("\t\t{");
 
@@ -458,8 +458,13 @@ namespace F8Framework.Core.Editor
 
             //运行时加载所有配置表
             source.Append("\t\t[Preserve]\n");
-            source.Append("\t\tpublic void RuntimeLoadAll(Dictionary<String, System.Object> objs)\n");
+            source.Append("\t\tpublic void RuntimeLoadAll(Dictionary<String, System.Object> objs = null)\n");
             source.Append("\t\t{\n");
+            source.Append("\t\t\tif (objs == null)\n");
+            source.Append("\t\t\t{\n");
+            source.Append("\t\t\t\tobjs = new Dictionary<string, object>();\n");
+            source.Append("\t\t\t\tReadExcel.Instance.LoadAllExcelData(objs);\n");
+            source.Append("\t\t\t}\n");
             foreach (string t in types)
             {
                 source.Append("\t\t\tp_" + t + " = objs[" + '"' + t + '"' + "] as " + t + ";\n");
@@ -478,7 +483,7 @@ namespace F8Framework.Core.Editor
             source.Append("#if UNITY_EDITOR\n");
             source.Append("\t\t\tif (AssetManager.Instance.IsEditorMode)\n");
             source.Append("\t\t\t{\n");
-            source.Append("\t\t\t\tReadExcel.Instance.LoadAllExcelData();\n");
+            source.Append("\t\t\t\tRuntimeLoadAll();\n");
             source.Append("\t\t\t}\n");
             source.Append("#endif\n");
             source.Append("\t\t}\n\n");
@@ -494,7 +499,7 @@ namespace F8Framework.Core.Editor
             source.Append("#if UNITY_EDITOR\n");
             source.Append("\t\t\tif (AssetManager.Instance.IsEditorMode)\n");
             source.Append("\t\t\t{\n");
-            source.Append("\t\t\t\tReadExcel.Instance.LoadAllExcelData();\n");
+            source.Append("\t\t\t\tRuntimeLoadAll();\n");
             source.Append("\t\t\t}\n");
             source.Append("#endif\n");
             source.Append("\t\t}\n\n");
@@ -517,7 +522,7 @@ namespace F8Framework.Core.Editor
             source.Append("#if UNITY_EDITOR\n");
             source.Append("\t\t\tif (AssetManager.Instance.IsEditorMode)\n");
             source.Append("\t\t\t{\n");
-            source.Append("\t\t\t\tReadExcel.Instance.LoadAllExcelData();\n");
+            source.Append("\t\t\t\tRuntimeLoadAll();\n");
             source.Append("\t\t\t}\n");
             source.Append("#endif\n");
             source.Append("\t\t\tonLoadComplete?.Invoke();\n");

@@ -41,7 +41,7 @@ namespace F8Framework.Tests
             FF8.Config.VariantName = "English";
             
             // 运行时读取Excel的方式（如没有需求请谨慎使用）
-            ReadExcel.Instance.LoadAllExcelData();
+            FF8.Config.RuntimeLoadAll();
         }
     }
 }

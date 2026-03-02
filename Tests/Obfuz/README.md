@@ -21,3 +21,8 @@
 * Api Compatability Level 切换为 .Net Framework
 * 尝试将 F8Framework 所有程序集设为不混淆
 * 通过界面挂载脚本方法调用的方式，会导致丢失引用，所以 LogViewer 在混淆后，无法正常工作
+* 实时读取 Excel 需要改用 FF8.Config.RuntimeLoadAll
+    ```C#
+  // 实时读取Excel
+  FF8.Config.RuntimeLoadAll();
+    ```

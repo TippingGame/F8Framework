@@ -21,3 +21,8 @@ Integrate Obfuz code obfuscation and protection solution.
 * Switch Api Compatibility Level to .Net Framework
 * Try setting all F8Framework assemblies to non-obfuscated
 * Mounting scripts through the interface for method invocation will cause loss of references, so LogViewer cannot work properly after obfuscation
+* To read Excel in real-time, you need to use FF8.Config.RuntimeLoadAll instead
+    ```C#
+  // Read Excel in real-time
+  FF8.Config.RuntimeLoadAll();
+    ```

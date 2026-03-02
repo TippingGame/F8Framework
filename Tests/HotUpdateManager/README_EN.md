@@ -27,9 +27,10 @@ Method 2: Unity → Menu Bar → Window → Package Manager → "+" → Add Pack
   * Specify version number
   * Configure remote asset loading URL
   * Enable hot updates
-  * Full build / Subpackage build / Empty build  
-
-![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/HotUpdateManager/ui_20240317214323_3.png)  
+  * Full build / Subpackage build / Empty build
+  * Encrypt
+  * More asset settings
+  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/HotUpdateManager/ui_20240317214323_4.png)  
 
 --------------------------
 * For Local Hot Update Testing: Clear temporary files in the sandbox directory before testing.

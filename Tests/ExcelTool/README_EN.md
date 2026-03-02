@@ -142,7 +142,7 @@ await FF8.Config.LoadAllAsyncTask();
 Read Excel at Runtime (Use with Caution):
 
 ```C#
-ReadExcel.Instance.LoadAllExcelData(); // Load the latest Excel files at runtime  
+FF8.Config.RuntimeLoadAll(); // Load the latest Excel files at runtime  
 ```
 
 **Print Data:**：

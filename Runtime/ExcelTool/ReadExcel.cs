@@ -66,7 +66,7 @@ namespace F8Framework.Core
         private string ExcelPath = "config"; //需要导表的目录
         private Dictionary<string, List<ConfigData[]>> dataDict; //存放所有数据表内的数据，key：类名  value：数据
         
-        public void LoadAllExcelData()
+        public void LoadAllExcelData(Dictionary<string, object> excelData = null)
         {
 #if UNITY_EDITOR
         string INPUT_PATH = URLSetting.AddRootPath(F8EditorPrefs.GetString("ExcelPath", null)) ?? URLSetting.CS_STREAMINGASSETS_URL + ExcelPath;
@@ -130,12 +130,22 @@ namespace F8Framework.Core
                 object container = assembly.CreateInstance(CODE_NAMESPACE + "." + each.Key);
                 //序列化数据
                 Serialize(container, temp, each.Value);
-                objs.Add(each.Key, container);
+                if (excelData == null)
+                {
+                    objs.Add(each.Key, container);
+                }
+                else
+                {
+                    excelData.Add(each.Key, container);
+                }
             }
-            string _class = "F8DataManager";
-            string method= "RuntimeLoadAll";
-            object[] parameters = new object[] { objs };
-            Util.Assembly.InvokeMethod(_class, method, parameters);
+            if (excelData == null)
+            {
+                string _class = "F8DataManager";
+                string method= "RuntimeLoadAll";
+                object[] parameters = new object[] { objs };
+                Util.Assembly.InvokeMethod(_class, method, parameters);
+            }
             LogF8.LogConfig("<color=green>运行时导表成功！</color>");
         }
 
@@ -325,7 +335,7 @@ namespace F8Framework.Core
         }
 
         //序列化对象
-        private static void Serialize(object container, Type temp, List<ConfigData[]> dataList)
+        private void Serialize(object container, Type temp, List<ConfigData[]> dataList)
         {
             //设置数据
             foreach (ConfigData[] datas in dataList)

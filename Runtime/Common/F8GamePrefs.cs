@@ -11,11 +11,10 @@ namespace F8Framework.Core
         
 #if UNITY_EDITOR
         private const string GAMECONFIG_PATH = "Assets/F8Framework/Resources/F8GameConfig.asset";
-        private static bool IsBuilding => BuildPipeline.isBuildingPlayer;
         // 编辑器模式下：加载配置（可读写）
         private static F8GameConfig LoadConfig()
         {
-            if (IsBuilding)
+            if (BuildPipeline.isBuildingPlayer)
             {
                 if (!_config)
                 {
@@ -52,7 +51,7 @@ namespace F8Framework.Core
         // 编辑器模式下：保存配置
         private static void SaveConfig()
         {
-            if (IsBuilding) return;
+            if (BuildPipeline.isBuildingPlayer) return;
             if (_config != null)
             {
                 EditorUtility.SetDirty(_config);
@@ -63,7 +62,7 @@ namespace F8Framework.Core
         // 编辑器模式下：设置方法
         public static void SetString(string key, string value)
         {
-            if (IsBuilding) return;
+            if (BuildPipeline.isBuildingPlayer) return;
             if (string.IsNullOrEmpty(key)) return;
             
             var config = LoadConfig();
@@ -79,7 +78,7 @@ namespace F8Framework.Core
         
         public static void SetBool(string key, bool value)
         {
-            if (IsBuilding) return;
+            if (BuildPipeline.isBuildingPlayer) return;
             if (string.IsNullOrEmpty(key)) return;
             
             var config = LoadConfig();
@@ -95,7 +94,7 @@ namespace F8Framework.Core
         
         public static void SetInt(string key, int value)
         {
-            if (IsBuilding) return;
+            if (BuildPipeline.isBuildingPlayer) return;
             if (string.IsNullOrEmpty(key)) return;
             
             var config = LoadConfig();
@@ -111,7 +110,7 @@ namespace F8Framework.Core
         
         public static void SetFloat(string key, float value)
         {
-            if (IsBuilding) return;
+            if (BuildPipeline.isBuildingPlayer) return;
             if (string.IsNullOrEmpty(key)) return;
             
             var config = LoadConfig();
