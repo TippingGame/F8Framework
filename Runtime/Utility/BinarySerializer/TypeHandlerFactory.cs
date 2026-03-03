@@ -46,6 +46,7 @@ namespace F8Framework.Core
             PreRegister<RectInt>(new RectIntHandler());
             PreRegister<Bounds>(new BoundsHandler());
             PreRegister<BoundsInt>(new BoundsIntHandler());
+            PreRegister<Matrix4x4>(new Matrix4x4Handler());
 
             // object 类型单独注册（非泛型）
             _handlers[typeof(object)] = new ObjectTypeHandler();
@@ -79,6 +80,12 @@ namespace F8Framework.Core
                 {
                     var args = type.GetGenericArguments();
                     var handlerType = typeof(DictionaryHandler<,>).MakeGenericType(args[0], args[1]);
+                    return (TypeHandler)Activator.CreateInstance(handlerType);
+                }
+                if (genericDef == typeof(HashSet<>))
+                {
+                    var elementType = type.GetGenericArguments()[0];
+                    var handlerType = typeof(HashSetHandler<>).MakeGenericType(elementType);
                     return (TypeHandler)Activator.CreateInstance(handlerType);
                 }
                 if (type.FullName.StartsWith("System.ValueTuple"))

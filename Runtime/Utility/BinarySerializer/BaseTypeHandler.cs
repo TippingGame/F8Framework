@@ -485,6 +485,36 @@ namespace F8Framework.Core
             return new BoundsInt(position, size);
         }
     }
+    
+    internal class Matrix4x4Handler : TypeHandler<Matrix4x4>
+    {
+        public override void Serialize(BinaryWriter writer, Matrix4x4 value)
+        {
+            writer.Write(value.m00);
+            writer.Write(value.m10);
+            writer.Write(value.m20);
+            writer.Write(value.m30);
+            writer.Write(value.m01);
+            writer.Write(value.m11);
+            writer.Write(value.m21);
+            writer.Write(value.m31);
+            writer.Write(value.m02);
+            writer.Write(value.m12);
+            writer.Write(value.m22);
+            writer.Write(value.m32);
+            writer.Write(value.m03);
+            writer.Write(value.m13);
+            writer.Write(value.m23);
+            writer.Write(value.m33);
+        }
+
+        public override Matrix4x4 Deserialize(BinaryReader reader) =>
+            new Matrix4x4(
+                new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()),
+                new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()),
+                new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()),
+                new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()));
+    }
 
     // 枚举处理
     public class EnumHandler<T> : TypeHandler<T> where T : struct, Enum
@@ -686,6 +716,54 @@ namespace F8Framework.Core
                 dict.Add(key, val);
             }
             return dict;
+        }
+    }
+    
+    // HashSet 处理
+    public class HashSetHandler<T> : TypeHandler<HashSet<T>>
+    {
+        private static readonly TypeHandler<T> _elementHandler = (TypeHandler<T>)TypeHandlerFactory.GetHandler(typeof(T));
+
+        public override void Serialize(BinaryWriter writer, HashSet<T> value)
+        {
+            if (value == null)
+            {
+                writer.Write(-1);
+                return;
+            }
+
+            writer.Write(value.Count);
+            if (value.Count == 0) return;
+        
+            foreach (var item in value)
+            {
+                if (item == null)
+                    writer.Write((byte)0);
+                else
+                {
+                    writer.Write((byte)1);
+                    _elementHandler.Serialize(writer, item);
+                }
+            }
+        }
+
+        public override HashSet<T> Deserialize(BinaryReader reader)
+        {
+            var count = reader.ReadInt32();
+            if (count == -1) return null;
+            
+            var set = new HashSet<T>(count);
+            if (count == 0) return set;
+
+            for (int i = 0; i < count; i++)
+            {
+                var isNotNull = reader.ReadByte();
+                if (isNotNull == 0)
+                    set.Add(default(T));
+                else
+                    set.Add(_elementHandler.Deserialize(reader));
+            }
+            return set;
         }
     }
 

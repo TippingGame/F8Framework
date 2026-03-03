@@ -163,7 +163,13 @@ namespace LitJson
         }
         #endregion
 
-
+        private static bool IsHashSet(Type type)
+        {
+            return type != null 
+                   && type.IsGenericType 
+                   && type.GetGenericTypeDefinition() == typeof(HashSet<>);
+        }
+        
         #region Private Methods
         private static void AddArrayMetadata (Type type)
         {
@@ -176,7 +182,12 @@ namespace LitJson
 
             if (type.GetInterface ("System.Collections.IList") != null)
                 data.IsList = true;
-
+            else if (IsHashSet(type))
+            {
+                data.IsList = true;
+                data.ElementType = type.GetGenericArguments()[0];
+            }
+            
             foreach (PropertyInfo p_info in type.GetProperties ()) {
                 if (p_info.Name != "Item")
                     continue;
@@ -396,6 +407,21 @@ namespace LitJson
                             "Type {0} can't act as an array",
                             inst_type));
 
+                if (IsHashSet(inst_type))
+                {
+                    instance = Activator.CreateInstance(inst_type);
+                    Type elem_type_hashset = t_data.ElementType;
+                    MethodInfo addMethod = inst_type.GetMethod("Add", new Type[] { elem_type_hashset });
+
+                    while (true) {
+                        object item = ReadValue (elem_type_hashset, reader);
+                        if (item == null && reader.Token == JsonToken.ArrayEnd)
+                            break;
+                        addMethod.Invoke(instance, new object[] { item });
+                    }
+                    return instance;
+                }
+                
                 IList list;
                 Type elem_type;
 
@@ -832,6 +858,15 @@ namespace LitJson
                 return;
             }
 
+            if (IsHashSet(obj.GetType()))
+            {
+                writer.WriteArrayStart();
+                foreach (object elem in (IEnumerable)obj)
+                    WriteValue (elem, writer, writer_is_private, depth + 1);
+                writer.WriteArrayEnd();
+                return;
+            }
+            
             if (obj is IDictionary dictionary) {
                 writer.WriteObjectStart ();
                 foreach (DictionaryEntry entry in dictionary) {

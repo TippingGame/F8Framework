@@ -47,6 +47,7 @@ namespace F8Framework.Core
         public const string USHORT = "ushort";
         public const string UINT = "uint";
         public const string ULONG = "ulong";
+        public const string MATRIX4X4 = "matrix4x4";
         
         // 容器类型
         public const string ARRAY = "[]";
@@ -54,6 +55,7 @@ namespace F8Framework.Core
         public const string DICTIONARY = "dict<";
         public const string DICTIONARYFULL = "dictionary<";
         public const string VALUETUPLE = "valuetuple<";
+        public const string HASHSET = "hashset<";
         
         // 特殊类型
         public const string ENUM = "enum<";
@@ -501,6 +503,23 @@ namespace F8Framework.Core
                     }
                     
                     o = dictionary;
+                }
+                else if (type.StartsWith(SupportType.HASHSET) && type.EndsWith(">"))
+                {
+                    string innerType = type.Substring(8, type.Length - 9);
+                    data = RemoveOuterBracketsIfPaired(data); // 移除最外层的 '[' 和 ']' '{' 和 '}'
+                    var elements = ParseElements(data).ToArray();
+                    int elementsLength = elements.Length;
+                    Type elementType = SystemGetType(GetTrueType(innerType, classname, "", false));
+                    object set = Activator.CreateInstance(typeof(HashSet<>).MakeGenericType(elementType), elementsLength);
+                    MethodInfo addMethod = set.GetType().GetMethod("Add");
+    
+                    for (int i = 0; i < elementsLength; i++)
+                    {
+                        addMethod.Invoke(set, new[] { ParseValue(innerType, elements[i], classname) });
+                    }
+    
+                    o = set;
                 }
                 else if (type.StartsWith(SupportType.ENUM) && (type.EndsWith(">") || type.EndsWith("}")))
                 {
@@ -954,6 +973,31 @@ namespace F8Framework.Core
 
                             o = ULONG_ulong;
                             break;
+                        case SupportType.MATRIX4X4:
+                            data = RemoveOuterBracketsIfPaired(data); // 移除最外层的 '[' 和 ']' '{' 和 '}'
+                            var matrix4x4 = Regex.Matches(data, "(?:\"(?:[^\"]|\"\")*\"|[^,]+)") //逗号分隔
+                                .Cast<Match>()
+                                .Select(m => m.Value)
+                                .ToArray();
+                            var matrix = new Matrix4x4();
+                            matrix.m00 = (float)ParseValue(SupportType.FLOAT, matrix4x4.Length >= 1 ? matrix4x4[0] : "0", classname);
+                            matrix.m10 = (float)ParseValue(SupportType.FLOAT, matrix4x4.Length >= 2 ? matrix4x4[1] : "0", classname);
+                            matrix.m20 = (float)ParseValue(SupportType.FLOAT, matrix4x4.Length >= 3 ? matrix4x4[2] : "0", classname);
+                            matrix.m30 = (float)ParseValue(SupportType.FLOAT, matrix4x4.Length >= 4 ? matrix4x4[3] : "0", classname);
+                            matrix.m01 = (float)ParseValue(SupportType.FLOAT, matrix4x4.Length >= 5 ? matrix4x4[4] : "0", classname);
+                            matrix.m11 = (float)ParseValue(SupportType.FLOAT, matrix4x4.Length >= 6 ? matrix4x4[5] : "0", classname);
+                            matrix.m21 = (float)ParseValue(SupportType.FLOAT, matrix4x4.Length >= 7 ? matrix4x4[6] : "0", classname);
+                            matrix.m31 = (float)ParseValue(SupportType.FLOAT, matrix4x4.Length >= 8 ? matrix4x4[7] : "0", classname);
+                            matrix.m02 = (float)ParseValue(SupportType.FLOAT, matrix4x4.Length >= 9 ? matrix4x4[8] : "0", classname);
+                            matrix.m12 = (float)ParseValue(SupportType.FLOAT, matrix4x4.Length >= 10 ? matrix4x4[9] : "0", classname);
+                            matrix.m22 = (float)ParseValue(SupportType.FLOAT, matrix4x4.Length >= 11 ? matrix4x4[10] : "0", classname);
+                            matrix.m32 = (float)ParseValue(SupportType.FLOAT, matrix4x4.Length >= 12 ? matrix4x4[11] : "0", classname);
+                            matrix.m03 = (float)ParseValue(SupportType.FLOAT, matrix4x4.Length >= 13 ? matrix4x4[12] : "0", classname);
+                            matrix.m13 = (float)ParseValue(SupportType.FLOAT, matrix4x4.Length >= 14 ? matrix4x4[13] : "0", classname);
+                            matrix.m23 = (float)ParseValue(SupportType.FLOAT, matrix4x4.Length >= 15 ? matrix4x4[14] : "0", classname);
+                            matrix.m33 = (float)ParseValue(SupportType.FLOAT, matrix4x4.Length >= 16 ? matrix4x4[15] : "0", classname);
+                            o = matrix;
+                            break;
                     }
                 }
             }
@@ -1056,6 +1100,21 @@ namespace F8Framework.Core
                     result = "System.Collections.Generic.Dictionary`2[[" + keyTypeName + "],[" + valueTypeName + "]]";
                 }
                 collectedTypes?.TryAdd(result, SupportType.DICTIONARY);
+                return result;
+            }
+            else if (type.StartsWith(SupportType.HASHSET) && type.EndsWith(">"))
+            {
+                string innerType = type.Substring(8, type.Length - 9);
+                if (writtenForm)
+                {
+                    result = "System.Collections.Generic.HashSet<" + GetTrueType(innerType, className, inputPath, writtenForm, collectedTypes) + ">";
+                }
+                else
+                {
+                    var assemblyQualifiedName = SystemGetType(GetTrueType(innerType, className, inputPath, writtenForm, collectedTypes)).AssemblyQualifiedName;
+                    result = "System.Collections.Generic.HashSet`1[[" + assemblyQualifiedName + "]]";
+                }
+                collectedTypes?.TryAdd(result, SupportType.HASHSET);
                 return result;
             }
             else if (type.StartsWith(SupportType.ENUM) && (type.EndsWith(">") || type.EndsWith("}")))
@@ -1196,6 +1255,9 @@ namespace F8Framework.Core
                     break;
                 case SupportType.ULONG:
                     type = "System.UInt64";
+                    break;
+                case SupportType.MATRIX4X4:
+                    type = "UnityEngine.Matrix4x4";
                     break;
                 default:
                     throw new Exception("输入了错误的数据类型:  " + type + ", 类名:  " + className + ", 位于:  " + inputPath);

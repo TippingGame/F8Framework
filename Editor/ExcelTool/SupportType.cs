@@ -180,6 +180,15 @@ namespace F8Framework.Core.Editor
                         classSource.AppendLine(
                             $"\t\t\tTypeHandlerFactory.PreRegister<{dictType}>(new F8Framework.Core.DictionaryHandler<{keyType}, {valueType}>());");
                     }
+                    else if (item.Value == SupportType.HASHSET)
+                    {
+                        string hashSetType = item.Key; // 例如 "HashSet<int>"
+                        int start = hashSetType.IndexOf('<') + 1;
+                        int end = hashSetType.LastIndexOf('>');
+                        string elementType = hashSetType.Substring(start, end - start);
+                        classSource.AppendLine(
+                            $"\t\t\tTypeHandlerFactory.PreRegister<{hashSetType}>(new F8Framework.Core.HashSetHandler<{elementType}>());");
+                    }
                     else if (item.Value == SupportType.ENUM)
                     {
                         string enumType = item.Key; // 例如 "Sheet11.MyEnum"
