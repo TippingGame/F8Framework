@@ -262,6 +262,7 @@ namespace F8Framework.Core.Editor
         private static IEnumerator CompilationFinishedNext()
         {
             AssetDatabase.Refresh();
+            yield return null;
             if (F8EditorPrefs.GetBool("compilationFinishedHotUpdateDll", false) == true)
             {
                 F8EditorPrefs.SetBool("compilationFinishedHotUpdateDll", false);

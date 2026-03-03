@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.6.259] - 2025-03-04
+1.新增Obfuz与HybridCLR协同工作方案  
+2.完善文档  
+
 ## [2.6.258] - 2025-03-03
 1.新增配置表Unity类型matrix4x4，容器类型hashset<>  
 

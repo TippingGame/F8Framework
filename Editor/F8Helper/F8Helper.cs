@@ -69,7 +69,11 @@ namespace F8Framework.Core.Editor
         public static void GenerateCopyHotUpdateDll()
         {
             // F8EditorPrefs.SetBool("compilationFinishedHotUpdateDll", false);
+            //
+            // // 只使用HybridCLR执行的命令（二选一）
             // HybridCLR.Editor.Commands.PrebuildCommand.GenerateAll();
+            // // 使用HybridCLR的同时也使用Obfuz执行的命令（二选一）
+            // // Obfuz4HybridCLR.PrebuildCommandExt.GenerateAll();
             //
             // string outpath = Application.dataPath + "/AssetBundles/Code/";
             //
@@ -77,20 +81,24 @@ namespace F8Framework.Core.Editor
             // FileTools.CheckDirAndCreateWhenNeeded(outpath);
             // foreach (var dll in HybridCLR.Editor.SettingsUtil.HotUpdateAssemblyNamesExcludePreserved) // 获取HybridCLR设置面板的dll名称
             // {
-            //     var path =
-            //         HybridCLR.Editor.SettingsUtil.GetHotUpdateDllsOutputDirByTarget(EditorUserBuildSettings
-            //             .activeBuildTarget) + "/" + dll + ".dll";
-            //     FileTools.SafeCopyFile(
-            //         HybridCLR.Editor.SettingsUtil.GetHotUpdateDllsOutputDirByTarget(EditorUserBuildSettings.activeBuildTarget) + "/" + dll + ".dll",
-            //         outpath + dll + ".bytes");
+            //     var path = HybridCLR.Editor.SettingsUtil.GetHotUpdateDllsOutputDirByTarget(
+            //         EditorUserBuildSettings.activeBuildTarget) + "/" + dll + ".dll";
+            //
+            //     // 使用HybridCLR的同时也使用Obfuz解除注释
+            //     // if (Obfuz.Settings.ObfuzSettings.Instance.assemblySettings.GetAssembliesToObfuscate().Contains(dll))
+            //     // {
+            //     //     path = Obfuz4HybridCLR.PrebuildCommandExt.GetObfuscatedHotUpdateAssemblyOutputPath(
+            //     //         EditorUserBuildSettings.activeBuildTarget) + "/" + dll + ".dll";
+            //     // }
+            //     
+            //     FileTools.SafeCopyFile(path, outpath + dll + ".bytes");
             //     LogF8.LogAsset("生成并复制热更新dll：" + dll);
             // }
             //
             // foreach (var aotDllName in F8Helper.AOTDllList)
             // {
-            //     var mscorlibsouPath =
-            //         HybridCLR.Editor.SettingsUtil.GetAssembliesPostIl2CppStripDir(EditorUserBuildSettings
-            //             .activeBuildTarget) + "/" + aotDllName;
+            //     var mscorlibsouPath = HybridCLR.Editor.SettingsUtil.GetAssembliesPostIl2CppStripDir(
+            //         EditorUserBuildSettings.activeBuildTarget) + "/" + aotDllName;
             //     
             //     FileTools.SafeCopyFile(
             //         mscorlibsouPath,

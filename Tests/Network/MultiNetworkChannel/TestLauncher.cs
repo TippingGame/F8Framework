@@ -50,19 +50,19 @@ namespace F8Framework.Tests
 
         void Update()
         {
-            // 更新模块
+            // 更新模块，切勿多处调用
             ModuleCenter.Update();
         }
 
         void LateUpdate()
         {
-            // 更新模块
+            // 更新模块，切勿多处调用
             ModuleCenter.LateUpdate();
         }
 
         void FixedUpdate()
         {
-            // 更新模块
+            // 更新模块，切勿多处调用
             ModuleCenter.FixedUpdate();
         }
     }

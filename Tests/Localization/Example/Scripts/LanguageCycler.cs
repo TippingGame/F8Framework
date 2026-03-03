@@ -56,7 +56,7 @@ namespace F8Framework.Tests
 
 		void LateUpdate()
 		{
-			// 更新模块
+			// 更新模块，切勿多处调用
 			ModuleCenter.LateUpdate();
 		}
 

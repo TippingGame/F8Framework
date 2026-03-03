@@ -7,7 +7,9 @@
         "ICSharpCode.SharpZipLib",
         "Excel",
         "LitJson",
-        "HybridCLR.Editor"
+        "HybridCLR.Editor",
+        "Obfuz.Editor",
+        "Obfuz4HybridCLR.Editor"
     ],
     "includePlatforms": [
         "Editor"

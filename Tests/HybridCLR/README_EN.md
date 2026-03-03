@@ -32,7 +32,11 @@ public static List<string> AOTDllList = new List<string>
 public static void GenerateCopyHotUpdateDll()
 {
     // F8EditorPrefs.SetBool("compilationFinishedHotUpdateDll", false);
+    //
+    // // Only execute commands using HybridCLR (choose one)
     // HybridCLR.Editor.Commands.PrebuildCommand.GenerateAll();
+    // // Execute commands using both HybridCLR and Obfuz (choose one)
+    // // Obfuz4HybridCLR.PrebuildCommandExt.GenerateAll();
     //
     // string outpath = Application.dataPath + "/AssetBundles/Code/";
     //
@@ -40,25 +44,29 @@ public static void GenerateCopyHotUpdateDll()
     // FileTools.CheckDirAndCreateWhenNeeded(outpath);
     // foreach (var dll in HybridCLR.Editor.SettingsUtil.HotUpdateAssemblyNamesExcludePreserved) // 获取HybridCLR设置面板的dll名称
     // {
-    //     var path =
-    //         HybridCLR.Editor.SettingsUtil.GetHotUpdateDllsOutputDirByTarget(EditorUserBuildSettings
-    //             .activeBuildTarget) + "/" + dll + ".dll";
-    //     FileTools.SafeCopyFile(
-    //         HybridCLR.Editor.SettingsUtil.GetHotUpdateDllsOutputDirByTarget(EditorUserBuildSettings.activeBuildTarget) + "/" + dll + ".dll",
-    //         outpath + dll + ".bytes");
-    //     LogF8.LogAsset("生成并复制热更新dll：" + dll);
+    //     var path = HybridCLR.Editor.SettingsUtil.GetHotUpdateDllsOutputDirByTarget(
+    //         EditorUserBuildSettings.activeBuildTarget) + "/" + dll + ".dll";
+    //
+    //     // Uncomment to use both HybridCLR and Obfuz
+    //     // if (Obfuz.Settings.ObfuzSettings.Instance.assemblySettings.GetAssembliesToObfuscate().Contains(dll))
+    //     // {
+    //     //     path = Obfuz4HybridCLR.PrebuildCommandExt.GetObfuscatedHotUpdateAssemblyOutputPath(
+    //     //         EditorUserBuildSettings.activeBuildTarget) + "/" + dll + ".dll";
+    //     // }
+    //     
+    //     FileTools.SafeCopyFile(path, outpath + dll + ".bytes");
+    //     LogF8.LogAsset("Generate and copy hot update dll: " + dll);
     // }
     //
     // foreach (var aotDllName in F8Helper.AOTDllList)
     // {
-    //     var mscorlibsouPath =
-    //         HybridCLR.Editor.SettingsUtil.GetAssembliesPostIl2CppStripDir(EditorUserBuildSettings
-    //             .activeBuildTarget) + "/" + aotDllName;
+    //     var mscorlibsouPath = HybridCLR.Editor.SettingsUtil.GetAssembliesPostIl2CppStripDir(
+    //         EditorUserBuildSettings.activeBuildTarget) + "/" + aotDllName;
     //     
     //     FileTools.SafeCopyFile(
     //         mscorlibsouPath,
     //         outpath + aotDllName + "by.bytes");
-    //     LogF8.LogAsset("生成并复制补充元数据dll：" + aotDllName);
+    //     LogF8.LogAsset("Generate and copy supplementary metadata dll: " + aotDllName);
     // }
     //
     // AssetDatabase.Refresh();
@@ -91,6 +99,7 @@ public class LoadDll : MonoBehaviour
         HotUpdateManager HotUpdate = ModuleCenter.CreateModule<HotUpdateManager>();
         DownloadManager DownloadManager = ModuleCenter.CreateModule<DownloadManager>();
         AssetManager AssetManager = ModuleCenter.CreateModule<AssetManager>();
+        yield return AssetBundleManager.Instance.LoadAssetBundleManifest();
         
         // Initialize local version
         HotUpdate.InitLocalVersion();
@@ -145,26 +154,28 @@ public class LoadDll : MonoBehaviour
         }, () =>
         {
             LogF8.Log("Failed");
-        }, progress =>
+        }, eventArgs =>
         {
-            LogF8.Log("Progress: " + progress);
+            ulong downloadedBytes = eventArgs.DownloadInfo.DownloadedLength;
+            double speedBytesPerSecond = downloadedBytes / eventArgs.DownloadInfo.DownloadTimeSpan.TotalSeconds;
+            LogF8.Log($"Progress: {downloadedBytes}B/{allSize}B, Speed: {speedBytesPerSecond}B/s");
         });
     }
     void Update()
     {
-        // Update module
+        // Update module, do not call from multiple places.
         ModuleCenter.Update();
     }
 
     void LateUpdate()
     {
-        // Update module
+        // Update module, do not call from multiple places.
         ModuleCenter.LateUpdate();
     }
 
     void FixedUpdate()
     {
-        // Update module
+        // Update module, do not call from multiple places.
         ModuleCenter.FixedUpdate();
     }
 }

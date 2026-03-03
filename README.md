@@ -10,6 +10,8 @@
 [![Unity Version](https://img.shields.io/badge/unity-2021|2022|2023|6000-blue)](https://unity.com) 
 [![Platform](https://img.shields.io/badge/platform-Win%20%7C%20Android%20%7C%20iOS%20%7C%20Mac%20%7C%20Linux%20%7C%20WebGL-orange)]() 
 
+中文▲ | [English▼](#Introduction)
+
 > F8 框架初衷：希望自己点击 F8，就能开始制作游戏，不想多余的事。
 > 
 > F8 Framework original intention: Just click F8 and start making the game, don't want to be redundant.
@@ -109,12 +111,14 @@ git clone https://github.com/TippingGame/F8Framework.git
 
 ---
 
+[中文▲](#简介) | English▼
+
 ## Introduction
-The **F8 Framework** is an **elegant, lightweight, and intuitive** game framework based on the Unity engine. Centered around the F8 one-click startup, it eliminates **tedious configuration** and **minimizes cognitive load**, adhering to the principle of **minimal development overhead** for game creation.  
+**F8 Framework** is an **elegant, lightweight, and intuitive** game framework based on the Unity engine. Its components are centered around the F8 one-click startup, **eliminating the need for cumbersome startup configurations** and **ensuring minimal cognitive load**. The framework's overall design philosophy is to enable game **development with minimal** usage cost.  
 
 ## Supported Versions
 Unity 2021, 2022, 2023, 6000  
-Build targets: Win / Android / iOS / Mac / Linux / WebGL / WeChat Mini Games（[Build Documentation](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/README.md#%E5%A6%82%E9%9C%80%E8%A6%81%E6%8E%A5%E5%85%A5%E9%9A%90%E7%A7%81%E6%94%BF%E7%AD%96%E6%88%96%E6%8E%A5%E5%85%A5%E5%AE%89%E5%8D%93%E7%AB%AFsdk%E4%B8%8E%E5%AE%89%E5%8D%93%E7%AB%AF%E4%BA%A4%E4%BA%92%E5%8F%AF%E6%8C%89%E7%85%A7%E4%B8%8B%E6%96%B9%E6%95%99%E7%A8%8B%E6%89%8B%E5%8A%A8%E6%93%8D%E4%BD%9C)，[Jenkins Integration](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/README.md#%E4%BD%BF%E7%94%A8jenkins%E8%BF%9B%E8%A1%8C%E8%BF%9C%E7%A8%8B%E6%89%93%E5%8C%85)）
+Build targets: Win / Android / iOS / Mac / Linux / WebGL / WeChat Mini Games / TikTok Games（[Build Documentation](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/README_EN.md#android-project-usage-guide)，[Jenkins Integration](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/README_EN.md#remote-building-with-jenkins)）
 
 ## Quick Overview – 1 Minute
 ### ----------Optional Features----------
