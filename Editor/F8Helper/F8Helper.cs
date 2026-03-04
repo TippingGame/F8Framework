@@ -79,13 +79,13 @@ namespace F8Framework.Core.Editor
             //
             // FileTools.SafeClearDir(outpath);
             // FileTools.CheckDirAndCreateWhenNeeded(outpath);
-            // foreach (var dll in HybridCLR.Editor.SettingsUtil.HotUpdateAssemblyNamesExcludePreserved) // 获取HybridCLR设置面板的dll名称
+            // foreach (var dll in HybridCLR.Editor.SettingsUtil.HotUpdateAssemblyNamesIncludePreserved) // 获取HybridCLR设置面板的dll名称
             // {
             //     var path = HybridCLR.Editor.SettingsUtil.GetHotUpdateDllsOutputDirByTarget(
             //         EditorUserBuildSettings.activeBuildTarget) + "/" + dll + ".dll";
             //
             //     // 使用HybridCLR的同时也使用Obfuz解除注释
-            //     // if (Obfuz.Settings.ObfuzSettings.Instance.assemblySettings.GetAssembliesToObfuscate().Contains(dll))
+            //     // if (Obfuz.Settings.ObfuzSettings.Instance.assemblySettings.GetObfuscationRelativeAssemblyNames().Contains(dll))
             //     // {
             //     //     path = Obfuz4HybridCLR.PrebuildCommandExt.GetObfuscatedHotUpdateAssemblyOutputPath(
             //     //         EditorUserBuildSettings.activeBuildTarget) + "/" + dll + ".dll";
