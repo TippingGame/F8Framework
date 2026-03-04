@@ -42,13 +42,13 @@ public static void GenerateCopyHotUpdateDll()
     //
     // FileTools.SafeClearDir(outpath);
     // FileTools.CheckDirAndCreateWhenNeeded(outpath);
-    // foreach (var dll in HybridCLR.Editor.SettingsUtil.HotUpdateAssemblyNamesExcludePreserved) // 获取HybridCLR设置面板的dll名称
+    // foreach (var dll in HybridCLR.Editor.SettingsUtil.HotUpdateAssemblyNamesIncludePreserved) // 获取HybridCLR设置面板的dll名称
     // {
     //     var path = HybridCLR.Editor.SettingsUtil.GetHotUpdateDllsOutputDirByTarget(
     //         EditorUserBuildSettings.activeBuildTarget) + "/" + dll + ".dll";
     //
     //     // Uncomment to use both HybridCLR and Obfuz
-    //     // if (Obfuz.Settings.ObfuzSettings.Instance.assemblySettings.GetAssembliesToObfuscate().Contains(dll))
+    //     // if (Obfuz.Settings.ObfuzSettings.Instance.assemblySettings.GetObfuscationRelativeAssemblyNames().Contains(dll))
     //     // {
     //     //     path = Obfuz4HybridCLR.PrebuildCommandExt.GetObfuscatedHotUpdateAssemblyOutputPath(
     //     //         EditorUserBuildSettings.activeBuildTarget) + "/" + dll + ".dll";
