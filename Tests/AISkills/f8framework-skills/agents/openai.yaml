@@ -1,0 +1,6 @@
+interface:
+  display_name: "F8Framework Skills Index"
+  short_description: "Route tasks across foundation, features, editor, tools, and build."
+  icon_small: "./assets/logo.png"
+  icon_large: "./assets/logo.png"
+  default_prompt: "Use $f8framework-skills to choose the correct F8Framework skill or skill chain based on task layer and dependency order."
