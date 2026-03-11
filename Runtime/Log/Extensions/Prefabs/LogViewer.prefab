@@ -10863,7 +10863,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d89b1759d737d14f8b29df5f21b85c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  keyCodeBackQuote: 1
   gestureEnable: 1
+  autoPopupOnError: 1
   mailSetting:
     to: to@mail.com
     userName: username@mail.com

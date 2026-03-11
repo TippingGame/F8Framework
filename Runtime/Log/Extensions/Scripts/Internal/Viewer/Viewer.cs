@@ -203,6 +203,7 @@ namespace F8Framework.Core
 
         private void OnLogNotification(Log.LogData data)
         {
+            if (!LogViewer.Instance.autoPopupOnExceptionOrAssert) return;
             if (data.logType == LogType.Exception || data.logType == LogType.Assert)
             {
                 Show(true);

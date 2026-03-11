@@ -7,6 +7,7 @@ namespace F8Framework.Core
     {
         [Header("按键~号启用")] public bool keyCodeBackQuote = true;
         [Header("5指长按启用")] public bool gestureEnable = true;
+        [Header("异常或断言时自动弹窗")] public bool autoPopupOnExceptionOrAssert = true;
 
         [Space(5)] [Header("发送邮件")]
         public MailData mailSetting = null;
