@@ -71,6 +71,12 @@ namespace F8Framework.Core
 
                 childs.Enqueue(current);
 
+                // 当前节点如果挂了 BaseItem 或其子类，则不再遍历它的子物体
+                if (current != transform && current.GetComponent<BaseItem>() != null)
+                {
+                    continue;
+                }
+                
                 // 将当前物体的子物体加入队列
                 foreach (Transform child in current)
                 {
