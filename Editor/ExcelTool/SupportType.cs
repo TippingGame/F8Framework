@@ -156,8 +156,8 @@ namespace F8Framework.Core.Editor
                         string elementType = arrayType.EndsWith("[]") 
                             ? arrayType.Substring(0, arrayType.Length - 2) 
                             : arrayType;
-                        classSource.AppendLine(
-                            $"\t\t\tTypeHandlerFactory.PreRegister<{arrayType}>(new F8Framework.Core.ArrayHandler<{elementType}>());");
+                        classSource.Append(
+                            $"\t\t\tTypeHandlerFactory.PreRegister<{arrayType}>(new F8Framework.Core.ArrayHandler<{elementType}>());\n");
                     }
                     else if (item.Value == SupportType.LIST)
                     {
@@ -165,8 +165,8 @@ namespace F8Framework.Core.Editor
                         int start = listType.IndexOf('<') + 1;
                         int end = listType.LastIndexOf('>');
                         string elementType = listType.Substring(start, end - start);
-                        classSource.AppendLine(
-                            $"\t\t\tTypeHandlerFactory.PreRegister<{listType}>(new F8Framework.Core.ListHandler<{elementType}>());");
+                        classSource.Append(
+                            $"\t\t\tTypeHandlerFactory.PreRegister<{listType}>(new F8Framework.Core.ListHandler<{elementType}>());\n");
                     }
                     else if (item.Value == SupportType.DICTIONARY)
                     {
@@ -177,8 +177,8 @@ namespace F8Framework.Core.Editor
                         string[] parts = inner.Split(new char[] { ',' }, 2);
                         string keyType = parts[0].Trim();
                         string valueType = parts[1].Trim();
-                        classSource.AppendLine(
-                            $"\t\t\tTypeHandlerFactory.PreRegister<{dictType}>(new F8Framework.Core.DictionaryHandler<{keyType}, {valueType}>());");
+                        classSource.Append(
+                            $"\t\t\tTypeHandlerFactory.PreRegister<{dictType}>(new F8Framework.Core.DictionaryHandler<{keyType}, {valueType}>());\n");
                     }
                     else if (item.Value == SupportType.HASHSET)
                     {
@@ -186,26 +186,26 @@ namespace F8Framework.Core.Editor
                         int start = hashSetType.IndexOf('<') + 1;
                         int end = hashSetType.LastIndexOf('>');
                         string elementType = hashSetType.Substring(start, end - start);
-                        classSource.AppendLine(
-                            $"\t\t\tTypeHandlerFactory.PreRegister<{hashSetType}>(new F8Framework.Core.HashSetHandler<{elementType}>());");
+                        classSource.Append(
+                            $"\t\t\tTypeHandlerFactory.PreRegister<{hashSetType}>(new F8Framework.Core.HashSetHandler<{elementType}>());\n");
                     }
                     else if (item.Value == SupportType.ENUM)
                     {
                         string enumType = item.Key; // 例如 "Sheet11.MyEnum"
-                        classSource.AppendLine(
-                            $"\t\t\tTypeHandlerFactory.PreRegister<{enumType}>(new F8Framework.Core.EnumHandler<{enumType}>());");
+                        classSource.Append(
+                            $"\t\t\tTypeHandlerFactory.PreRegister<{enumType}>(new F8Framework.Core.EnumHandler<{enumType}>());\n");
                     }
                     else if (item.Value == SupportType.VALUETUPLE)
                     {
                         string tupleType = item.Key; // 例如 "ValueTuple<int, string>"
-                        classSource.AppendLine(
-                            $"\t\t\tTypeHandlerFactory.PreRegister<{tupleType}>(new F8Framework.Core.ValueTupleHandler<{tupleType}>());");
+                        classSource.Append(
+                            $"\t\t\tTypeHandlerFactory.PreRegister<{tupleType}>(new F8Framework.Core.ValueTupleHandler<{tupleType}>());\n");
                     }
                     else if (item.Value == SupportType.OBJ)
                     {
                         string classType = item.Key; // 自定义类
-                        classSource.AppendLine(
-                            $"\t\t\tTypeHandlerFactory.PreRegister<{classType}>(new F8Framework.Core.ObjectHandler<{classType}>());");
+                        classSource.Append(
+                            $"\t\t\tTypeHandlerFactory.PreRegister<{classType}>(new F8Framework.Core.ObjectHandler<{classType}>());\n");
                     }
                 }
             }
@@ -332,13 +332,13 @@ namespace F8Framework.Core.Editor
 
             if (isFlags)
             {
-                sb.AppendLine("\t\t[System.Flags]");
+                sb.Append("\t\t[System.Flags]\n");
             }
 
-            sb.AppendLine("\t\t[Preserve]");
-            sb.AppendLine("\t\t[Serializable]");
-            sb.Append("\t\tpublic enum ").Append(enumName).Append(" : ").Append(ReadExcel.GetTrueType(underlyingType, className, inputPath, writtenForm)) .AppendLine();
-            sb.AppendLine("\t\t{");
+            sb.Append("\t\t[Preserve]\n");
+            sb.Append("\t\t[Serializable]\n");
+            sb.Append("\t\tpublic enum ").Append(enumName).Append(" : ").Append(ReadExcel.GetTrueType(underlyingType, className, inputPath, writtenForm)).Append("\n");
+            sb.Append("\t\t{\n");
 
             // 6. 处理枚举值（如果有）
             if (hasBraces && !string.IsNullOrEmpty(enumValues))
@@ -349,17 +349,17 @@ namespace F8Framework.Core.Editor
                     string trimmedPair = pair.Trim();
                     if (!string.IsNullOrEmpty(trimmedPair))
                     {
-                        sb.AppendLine("\t\t\t" + trimmedPair + ",");
+                        sb.Append("\t\t\t" + trimmedPair + ",\n");
                     }
                 }
             }
             else
             {
                 // 简化定义时添加一个默认值
-                sb.AppendLine("\t\t\tNone = 0,");
+                sb.Append("\t\t\tNone = 0,\n");
             }
 
-            sb.AppendLine("\t\t}");
+            sb.Append("\t\t}\n");
 
             binaryRegisters?.TryAdd($"{ExcelDataTool.CODE_NAMESPACE}.{className}.{enumName}", SupportType.ENUM);
             return sb.ToString();

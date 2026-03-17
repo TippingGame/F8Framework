@@ -18,7 +18,12 @@ namespace F8Framework.Core
         
         public void Bind()
         {
-            GenerateAutoBindComponentsCode();
+            GenerateAutoBindComponentsCode(false);
+        }
+
+        public void BindAllUIComponents()
+        {
+            GenerateAutoBindComponentsCode(true);
         }
         
         // 屏蔽自动获取组件
@@ -35,7 +40,7 @@ namespace F8Framework.Core
         //     }
         // }
 
-        private void GenerateAutoBindComponentsCode()
+        private void GenerateAutoBindComponentsCode(bool bindAllUIComponents)
         {
             string scriptPath = GetScriptPath(this);
 
@@ -98,81 +103,52 @@ namespace F8Framework.Core
                 if (child.Equals(transform)) // 忽略自身
                     continue;
 
-                System.Collections.Generic.List<string> componentNames = null;
+                System.Collections.Generic.List<(string componentType, string componentKey)> bindTargets =
+                    bindAllUIComponents ? GetAllUIBindTargets(child) : GetConventionBindTargets(child);
 
-                string[] nameDivision = child.gameObject.name.Split(_division);
-
-                foreach (var name in nameDivision)
+                foreach (var bindTarget in bindTargets)
                 {
-                    // 检查物体名字的一部分是否包含在字典的key中
-                    foreach (var key in DefaultCodeBindNameTypeConfig.BindNameTypeDict.Keys)
+                    string componentType = bindTarget.componentType;
+                    string normalizeName = RemoveSpecialCharacters(child.gameObject.name);
+                    string normalizeKey = RemoveSpecialCharacters(bindTarget.componentKey);
+
+                    if (!tempDic.TryAdd($"{normalizeName}_{normalizeKey}", 1))
                     {
-                        if (!name.Contains(key))
-                            continue;
-                        string componentType = DefaultCodeBindNameTypeConfig.BindNameTypeDict[key];
-                        if (componentNames == null)
-                            componentNames = new System.Collections.Generic.List<string>();
+                        tempDic[$"{normalizeName}_{normalizeKey}"] += 1;
+                        normalizeKey += _division + tempDic[$"{normalizeName}_{normalizeKey}"];
+                    }
 
-                        if (componentNames.Contains(componentType))
-                            continue;
-                        componentNames.Add(componentType);
+                    string fieldName = $"{normalizeName}_{normalizeKey}";
 
-                        string extension = System.IO.Path.GetExtension(componentType);
-                        string typeToCheck = string.IsNullOrEmpty(extension) ? componentType : extension[1..];
-                        if (componentType != typeof(UnityEngine.GameObject).ToString() &&
-                            !child.GetComponent(typeToCheck))
-                            continue;
+                    generatedCode.Append($"\t[SerializeField] private {componentType} {fieldName};\n");
+                    string childPath = GetChildPath(child, prefab.transform);
+                    if (componentType == typeof(UnityEngine.GameObject).ToString())
+                    {
+                        referenceCode.Append($"\t\t{fieldName} = transform.Find(\"{SelectiveEscape(childPath)}\").gameObject;\n");
+                    }
+                    else
+                    {
+                        referenceCode.Append($"\t\t{fieldName} = transform.Find(\"{SelectiveEscape(childPath)}\").GetComponent<{componentType}>();\n");
+                    }
 
-                        string normalizeName = RemoveSpecialCharacters(child.gameObject.name);
+                    if (ShouldGenerateListener(componentType))
+                    {
+                        listenerComponents.Add((fieldName, componentType));
+                    }
 
-                        string normalizeKey = RemoveSpecialCharacters(key);
-
-                        if (!tempDic.TryAdd($"{normalizeName}_{normalizeKey}", 1))
+                    System.Text.RegularExpressions.Match matchArray =
+                        System.Text.RegularExpressions.Regex.Match(child.gameObject.name, @"^(.*?)\[\d+\]$");
+                    if (matchArray.Success)
+                    {
+                        string baseName = matchArray.Groups[1].Value;
+                        string arrayKey = baseName + "_" + normalizeKey;
+                        if (!arrayComponents.ContainsKey(arrayKey))
                         {
-                            tempDic[$"{normalizeName}_{normalizeKey}"] += 1;
-                            // LogF8.LogView("有重名物体：" + normalizeKey);
-                            normalizeKey += _division + tempDic[$"{normalizeName}_{normalizeKey}"];
+                            arrayComponents[arrayKey] =
+                                new System.Collections.Generic.List<(string path, string componentType)>();
                         }
 
-                        string fieldName = $"{normalizeName}_{normalizeKey}";
-
-                        // 生成自动获取组件的代码
-                        generatedCode.AppendLine($"\t[SerializeField] private {componentType} {fieldName};");
-                        // 生成引用代码
-                        string childPath = GetChildPath(child, prefab.transform);
-                        if (componentType == typeof(UnityEngine.GameObject).ToString())
-                        {
-                            referenceCode.AppendLine(
-                                $"\t\t{fieldName} = transform.Find(\"{SelectiveEscape(childPath)}\").gameObject;");
-                        }
-                        else
-                        {
-                            referenceCode.AppendLine(
-                                $"\t\t{fieldName} = transform.Find(\"{SelectiveEscape(childPath)}\").GetComponent<{componentType}>();");
-                        }
-
-                        // 检查是否需要生成监听事件
-                        if (ShouldGenerateListener(componentType))
-                        {
-                            listenerComponents.Add((fieldName, componentType));
-                        }
-
-                        // 检查是否是数组元素（名字以[数字]结尾）
-                        System.Text.RegularExpressions.Match matchArray =
-                            System.Text.RegularExpressions.Regex.Match(child.gameObject.name, @"^(.*?)\[\d+\]$");
-                        if (matchArray.Success)
-                        {
-                            string baseName = matchArray.Groups[1].Value;
-                            // 添加到数组字典
-                            string arrayKey = baseName + "_" + normalizeKey;
-                            if (!arrayComponents.ContainsKey(arrayKey))
-                            {
-                                arrayComponents[arrayKey] =
-                                    new System.Collections.Generic.List<(string path, string componentType)>();
-                            }
-
-                            arrayComponents[arrayKey].Add((childPath, componentType));
-                        }
+                        arrayComponents[arrayKey].Add((childPath, componentType));
                     }
                 }
             }
@@ -204,21 +180,18 @@ namespace F8Framework.Core
                 int arraySize = maxIndex + 1;
 
                 // 生成数组声明
-                generatedCode.AppendLine(
-                    $"\t[SerializeField] private {componentType}[] {arrayName} = new {componentType}[{arraySize}];");
+                generatedCode.Append($"\t[SerializeField] private {componentType}[] {arrayName} = new {componentType}[{arraySize}];\n");
 
                 // 生成数组元素赋值代码（使用元素自身的索引）
                 foreach (var item in indexedItems)
                 {
                     if (componentType == typeof(UnityEngine.GameObject).ToString())
                     {
-                        referenceCode.AppendLine(
-                            $"\t\t{arrayName}[{item.index}] = transform.Find(\"{SelectiveEscape(item.path)}\").gameObject;");
+                        referenceCode.Append($"\t\t{arrayName}[{item.index}] = transform.Find(\"{SelectiveEscape(item.path)}\").gameObject;\n");
                     }
                     else
                     {
-                        referenceCode.AppendLine(
-                            $"\t\t{arrayName}[{item.index}] = transform.Find(\"{SelectiveEscape(item.path)}\").GetComponent<{componentType}>();");
+                        referenceCode.Append($"\t\t{arrayName}[{item.index}] = transform.Find(\"{SelectiveEscape(item.path)}\").GetComponent<{componentType}>();\n");
                     }
                 }
 
@@ -242,25 +215,25 @@ namespace F8Framework.Core
                     string listenerField = GenerateListenerField(component.fieldName, component.componentType);
                     if (!string.IsNullOrEmpty(listenerField))
                     {
-                        listenerFieldCode.AppendLine($"\t{listenerField}");
+                        listenerFieldCode.Append($"\t{listenerField}\n");
                     }
                 }
                 
-                listenerCode.AppendLine(listenerFieldCode.ToString());
-                listenerCode.AppendLine("\t// 自动生成");
-                listenerCode.AppendLine("\tprotected override void OnAddUIComponentListener()");
-                listenerCode.AppendLine("\t{");
+                listenerCode.Append(listenerFieldCode);
+                listenerCode.Append("\t// 自动生成\n");
+                listenerCode.Append("\tprotected override void OnAddUIComponentListener()\n");
+                listenerCode.Append("\t{\n");
 
                 foreach (var component in listenerComponents)
                 {
                     string listenerCall = GenerateListenerCall(component.fieldName, component.componentType);
                     if (!string.IsNullOrEmpty(listenerCall))
                     {
-                        listenerCode.AppendLine($"\t\t{listenerCall}");
+                        listenerCode.Append($"\t\t{listenerCall}\n");
                     }
                 }
 
-                listenerCode.AppendLine("\t}");
+                listenerCode.Append("\t}\n");
             }
 
             // 将生成的代码插入到脚本中
@@ -271,6 +244,8 @@ namespace F8Framework.Core
                 // 关闭文件句柄
                 reader.Close();
             }
+            
+            scriptContent = scriptContent.Replace("\r\n", "\n").Replace("\r", "\n");
 
             // 使用正则表达式匹配并替换注释之间的内容
             string pattern = @"// 自动获取组件（自动生成，不能删除）(.*?)// 自动获取组件（自动生成，不能删除）";
@@ -294,10 +269,6 @@ namespace F8Framework.Core
                     $"\t}}" +
                     $"\n#endif" +
                     $"\n\t// 自动获取组件（自动生成，不能删除）");
-
-                // 将所有换行符替换为 UNIX 风格的 "\n"
-                scriptContent = scriptContent.Replace("\r\n", "\n").Replace("\r", "\n");
-
                 // 保存脚本文件
                 using (System.IO.StreamWriter writer = new System.IO.StreamWriter(scriptPath, false))
                 {
@@ -340,6 +311,84 @@ namespace F8Framework.Core
             };
 
             return Array.Exists(listenerTypes, componentType.Equals);
+        }
+
+        private System.Collections.Generic.List<(string componentType, string componentKey)> GetConventionBindTargets(Transform child)
+        {
+            System.Collections.Generic.List<(string componentType, string componentKey)> bindTargets =
+                new System.Collections.Generic.List<(string componentType, string componentKey)>();
+            string[] nameDivision = child.gameObject.name.Split(_division);
+
+            foreach (var name in nameDivision)
+            {
+                foreach (var pair in DefaultCodeBindNameTypeConfig.BindNameTypeDict)
+                {
+                    if (!name.Contains(pair.Key))
+                        continue;
+                    if (ContainsBindTarget(bindTargets, pair.Value))
+                        continue;
+                    if (!HasComponent(child, pair.Value))
+                        continue;
+                    bindTargets.Add((pair.Value, pair.Key));
+                }
+            }
+
+            return bindTargets;
+        }
+
+        private System.Collections.Generic.List<(string componentType, string componentKey)> GetAllUIBindTargets(Transform child)
+        {
+            System.Collections.Generic.List<(string componentType, string componentKey)> bindTargets =
+                new System.Collections.Generic.List<(string componentType, string componentKey)>();
+
+            foreach (var pair in DefaultCodeBindNameTypeConfig.BindNameTypeDict)
+            {
+                if (NotUIBindingType(pair.Value))
+                    continue;
+                if (ContainsBindTarget(bindTargets, pair.Value))
+                    continue;
+                if (!HasComponent(child, pair.Value))
+                    continue;
+
+                bindTargets.Add((pair.Value, GetDefaultFieldSuffix(pair.Value, pair.Key)));
+            }
+
+            return bindTargets;
+        }
+
+        private bool ContainsBindTarget(System.Collections.Generic.List<(string componentType, string componentKey)> bindTargets, string componentType)
+        {
+            foreach (var bindTarget in bindTargets)
+            {
+                if (bindTarget.componentType == componentType)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool HasComponent(Transform child, string componentType)
+        {
+            string extension = System.IO.Path.GetExtension(componentType);
+            string typeToCheck = string.IsNullOrEmpty(extension) ? componentType : extension[1..];
+            return componentType == typeof(UnityEngine.GameObject).ToString() || child.GetComponent(typeToCheck);
+        }
+
+        private bool NotUIBindingType(string componentType)
+        {
+            return componentType == typeof (UnityEngine.GameObject).ToString() ||
+                   componentType == typeof(UnityEngine.Transform).ToString();
+        }
+
+        private string GetDefaultFieldSuffix(string componentType, string fallbackKey)
+        {
+            int lastDotIndex = componentType.LastIndexOf('.');
+            string suffix = lastDotIndex >= 0 ? componentType[(lastDotIndex + 1)..] : componentType;
+            suffix = suffix.Replace("TMP_", "TMP");
+            suffix = RemoveSpecialCharacters(suffix);
+            return string.IsNullOrEmpty(suffix) ? fallbackKey : suffix;
         }
 
         // 生成监听事件字段

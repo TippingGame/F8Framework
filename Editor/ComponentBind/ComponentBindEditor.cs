@@ -12,9 +12,14 @@ namespace F8Framework.Core.Editor
             foreach (var o in targets)
             {
                 var targetObject = (ComponentBind)o;
-                if (GUILayout.Button("组件绑定（可能需要点击两次）", GUILayout.Height(50)))
+                if (GUILayout.Button("按照约定名称UI组件绑定（需要点击两次）", GUILayout.Height(50)))
                 {
                     (targetObject).Bind();
+                }
+
+                if (GUILayout.Button("搜索全部UI组件绑定（需要点击两次）", GUILayout.Height(50)))
+                {
+                    targetObject.BindAllUIComponents();
                 }
             }
         }
