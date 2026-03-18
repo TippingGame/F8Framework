@@ -169,6 +169,105 @@ namespace LitJson
                    && type.IsGenericType 
                    && type.GetGenericTypeDefinition() == typeof(HashSet<>);
         }
+
+        private static bool IsRectangularArray(Type type)
+        {
+            return type != null && type.IsArray && type.GetArrayRank() > 1;
+        }
+
+        private static object ReadRectangularArray(Type inst_type, JsonReader reader)
+        {
+            Type elementType = inst_type.GetElementType();
+            int rank = inst_type.GetArrayRank();
+            int[] lengths = null;
+            Array items = null;
+
+            while (true)
+            {
+                reader.Read();
+
+                if (reader.Token == JsonToken.ObjectEnd)
+                    break;
+
+                string property = (string)reader.Value;
+
+                if (property == "$rank")
+                {
+                    rank = (int)ReadValue(typeof(int), reader);
+                }
+                else if (property == "$lengths")
+                {
+                    lengths = (int[])ReadValue(typeof(int[]), reader);
+                }
+                else if (property == "$items")
+                {
+                    Type itemsType = elementType.MakeArrayType();
+                    items = (Array)ReadValue(itemsType, reader);
+                }
+                else
+                {
+                    ReadSkip(reader);
+                }
+            }
+
+            if (lengths == null || lengths.Length == 0)
+                lengths = new int[rank];
+
+            Array array = Array.CreateInstance(elementType, lengths);
+            if (items == null || items.Length == 0)
+                return array;
+
+            int[] indices = new int[lengths.Length];
+            int count = Math.Min(items.Length, array.Length);
+            for (int i = 0; i < count; i++)
+            {
+                GetArrayRankIndices(i, lengths, indices);
+                array.SetValue(items.GetValue(i), indices);
+            }
+
+            return array;
+        }
+
+        private static void WriteRectangularArray(Array array, JsonWriter writer,
+                                                  bool writer_is_private,
+                                                  int depth)
+        {
+            int rank = array.Rank;
+            int[] lengths = new int[rank];
+            for (int i = 0; i < rank; i++)
+                lengths[i] = array.GetLength(i);
+
+            writer.WriteObjectStart();
+            writer.WritePropertyName("$rank");
+            writer.Write(rank);
+            writer.WritePropertyName("$lengths");
+            writer.WriteArrayStart();
+            for (int i = 0; i < lengths.Length; i++)
+                writer.Write(lengths[i]);
+            writer.WriteArrayEnd();
+            writer.WritePropertyName("$items");
+            writer.WriteArrayStart();
+            foreach (object elem in array)
+                WriteValue(elem, writer, writer_is_private, depth + 1);
+            writer.WriteArrayEnd();
+            writer.WriteObjectEnd();
+        }
+
+        private static void GetArrayRankIndices(int flatIndex, int[] lengths, int[] indices)
+        {
+            for (int dimension = lengths.Length - 1; dimension >= 0; dimension--)
+            {
+                int length = lengths[dimension];
+                if (length <= 0)
+                {
+                    indices[dimension] = 0;
+                    continue;
+                }
+
+                indices[dimension] = flatIndex % length;
+                flatIndex /= length;
+            }
+        }
         
         #region Private Methods
         private static void AddArrayMetadata (Type type)
@@ -453,6 +552,9 @@ namespace LitJson
                     instance = list;
 
             } else if (reader.Token == JsonToken.ObjectStart) {
+                if (IsRectangularArray(value_type))
+                    return ReadRectangularArray(value_type, reader);
+
                 AddObjectMetadata (value_type);
                 ObjectMetadata t_data = object_metadata[value_type];
 
@@ -835,6 +937,11 @@ namespace LitJson
 
             if (obj is Int64) {
                 writer.Write ((long) obj);
+                return;
+            }
+
+            if (obj is Array arrayObj && arrayObj.Rank > 1) {
+                WriteRectangularArray(arrayObj, writer, writer_is_private, depth);
                 return;
             }
 

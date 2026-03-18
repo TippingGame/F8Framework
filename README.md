@@ -46,7 +46,7 @@ Unity 2021、2022、2023、6000
 * [14. UI界面管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/UI/README.md) - 处理界面加载、打开、关闭、查询、层级控制、自定义动画、自动获取组件索引。UI界面分为三大类：**普通UI、模态弹窗、非模态弹窗**，内置各种常用组件。
 * [15. 输入系统管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Input/README.md) - 使用同一套代码，通过自定义输入设备，适配多平台，可热切换输入设备，或同时启用多套输入设备。
 * [16. 游戏流程管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Procedure/README.md) - 自定义流程节点 ProcedureNode，控制游戏流程的，添加/运行/轮询/移除。
-* [17. 本地数据存储（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Storage/README.md) - 本地数据存储/读取/加密。
+* [17. 本地数据存储（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Storage/README.md) - 本地数据存储/读取/加密/压缩。
 * [18. SDK接入管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/README.md) - 与**原生平台交互**，接入多个平台或者渠道SDK，登录/退出/切换/支付/视频广告/退出游戏/原生Toast。
 * [19. 网络连接与通信（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Network/README.md) - 使用 KCP / TCP / WebSocket 网络通讯协议建立长连接通道，支持Client端和Server端。
 ### ----------第三方库（注意冲突）----------
@@ -144,7 +144,7 @@ Build targets: Win / Android / iOS / Mac / Linux / WebGL / WeChat Mini Games / T
 * [14. UI interface manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/UI/README_EN.md) - Handles loading/opening/closing/querying/layering/custom animations/auto-component indexing. UI types: **Standard UI, Modal Popup, Non-Modal Popup**, with built-in common components.
 * [15. Input System Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Input/README_EN.md) - Unified multi-platform input via customizable devices, with hot-swapping or multi-device support.
 * [16. Game Procedure Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Procedure/README_EN.md) - Custom ProcedureNode for flow control: add/run/poll/remove.
-* [17. Local data storage (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Storage/README_EN.md) - Local data save/load/encryption.
+* [17. Local data storage (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Storage/README_EN.md) - Local data save/load/encryption/compression.
 * [18. SDK Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/README_EN.md) - **Native platform interoperability**: Supports integration with multiple platform/channel SDKs for login/logout/account switching/payments/video ads/game exit/native toast notifications.
 * [19. Network Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Network/README_EN.md) - Long connections via KCP/TCP/WebSocket for Client/Server.
 ### ----------Third-Party Libraries (Watch for Conflicts)----------

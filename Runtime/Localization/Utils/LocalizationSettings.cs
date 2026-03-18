@@ -2,53 +2,35 @@
 
 namespace F8Framework.Core
 {
-	public static class LocalizationSettings
-	{
-		class Definition
-		{
-			public string currentLanguageName;
-		}
-
-		public static string LoadLanguageSettings()
-		{
+    public static class LocalizationSettings
+    {
+        public static string LoadLanguageSettings()
+        {
 #if UNITY_EDITOR
-			var json = F8EditorPrefs.GetString(LocalizationConst.CurrentLanguageKey, "");
-			if (json == "")
-			{
-				// 根据系统语言设置
-				Localization.Instance.CurrentLanguageName = Application.systemLanguage.ToString();
-				return Application.systemLanguage.ToString();
-			}
-			else
-			{
-				var definition = JsonUtility.FromJson<Definition>(json);
-				Localization.Instance.CurrentLanguageName = definition.currentLanguageName;
-				return definition.currentLanguageName;
-			}
+            string languageName = F8EditorPrefs.GetString(LocalizationConst.CurrentLanguageKey, "");
 #else
-			Definition definition = StorageManager.Instance.GetObject<Definition>(LocalizationConst.CurrentLanguageKey, true);
-			if (definition == null)
-			{
-				Localization.Instance.CurrentLanguageName = Application.systemLanguage.ToString();
-			}
-			else
-			{
-				Localization.Instance.CurrentLanguageName = definition.currentLanguageName;
-			}
-			return Localization.Instance.CurrentLanguageName;
+            string languageName = PlayerPrefs.GetString(LocalizationConst.CurrentLanguageKey, "");
 #endif
-		}
 
-		public static void SaveLanguageSettings()
-		{
+            if (string.IsNullOrEmpty(languageName))
+            {
+                languageName = Application.systemLanguage.ToString();
+            }
+
+            Localization.Instance.CurrentLanguageName = languageName;
+            return languageName;
+        }
+
+        public static void SaveLanguageSettings()
+        {
+            string languageName = Localization.Instance.CurrentLanguageName;
+
 #if UNITY_EDITOR
-			var definition = new Definition { currentLanguageName = Localization.Instance.CurrentLanguageName };
-			var json = JsonUtility.ToJson(definition);
-			F8EditorPrefs.SetString(LocalizationConst.CurrentLanguageKey, json);
+            F8EditorPrefs.SetString(LocalizationConst.CurrentLanguageKey, languageName);
 #else
-			var definition = new Definition { currentLanguageName = Localization.Instance.CurrentLanguageName };
-			StorageManager.Instance.SetObject<Definition>(LocalizationConst.CurrentLanguageKey, definition, true);
+            PlayerPrefs.SetString(LocalizationConst.CurrentLanguageKey, languageName);
+            PlayerPrefs.Save();
 #endif
-		}
-	}
+        }
+    }
 }
