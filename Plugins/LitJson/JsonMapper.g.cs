@@ -170,6 +170,20 @@ namespace LitJson
                    && type.GetGenericTypeDefinition() == typeof(HashSet<>);
         }
 
+        private static bool IsQueue(Type type)
+        {
+            return type != null
+                   && type.IsGenericType
+                   && type.GetGenericTypeDefinition() == typeof(Queue<>);
+        }
+
+        private static bool IsStack(Type type)
+        {
+            return type != null
+                   && type.IsGenericType
+                   && type.GetGenericTypeDefinition() == typeof(Stack<>);
+        }
+
         private static bool IsRectangularArray(Type type)
         {
             return type != null && type.IsArray && type.GetArrayRank() > 1;
@@ -282,6 +296,11 @@ namespace LitJson
             if (type.GetInterface ("System.Collections.IList") != null)
                 data.IsList = true;
             else if (IsHashSet(type))
+            {
+                data.IsList = true;
+                data.ElementType = type.GetGenericArguments()[0];
+            }
+            else if (IsQueue(type) || IsStack(type))
             {
                 data.IsList = true;
                 data.ElementType = type.GetGenericArguments()[0];
@@ -518,6 +537,41 @@ namespace LitJson
                             break;
                         addMethod.Invoke(instance, new object[] { item });
                     }
+                    return instance;
+                }
+
+                if (IsQueue(inst_type))
+                {
+                    instance = Activator.CreateInstance(inst_type);
+                    Type elem_type_queue = t_data.ElementType;
+                    MethodInfo enqueueMethod = inst_type.GetMethod("Enqueue", new Type[] { elem_type_queue });
+
+                    while (true) {
+                        object item = ReadValue (elem_type_queue, reader);
+                        if (item == null && reader.Token == JsonToken.ArrayEnd)
+                            break;
+                        enqueueMethod.Invoke(instance, new object[] { item });
+                    }
+                    return instance;
+                }
+
+                if (IsStack(inst_type))
+                {
+                    instance = Activator.CreateInstance(inst_type);
+                    Type elem_type_stack = t_data.ElementType;
+                    MethodInfo pushMethod = inst_type.GetMethod("Push", new Type[] { elem_type_stack });
+                    IList stackItems = new ArrayList();
+
+                    while (true) {
+                        object item = ReadValue (elem_type_stack, reader);
+                        if (item == null && reader.Token == JsonToken.ArrayEnd)
+                            break;
+                        stackItems.Add(item);
+                    }
+
+                    for (int i = stackItems.Count - 1; i >= 0; i--)
+                        pushMethod.Invoke(instance, new object[] { stackItems[i] });
+
                     return instance;
                 }
                 
@@ -966,6 +1020,15 @@ namespace LitJson
             }
 
             if (IsHashSet(obj.GetType()))
+            {
+                writer.WriteArrayStart();
+                foreach (object elem in (IEnumerable)obj)
+                    WriteValue (elem, writer, writer_is_private, depth + 1);
+                writer.WriteArrayEnd();
+                return;
+            }
+
+            if (IsQueue(obj.GetType()) || IsStack(obj.GetType()))
             {
                 writer.WriteArrayStart();
                 foreach (object elem in (IEnumerable)obj)

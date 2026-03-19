@@ -838,6 +838,383 @@ namespace F8Framework.Core
             SetRawBytes(key, prefItem.ExportRawBytes(), user);
         }
 
+        public char GetChar(string key, char defaultValue = default, bool user = false)
+        {
+            string storedValue = GetString(key, null, user);
+            return string.IsNullOrEmpty(storedValue) ? defaultValue : storedValue[0];
+        }
+
+        public void SetChar(string key, char value, bool user = false)
+        {
+            SetString(key, value.ToString(), user);
+        }
+
+        public byte GetByte(string key, byte defaultValue = default, bool user = false)
+        {
+            string storedValue = GetString(key, null, user);
+            return byte.TryParse(storedValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out byte value)
+                ? value
+                : defaultValue;
+        }
+
+        public void SetByte(string key, byte value, bool user = false)
+        {
+            SetString(key, value.ToString(CultureInfo.InvariantCulture), user);
+        }
+
+        public short GetShort(string key, short defaultValue = default, bool user = false)
+        {
+            string storedValue = GetString(key, null, user);
+            return short.TryParse(storedValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out short value)
+                ? value
+                : defaultValue;
+        }
+
+        public void SetShort(string key, short value, bool user = false)
+        {
+            SetString(key, value.ToString(CultureInfo.InvariantCulture), user);
+        }
+
+        public long GetLong(string key, long defaultValue = default, bool user = false)
+        {
+            string storedValue = GetString(key, null, user);
+            return long.TryParse(storedValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out long value)
+                ? value
+                : defaultValue;
+        }
+
+        public void SetLong(string key, long value, bool user = false)
+        {
+            SetString(key, value.ToString(CultureInfo.InvariantCulture), user);
+        }
+
+        public double GetDouble(string key, double defaultValue = default, bool user = false)
+        {
+            string storedValue = GetString(key, null, user);
+            return double.TryParse(storedValue, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out double value)
+                ? value
+                : defaultValue;
+        }
+
+        public void SetDouble(string key, double value, bool user = false)
+        {
+            SetString(key, value.ToString("R", CultureInfo.InvariantCulture), user);
+        }
+
+        public decimal GetDecimal(string key, decimal defaultValue = default, bool user = false)
+        {
+            string storedValue = GetString(key, null, user);
+            return decimal.TryParse(storedValue, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal value)
+                ? value
+                : defaultValue;
+        }
+
+        public void SetDecimal(string key, decimal value, bool user = false)
+        {
+            SetString(key, value.ToString(CultureInfo.InvariantCulture), user);
+        }
+
+        public sbyte GetSByte(string key, sbyte defaultValue = default, bool user = false)
+        {
+            string storedValue = GetString(key, null, user);
+            return sbyte.TryParse(storedValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out sbyte value)
+                ? value
+                : defaultValue;
+        }
+
+        public void SetSByte(string key, sbyte value, bool user = false)
+        {
+            SetString(key, value.ToString(CultureInfo.InvariantCulture), user);
+        }
+
+        public ushort GetUShort(string key, ushort defaultValue = default, bool user = false)
+        {
+            string storedValue = GetString(key, null, user);
+            return ushort.TryParse(storedValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out ushort value)
+                ? value
+                : defaultValue;
+        }
+
+        public void SetUShort(string key, ushort value, bool user = false)
+        {
+            SetString(key, value.ToString(CultureInfo.InvariantCulture), user);
+        }
+
+        public uint GetUInt(string key, uint defaultValue = default, bool user = false)
+        {
+            string storedValue = GetString(key, null, user);
+            return uint.TryParse(storedValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out uint value)
+                ? value
+                : defaultValue;
+        }
+
+        public void SetUInt(string key, uint value, bool user = false)
+        {
+            SetString(key, value.ToString(CultureInfo.InvariantCulture), user);
+        }
+
+        public ulong GetULong(string key, ulong defaultValue = default, bool user = false)
+        {
+            string storedValue = GetString(key, null, user);
+            return ulong.TryParse(storedValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out ulong value)
+                ? value
+                : defaultValue;
+        }
+
+        public void SetULong(string key, ulong value, bool user = false)
+        {
+            SetString(key, value.ToString(CultureInfo.InvariantCulture), user);
+        }
+
+        public TEnum GetEnum<TEnum>(string key, TEnum defaultValue = default, bool user = false) where TEnum : struct, Enum
+        {
+            string storedValue = GetString(key, null, user);
+            if (string.IsNullOrEmpty(storedValue))
+            {
+                return defaultValue;
+            }
+
+            if (Enum.TryParse(storedValue, true, out TEnum enumValue))
+            {
+                return enumValue;
+            }
+
+            Type enumType = typeof(TEnum);
+            Type underlyingType = Enum.GetUnderlyingType(enumType);
+
+            try
+            {
+                object numericValue = Convert.ChangeType(storedValue, underlyingType, CultureInfo.InvariantCulture);
+                return (TEnum)Enum.ToObject(enumType, numericValue);
+            }
+            catch
+            {
+                return defaultValue;
+            }
+        }
+
+        public void SetEnum<TEnum>(string key, TEnum value, bool user = false) where TEnum : struct, Enum
+        {
+            SetString(key, value.ToString(), user);
+        }
+
+        public ValueTuple<T1> GetValueTuple<T1>(string key, ValueTuple<T1> defaultValue = default, bool user = false)
+        {
+            return GetObject(key, defaultValue, user);
+        }
+
+        public void SetValueTuple<T1>(string key, ValueTuple<T1> value, bool user = false)
+        {
+            SetObject(key, value, user);
+        }
+
+        public ValueTuple<T1, T2> GetValueTuple<T1, T2>(string key, ValueTuple<T1, T2> defaultValue = default, bool user = false)
+        {
+            return GetObject(key, defaultValue, user);
+        }
+
+        public void SetValueTuple<T1, T2>(string key, ValueTuple<T1, T2> value, bool user = false)
+        {
+            SetObject(key, value, user);
+        }
+
+        public ValueTuple<T1, T2, T3> GetValueTuple<T1, T2, T3>(string key, ValueTuple<T1, T2, T3> defaultValue = default, bool user = false)
+        {
+            return GetObject(key, defaultValue, user);
+        }
+
+        public void SetValueTuple<T1, T2, T3>(string key, ValueTuple<T1, T2, T3> value, bool user = false)
+        {
+            SetObject(key, value, user);
+        }
+
+        public ValueTuple<T1, T2, T3, T4> GetValueTuple<T1, T2, T3, T4>(string key, ValueTuple<T1, T2, T3, T4> defaultValue = default, bool user = false)
+        {
+            return GetObject(key, defaultValue, user);
+        }
+
+        public void SetValueTuple<T1, T2, T3, T4>(string key, ValueTuple<T1, T2, T3, T4> value, bool user = false)
+        {
+            SetObject(key, value, user);
+        }
+
+        public ValueTuple<T1, T2, T3, T4, T5> GetValueTuple<T1, T2, T3, T4, T5>(string key, ValueTuple<T1, T2, T3, T4, T5> defaultValue = default, bool user = false)
+        {
+            return GetObject(key, defaultValue, user);
+        }
+
+        public void SetValueTuple<T1, T2, T3, T4, T5>(string key, ValueTuple<T1, T2, T3, T4, T5> value, bool user = false)
+        {
+            SetObject(key, value, user);
+        }
+
+        public ValueTuple<T1, T2, T3, T4, T5, T6> GetValueTuple<T1, T2, T3, T4, T5, T6>(string key, ValueTuple<T1, T2, T3, T4, T5, T6> defaultValue = default, bool user = false)
+        {
+            return GetObject(key, defaultValue, user);
+        }
+
+        public void SetValueTuple<T1, T2, T3, T4, T5, T6>(string key, ValueTuple<T1, T2, T3, T4, T5, T6> value, bool user = false)
+        {
+            SetObject(key, value, user);
+        }
+
+        public ValueTuple<T1, T2, T3, T4, T5, T6, T7> GetValueTuple<T1, T2, T3, T4, T5, T6, T7>(string key, ValueTuple<T1, T2, T3, T4, T5, T6, T7> defaultValue = default, bool user = false)
+        {
+            return GetObject(key, defaultValue, user);
+        }
+
+        public void SetValueTuple<T1, T2, T3, T4, T5, T6, T7>(string key, ValueTuple<T1, T2, T3, T4, T5, T6, T7> value, bool user = false)
+        {
+            SetObject(key, value, user);
+        }
+
+        private static bool IsSupportedValueTupleType(Type type)
+        {
+            if (type == null || !type.IsGenericType)
+            {
+                return false;
+            }
+
+            Type genericType = type.GetGenericTypeDefinition();
+            return genericType == typeof(ValueTuple<>)
+                   || genericType == typeof(ValueTuple<,>)
+                   || genericType == typeof(ValueTuple<,,>)
+                   || genericType == typeof(ValueTuple<,,,>)
+                   || genericType == typeof(ValueTuple<,,,,>)
+                   || genericType == typeof(ValueTuple<,,,,,>)
+                   || genericType == typeof(ValueTuple<,,,,,,>);
+        }
+
+        public Vector2 GetVector2(string key, Vector2 defaultValue = default, bool user = false)
+        {
+            return GetObject(key, defaultValue, user);
+        }
+
+        public void SetVector2(string key, Vector2 value, bool user = false)
+        {
+            SetObject(key, value, user);
+        }
+
+        public Vector3 GetVector3(string key, Vector3 defaultValue = default, bool user = false)
+        {
+            return GetObject(key, defaultValue, user);
+        }
+
+        public void SetVector3(string key, Vector3 value, bool user = false)
+        {
+            SetObject(key, value, user);
+        }
+
+        public Vector4 GetVector4(string key, Vector4 defaultValue = default, bool user = false)
+        {
+            return GetObject(key, defaultValue, user);
+        }
+
+        public void SetVector4(string key, Vector4 value, bool user = false)
+        {
+            SetObject(key, value, user);
+        }
+
+        public Vector2Int GetVector2Int(string key, Vector2Int defaultValue = default, bool user = false)
+        {
+            return GetObject(key, defaultValue, user);
+        }
+
+        public void SetVector2Int(string key, Vector2Int value, bool user = false)
+        {
+            SetObject(key, value, user);
+        }
+
+        public Vector3Int GetVector3Int(string key, Vector3Int defaultValue = default, bool user = false)
+        {
+            return GetObject(key, defaultValue, user);
+        }
+
+        public void SetVector3Int(string key, Vector3Int value, bool user = false)
+        {
+            SetObject(key, value, user);
+        }
+
+        public Quaternion GetQuaternion(string key, Quaternion defaultValue = default, bool user = false)
+        {
+            return GetObject(key, defaultValue, user);
+        }
+
+        public void SetQuaternion(string key, Quaternion value, bool user = false)
+        {
+            SetObject(key, value, user);
+        }
+
+        public Color GetColor(string key, Color defaultValue = default, bool user = false)
+        {
+            return GetObject(key, defaultValue, user);
+        }
+
+        public void SetColor(string key, Color value, bool user = false)
+        {
+            SetObject(key, value, user);
+        }
+
+        public Color32 GetColor32(string key, Color32 defaultValue = default, bool user = false)
+        {
+            return GetObject(key, defaultValue, user);
+        }
+
+        public void SetColor32(string key, Color32 value, bool user = false)
+        {
+            SetObject(key, value, user);
+        }
+
+        public Matrix4x4 GetMatrix4x4(string key, Matrix4x4 defaultValue = default, bool user = false)
+        {
+            return GetObject(key, defaultValue, user);
+        }
+
+        public void SetMatrix4x4(string key, Matrix4x4 value, bool user = false)
+        {
+            SetObject(key, value, user);
+        }
+
+        public Bounds GetBounds(string key, Bounds defaultValue = default, bool user = false)
+        {
+            return GetObject(key, defaultValue, user);
+        }
+
+        public void SetBounds(string key, Bounds value, bool user = false)
+        {
+            SetObject(key, value, user);
+        }
+
+        public Rect GetRect(string key, Rect defaultValue = default, bool user = false)
+        {
+            return GetObject(key, defaultValue, user);
+        }
+
+        public void SetRect(string key, Rect value, bool user = false)
+        {
+            SetObject(key, value, user);
+        }
+
+        public RectOffset GetRectOffset(string key, RectOffset defaultValue = null, bool user = false)
+        {
+            return GetObject(key, defaultValue, user);
+        }
+
+        public void SetRectOffset(string key, RectOffset value, bool user = false)
+        {
+            SetObject(key, value, user);
+        }
+
+        public LayerMask GetLayerMask(string key, LayerMask defaultValue = default, bool user = false)
+        {
+            return GetObject(key, defaultValue, user);
+        }
+
+        public void SetLayerMask(string key, LayerMask value, bool user = false)
+        {
+            SetObject(key, value, user);
+        }
+        
         public T Get<T>(string key, bool user = false)
         {
             return Get(key, default(T), user);
@@ -868,119 +1245,344 @@ namespace F8Framework.Core
                 return (T)(object)GetBool(key, boxedDefaultValue != null && (bool)boxedDefaultValue, user);
             }
 
+            if (type == typeof(char))
+            {
+                return (T)(object)GetChar(key, boxedDefaultValue == null ? default : (char)boxedDefaultValue, user);
+            }
+
+            if (type == typeof(byte))
+            {
+                return (T)(object)GetByte(key, boxedDefaultValue == null ? default : (byte)boxedDefaultValue, user);
+            }
+
+            if (type == typeof(short))
+            {
+                return (T)(object)GetShort(key, boxedDefaultValue == null ? default : (short)boxedDefaultValue, user);
+            }
+
+            if (type == typeof(long))
+            {
+                return (T)(object)GetLong(key, boxedDefaultValue == null ? default : (long)boxedDefaultValue, user);
+            }
+
+            if (type == typeof(double))
+            {
+                return (T)(object)GetDouble(key, boxedDefaultValue == null ? default : (double)boxedDefaultValue, user);
+            }
+
+            if (type == typeof(decimal))
+            {
+                return (T)(object)GetDecimal(key, boxedDefaultValue == null ? default : (decimal)boxedDefaultValue, user);
+            }
+
+            if (type == typeof(sbyte))
+            {
+                return (T)(object)GetSByte(key, boxedDefaultValue == null ? default : (sbyte)boxedDefaultValue, user);
+            }
+
+            if (type == typeof(ushort))
+            {
+                return (T)(object)GetUShort(key, boxedDefaultValue == null ? default : (ushort)boxedDefaultValue, user);
+            }
+
+            if (type == typeof(uint))
+            {
+                return (T)(object)GetUInt(key, boxedDefaultValue == null ? default : (uint)boxedDefaultValue, user);
+            }
+
+            if (type == typeof(ulong))
+            {
+                return (T)(object)GetULong(key, boxedDefaultValue == null ? default : (ulong)boxedDefaultValue, user);
+            }
+
+            if (type.IsEnum)
+            {
+                if (!HasStorageKey(key, user))
+                {
+                    return defaultValue;
+                }
+
+                string storedValue = GetString(key, boxedDefaultValue?.ToString(), user);
+                if (string.IsNullOrEmpty(storedValue))
+                {
+                    return defaultValue;
+                }
+
+                try
+                {
+                    return (T)Enum.Parse(type, storedValue, true);
+                }
+                catch
+                {
+                    Type underlyingType = Enum.GetUnderlyingType(type);
+                    try
+                    {
+                        object numericValue = Convert.ChangeType(storedValue, underlyingType, CultureInfo.InvariantCulture);
+                        return (T)Enum.ToObject(type, numericValue);
+                    }
+                    catch
+                    {
+                        return defaultValue;
+                    }
+                }
+            }
+
+            if (type == typeof(Vector2))
+            {
+                return (T)(object)GetVector2(key, boxedDefaultValue == null ? default : (Vector2)boxedDefaultValue, user);
+            }
+
+            if (type == typeof(Vector3))
+            {
+                return (T)(object)GetVector3(key, boxedDefaultValue == null ? default : (Vector3)boxedDefaultValue, user);
+            }
+
+            if (type == typeof(Vector4))
+            {
+                return (T)(object)GetVector4(key, boxedDefaultValue == null ? default : (Vector4)boxedDefaultValue, user);
+            }
+
+            if (type == typeof(Vector2Int))
+            {
+                return (T)(object)GetVector2Int(key, boxedDefaultValue == null ? default : (Vector2Int)boxedDefaultValue, user);
+            }
+
+            if (type == typeof(Vector3Int))
+            {
+                return (T)(object)GetVector3Int(key, boxedDefaultValue == null ? default : (Vector3Int)boxedDefaultValue, user);
+            }
+
+            if (type == typeof(Quaternion))
+            {
+                return (T)(object)GetQuaternion(key, boxedDefaultValue == null ? default : (Quaternion)boxedDefaultValue, user);
+            }
+
+            if (type == typeof(Color))
+            {
+                return (T)(object)GetColor(key, boxedDefaultValue == null ? default : (Color)boxedDefaultValue, user);
+            }
+
+            if (type == typeof(Color32))
+            {
+                return (T)(object)GetColor32(key, boxedDefaultValue == null ? default : (Color32)boxedDefaultValue, user);
+            }
+
+            if (type == typeof(Matrix4x4))
+            {
+                return (T)(object)GetMatrix4x4(key, boxedDefaultValue == null ? default : (Matrix4x4)boxedDefaultValue, user);
+            }
+
+            if (type == typeof(Bounds))
+            {
+                return (T)(object)GetBounds(key, boxedDefaultValue == null ? default : (Bounds)boxedDefaultValue, user);
+            }
+
+            if (type == typeof(Rect))
+            {
+                return (T)(object)GetRect(key, boxedDefaultValue == null ? default : (Rect)boxedDefaultValue, user);
+            }
+
+            if (type == typeof(RectOffset))
+            {
+                return (T)(object)GetRectOffset(key, boxedDefaultValue as RectOffset, user);
+            }
+
+            if (type == typeof(LayerMask))
+            {
+                return (T)(object)GetLayerMask(key, boxedDefaultValue == null ? default : (LayerMask)boxedDefaultValue, user);
+            }
+
+            if (IsSupportedValueTupleType(type))
+            {
+                return GetObject(key, defaultValue, user);
+            }
+            
             return GetObject(key, defaultValue, user);
         }
 
         public void Set<T>(string key, T value, bool user = false)
         {
             Type type = typeof(T);
-            object boxedValue = value;
 
-            if (type == typeof(string))
+            if (type.IsEnum)
             {
-                SetString(key, boxedValue == null ? string.Empty : (string)boxedValue, user);
+                SetString(key, value.ToString(), user);
                 return;
             }
 
-            if (type == typeof(int))
+            if (IsSupportedValueTupleType(type))
             {
-                SetInt(key, boxedValue == null ? default : (int)boxedValue, user);
+                SetObject(key, value, user);
                 return;
             }
 
-            if (type == typeof(float))
+            switch (value)
             {
-                SetFloat(key, boxedValue == null ? default : (float)boxedValue, user);
-                return;
+                case string s:
+                    SetString(key, s, user);
+                    return;
+                case int i:
+                    SetInt(key, i, user);
+                    return;
+                case float f:
+                    SetFloat(key, f, user);
+                    return;
+                case bool b:
+                    SetBool(key, b, user);
+                    return;
+                case char c:
+                    SetChar(key, c, user);
+                    return;
+                case byte b8:
+                    SetByte(key, b8, user);
+                    return;
+                case short s16:
+                    SetShort(key, s16, user);
+                    return;
+                case long l:
+                    SetLong(key, l, user);
+                    return;
+                case double d:
+                    SetDouble(key, d, user);
+                    return;
+                case decimal m:
+                    SetDecimal(key, m, user);
+                    return;
+                case sbyte sb:
+                    SetSByte(key, sb, user);
+                    return;
+                case ushort us:
+                    SetUShort(key, us, user);
+                    return;
+                case uint ui:
+                    SetUInt(key, ui, user);
+                    return;
+                case ulong ul:
+                    SetULong(key, ul, user);
+                    return;
+                case Vector2 v2:
+                    SetVector2(key, v2, user);
+                    return;
+                case Vector3 v3:
+                    SetVector3(key, v3, user);
+                    return;
+                case Vector4 v4:
+                    SetVector4(key, v4, user);
+                    return;
+                case Vector2Int v2Int:
+                    SetVector2Int(key, v2Int, user);
+                    return;
+                case Vector3Int v3Int:
+                    SetVector3Int(key, v3Int, user);
+                    return;
+                case Quaternion quaternion:
+                    SetQuaternion(key, quaternion, user);
+                    return;
+                case Color color:
+                    SetColor(key, color, user);
+                    return;
+                case Color32 color32:
+                    SetColor32(key, color32, user);
+                    return;
+                case Matrix4x4 matrix:
+                    SetMatrix4x4(key, matrix, user);
+                    return;
+                case Bounds bounds:
+                    SetBounds(key, bounds, user);
+                    return;
+                case Rect rect:
+                    SetRect(key, rect, user);
+                    return;
+                case RectOffset rectOffset:
+                    SetRectOffset(key, rectOffset, user);
+                    return;
+                case LayerMask layerMask:
+                    SetLayerMask(key, layerMask, user);
+                    return;
+                default:
+                    SetObject(key, value, user);
+                    return;
             }
-
-            if (type == typeof(bool))
-            {
-                SetBool(key, boxedValue != null && (bool)boxedValue, user);
-                return;
-            }
-
-            SetObject(key, value, user);
         }
 
         public T[] GetArray<T>(string key, T[] defaultValue = null, bool user = false)
         {
-            return Get(key, defaultValue, user);
+            return GetObject(key, defaultValue, user);
         }
 
         public void SetArray<T>(string key, T[] value, bool user = false)
         {
-            Set(key, value, user);
+            SetObject(key, value, user);
         }
 
         public List<T> GetList<T>(string key, List<T> defaultValue = null, bool user = false)
         {
-            return Get(key, defaultValue, user);
+            return GetObject(key, defaultValue, user);
         }
 
         public void SetList<T>(string key, List<T> value, bool user = false)
         {
-            Set(key, value, user);
+            SetObject(key, value, user);
         }
 
         public Dictionary<TKey, TValue> GetDictionary<TKey, TValue>(string key, Dictionary<TKey, TValue> defaultValue = null, bool user = false)
         {
-            return Get(key, defaultValue, user);
+            return GetObject(key, defaultValue, user);
         }
 
         public void SetDictionary<TKey, TValue>(string key, Dictionary<TKey, TValue> value, bool user = false)
         {
-            Set(key, value, user);
+            SetObject(key, value, user);
         }
 
         public Queue<T> GetQueue<T>(string key, Queue<T> defaultValue = null, bool user = false)
         {
-            return Get(key, defaultValue, user);
+            return GetObject(key, defaultValue, user);
         }
 
         public void SetQueue<T>(string key, Queue<T> value, bool user = false)
         {
-            Set(key, value, user);
+            SetObject(key, value, user);
         }
 
         public HashSet<T> GetHashSet<T>(string key, HashSet<T> defaultValue = null, bool user = false)
         {
-            return Get(key, defaultValue, user);
+            return GetObject(key, defaultValue, user);
         }
 
         public void SetHashSet<T>(string key, HashSet<T> value, bool user = false)
         {
-            Set(key, value, user);
+            SetObject(key, value, user);
         }
 
         public Stack<T> GetStack<T>(string key, Stack<T> defaultValue = null, bool user = false)
         {
-            return Get(key, defaultValue, user);
+            return GetObject(key, defaultValue, user);
         }
 
         public void SetStack<T>(string key, Stack<T> value, bool user = false)
         {
-            Set(key, value, user);
+            SetObject(key, value, user);
         }
 
         public T[,] GetRectangularArray<T>(string key, T[,] defaultValue = null, bool user = false)
         {
-            return Get(key, defaultValue, user);
+            return GetObject(key, defaultValue, user);
         }
 
         public void SetRectangularArray<T>(string key, T[,] value, bool user = false)
         {
-            Set(key, value, user);
+            SetObject(key, value, user);
         }
 
         public T[][] GetJaggedArray<T>(string key, T[][] defaultValue = null, bool user = false)
         {
-            return Get(key, defaultValue, user);
+            return GetObject(key, defaultValue, user);
         }
 
         public void SetJaggedArray<T>(string key, T[][] value, bool user = false)
         {
-            Set(key, value, user);
+            SetObject(key, value, user);
         }
 
         /// <summary>

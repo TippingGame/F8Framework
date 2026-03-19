@@ -58,26 +58,6 @@ namespace LitJson
                 w.WriteProperty("w", v.w);
                 w.WriteObjectEnd();
             };
-            
-            // Transform
-            Action<Transform, JsonWriter> writeTransform = (v, w) =>
-            {
-                w.WriteObjectStart();
-                var localPosition = v.localPosition;
-                w.WriteProperty("xPos", localPosition.x);
-                w.WriteProperty("yPos", localPosition.y);
-                w.WriteProperty("zPos", localPosition.z);
-                var localRotation = v.localRotation;
-                w.WriteProperty("xQua", localRotation.x);
-                w.WriteProperty("yQua", localRotation.y);
-                w.WriteProperty("zQua", localRotation.z);
-                w.WriteProperty("wQua", localRotation.x);
-                var localScale = v.localScale;
-                w.WriteProperty("xScale", localScale.y);
-                w.WriteProperty("yScale", localScale.y);
-                w.WriteProperty("zScale", localScale.z);
-                w.WriteObjectEnd();
-            };
 
             JsonMapper.RegisterExporter<Vector3>((v, w) =>
             {
@@ -189,12 +169,6 @@ namespace LitJson
                 }
                 w.WriteObjectEnd();
             });
-
-            // Transform
-            JsonMapper.RegisterExporter<Transform>((v, w) =>
-            {
-                writeTransform(v, w);
-            });
             
             // LayerMask
             JsonMapper.RegisterExporter<LayerMask>((v, w) =>
@@ -227,7 +201,6 @@ namespace LitJson
                 w.WriteObjectEnd();
             });
             
-#if UNITY_2017_2_OR_NEWER
             // 注册Vector3Int类型的Exporter
             Action<Vector3Int, JsonWriter> writeVector3Int = (v, w) =>
             {
@@ -269,12 +242,23 @@ namespace LitJson
             {
                 w.WriteObjectStart();
 
-                w.WritePropertyName("center");
-                writeVector3(v.center, w);
+                w.WritePropertyName("position");
+                writeVector3Int(v.position, w);
 
                 w.WritePropertyName("size");
                 writeVector3Int(v.size, w);
 
+                w.WriteObjectEnd();
+            });
+            
+            // RectInt
+            JsonMapper.RegisterExporter<RectInt>((v, w) =>
+            {
+                w.WriteObjectStart();
+                w.WriteProperty("x", v.x);
+                w.WriteProperty("y", v.y);
+                w.WriteProperty("width", v.width);
+                w.WriteProperty("height", v.height);
                 w.WriteObjectEnd();
             });
             
@@ -284,7 +268,6 @@ namespace LitJson
                 // TODO
                 w.WriteObjectEnd();
             });
-#endif
         }
     }
 }
