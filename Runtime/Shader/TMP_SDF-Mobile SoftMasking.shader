@@ -90,7 +90,7 @@ SubShader {
 
 
 		#include "UnityCG.cginc"
-		#include "TMPro_Properties.cginc"
+		#include "Assets/TextMesh Pro/Shaders/TMPro_Properties.cginc"
 		#include "UnityUI.cginc"
 
 		struct vertex_t {

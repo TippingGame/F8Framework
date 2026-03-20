@@ -184,11 +184,11 @@ namespace F8Framework.Core.Editor
                 case RegistryHive.CurrentUser:
                     _registryHive = HKEY_CURRENT_USER;
                     break;
-
+#if !UNITY_6000_3_OR_NEWER
                 case RegistryHive.DynData:
                     _registryHive = HKEY_DYN_DATA;
                     break;
-
+#endif
                 case RegistryHive.LocalMachine:
                     _registryHive = HKEY_LOCAL_MACHINE;
                     break;
