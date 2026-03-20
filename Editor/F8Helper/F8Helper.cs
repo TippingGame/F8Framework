@@ -50,8 +50,8 @@ namespace F8Framework.Core.Editor
                 return;
             }
             LoadAllExcelData();
-            F8EditorPrefs.SetBool("compilationFinishedHotUpdateDll", true);
-            F8EditorPrefs.SetBool("compilationFinishedBuildAB", true);
+            SessionState.SetBool("compilationFinishedHotUpdateDll", true);
+            SessionState.SetBool("compilationFinishedBuildAB", true);
         }
 
         // 补充元数据，不会热更新此处的dll，一般在{project}/HybridCLRData/AssembliesPostIl2CppStrip/{target}目录下
@@ -68,7 +68,7 @@ namespace F8Framework.Core.Editor
         [MenuItem("开发工具/3: 生成并复制热更新Dll-F8", false, 210)]
         public static void GenerateCopyHotUpdateDll()
         {
-            // F8EditorPrefs.SetBool("compilationFinishedHotUpdateDll", false);
+            // SessionState.SetBool("compilationFinishedHotUpdateDll", false);
             //
             // // 只使用HybridCLR执行的命令（二选一）
             // HybridCLR.Editor.Commands.PrebuildCommand.GenerateAll();
@@ -118,7 +118,7 @@ namespace F8Framework.Core.Editor
         [MenuItem("开发工具/4: 打包AssetBundles目录资源-F8", false, 215)]
         public static void BuildAssetBundles()
         {
-            F8EditorPrefs.SetBool("compilationFinishedBuildAB", false);
+            SessionState.SetBool("compilationFinishedBuildAB", false);
             ABBuildTool.BuildAllAB();
         }
 
@@ -139,12 +139,12 @@ namespace F8Framework.Core.Editor
         
         private static void OnEditorQuit()
         {
-            F8EditorPrefs.SetBool("compilationFinished", false);
-            F8EditorPrefs.SetBool("compilationFinishedHotUpdateDll", false);
-            F8EditorPrefs.SetBool("compilationFinishedBuildAB", false);
-            F8EditorPrefs.SetBool("compilationFinishedBuildPkg", false);
-            F8EditorPrefs.SetBool("compilationFinishedBuildRun", false);
-            F8EditorPrefs.SetBool("compilationFinishedBuildUpdate", false);
+            SessionState.SetBool("compilationFinished", false);
+            SessionState.SetBool("compilationFinishedHotUpdateDll", false);
+            SessionState.SetBool("compilationFinishedBuildAB", false);
+            SessionState.SetBool("compilationFinishedBuildPkg", false);
+            SessionState.SetBool("compilationFinishedBuildRun", false);
+            SessionState.SetBool("compilationFinishedBuildUpdate", false);
         }
 
         private static void ProjectWindowItemOnGUI(string guid, Rect selectionRect)

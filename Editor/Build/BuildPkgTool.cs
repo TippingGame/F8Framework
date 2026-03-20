@@ -302,7 +302,7 @@ namespace F8Framework.Core.Editor
             bool enableNullPackage = F8EditorPrefs.GetBool(_enableNullPackageKey, false);
             
             BuildOptions buildOptions = BuildOptions.None;
-            if (F8EditorPrefs.GetBool("compilationFinishedBuildRun"))
+            if (SessionState.GetBool("compilationFinishedBuildRun", false))
             {
                 buildOptions |= BuildOptions.AutoRunPlayer;
             }
@@ -1018,8 +1018,8 @@ namespace F8Framework.Core.Editor
                     string countent = "确定构建版本 " + _toVersion;
                     if (EditorUtility.DisplayDialog("打包游戏", countent, "确定", "取消"))
                     {
-                        F8EditorPrefs.SetBool("compilationFinishedBuildPkg", true);
-                        F8EditorPrefs.SetBool("compilationFinishedBuildRun", false);
+                        SessionState.SetBool("compilationFinishedBuildPkg", true);
+                        SessionState.SetBool("compilationFinishedBuildRun", false);
                         EditorApplication.delayCall += WriteGameVersion;
                         EditorApplication.delayCall += F8Helper.F8Run;
                     }
@@ -1044,8 +1044,8 @@ namespace F8Framework.Core.Editor
                     string countent = "确定构建热更新包版本 " + _toVersion;
                     if (EditorUtility.DisplayDialog("构建热更新包", countent, "确定", "取消"))
                     {
-                        F8EditorPrefs.SetBool("compilationFinishedBuildUpdate", true);
-                        F8EditorPrefs.SetBool("compilationFinishedBuildRun", false);
+                        SessionState.SetBool("compilationFinishedBuildUpdate", true);
+                        SessionState.SetBool("compilationFinishedBuildRun", false);
                         EditorApplication.delayCall += F8Helper.F8Run;
                     }
                 }
@@ -1078,8 +1078,8 @@ namespace F8Framework.Core.Editor
                     string countent = "确定构建版本 " + _toVersion;
                     if (EditorUtility.DisplayDialog("打包游戏", countent, "确定", "取消"))
                     {
-                        F8EditorPrefs.SetBool("compilationFinishedBuildPkg", true);
-                        F8EditorPrefs.SetBool("compilationFinishedBuildRun", true);
+                        SessionState.SetBool("compilationFinishedBuildPkg", true);
+                        SessionState.SetBool("compilationFinishedBuildRun", true);
                         EditorApplication.delayCall += WriteGameVersion;
                         EditorApplication.delayCall += F8Helper.F8Run;
                     }

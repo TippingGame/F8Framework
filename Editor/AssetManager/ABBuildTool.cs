@@ -17,7 +17,7 @@ namespace F8Framework.Core.Editor
         
         public static void JenkinsBuildAllAB()
         {
-            F8EditorPrefs.SetBool("compilationFinishedBuildAB", false);
+            SessionState.SetBool("compilationFinishedBuildAB", false);
             string[] args = Environment.GetCommandLineArgs();
             bool enableFullPathAssetLoading = BuildPkgTool.GetArgValue(args, "EnableFullPathAssetLoading-").Equals("true", StringComparison.OrdinalIgnoreCase);
             bool enableFullPathExtensionAssetLoading = BuildPkgTool.GetArgValue(args, "EnableFullPathExtensionAssetLoading-").Equals("true", StringComparison.OrdinalIgnoreCase);

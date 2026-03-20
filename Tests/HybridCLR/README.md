@@ -33,7 +33,7 @@ public static List<string> AOTDllList = new List<string>
 [MenuItem("开发工具/3: 生成并复制热更新Dll-F8", false, 210)]
 public static void GenerateCopyHotUpdateDll()
 {
-    // F8EditorPrefs.SetBool("compilationFinishedHotUpdateDll", false);
+    // SessionState.SetBool("compilationFinishedHotUpdateDll", false);
     //
     // // 只使用HybridCLR执行的命令（二选一）
     // HybridCLR.Editor.Commands.PrebuildCommand.GenerateAll();
