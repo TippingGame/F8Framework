@@ -36,14 +36,17 @@ private void Start()
     // 全局监听（参数兼容int和枚举）
     FF8.Message.AddEventListener(MessageEvent.ApplicationFocus, OnPlayerSpawned, this);
     FF8.Message.AddEventListener(10001, OnPlayerSpawned2, this);
+    FF8.Message.AddEventListener<int, string>(10002, OnPlayerSpawnedNoGC, this);
     
     // 发送全局消息（不带参数/带参数）
     FF8.Message.DispatchEvent(MessageEvent.ApplicationFocus);
     FF8.Message.DispatchEvent(10001, data);
+    FF8.Message.DispatchEvent(10002, 123123, "asdasd");
     
     // 移除监听
     FF8.Message.RemoveEventListener(MessageEvent.ApplicationFocus, OnPlayerSpawned, this);
     FF8.Message.RemoveEventListener(10001, OnPlayerSpawned2, this);
+    FF8.Message.RemoveEventListener<int, string>(10002, OnPlayerSpawnedNoGC, this);
 }
 
 private void OnPlayerSpawned()
@@ -61,16 +64,45 @@ private void OnPlayerSpawned2(params object[] obj)
     }
 }
 
+private void OnPlayerSpawnedNoGC(int id, string name)
+{
+    LogF8.Log("OnPlayerSpawnedNoGC");
+    LogF8.Log(id);
+    LogF8.Log(name);
+}
+
 /*--------------------------EventDispatcher用法--------------------------*/
 // 用作在实体或UI上，简化代码，监听自动释放
 AddEventListener(MessageEvent.ApplicationFocus, OnPlayerSpawned);
+AddEventListener<int, string>(10002, OnPlayerSpawnedNoGC);
 
 // 发送全局消息（不带参数/带参数）
 DispatchEvent(MessageEvent.ApplicationFocus);
+DispatchEvent(10002, 123123, "asdasd");
 
 // 可不执行，Clear()时会清理此脚本所有监听
 RemoveEventListener(MessageEvent.ApplicationFocus, OnPlayerSpawned);
+RemoveEventListener<int, string>(10002, OnPlayerSpawnedNoGC);
 ```
+
+### 无GC参数事件
+当事件参数个数固定时，优先使用强类型重载，避免 `params object[]` 产生数组分配。
+
+```C#
+FF8.Message.AddEventListener<int, string>(10002, OnPlayerSpawnedNoGC, this);
+FF8.Message.DispatchEvent(10002, 123123, "asdasd");
+FF8.Message.RemoveEventListener<int, string>(10002, OnPlayerSpawnedNoGC, this);
+
+AddEventListener<int, string>(10002, OnPlayerSpawnedNoGC);
+DispatchEvent(10002, 123123, "asdasd");
+RemoveEventListener<int, string>(10002, OnPlayerSpawnedNoGC);
+
+void OnPlayerSpawnedNoGC(int id, string name)
+{
+}
+```
+
+目前支持 0~4 个固定参数；如果继续使用 `Action<object[]>` / `params object[]`，则仍然是兼容模式，会有分配。
 
 ### EventDispatcher使用方法[（参考BaseView.cs）](https://github.com/TippingGame/F8Framework/blob/main/Runtime/UI/Base/BaseView.cs)
 Demo直接拖拽[（DemoEventDispatcher.cs）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Event/DemoEventDispatcher.cs)，挂载到GameObject  

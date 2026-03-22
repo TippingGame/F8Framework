@@ -1,6 +1,6 @@
 ---
 name: f8-features-event-workflow
-description: Use when implementing or troubleshooting Event feature workflows — message dispatching, event listening, EventDispatcher auto-cleanup in F8Framework.
+description: Use when implementing or troubleshooting Event feature workflows — message dispatching, event listening, EventDispatcher auto-cleanup, and zero-GC strongly typed event parameters in F8Framework.
 ---
 
 # Event Feature Workflow
@@ -31,7 +31,7 @@ description: Use when implementing or troubleshooting Event feature workflows �
 
 | Class | Role |
 |-------|------|
-| `EventManager` | Core module. Access via `FF8.Message`. Global event bus. |
+| `MessageManager` | Core module. Access via `FF8.Message`. Global event bus. |
 | `EventDispatcher` | Mixin base class for auto-cleanup event listeners. Used by BaseView. |
 
 ## API quick reference
@@ -52,27 +52,47 @@ public enum MessageEvent
 // Add listener (supports int and enum, pass 'this' for auto-cleanup)
 FF8.Message.AddEventListener(MessageEvent.ApplicationFocus, OnEvent, this);
 FF8.Message.AddEventListener(10001, OnEventWithArgs, this);
+FF8.Message.AddEventListener<int, string>(10002, OnEventNoGC, this);
 
 // Dispatch event (without/with parameters)
 FF8.Message.DispatchEvent(MessageEvent.ApplicationFocus);
 FF8.Message.DispatchEvent(10001, new object[] { 123, "data" });
+FF8.Message.DispatchEvent(10002, 123, "data");
 
 // Remove listener
 FF8.Message.RemoveEventListener(MessageEvent.ApplicationFocus, OnEvent, this);
 FF8.Message.RemoveEventListener(10001, OnEventWithArgs, this);
+FF8.Message.RemoveEventListener<int, string>(10002, OnEventNoGC, this);
 
 // Callback signatures
 void OnEvent() { }
 void OnEventWithArgs(params object[] args) { }
+void OnEventNoGC(int id, string name) { }
 ```
 
 ### EventDispatcher pattern (auto-cleanup)
 ```csharp
 // In classes inheriting EventDispatcher (e.g., BaseView):
 AddEventListener(MessageEvent.ApplicationFocus, OnEvent);
+AddEventListener<int, string>(10002, OnEventNoGC);
 DispatchEvent(MessageEvent.ApplicationFocus);
+DispatchEvent(10002, 123, "data");
 RemoveEventListener(MessageEvent.ApplicationFocus, OnEvent);
+RemoveEventListener<int, string>(10002, OnEventNoGC);
 // All listeners auto-cleaned on Clear()
+```
+
+### Zero-GC recommendation
+```csharp
+// Prefer fixed-parameter overloads on hot paths to avoid params object[] allocations.
+FF8.Message.AddEventListener<int>(10010, OnHpChanged, this);
+FF8.Message.DispatchEvent(10010, 99);
+
+FF8.Message.AddEventListener<int, int>(10011, OnDamage, this);
+FF8.Message.DispatchEvent(10011, 12, 3);
+
+void OnHpChanged(int hp) { }
+void OnDamage(int damage, int criticalType) { }
 ```
 
 ## Workflow
@@ -80,9 +100,11 @@ RemoveEventListener(MessageEvent.ApplicationFocus, OnEvent);
 1. Define event IDs as enum (start from 10000 to avoid framework conflicts).
 2. Choose pattern: global `FF8.Message` or `EventDispatcher` mixin.
 3. For UI/entity classes, prefer `EventDispatcher` for automatic cleanup.
-4. Always pass `this` as the last parameter to `AddEventListener` for lifecycle binding.
-5. The framework has built-in dead-loop prevention.
-6. Use the Event System Monitor editor window to debug active listeners.
+4. On hot paths, prefer `Action<T1>` to `Action<T1,T2,T3,T4>` overloads for zero-GC parameter dispatch.
+5. Use `Action<object[]>` only when parameter count is dynamic or compatibility is required.
+6. Always pass `this` as the last parameter to `AddEventListener` for lifecycle binding.
+7. The framework has built-in dead-loop prevention.
+8. Use the Event System Monitor editor window to debug active listeners.
 
 ## Common error handling
 
@@ -91,7 +113,7 @@ RemoveEventListener(MessageEvent.ApplicationFocus, OnEvent);
 | Event not received | Listener added after dispatch | Ensure listener registration before dispatch |
 | Dead loop warning | Event A dispatches Event B which dispatches Event A | Break the cycle, use intermediate state |
 | Memory leak | Listeners not removed on destroy | Use EventDispatcher or pass `this` for auto-cleanup |
-| Wrong callback signature | Params mismatch | Use `void()` for no-args or `void(params object[])` for args |
+| Wrong callback signature | Params mismatch | Match the overload: `void()`, `void(T1)`, `void(T1,T2)`... or `void(params object[])` |
 
 ## Cross-module dependencies
 

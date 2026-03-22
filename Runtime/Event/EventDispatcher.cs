@@ -5,148 +5,201 @@ namespace F8Framework.Core
 {
     public class EventDispatcher : IMessageManager
     {
-        private Dictionary<int, HashSet<IEventDataBase>> events = new Dictionary<int, HashSet<IEventDataBase>>();
-        // 存储待删除的事件处理器列表
-        private List<IEventDataBase> delects = new List<IEventDataBase>();
+        private readonly Dictionary<int, HashSet<IEventDataBase>> events = new Dictionary<int, HashSet<IEventDataBase>>();
+        private readonly List<IEventDataBase> delects = new List<IEventDataBase>();
+
+        private HashSet<IEventDataBase> GetOrCreateEventSet(int eventId)
+        {
+            if (!events.TryGetValue(eventId, out var eventSet))
+            {
+                eventSet = new HashSet<IEventDataBase>();
+                events[eventId] = eventSet;
+            }
+
+            return eventSet;
+        }
+
+        private void AddEventListenerInternal(int eventId, IEventDataBase eventData)
+        {
+            GetOrCreateEventSet(eventId).Add(eventData);
+        }
+
+        private void RemoveEventListenerInternal<TEventData>(int eventId, Func<TEventData, bool> predicate)
+            where TEventData : class, IEventDataBase
+        {
+            if (!events.TryGetValue(eventId, out var eventSet) || eventSet.Count <= 0)
+            {
+                return;
+            }
+
+            delects.Clear();
+
+            foreach (var item in eventSet)
+            {
+                if (item is TEventData eventData && predicate(eventData))
+                {
+                    RemoveFromMessageManager(item);
+                    delects.Add(item);
+                }
+            }
+
+            foreach (var deletion in delects)
+            {
+                eventSet.Remove(deletion);
+            }
+
+            delects.Clear();
+        }
+
+        private void RemoveFromMessageManager(IEventDataBase eventData)
+        {
+            if (eventData == null)
+            {
+                return;
+            }
+            eventData.RemoveFrom(MessageManager.Instance);
+        }
+
         public void AddEventListener<T>(T eventName, Action listener, object handle = null) where T : Enum, IConvertible
         {
-            int tempName = (int)(object)eventName;
-            AddEventListener(tempName, listener, handle);
+            AddEventListener((int)(object)eventName, listener, handle);
         }
 
         public void AddEventListener(int eventId, Action listener, object handle = null)
         {
-            if (!events.ContainsKey(eventId))
-            {
-                events[eventId] = new HashSet<IEventDataBase>();
-            }
-            EventData eventData = new EventData(eventId, listener, handle);
-            events[eventId].Add(eventData);
-            
+            AddEventListenerInternal(eventId, new EventData(eventId, listener, handle));
             MessageManager.Instance.AddEventListener(eventId, listener, handle);
         }
 
         public void AddEventListener<T>(T eventName, Action<object[]> listener, object handle = null) where T : Enum, IConvertible
         {
-            int tempName = (int)(object)eventName;
-            AddEventListener(tempName, listener, handle);
+            AddEventListener((int)(object)eventName, listener, handle);
         }
 
         public void AddEventListener(int eventId, Action<object[]> listener, object handle = null)
         {
-            if (!events.ContainsKey(eventId))
-            {
-                events[eventId] = new HashSet<IEventDataBase>();
-            }
-            EventData<object[]> eventData = new EventData<object[]>(eventId, listener, handle);
-            events[eventId].Add(eventData);
-            
+            AddEventListenerInternal(eventId, new EventData<object[]>(eventId, listener, handle));
+            MessageManager.Instance.AddEventListener(eventId, listener, handle);
+        }
+
+        public void AddEventListener<T, T1>(T eventName, Action<T1> listener, object handle = null) where T : Enum, IConvertible
+        {
+            AddEventListener((int)(object)eventName, listener, handle);
+        }
+
+        public void AddEventListener<T1>(int eventId, Action<T1> listener, object handle = null)
+        {
+            AddEventListenerInternal(eventId, new EventData<T1>(eventId, listener, handle));
+            MessageManager.Instance.AddEventListener(eventId, listener, handle);
+        }
+
+        public void AddEventListener<T, T1, T2>(T eventName, Action<T1, T2> listener, object handle = null) where T : Enum, IConvertible
+        {
+            AddEventListener((int)(object)eventName, listener, handle);
+        }
+
+        public void AddEventListener<T1, T2>(int eventId, Action<T1, T2> listener, object handle = null)
+        {
+            AddEventListenerInternal(eventId, new EventData<T1, T2>(eventId, listener, handle));
+            MessageManager.Instance.AddEventListener(eventId, listener, handle);
+        }
+
+        public void AddEventListener<T, T1, T2, T3>(T eventName, Action<T1, T2, T3> listener, object handle = null) where T : Enum, IConvertible
+        {
+            AddEventListener((int)(object)eventName, listener, handle);
+        }
+
+        public void AddEventListener<T1, T2, T3>(int eventId, Action<T1, T2, T3> listener, object handle = null)
+        {
+            AddEventListenerInternal(eventId, new EventData<T1, T2, T3>(eventId, listener, handle));
+            MessageManager.Instance.AddEventListener(eventId, listener, handle);
+        }
+
+        public void AddEventListener<T, T1, T2, T3, T4>(T eventName, Action<T1, T2, T3, T4> listener, object handle = null) where T : Enum, IConvertible
+        {
+            AddEventListener((int)(object)eventName, listener, handle);
+        }
+
+        public void AddEventListener<T1, T2, T3, T4>(int eventId, Action<T1, T2, T3, T4> listener, object handle = null)
+        {
+            AddEventListenerInternal(eventId, new EventData<T1, T2, T3, T4>(eventId, listener, handle));
             MessageManager.Instance.AddEventListener(eventId, listener, handle);
         }
 
         public void RemoveEventListener<T>(T eventName, Action listener, object handle = null) where T : Enum, IConvertible
         {
-            int tempName = (int)(object)eventName;
-            RemoveEventListener(tempName, listener, handle);
+            RemoveEventListener((int)(object)eventName, listener, handle);
         }
 
         public void RemoveEventListener(int eventId, Action listener, object handle = null)
         {
-            if (events.ContainsKey(eventId))
-            {
-                if (events[eventId].Count > 0)
-                {
-                    HashSet<IEventDataBase> ebs = events[eventId];
-                    if (ebs.Count < 0) {
-                        return;
-                    }
-
-                    delects.Clear();
-
-                    foreach (var item in ebs)
-                    {
-                        if (item is EventData eb && eb.Listener == listener && eb.Handle == handle)
-                        {
-                            MessageManager.Instance.RemoveEventListener(eventId, eb.Listener, eb.Handle);
-                            delects.Add(eb);
-                        }
-                    }
-                    
-                    foreach (var deletion in delects)
-                    {
-                        ebs.Remove(deletion);
-                    }
-
-                    delects.Clear();
-                    
-                    
-                }
-            }
+            RemoveEventListenerInternal<EventData>(eventId, eb => eb.Listener == listener && eb.Handle == handle);
         }
 
         public void RemoveEventListener<T>(T eventName, Action<object[]> listener, object handle = null) where T : Enum, IConvertible
         {
-            int tempName = (int)(object)eventName;
-            RemoveEventListener(tempName, listener, handle);
+            RemoveEventListener((int)(object)eventName, listener, handle);
         }
 
         public void RemoveEventListener(int eventId, Action<object[]> listener, object handle = null)
         {
-            if (events.ContainsKey(eventId))
-            {
-                if (events[eventId].Count > 0)
-                {
-                    HashSet<IEventDataBase> ebs = events[eventId];
-                    if (ebs.Count < 0) {
-                        LogF8.Log("不可能为零");
-                        return;
-                    }
-                    
-                    delects.Clear();
-
-                    foreach (var item in ebs)
-                    {
-                        if (item is EventData<object[]> eb && eb.Listener == listener && eb.Handle == handle)
-                        {
-                            MessageManager.Instance.RemoveEventListener(eventId, eb.Listener, eb.Handle);
-                            delects.Add(eb);
-                        }
-                    }
-                    
-                    foreach (var deletion in delects)
-                    {
-                        ebs.Remove(deletion);
-                    }
-
-                    delects.Clear();
-                }
-            }
+            RemoveEventListenerInternal<EventData<object[]>>(eventId, eb => eb.Listener == listener && eb.Handle == handle);
         }
 
-        /// <summary>
-        /// 删除此事件所有监听（慎用）
-        /// </summary>
+        public void RemoveEventListener<T, T1>(T eventName, Action<T1> listener, object handle = null) where T : Enum, IConvertible
+        {
+            RemoveEventListener((int)(object)eventName, listener, handle);
+        }
+
+        public void RemoveEventListener<T1>(int eventId, Action<T1> listener, object handle = null)
+        {
+            RemoveEventListenerInternal<EventData<T1>>(eventId, eb => eb.Listener == listener && eb.Handle == handle);
+        }
+
+        public void RemoveEventListener<T, T1, T2>(T eventName, Action<T1, T2> listener, object handle = null) where T : Enum, IConvertible
+        {
+            RemoveEventListener((int)(object)eventName, listener, handle);
+        }
+
+        public void RemoveEventListener<T1, T2>(int eventId, Action<T1, T2> listener, object handle = null)
+        {
+            RemoveEventListenerInternal<EventData<T1, T2>>(eventId, eb => eb.Listener == listener && eb.Handle == handle);
+        }
+
+        public void RemoveEventListener<T, T1, T2, T3>(T eventName, Action<T1, T2, T3> listener, object handle = null) where T : Enum, IConvertible
+        {
+            RemoveEventListener((int)(object)eventName, listener, handle);
+        }
+
+        public void RemoveEventListener<T1, T2, T3>(int eventId, Action<T1, T2, T3> listener, object handle = null)
+        {
+            RemoveEventListenerInternal<EventData<T1, T2, T3>>(eventId, eb => eb.Listener == listener && eb.Handle == handle);
+        }
+
+        public void RemoveEventListener<T, T1, T2, T3, T4>(T eventName, Action<T1, T2, T3, T4> listener, object handle = null) where T : Enum, IConvertible
+        {
+            RemoveEventListener((int)(object)eventName, listener, handle);
+        }
+
+        public void RemoveEventListener<T1, T2, T3, T4>(int eventId, Action<T1, T2, T3, T4> listener, object handle = null)
+        {
+            RemoveEventListenerInternal<EventData<T1, T2, T3, T4>>(eventId, eb => eb.Listener == listener && eb.Handle == handle);
+        }
+
         public void RemoveEventListener<T>(T eventName)
         {
-            int tempName = (int)(object)eventName;
-            RemoveEventListener(tempName);
+            RemoveEventListener((int)(object)eventName);
         }
-        
-        /// <summary>
-        /// 删除此事件所有监听（慎用）
-        /// </summary>
+
         public void RemoveEventListener(int eventId)
         {
-            if (events.ContainsKey(eventId))
+            if (events.ContainsKey(eventId) && events[eventId].Count > 0)
             {
-                if (events[eventId].Count > 0)
-                {
-                    events.Remove(eventId);
-                    MessageManager.Instance.RemoveEventListener(eventId);
-                }
+                events.Remove(eventId);
+                MessageManager.Instance.RemoveEventListener(eventId);
             }
         }
-        
+
         public void DispatchEvent<T>(T eventName) where T : Enum, IConvertible
         {
             MessageManager.Instance.DispatchEvent(eventName);
@@ -167,25 +220,56 @@ namespace F8Framework.Core
             MessageManager.Instance.DispatchEvent(eventId, arg1);
         }
 
+        public void DispatchEvent<T, T1>(T eventName, T1 arg1) where T : Enum, IConvertible
+        {
+            MessageManager.Instance.DispatchEvent(eventName, arg1);
+        }
+
+        public void DispatchEvent<T1>(int eventId, T1 arg1)
+        {
+            MessageManager.Instance.DispatchEvent(eventId, arg1);
+        }
+
+        public void DispatchEvent<T, T1, T2>(T eventName, T1 arg1, T2 arg2) where T : Enum, IConvertible
+        {
+            MessageManager.Instance.DispatchEvent(eventName, arg1, arg2);
+        }
+
+        public void DispatchEvent<T1, T2>(int eventId, T1 arg1, T2 arg2)
+        {
+            MessageManager.Instance.DispatchEvent(eventId, arg1, arg2);
+        }
+
+        public void DispatchEvent<T, T1, T2, T3>(T eventName, T1 arg1, T2 arg2, T3 arg3) where T : Enum, IConvertible
+        {
+            MessageManager.Instance.DispatchEvent(eventName, arg1, arg2, arg3);
+        }
+
+        public void DispatchEvent<T1, T2, T3>(int eventId, T1 arg1, T2 arg2, T3 arg3)
+        {
+            MessageManager.Instance.DispatchEvent(eventId, arg1, arg2, arg3);
+        }
+
+        public void DispatchEvent<T, T1, T2, T3, T4>(T eventName, T1 arg1, T2 arg2, T3 arg3, T4 arg4) where T : Enum, IConvertible
+        {
+            MessageManager.Instance.DispatchEvent(eventName, arg1, arg2, arg3, arg4);
+        }
+
+        public void DispatchEvent<T1, T2, T3, T4>(int eventId, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+        {
+            MessageManager.Instance.DispatchEvent(eventId, arg1, arg2, arg3, arg4);
+        }
+
         public void Clear()
         {
             foreach (var eventSet in events.Values)
             {
                 foreach (var eventData in eventSet)
                 {
-                    if (eventData is IEventData or IEventData<object[]>)
-                    {
-                        if (eventData is IEventData typedEventData)
-                        {
-                            MessageManager.Instance.RemoveEventListener(typedEventData.GetEvent(), typedEventData.Listener, typedEventData.Handle);
-                        }
-                        else if (eventData is IEventData<object[]> typedEventData1)
-                        {
-                            MessageManager.Instance.RemoveEventListener(typedEventData1.GetEvent(), typedEventData1.Listener, typedEventData1.Handle);
-                        }
-                    }
+                    RemoveFromMessageManager(eventData);
                 }
             }
+
             events.Clear();
             delects.Clear();
         }

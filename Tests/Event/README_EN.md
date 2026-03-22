@@ -34,14 +34,17 @@ private void Start()
     // Global listener (supports both int and enum parameters)
     FF8.Message.AddEventListener(MessageEvent.ApplicationFocus, OnPlayerSpawned, this);
     FF8.Message.AddEventListener(10001, OnPlayerSpawned2, this);
+    FF8.Message.AddEventListener<int, string>(10002, OnPlayerSpawnedNoGC, this);
     
     // Dispatch global message (with/without parameters)
     FF8.Message.DispatchEvent(MessageEvent.ApplicationFocus);
     FF8.Message.DispatchEvent(10001, data);
+    FF8.Message.DispatchEvent(10002, 123123, "asdasd");
     
     // Remove listeners
     FF8.Message.RemoveEventListener(MessageEvent.ApplicationFocus, OnPlayerSpawned, this);
     FF8.Message.RemoveEventListener(10001, OnPlayerSpawned2, this);
+    FF8.Message.RemoveEventListener<int, string>(10002, OnPlayerSpawnedNoGC, this);
 }
 
 private void OnPlayerSpawned()
@@ -59,16 +62,45 @@ private void OnPlayerSpawned2(params object[] obj)
     }
 }
 
+private void OnPlayerSpawnedNoGC(int id, string name)
+{
+    LogF8.Log("OnPlayerSpawnedNoGC");
+    LogF8.Log(id);
+    LogF8.Log(name);
+}
+
 /*--------------------------EventDispatcher Usage--------------------------*/
 // When used on entities/UI, simplifies code with auto-cleanup
 AddEventListener(MessageEvent.ApplicationFocus, OnPlayerSpawned);
+AddEventListener<int, string>(10002, OnPlayerSpawnedNoGC);
 
 // Dispatch global message (with/without parameters)
 DispatchEvent(MessageEvent.ApplicationFocus);
+DispatchEvent(10002, 123123, "asdasd");
 
 // Optional: Clear() will remove all listeners from this script
 RemoveEventListener(MessageEvent.ApplicationFocus, OnPlayerSpawned);
+RemoveEventListener<int, string>(10002, OnPlayerSpawnedNoGC);
 ```
+
+### Zero-GC parameter events
+When the parameter count is fixed, prefer the strongly typed overloads to avoid the `params object[]` array allocation path.
+
+```C#
+FF8.Message.AddEventListener<int, string>(10002, OnPlayerSpawnedNoGC, this);
+FF8.Message.DispatchEvent(10002, 123123, "asdasd");
+FF8.Message.RemoveEventListener<int, string>(10002, OnPlayerSpawnedNoGC, this);
+
+AddEventListener<int, string>(10002, OnPlayerSpawnedNoGC);
+DispatchEvent(10002, 123123, "asdasd");
+RemoveEventListener<int, string>(10002, OnPlayerSpawnedNoGC);
+
+void OnPlayerSpawnedNoGC(int id, string name)
+{
+}
+```
+
+Currently supports 0-4 fixed parameters. If you keep using `Action<object[]>` or `params object[]`, it remains a compatibility path and still allocates.
 
 ## EventDispatcher Usage Guide[（Refer to BaseView.cs）](https://github.com/TippingGame/F8Framework/blob/main/Runtime/UI/Base/BaseView.cs)
 For Demo: Simply drag and attach [(DemoEventDispatcher.cs)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Event/DemoEventDispatcher.cs) to a GameObject  

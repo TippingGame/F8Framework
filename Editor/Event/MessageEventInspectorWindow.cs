@@ -2,6 +2,7 @@ using UnityEditor;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace F8Framework.Core.Editor
 {
@@ -67,6 +68,10 @@ namespace F8Framework.Core.Editor
                 return;
             }
             
+            messageManager = MessageManager.Instance;
+            if (messageManager == null)
+                return;
+            
             DrawToolbar();
             
             var events = MessageManager.Instance.events;
@@ -75,8 +80,7 @@ namespace F8Framework.Core.Editor
                 EditorGUILayout.HelpBox("MessageManager 没有事件监听", MessageType.Info);
                 return;
             }
-            messageManager = MessageManager.Instance;
-                
+            
             DrawStatistics();
             DrawEventsList();
         }
@@ -386,14 +390,9 @@ namespace F8Framework.Core.Editor
 
         private string GetHandleInfo(IEventDataBase eventData)
         {
-            // 直接访问public字段
-            if (eventData is EventData simpleEvent)
+            if (eventData is IEventData typedEventData)
             {
-                return simpleEvent.Handle == null ? "null" : simpleEvent.Handle.ToString();
-            }
-            else if (eventData is EventData<object[]> complexEvent)
-            {
-                return complexEvent.Handle == null ? "null" : complexEvent.Handle.ToString();
+                return typedEventData.Handle == null ? "null" : typedEventData.Handle.ToString();
             }
             
             return "未知类型";
@@ -401,21 +400,21 @@ namespace F8Framework.Core.Editor
 
         private void RemoveListener(IEventDataBase eventData, int eventId)
         {
-            // 由于无法直接知道具体的Action类型，这里提供通用移除方法
-            if (eventData is EventData simpleEvent && simpleEvent.Listener != null)
-            {
-                messageManager.RemoveEventListener(eventId, simpleEvent.Listener, simpleEvent.Handle);
-                Debug.Log($"移除监听器: {simpleEvent.Listener.Method.Name}");
-            }
-            else if (eventData is EventData<object[]> complexEvent && complexEvent.Listener != null)
-            {
-                messageManager.RemoveEventListener(eventId, complexEvent.Listener, complexEvent.Handle);
-                Debug.Log($"移除监听器: {complexEvent.Listener.Method.Name}");
-            }
-            else
+            if (eventData == null)
             {
                 Debug.LogWarning("无法移除该监听器：类型不匹配");
+                return;
             }
+
+            var listener = eventData is IEventData typedEventData ? typedEventData.GetListener() : null;
+            if (listener == null)
+            {
+                Debug.LogWarning("无法移除该监听器：监听器为空");
+                return;
+            }
+
+            eventData.RemoveFrom(messageManager);
+            Debug.Log($"移除监听器: {listener.Method.Name}");
         }
 
         private void RefreshData()

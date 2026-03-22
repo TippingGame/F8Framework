@@ -85,6 +85,26 @@ namespace F8Framework.Core
         {
             EventDispatcher.AddEventListener(eventName, listener, this);
         }
+
+        public void AddEventListener<T, T1>(T eventName, Action<T1> listener) where T : struct, Enum, IConvertible
+        {
+            EventDispatcher.AddEventListener(eventName, listener, this);
+        }
+
+        public void AddEventListener<T, T1, T2>(T eventName, Action<T1, T2> listener) where T : struct, Enum, IConvertible
+        {
+            EventDispatcher.AddEventListener(eventName, listener, this);
+        }
+
+        public void AddEventListener<T, T1, T2, T3>(T eventName, Action<T1, T2, T3> listener) where T : struct, Enum, IConvertible
+        {
+            EventDispatcher.AddEventListener(eventName, listener, this);
+        }
+
+        public void AddEventListener<T, T1, T2, T3, T4>(T eventName, Action<T1, T2, T3, T4> listener) where T : struct, Enum, IConvertible
+        {
+            EventDispatcher.AddEventListener(eventName, listener, this);
+        }
             
         public void RemoveEventListener<T>(T eventName, Action listener) where T : struct, Enum, IConvertible
         {
@@ -92,6 +112,26 @@ namespace F8Framework.Core
         }
             
         public void RemoveEventListener<T>(T eventName, Action<object[]> listener) where T : struct, Enum, IConvertible
+        {
+            EventDispatcher.RemoveEventListener(eventName, listener, this);
+        }
+
+        public void RemoveEventListener<T, T1>(T eventName, Action<T1> listener) where T : struct, Enum, IConvertible
+        {
+            EventDispatcher.RemoveEventListener(eventName, listener, this);
+        }
+
+        public void RemoveEventListener<T, T1, T2>(T eventName, Action<T1, T2> listener) where T : struct, Enum, IConvertible
+        {
+            EventDispatcher.RemoveEventListener(eventName, listener, this);
+        }
+
+        public void RemoveEventListener<T, T1, T2, T3>(T eventName, Action<T1, T2, T3> listener) where T : struct, Enum, IConvertible
+        {
+            EventDispatcher.RemoveEventListener(eventName, listener, this);
+        }
+
+        public void RemoveEventListener<T, T1, T2, T3, T4>(T eventName, Action<T1, T2, T3, T4> listener) where T : struct, Enum, IConvertible
         {
             EventDispatcher.RemoveEventListener(eventName, listener, this);
         }
@@ -105,6 +145,26 @@ namespace F8Framework.Core
         {
             EventDispatcher.DispatchEvent(eventName, arg1);
         }
+
+        public void DispatchEvent<T, T1>(T eventName, T1 arg1) where T : struct, Enum, IConvertible
+        {
+            EventDispatcher.DispatchEvent(eventName, arg1);
+        }
+
+        public void DispatchEvent<T, T1, T2>(T eventName, T1 arg1, T2 arg2) where T : struct, Enum, IConvertible
+        {
+            EventDispatcher.DispatchEvent(eventName, arg1, arg2);
+        }
+
+        public void DispatchEvent<T, T1, T2, T3>(T eventName, T1 arg1, T2 arg2, T3 arg3) where T : struct, Enum, IConvertible
+        {
+            EventDispatcher.DispatchEvent(eventName, arg1, arg2, arg3);
+        }
+
+        public void DispatchEvent<T, T1, T2, T3, T4>(T eventName, T1 arg1, T2 arg2, T3 arg3, T4 arg4) where T : struct, Enum, IConvertible
+        {
+            EventDispatcher.DispatchEvent(eventName, arg1, arg2, arg3, arg4);
+        }
         
         public void AddEventListener(int eventId, Action listener)
         {
@@ -112,6 +172,26 @@ namespace F8Framework.Core
         }
             
         public void AddEventListener(int eventId, Action<object[]> listener)
+        {
+            EventDispatcher.AddEventListener(eventId, listener, this);
+        }
+
+        public void AddEventListener<T1>(int eventId, Action<T1> listener)
+        {
+            EventDispatcher.AddEventListener(eventId, listener, this);
+        }
+
+        public void AddEventListener<T1, T2>(int eventId, Action<T1, T2> listener)
+        {
+            EventDispatcher.AddEventListener(eventId, listener, this);
+        }
+
+        public void AddEventListener<T1, T2, T3>(int eventId, Action<T1, T2, T3> listener)
+        {
+            EventDispatcher.AddEventListener(eventId, listener, this);
+        }
+
+        public void AddEventListener<T1, T2, T3, T4>(int eventId, Action<T1, T2, T3, T4> listener)
         {
             EventDispatcher.AddEventListener(eventId, listener, this);
         }
@@ -125,6 +205,26 @@ namespace F8Framework.Core
         {
             EventDispatcher.RemoveEventListener(eventId, listener, this);
         }
+
+        public void RemoveEventListener<T1>(int eventId, Action<T1> listener)
+        {
+            EventDispatcher.RemoveEventListener(eventId, listener, this);
+        }
+
+        public void RemoveEventListener<T1, T2>(int eventId, Action<T1, T2> listener)
+        {
+            EventDispatcher.RemoveEventListener(eventId, listener, this);
+        }
+
+        public void RemoveEventListener<T1, T2, T3>(int eventId, Action<T1, T2, T3> listener)
+        {
+            EventDispatcher.RemoveEventListener(eventId, listener, this);
+        }
+
+        public void RemoveEventListener<T1, T2, T3, T4>(int eventId, Action<T1, T2, T3, T4> listener)
+        {
+            EventDispatcher.RemoveEventListener(eventId, listener, this);
+        }
             
         public void DispatchEvent(int eventId)
         {
@@ -134,6 +234,26 @@ namespace F8Framework.Core
         public void DispatchEvent(int eventId, params object[] arg1)
         {
             EventDispatcher.DispatchEvent(eventId, arg1);
+        }
+
+        public void DispatchEvent<T1>(int eventId, T1 arg1)
+        {
+            EventDispatcher.DispatchEvent(eventId, arg1);
+        }
+
+        public void DispatchEvent<T1, T2>(int eventId, T1 arg1, T2 arg2)
+        {
+            EventDispatcher.DispatchEvent(eventId, arg1, arg2);
+        }
+
+        public void DispatchEvent<T1, T2, T3>(int eventId, T1 arg1, T2 arg2, T3 arg3)
+        {
+            EventDispatcher.DispatchEvent(eventId, arg1, arg2, arg3);
+        }
+
+        public void DispatchEvent<T1, T2, T3, T4>(int eventId, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+        {
+            EventDispatcher.DispatchEvent(eventId, arg1, arg2, arg3, arg4);
         }
         
         /// <summary>
