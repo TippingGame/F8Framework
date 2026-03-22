@@ -115,9 +115,13 @@ public class UIMain : BaseView
     }
     protected override void OnPlayViewTween()
     {
-        // transform.ScaleTween(Vector3.one, 0.1f).SetEase(Ease.Linear).SetOnComplete(OnViewOpen);
+        // ViewOpenSequence.Append(transform.ScaleTween(Vector3.one, 0.7f));
     }
     protected override void OnViewOpen() { }
+    protected override void OnPlayViewCloseTween()
+    {
+        // ViewCloseSequence.Append(transform.ScaleTween(Vector3.zero, 0.7f));
+    }
     protected override void OnBeforeRemove() { }
     protected override void OnRemoved() { }
     // Auto-generated component bindings below

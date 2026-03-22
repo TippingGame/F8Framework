@@ -10,6 +10,8 @@ namespace F8Framework.Core
         public int UIid;
         public string Guid;
         public object[] Args;
+        private Sequence _viewOpenSequence;
+        private Sequence _viewCloseSequence;
         
         // 消息事件
         private EventDispatcher _eventDispatcher = null;
@@ -42,12 +44,15 @@ namespace F8Framework.Core
 
         public void Added(int uiId, string guid, object[] args = null)
         {
+            CancelViewOpenSequence();
+            CancelViewCloseSequence();
             this.Args = args;
             this.UIid = uiId;
             this.Guid = guid;
             OnAdded(uiId, args);
             OnViewTweenInit();
             OnPlayViewTween();
+            BindOpenSequenceComplete();
         }
 
         protected virtual void OnAdded(int uiId, object[] args = null)
@@ -76,6 +81,14 @@ namespace F8Framework.Core
         {
         }
 
+        protected virtual void OnPlayViewCloseTween()
+        {
+        }
+
+        protected Sequence ViewOpenSequence => _viewOpenSequence ??= SequenceManager.GetSequence();
+
+        protected Sequence ViewCloseSequence => _viewCloseSequence ??= SequenceManager.GetSequence();
+
         protected virtual void ButtonClick(UIBehaviour ui)
         {
         }
@@ -101,6 +114,7 @@ namespace F8Framework.Core
 
         public void BeforeRemove()
         {
+            CancelViewOpenSequence();
             if (_eventDispatcher != null) {
                 _eventDispatcher.Clear();
                 _eventDispatcher = null;
@@ -114,7 +128,76 @@ namespace F8Framework.Core
 
         public void Removed()
         {
+            CancelViewOpenSequence();
+            CancelViewCloseSequence();
             OnRemoved();
+        }
+
+        internal bool TryPlayCloseTween(Action onComplete)
+        {
+            CancelViewOpenSequence();
+            CancelViewCloseSequence();
+            OnPlayViewCloseTween();
+
+            if (_viewCloseSequence == null)
+            {
+                return false;
+            }
+
+            if (!_viewCloseSequence.HasTweens)
+            {
+                CancelViewCloseSequence();
+                return false;
+            }
+
+            _viewCloseSequence.SetOnComplete(() =>
+            {
+                _viewCloseSequence = null;
+                onComplete?.Invoke();
+            });
+            return true;
+        }
+
+        private void BindOpenSequenceComplete()
+        {
+            if (_viewOpenSequence == null)
+            {
+                return;
+            }
+
+            if (!_viewOpenSequence.HasTweens)
+            {
+                CancelViewOpenSequence();
+                return;
+            }
+
+            _viewOpenSequence.SetOnComplete(() =>
+            {
+                _viewOpenSequence = null;
+                OnViewOpen();
+            });
+        }
+
+        private void CancelViewOpenSequence()
+        {
+            if (_viewOpenSequence == null)
+            {
+                return;
+            }
+
+            SequenceManager.KillSequence(_viewOpenSequence);
+            _viewOpenSequence = null;
+        }
+
+        private void CancelViewCloseSequence()
+        {
+            if (_viewCloseSequence == null)
+            {
+                return;
+            }
+
+            SequenceManager.KillSequence(_viewCloseSequence);
+            _viewCloseSequence = null;
         }
 
         protected virtual void OnRemoved()

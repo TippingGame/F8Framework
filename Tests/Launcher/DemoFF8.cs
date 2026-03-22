@@ -31,7 +31,7 @@ namespace F8Framework.Tests
         private static AudioManager _audio;
         // 补间动画
         private static Tween _tween;
-        // UI界面管理-->使用了资产模块
+        // UI界面管理-->使用了资产模块-->使用了补间动画模块
         private static UIManager _ui;
         // 本地化-->使用了配置模块-->使用了资产模块
         private static Localization _localization;

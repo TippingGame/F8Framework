@@ -35,13 +35,13 @@ public class #SCRIPTNAME# : BaseItem
     
     protected override void OnViewTweenInit()
     {
-        //transform.localScale = Vector3.one * 0.7f;
+        // transform.localScale = Vector3.one * 0.7f;
     }
     
     // 自定义打开界面动画
     protected override void OnPlayViewTween()
     {
-        //transform.ScaleTween(Vector3.one, 0.1f).SetEase(Ease.Linear).SetOnComplete(OnViewOpen);
+        // transform.ScaleTween(Vector3.one, 0.1f).SetOnComplete(OnViewOpen);
     }
     
     // 打开界面动画完成后

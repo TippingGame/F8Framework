@@ -26,6 +26,7 @@ namespace F8Framework.Core
 		private Action OnComplete = null;
 		
 		public Action Recycle { get; set; }
+		public bool HasTweens => tweenList.Count > 0 || commandQueue.Count > 0;
 
 		public Sequence()
 		{

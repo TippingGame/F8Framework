@@ -126,18 +126,24 @@ namespace F8Framework.Tests
     
         protected override void OnViewTweenInit()
         {
-            //transform.localScale = Vector3.one * 0.7f;
+            // transform.localScale = Vector3.one * 0.7f;
         }
     
         // 自定义打开界面动画
         protected override void OnPlayViewTween()
         {
-            //transform.ScaleTween(Vector3.one, 0.1f).SetEase(Ease.Linear).SetOnComplete(OnViewOpen);
+            // ViewOpenSequence.Append(transform.ScaleTween(Vector3.one, 0.7f));
         }
     
         // 打开界面动画完成后
         protected override void OnViewOpen()
         {
+        }
+    
+        // 自定义关闭界面动画
+        protected override void OnPlayViewCloseTween()
+        {
+            // ViewCloseSequence.Append(transform.ScaleTween(Vector3.zero, 0.7f));
         }
     
         // 删除之前，每次UI关闭前调用

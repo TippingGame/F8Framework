@@ -166,15 +166,21 @@ public class UIMain : BaseView
         //transform.localScale = Vector3.one * 0.7f;
     }
 
-    // Custom open UI animation
+    // Customize the opening interface animation
     protected override void OnPlayViewTween()
     {
-        //transform.ScaleTween(Vector3.one, 0.1f).SetEase(Ease.Linear).SetOnComplete(OnViewOpen);
+        // ViewOpenSequence.Append(transform.ScaleTween(Vector3.one, 0.7f));
     }
-
-    // After open animation completes
+    
+    // Open interface animation to complete callback
     protected override void OnViewOpen()
     {
+    }
+    
+    // Customize close interface animation
+    protected override void OnPlayViewCloseTween()
+    {
+        // ViewCloseSequence.Append(transform.ScaleTween(Vector3.zero, 0.7f));
     }
 
     // Before deletion, called every time before UI closes
