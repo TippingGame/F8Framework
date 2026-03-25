@@ -29,24 +29,25 @@ public enum MessageEvent
     ApplicationQuit = 10003, // 游戏退出
 }
 
-private object[] data = new object[] { 123123, "asdasd" };
-
 private void Start()
 {
     // 全局监听（参数兼容int和枚举）
     FF8.Message.AddEventListener(MessageEvent.ApplicationFocus, OnPlayerSpawned, this);
-    FF8.Message.AddEventListener(10001, OnPlayerSpawned2, this);
     FF8.Message.AddEventListener<int, string>(10002, OnPlayerSpawnedNoGC, this);
+    FF8.Message.AddEventListener<MessageEvent, int, string>(MessageEvent.ApplicationFocus, OnPlayerSpawnedNoGC, this);
+    FF8.Message.AddEventListener<int, string, bool, float, long, byte, char>(10004, OnPlayerSpawnedT7, this);
     
     // 发送全局消息（不带参数/带参数）
     FF8.Message.DispatchEvent(MessageEvent.ApplicationFocus);
-    FF8.Message.DispatchEvent(10001, data);
     FF8.Message.DispatchEvent(10002, 123123, "asdasd");
+    FF8.Message.DispatchEvent(MessageEvent.ApplicationFocus, 123123, "asdasd");
+    FF8.Message.DispatchEvent(10004, 123123, "asdasd", true, 1.5f, 999L, (byte)7, 'F');
     
     // 移除监听
     FF8.Message.RemoveEventListener(MessageEvent.ApplicationFocus, OnPlayerSpawned, this);
-    FF8.Message.RemoveEventListener(10001, OnPlayerSpawned2, this);
     FF8.Message.RemoveEventListener<int, string>(10002, OnPlayerSpawnedNoGC, this);
+    FF8.Message.RemoveEventListener<MessageEvent, int, string>(MessageEvent.ApplicationFocus, OnPlayerSpawnedNoGC, this);
+    FF8.Message.RemoveEventListener<int, string, bool, float, long, byte, char>(10004, OnPlayerSpawnedT7, this);
 }
 
 private void OnPlayerSpawned()
@@ -54,21 +55,15 @@ private void OnPlayerSpawned()
     LogF8.Log("OnPlayerSpawned");
 }
 
-private void OnPlayerSpawned2(params object[] obj)
-{
-    LogF8.Log("OnPlayerSpawned2");
-    if (obj is { Length: > 0 })
-    {
-        LogF8.Log(obj[0]);
-        LogF8.Log(obj[1]);
-    }
-}
-
 private void OnPlayerSpawnedNoGC(int id, string name)
 {
     LogF8.Log("OnPlayerSpawnedNoGC");
     LogF8.Log(id);
     LogF8.Log(name);
+}
+
+private void OnPlayerSpawnedT7(int id, string name, bool active, float speed, long score, byte level, char rank)
+{
 }
 
 /*--------------------------EventDispatcher用法--------------------------*/
@@ -86,7 +81,7 @@ RemoveEventListener<int, string>(10002, OnPlayerSpawnedNoGC);
 ```
 
 ### 无GC参数事件
-当事件参数个数固定时，优先使用强类型重载，避免 `params object[]` 产生数组分配。
+事件接口已统一为强类型重载，参数固定时直接使用对应泛型方法。
 
 ```C#
 FF8.Message.AddEventListener<int, string>(10002, OnPlayerSpawnedNoGC, this);
@@ -102,7 +97,7 @@ void OnPlayerSpawnedNoGC(int id, string name)
 }
 ```
 
-目前支持 0~4 个固定参数；如果继续使用 `Action<object[]>` / `params object[]`，则仍然是兼容模式，会有分配。
+目前支持 0~7 个固定参数。
 
 ### EventDispatcher使用方法[（参考BaseView.cs）](https://github.com/TippingGame/F8Framework/blob/main/Runtime/UI/Base/BaseView.cs)
 Demo直接拖拽[（DemoEventDispatcher.cs）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Event/DemoEventDispatcher.cs)，挂载到GameObject  

@@ -27,24 +27,25 @@ public enum MessageEvent
     ApplicationQuit = 10003,        // Game quitting
 }
 
-private object[] data = new object[] { 123123, "asdasd" };
-
 private void Start()
 {
     // Global listener (supports both int and enum parameters)
     FF8.Message.AddEventListener(MessageEvent.ApplicationFocus, OnPlayerSpawned, this);
-    FF8.Message.AddEventListener(10001, OnPlayerSpawned2, this);
     FF8.Message.AddEventListener<int, string>(10002, OnPlayerSpawnedNoGC, this);
+    FF8.Message.AddEventListener<MessageEvent, int, string>(MessageEvent.ApplicationFocus, OnPlayerSpawnedNoGC, this);
+    FF8.Message.AddEventListener<int, string, bool, float, long, byte, char>(10004, OnPlayerSpawnedT7, this);
     
     // Dispatch global message (with/without parameters)
     FF8.Message.DispatchEvent(MessageEvent.ApplicationFocus);
-    FF8.Message.DispatchEvent(10001, data);
     FF8.Message.DispatchEvent(10002, 123123, "asdasd");
+    FF8.Message.DispatchEvent(MessageEvent.ApplicationFocus, 123123, "asdasd");
+    FF8.Message.DispatchEvent(10004, 123123, "asdasd", true, 1.5f, 999L, (byte)7, 'F');
     
     // Remove listeners
     FF8.Message.RemoveEventListener(MessageEvent.ApplicationFocus, OnPlayerSpawned, this);
-    FF8.Message.RemoveEventListener(10001, OnPlayerSpawned2, this);
     FF8.Message.RemoveEventListener<int, string>(10002, OnPlayerSpawnedNoGC, this);
+    FF8.Message.RemoveEventListener<MessageEvent, int, string>(MessageEvent.ApplicationFocus, OnPlayerSpawnedNoGC, this);
+    FF8.Message.RemoveEventListener<int, string, bool, float, long, byte, char>(10004, OnPlayerSpawnedT7, this);
 }
 
 private void OnPlayerSpawned()
@@ -52,21 +53,15 @@ private void OnPlayerSpawned()
     LogF8.Log("OnPlayerSpawned");
 }
 
-private void OnPlayerSpawned2(params object[] obj)
-{
-    LogF8.Log("OnPlayerSpawned2");
-    if (obj is { Length: > 0 })
-    {
-        LogF8.Log(obj[0]);
-        LogF8.Log(obj[1]);
-    }
-}
-
 private void OnPlayerSpawnedNoGC(int id, string name)
 {
     LogF8.Log("OnPlayerSpawnedNoGC");
     LogF8.Log(id);
     LogF8.Log(name);
+}
+
+private void OnPlayerSpawnedT7(int id, string name, bool active, float speed, long score, byte level, char rank)
+{
 }
 
 /*--------------------------EventDispatcher Usage--------------------------*/
@@ -84,7 +79,7 @@ RemoveEventListener<int, string>(10002, OnPlayerSpawnedNoGC);
 ```
 
 ### Zero-GC parameter events
-When the parameter count is fixed, prefer the strongly typed overloads to avoid the `params object[]` array allocation path.
+The event API now uses strongly typed overloads only. Use the generic overload matching the fixed parameter count directly.
 
 ```C#
 FF8.Message.AddEventListener<int, string>(10002, OnPlayerSpawnedNoGC, this);
@@ -100,7 +95,7 @@ void OnPlayerSpawnedNoGC(int id, string name)
 }
 ```
 
-Currently supports 0-4 fixed parameters. If you keep using `Action<object[]>` or `params object[]`, it remains a compatibility path and still allocates.
+Currently supports 0-7 fixed parameters.
 
 ## EventDispatcher Usage Guide[（Refer to BaseView.cs）](https://github.com/TippingGame/F8Framework/blob/main/Runtime/UI/Base/BaseView.cs)
 For Demo: Simply drag and attach [(DemoEventDispatcher.cs)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Event/DemoEventDispatcher.cs) to a GameObject  

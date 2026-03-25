@@ -176,4 +176,64 @@ namespace F8Framework.Core
             manager.RemoveEventListener(Event, Listener, Handle);
         }
     }
+
+    public class EventData<T1, T2, T3, T4, T5> : EventDataBase
+    {
+        public Action<T1, T2, T3, T4, T5> Listener;
+
+        public EventData(int eventName, Action<T1, T2, T3, T4, T5> listener, object handle = null) : base(eventName, handle)
+        {
+            Listener = listener;
+        }
+
+        public override Delegate GetListener()
+        {
+            return Listener;
+        }
+
+        public override void RemoveFrom(MessageManager manager)
+        {
+            manager.RemoveEventListener(Event, Listener, Handle);
+        }
+    }
+
+    public class EventData<T1, T2, T3, T4, T5, T6> : EventDataBase
+    {
+        public Action<T1, T2, T3, T4, T5, T6> Listener;
+
+        public EventData(int eventName, Action<T1, T2, T3, T4, T5, T6> listener, object handle = null) : base(eventName, handle)
+        {
+            Listener = listener;
+        }
+
+        public override Delegate GetListener()
+        {
+            return Listener;
+        }
+
+        public override void RemoveFrom(MessageManager manager)
+        {
+            manager.RemoveEventListener(Event, Listener, Handle);
+        }
+    }
+
+    public class EventData<T1, T2, T3, T4, T5, T6, T7> : EventDataBase
+    {
+        public Action<T1, T2, T3, T4, T5, T6, T7> Listener;
+
+        public EventData(int eventName, Action<T1, T2, T3, T4, T5, T6, T7> listener, object handle = null) : base(eventName, handle)
+        {
+            Listener = listener;
+        }
+
+        public override Delegate GetListener()
+        {
+            return Listener;
+        }
+
+        public override void RemoveFrom(MessageManager manager)
+        {
+            manager.RemoveEventListener(Event, Listener, Handle);
+        }
+    }
 }

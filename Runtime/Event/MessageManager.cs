@@ -183,16 +183,6 @@ namespace F8Framework.Core
             AddEventListenerInternal(eventId, new EventData(eventId, listener, handle));
         }
 
-        public void AddEventListener<T>(T eventName, Action<object[]> listener, object handle) where T : Enum, IConvertible
-        {
-            AddEventListener((int)(object)eventName, listener, handle);
-        }
-
-        public void AddEventListener(int eventId, Action<object[]> listener, object handle)
-        {
-            AddEventListenerInternal(eventId, new EventData<object[]>(eventId, listener, handle));
-        }
-
         public void AddEventListener<T, T1>(T eventName, Action<T1> listener, object handle) where T : Enum, IConvertible
         {
             AddEventListener((int)(object)eventName, listener, handle);
@@ -233,6 +223,36 @@ namespace F8Framework.Core
             AddEventListenerInternal(eventId, new EventData<T1, T2, T3, T4>(eventId, listener, handle));
         }
 
+        public void AddEventListener<T, T1, T2, T3, T4, T5>(T eventName, Action<T1, T2, T3, T4, T5> listener, object handle) where T : Enum, IConvertible
+        {
+            AddEventListener((int)(object)eventName, listener, handle);
+        }
+
+        public void AddEventListener<T1, T2, T3, T4, T5>(int eventId, Action<T1, T2, T3, T4, T5> listener, object handle)
+        {
+            AddEventListenerInternal(eventId, new EventData<T1, T2, T3, T4, T5>(eventId, listener, handle));
+        }
+
+        public void AddEventListener<T, T1, T2, T3, T4, T5, T6>(T eventName, Action<T1, T2, T3, T4, T5, T6> listener, object handle) where T : Enum, IConvertible
+        {
+            AddEventListener((int)(object)eventName, listener, handle);
+        }
+
+        public void AddEventListener<T1, T2, T3, T4, T5, T6>(int eventId, Action<T1, T2, T3, T4, T5, T6> listener, object handle)
+        {
+            AddEventListenerInternal(eventId, new EventData<T1, T2, T3, T4, T5, T6>(eventId, listener, handle));
+        }
+
+        public void AddEventListener<T, T1, T2, T3, T4, T5, T6, T7>(T eventName, Action<T1, T2, T3, T4, T5, T6, T7> listener, object handle) where T : Enum, IConvertible
+        {
+            AddEventListener((int)(object)eventName, listener, handle);
+        }
+
+        public void AddEventListener<T1, T2, T3, T4, T5, T6, T7>(int eventId, Action<T1, T2, T3, T4, T5, T6, T7> listener, object handle)
+        {
+            AddEventListenerInternal(eventId, new EventData<T1, T2, T3, T4, T5, T6, T7>(eventId, listener, handle));
+        }
+
         public void RemoveEventListener<T>(T eventName, Action listener, object handle = null) where T : Enum, IConvertible
         {
             RemoveEventListener((int)(object)eventName, listener, handle);
@@ -241,16 +261,6 @@ namespace F8Framework.Core
         public void RemoveEventListener(int eventId, Action listener, object handle = null)
         {
             RemoveEventListenerInternal<EventData>(eventId, eventData => eventData.Listener == listener && eventData.Handle == handle, listener?.Method.Name);
-        }
-
-        public void RemoveEventListener<T>(T eventName, Action<object[]> listener, object handle = null) where T : Enum, IConvertible
-        {
-            RemoveEventListener((int)(object)eventName, listener, handle);
-        }
-
-        public void RemoveEventListener(int eventId, Action<object[]> listener, object handle = null)
-        {
-            RemoveEventListenerInternal<EventData<object[]>>(eventId, eventData => eventData.Listener == listener && eventData.Handle == handle, listener?.Method.Name);
         }
 
         public void RemoveEventListener<T, T1>(T eventName, Action<T1> listener, object handle = null) where T : Enum, IConvertible
@@ -293,6 +303,36 @@ namespace F8Framework.Core
             RemoveEventListenerInternal<EventData<T1, T2, T3, T4>>(eventId, eventData => eventData.Listener == listener && eventData.Handle == handle, listener?.Method.Name);
         }
 
+        public void RemoveEventListener<T, T1, T2, T3, T4, T5>(T eventName, Action<T1, T2, T3, T4, T5> listener, object handle = null) where T : Enum, IConvertible
+        {
+            RemoveEventListener((int)(object)eventName, listener, handle);
+        }
+
+        public void RemoveEventListener<T1, T2, T3, T4, T5>(int eventId, Action<T1, T2, T3, T4, T5> listener, object handle = null)
+        {
+            RemoveEventListenerInternal<EventData<T1, T2, T3, T4, T5>>(eventId, eventData => eventData.Listener == listener && eventData.Handle == handle, listener?.Method.Name);
+        }
+
+        public void RemoveEventListener<T, T1, T2, T3, T4, T5, T6>(T eventName, Action<T1, T2, T3, T4, T5, T6> listener, object handle = null) where T : Enum, IConvertible
+        {
+            RemoveEventListener((int)(object)eventName, listener, handle);
+        }
+
+        public void RemoveEventListener<T1, T2, T3, T4, T5, T6>(int eventId, Action<T1, T2, T3, T4, T5, T6> listener, object handle = null)
+        {
+            RemoveEventListenerInternal<EventData<T1, T2, T3, T4, T5, T6>>(eventId, eventData => eventData.Listener == listener && eventData.Handle == handle, listener?.Method.Name);
+        }
+
+        public void RemoveEventListener<T, T1, T2, T3, T4, T5, T6, T7>(T eventName, Action<T1, T2, T3, T4, T5, T6, T7> listener, object handle = null) where T : Enum, IConvertible
+        {
+            RemoveEventListener((int)(object)eventName, listener, handle);
+        }
+
+        public void RemoveEventListener<T1, T2, T3, T4, T5, T6, T7>(int eventId, Action<T1, T2, T3, T4, T5, T6, T7> listener, object handle = null)
+        {
+            RemoveEventListenerInternal<EventData<T1, T2, T3, T4, T5, T6, T7>>(eventId, eventData => eventData.Listener == listener && eventData.Handle == handle, listener?.Method.Name);
+        }
+
         public void RemoveEventListener<T>(T eventName)
         {
             RemoveEventListener((int)(object)eventName);
@@ -323,39 +363,6 @@ namespace F8Framework.Core
             {
                 var obj = queue.Dequeue();
                 if (obj is EventData eventData)
-                {
-                    eventData.Listener?.Invoke();
-                }
-                else if (obj is EventData<object[]> eventData1)
-                {
-                    eventData1.Listener?.Invoke(null);
-                }
-            }
-
-            FinishDispatch();
-        }
-
-        public void DispatchEvent<T>(T eventName, params object[] arg1) where T : Enum, IConvertible
-        {
-            DispatchEvent((int)(object)eventName, arg1);
-        }
-
-        public void DispatchEvent(int eventId, params object[] arg1)
-        {
-            var queue = CollectDispatchTargets(eventId);
-            if (queue == null)
-            {
-                return;
-            }
-
-            while (queue.Count > 0)
-            {
-                var obj = queue.Dequeue();
-                if (obj is EventData<object[]> eventData1)
-                {
-                    eventData1.Listener?.Invoke(arg1);
-                }
-                else if (obj is EventData eventData)
                 {
                     eventData.Listener?.Invoke();
                 }
@@ -470,6 +477,93 @@ namespace F8Framework.Core
                 if (obj is EventData<T1, T2, T3, T4> eventData)
                 {
                     eventData.Listener?.Invoke(arg1, arg2, arg3, arg4);
+                }
+                else if (obj is EventData eventData0)
+                {
+                    eventData0.Listener?.Invoke();
+                }
+            }
+
+            FinishDispatch();
+        }
+
+        public void DispatchEvent<T, T1, T2, T3, T4, T5>(T eventName, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5) where T : Enum, IConvertible
+        {
+            DispatchEvent((int)(object)eventName, arg1, arg2, arg3, arg4, arg5);
+        }
+
+        public void DispatchEvent<T1, T2, T3, T4, T5>(int eventId, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
+        {
+            var queue = CollectDispatchTargets(eventId);
+            if (queue == null)
+            {
+                return;
+            }
+
+            while (queue.Count > 0)
+            {
+                var obj = queue.Dequeue();
+                if (obj is EventData<T1, T2, T3, T4, T5> eventData)
+                {
+                    eventData.Listener?.Invoke(arg1, arg2, arg3, arg4, arg5);
+                }
+                else if (obj is EventData eventData0)
+                {
+                    eventData0.Listener?.Invoke();
+                }
+            }
+
+            FinishDispatch();
+        }
+
+        public void DispatchEvent<T, T1, T2, T3, T4, T5, T6>(T eventName, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6) where T : Enum, IConvertible
+        {
+            DispatchEvent((int)(object)eventName, arg1, arg2, arg3, arg4, arg5, arg6);
+        }
+
+        public void DispatchEvent<T1, T2, T3, T4, T5, T6>(int eventId, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
+        {
+            var queue = CollectDispatchTargets(eventId);
+            if (queue == null)
+            {
+                return;
+            }
+
+            while (queue.Count > 0)
+            {
+                var obj = queue.Dequeue();
+                if (obj is EventData<T1, T2, T3, T4, T5, T6> eventData)
+                {
+                    eventData.Listener?.Invoke(arg1, arg2, arg3, arg4, arg5, arg6);
+                }
+                else if (obj is EventData eventData0)
+                {
+                    eventData0.Listener?.Invoke();
+                }
+            }
+
+            FinishDispatch();
+        }
+
+        public void DispatchEvent<T, T1, T2, T3, T4, T5, T6, T7>(T eventName, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7) where T : Enum, IConvertible
+        {
+            DispatchEvent((int)(object)eventName, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+        }
+
+        public void DispatchEvent<T1, T2, T3, T4, T5, T6, T7>(int eventId, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
+        {
+            var queue = CollectDispatchTargets(eventId);
+            if (queue == null)
+            {
+                return;
+            }
+
+            while (queue.Count > 0)
+            {
+                var obj = queue.Dequeue();
+                if (obj is EventData<T1, T2, T3, T4, T5, T6, T7> eventData)
+                {
+                    eventData.Listener?.Invoke(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
                 }
                 else if (obj is EventData eventData0)
                 {

@@ -71,17 +71,6 @@ namespace F8Framework.Core
             MessageManager.Instance.AddEventListener(eventId, listener, handle);
         }
 
-        public void AddEventListener<T>(T eventName, Action<object[]> listener, object handle = null) where T : Enum, IConvertible
-        {
-            AddEventListener((int)(object)eventName, listener, handle);
-        }
-
-        public void AddEventListener(int eventId, Action<object[]> listener, object handle = null)
-        {
-            AddEventListenerInternal(eventId, new EventData<object[]>(eventId, listener, handle));
-            MessageManager.Instance.AddEventListener(eventId, listener, handle);
-        }
-
         public void AddEventListener<T, T1>(T eventName, Action<T1> listener, object handle = null) where T : Enum, IConvertible
         {
             AddEventListener((int)(object)eventName, listener, handle);
@@ -126,6 +115,39 @@ namespace F8Framework.Core
             MessageManager.Instance.AddEventListener(eventId, listener, handle);
         }
 
+        public void AddEventListener<T, T1, T2, T3, T4, T5>(T eventName, Action<T1, T2, T3, T4, T5> listener, object handle = null) where T : Enum, IConvertible
+        {
+            AddEventListener((int)(object)eventName, listener, handle);
+        }
+
+        public void AddEventListener<T1, T2, T3, T4, T5>(int eventId, Action<T1, T2, T3, T4, T5> listener, object handle = null)
+        {
+            AddEventListenerInternal(eventId, new EventData<T1, T2, T3, T4, T5>(eventId, listener, handle));
+            MessageManager.Instance.AddEventListener(eventId, listener, handle);
+        }
+
+        public void AddEventListener<T, T1, T2, T3, T4, T5, T6>(T eventName, Action<T1, T2, T3, T4, T5, T6> listener, object handle = null) where T : Enum, IConvertible
+        {
+            AddEventListener((int)(object)eventName, listener, handle);
+        }
+
+        public void AddEventListener<T1, T2, T3, T4, T5, T6>(int eventId, Action<T1, T2, T3, T4, T5, T6> listener, object handle = null)
+        {
+            AddEventListenerInternal(eventId, new EventData<T1, T2, T3, T4, T5, T6>(eventId, listener, handle));
+            MessageManager.Instance.AddEventListener(eventId, listener, handle);
+        }
+
+        public void AddEventListener<T, T1, T2, T3, T4, T5, T6, T7>(T eventName, Action<T1, T2, T3, T4, T5, T6, T7> listener, object handle = null) where T : Enum, IConvertible
+        {
+            AddEventListener((int)(object)eventName, listener, handle);
+        }
+
+        public void AddEventListener<T1, T2, T3, T4, T5, T6, T7>(int eventId, Action<T1, T2, T3, T4, T5, T6, T7> listener, object handle = null)
+        {
+            AddEventListenerInternal(eventId, new EventData<T1, T2, T3, T4, T5, T6, T7>(eventId, listener, handle));
+            MessageManager.Instance.AddEventListener(eventId, listener, handle);
+        }
+
         public void RemoveEventListener<T>(T eventName, Action listener, object handle = null) where T : Enum, IConvertible
         {
             RemoveEventListener((int)(object)eventName, listener, handle);
@@ -134,16 +156,6 @@ namespace F8Framework.Core
         public void RemoveEventListener(int eventId, Action listener, object handle = null)
         {
             RemoveEventListenerInternal<EventData>(eventId, eb => eb.Listener == listener && eb.Handle == handle);
-        }
-
-        public void RemoveEventListener<T>(T eventName, Action<object[]> listener, object handle = null) where T : Enum, IConvertible
-        {
-            RemoveEventListener((int)(object)eventName, listener, handle);
-        }
-
-        public void RemoveEventListener(int eventId, Action<object[]> listener, object handle = null)
-        {
-            RemoveEventListenerInternal<EventData<object[]>>(eventId, eb => eb.Listener == listener && eb.Handle == handle);
         }
 
         public void RemoveEventListener<T, T1>(T eventName, Action<T1> listener, object handle = null) where T : Enum, IConvertible
@@ -186,6 +198,36 @@ namespace F8Framework.Core
             RemoveEventListenerInternal<EventData<T1, T2, T3, T4>>(eventId, eb => eb.Listener == listener && eb.Handle == handle);
         }
 
+        public void RemoveEventListener<T, T1, T2, T3, T4, T5>(T eventName, Action<T1, T2, T3, T4, T5> listener, object handle = null) where T : Enum, IConvertible
+        {
+            RemoveEventListener((int)(object)eventName, listener, handle);
+        }
+
+        public void RemoveEventListener<T1, T2, T3, T4, T5>(int eventId, Action<T1, T2, T3, T4, T5> listener, object handle = null)
+        {
+            RemoveEventListenerInternal<EventData<T1, T2, T3, T4, T5>>(eventId, eb => eb.Listener == listener && eb.Handle == handle);
+        }
+
+        public void RemoveEventListener<T, T1, T2, T3, T4, T5, T6>(T eventName, Action<T1, T2, T3, T4, T5, T6> listener, object handle = null) where T : Enum, IConvertible
+        {
+            RemoveEventListener((int)(object)eventName, listener, handle);
+        }
+
+        public void RemoveEventListener<T1, T2, T3, T4, T5, T6>(int eventId, Action<T1, T2, T3, T4, T5, T6> listener, object handle = null)
+        {
+            RemoveEventListenerInternal<EventData<T1, T2, T3, T4, T5, T6>>(eventId, eb => eb.Listener == listener && eb.Handle == handle);
+        }
+
+        public void RemoveEventListener<T, T1, T2, T3, T4, T5, T6, T7>(T eventName, Action<T1, T2, T3, T4, T5, T6, T7> listener, object handle = null) where T : Enum, IConvertible
+        {
+            RemoveEventListener((int)(object)eventName, listener, handle);
+        }
+
+        public void RemoveEventListener<T1, T2, T3, T4, T5, T6, T7>(int eventId, Action<T1, T2, T3, T4, T5, T6, T7> listener, object handle = null)
+        {
+            RemoveEventListenerInternal<EventData<T1, T2, T3, T4, T5, T6, T7>>(eventId, eb => eb.Listener == listener && eb.Handle == handle);
+        }
+
         public void RemoveEventListener<T>(T eventName)
         {
             RemoveEventListener((int)(object)eventName);
@@ -208,16 +250,6 @@ namespace F8Framework.Core
         public void DispatchEvent(int eventId)
         {
             MessageManager.Instance.DispatchEvent(eventId);
-        }
-
-        public void DispatchEvent<T>(T eventName, params object[] arg1) where T : Enum, IConvertible
-        {
-            MessageManager.Instance.DispatchEvent(eventName, arg1);
-        }
-
-        public void DispatchEvent(int eventId, params object[] arg1)
-        {
-            MessageManager.Instance.DispatchEvent(eventId, arg1);
         }
 
         public void DispatchEvent<T, T1>(T eventName, T1 arg1) where T : Enum, IConvertible
@@ -258,6 +290,36 @@ namespace F8Framework.Core
         public void DispatchEvent<T1, T2, T3, T4>(int eventId, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
         {
             MessageManager.Instance.DispatchEvent(eventId, arg1, arg2, arg3, arg4);
+        }
+
+        public void DispatchEvent<T, T1, T2, T3, T4, T5>(T eventName, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5) where T : Enum, IConvertible
+        {
+            MessageManager.Instance.DispatchEvent(eventName, arg1, arg2, arg3, arg4, arg5);
+        }
+
+        public void DispatchEvent<T1, T2, T3, T4, T5>(int eventId, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
+        {
+            MessageManager.Instance.DispatchEvent(eventId, arg1, arg2, arg3, arg4, arg5);
+        }
+
+        public void DispatchEvent<T, T1, T2, T3, T4, T5, T6>(T eventName, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6) where T : Enum, IConvertible
+        {
+            MessageManager.Instance.DispatchEvent(eventName, arg1, arg2, arg3, arg4, arg5, arg6);
+        }
+
+        public void DispatchEvent<T1, T2, T3, T4, T5, T6>(int eventId, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
+        {
+            MessageManager.Instance.DispatchEvent(eventId, arg1, arg2, arg3, arg4, arg5, arg6);
+        }
+
+        public void DispatchEvent<T, T1, T2, T3, T4, T5, T6, T7>(T eventName, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7) where T : Enum, IConvertible
+        {
+            MessageManager.Instance.DispatchEvent(eventName, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+        }
+
+        public void DispatchEvent<T1, T2, T3, T4, T5, T6, T7>(int eventId, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
+        {
+            MessageManager.Instance.DispatchEvent(eventId, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
         }
 
         public void Clear()

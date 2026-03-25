@@ -5,24 +5,25 @@ namespace F8Framework.Tests
 {
     public class DemoMessageManager : MonoBehaviour
     {
-        private object[] data = new object[] { 123123, "asdasd" };
-
         private void Awake()
         {
             FF8.Message.AddEventListener(MessageEvent.ApplicationFocus, OnPlayerSpawned, this);
-            FF8.Message.AddEventListener(10001, OnPlayerSpawned2, this);
             FF8.Message.AddEventListener<int, string>(10002, OnPlayerSpawnedNoGC, this);
+            FF8.Message.AddEventListener<MessageEvent, int, string>(MessageEvent.ApplicationFocus, OnPlayerSpawnedNoGC, this);
+            FF8.Message.AddEventListener<int, string, bool, float, long, byte, char>(10004, OnPlayerSpawnedT7, this);
         }
 
         private void Start()
         {
             FF8.Message.DispatchEvent(MessageEvent.ApplicationFocus);
-            FF8.Message.DispatchEvent(10001, data);
             FF8.Message.DispatchEvent(10002, 123123, "asdasd");
+            FF8.Message.DispatchEvent(MessageEvent.ApplicationFocus, 123123, "asdasd");
+            FF8.Message.DispatchEvent(10004, 123123, "asdasd", true, 1.5f, 999L, (byte)7, 'F');
             //全局时需要执行RemoveEventListener
             FF8.Message.RemoveEventListener(MessageEvent.ApplicationFocus, OnPlayerSpawned, this);
-            FF8.Message.RemoveEventListener(10001, OnPlayerSpawned2, this);
             FF8.Message.RemoveEventListener<int, string>(10002, OnPlayerSpawnedNoGC, this);
+            FF8.Message.RemoveEventListener<MessageEvent, int, string>(MessageEvent.ApplicationFocus, OnPlayerSpawnedNoGC, this);
+            FF8.Message.RemoveEventListener<int, string, bool, float, long, byte, char>(10004, OnPlayerSpawnedT7, this);
         }
 
         private void OnPlayerSpawned()
@@ -30,21 +31,23 @@ namespace F8Framework.Tests
             LogF8.Log("OnPlayerSpawned");
         }
 
-        private void OnPlayerSpawned2(params object[] obj)
-        {
-            LogF8.Log("OnPlayerSpawned2");
-            if (obj is { Length: > 0 })
-            {
-                LogF8.Log(obj[0]);
-                LogF8.Log(obj[1]);
-            }
-        }
-
         private void OnPlayerSpawnedNoGC(int id, string name)
         {
             LogF8.Log("OnPlayerSpawnedNoGC");
             LogF8.Log(id);
             LogF8.Log(name);
+        }
+
+        private void OnPlayerSpawnedT7(int id, string name, bool active, float speed, long score, byte level, char rank)
+        {
+            LogF8.Log("OnPlayerSpawnedT7");
+            LogF8.Log(id);
+            LogF8.Log(name);
+            LogF8.Log(active);
+            LogF8.Log(speed);
+            LogF8.Log(score);
+            LogF8.Log(level);
+            LogF8.Log(rank);
         }
     }
 }
