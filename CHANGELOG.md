@@ -5,6 +5,7 @@
 2.优化Audio模块优化生成位置  
 3.迁移F8PoolGlobal，迁移SequenceManager  
 4.优化模块卸载逻辑  
+5.优化区分EditorInstance  
 
 ## [2.6.270] - 2025-03-23
 1.新增Event模块Action<T1,T2,T3,T4>泛型多参数方法  
