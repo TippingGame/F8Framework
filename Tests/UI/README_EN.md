@@ -169,7 +169,7 @@ public class UIMain : BaseView
     // Customize the opening interface animation
     protected override void OnPlayViewTween()
     {
-        // ViewOpenSequence.Append(transform.ScaleTween(Vector3.one, 0.7f));
+        // ViewOpenSequence?.Append(transform.ScaleTween(Vector3.one, 0.7f));
     }
     
     // Open interface animation to complete callback
@@ -180,7 +180,7 @@ public class UIMain : BaseView
     // Customize close interface animation
     protected override void OnPlayViewCloseTween()
     {
-        // ViewCloseSequence.Append(transform.ScaleTween(Vector3.zero, 0.7f));
+        // ViewCloseSequence?.Append(transform.ScaleTween(Vector3.zero, 0.7f));
     }
 
     // Before deletion, called every time before UI closes

@@ -62,7 +62,10 @@ namespace F8Framework.Core
         /// </summary>
         public void Abort()
         {
-            if (!IsFinished)
+            if (uwr == null)
+                return;
+
+            if (!uwr.isDone)
                 uwr.Abort();
         }
 
@@ -332,6 +335,7 @@ namespace F8Framework.Core
 
         public void Dispose()
         {
+            Abort();
             uwr?.Dispose();
             uwr = null;
             assetBundleLoadRequest = null;

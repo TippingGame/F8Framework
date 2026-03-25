@@ -29,7 +29,7 @@ namespace F8Framework.Core
 
 		protected virtual void OnDestroy()
 		{
-			Localization.Instance.RemoveLocalizer(this);
+			Localization.Instance?.RemoveLocalizer(this);
 		}
 	}
 }

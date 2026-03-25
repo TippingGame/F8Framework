@@ -14,7 +14,14 @@ namespace F8Framework.Core
         private long tempTime; // 临时时间
         private bool isFocus = true; // 是否处于焦点状态
         private int frameTime = 1; // 帧时间，默认为1
+        private int counter = 0;
 
+        private int GenerateId()
+        {
+            counter++;
+            return counter;
+        }
+        
         public void OnInit(object createParam)
         {
             initTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
@@ -34,9 +41,13 @@ namespace F8Framework.Core
 
         public void OnTermination()
         {
-            MessageManager.Instance.RemoveEventListener(MessageEvent.ApplicationFocus, OnApplicationFocus, this);
-            MessageManager.Instance.RemoveEventListener(MessageEvent.NotApplicationFocus, NotApplicationFocus, this);
+            MessageManager.Instance?.RemoveEventListener(MessageEvent.ApplicationFocus, OnApplicationFocus, this);
+            MessageManager.Instance?.RemoveEventListener(MessageEvent.NotApplicationFocus, NotApplicationFocus, this);
             times.Clear();
+            timerPool.Clear();
+            counter = 0;
+            frameTime = 1;
+            isFocus = true;
             base.Destroy();
         }
 
@@ -127,7 +138,7 @@ namespace F8Framework.Core
         // 注册一个计时器并返回其ID
         public int AddTimer(object handle, float step = 1f, float delay = 0f, int field = 0, Action onSecond = null, Action onComplete = null, bool ignoreTimeScale = false)
         {
-            int id = Guid.NewGuid().GetHashCode(); // 生成一个唯一的ID
+            int id = GenerateId();
             Timer timer = GetTimer(handle, id, step, delay, field, onSecond, onComplete, ignoreTimeScale, false); // 创建一个计时器对象
             times.Add(timer);
             return id;
@@ -176,7 +187,7 @@ namespace F8Framework.Core
         // 注册一个以帧为单位的计时器并返回其ID
         public int AddTimerFrame(object handle, float stepFrame = 1f, float delayFrame = 0f, int field = 0, Action onFrame = null, Action onComplete = null, bool ignoreTimeScale = false)
         {
-            int id = Guid.NewGuid().GetHashCode(); // 生成一个唯一的ID
+            int id = GenerateId();
             Timer timer = GetTimer(handle, id, stepFrame, delayFrame, field, onFrame, onComplete, ignoreTimeScale, true); // 创建一个以帧为单位的计时器对象
             times.Add(timer);
             return id;
@@ -315,8 +326,8 @@ namespace F8Framework.Core
         
         public void AddListenerApplicationFocus()
         {
-            MessageManager.Instance.AddEventListener(MessageEvent.ApplicationFocus, OnApplicationFocus, this);
-            MessageManager.Instance.AddEventListener(MessageEvent.NotApplicationFocus, NotApplicationFocus, this);
+            MessageManager.Instance?.AddEventListener(MessageEvent.ApplicationFocus, OnApplicationFocus, this);
+            MessageManager.Instance?.AddEventListener(MessageEvent.NotApplicationFocus, NotApplicationFocus, this);
         }
 
         // 当应用程序获得焦点时调用

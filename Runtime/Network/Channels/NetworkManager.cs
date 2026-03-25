@@ -9,6 +9,7 @@ namespace F8Framework.Core
         List<INetworkChannel> channelDict;
         List<INetworkChannel> channelDictRemove;
         private Thread netRun;
+        private volatile bool isRunning;
         
         public int NetworkChannelCount => channelDict.Count;
 
@@ -119,6 +120,8 @@ namespace F8Framework.Core
             if (netRun == null)
             {
                 netRun = new Thread(new ThreadStart(ThreadOnUpdate));
+                netRun.IsBackground = true;
+                isRunning = true;
                 netRun.Start();
             }
         }   
@@ -128,7 +131,7 @@ namespace F8Framework.Core
         /// </summary>
         private void ThreadOnUpdate()
         {
-            while (true)
+            while (isRunning)
             {
                 Update();
                 Thread.Sleep(1);
@@ -172,12 +175,22 @@ namespace F8Framework.Core
 
         public void OnTermination()
         {
+            isRunning = false;
+
+            if (netRun != null)
+            {
+                netRun.Join(100);
+                netRun = null;
+            }
+
             for (int i = 0; i < channelDict.Count; i++)
             {
                 channelDict[i].Close();
             }
 
             channelDict.Clear();
+            channelDictRemove.Clear();
+            base.Destroy();
         }
     }
 }

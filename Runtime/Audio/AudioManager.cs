@@ -78,7 +78,7 @@ namespace F8Framework.Core
             AudioMusicAudioEffect.MusicSource.playOnAwake = false;
             AudioMusicAudioEffect.MusicSource.loop = false;
             
-            _audioMusicAudioEffect3D = new AudioEffect();
+            _audioMusicAudioEffect3D = new AudioEffect(transform);
 
             _volumeMusic = PlayerPrefs.GetFloat(_volumeMusicKey, 1f);
             _switchMusic = PlayerPrefs.GetInt(_switchMusicKey, 1) == 1;
@@ -123,11 +123,23 @@ namespace F8Framework.Core
         public void OnTermination()
         {
             StopAll();
-            Tween.Instance.CancelTween(AudioMusic.AudioTween);
-            Tween.Instance.CancelTween(AudioMusicVoice.AudioTween);
-            Tween.Instance.CancelTween(AudioMusicBtnClick.AudioTween);
-            Tween.Instance.CancelTween(AudioMusicUISound.AudioTween);
-            Tween.Instance.CancelTween(AudioMusicAudioEffect.AudioTween);
+
+            Tween.Instance?.CancelTween(AudioMusic.AudioTween);
+            Tween.Instance?.CancelTween(AudioMusicVoice.AudioTween);
+            Tween.Instance?.CancelTween(AudioMusicBtnClick.AudioTween);
+            Tween.Instance?.CancelTween(AudioMusicUISound.AudioTween);
+            Tween.Instance?.CancelTween(AudioMusicAudioEffect.AudioTween);
+
+            UnloadAll(true);
+            _audioMusicAudioEffect3D = null;
+            _audioEffectMixerGroup = null;
+            _audioMixer = null;
+            _transform = null;
+            AudioMusic = null;
+            AudioMusicVoice = null;
+            AudioMusicBtnClick = null;
+            AudioMusicUISound = null;
+            AudioMusicAudioEffect = null;
             
             Destroy(gameObject);
         }

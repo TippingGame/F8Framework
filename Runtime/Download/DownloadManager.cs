@@ -120,10 +120,18 @@ namespace F8Framework.Core
 
         public void OnTermination()
         {
-            foreach (var downloader in downloaders.Values)
+            if (downloaders != null)
             {
-                downloader.CancelDownload();
+                foreach (var downloader in downloaders.Values)
+                {
+                    downloader.CancelDownload();
+                }
+
+                downloaders.Clear();
             }
+
+            downloadRequester = null;
+            downloadUrlHelper = null;
             base.Destroy();
         }
     }

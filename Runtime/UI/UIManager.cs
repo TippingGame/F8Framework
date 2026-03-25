@@ -213,6 +213,16 @@ namespace F8Framework.Core
 
         public void OnTermination()
         {
+            Clear(true);
+            CurrentUIs.Clear();
+            _layers?.Clear();
+            _layerGame = null;
+            _layerUI = null;
+            _layerPopUp = null;
+            _layerDialog = null;
+            _layerNotify = null;
+            _layerGuide = null;
+            _layers = null;
             Destroy(gameObject);
         }
         
@@ -480,11 +490,12 @@ namespace F8Framework.Core
         
         public void Clear(bool isDestroy = true)
         {
-            _layerGame.Clear(isDestroy);
-            _layerUI.Clear(isDestroy);
-            _layerPopUp.Clear(isDestroy);
-            _layerDialog.Clear(isDestroy);
-            _layerGuide.Clear(isDestroy);
+            _layerGame?.Clear(isDestroy);
+            _layerUI?.Clear(isDestroy);
+            _layerPopUp?.Clear(isDestroy);
+            _layerDialog?.Clear(isDestroy);
+            _layerNotify?.Clear(isDestroy);
+            _layerGuide?.Clear(isDestroy);
         }
         
         public void Clear(LayerType layerType, bool isDestroy = false)

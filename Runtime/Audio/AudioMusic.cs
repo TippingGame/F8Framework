@@ -91,8 +91,8 @@ namespace F8Framework.Core
         
         private void StopCurrentPlayback()
         {
-            TimerManager.Instance.RemoveTimer(_timerId);
-            Tween.Instance.CancelTween(AudioTween);
+            TimerManager.Instance?.RemoveTimer(_timerId);
+            Tween.Instance?.CancelTween(AudioTween);
             MusicSource.Stop();
             OnComplete?.Invoke();
         }
@@ -102,8 +102,8 @@ namespace F8Framework.Core
             if (MusicSource.isPlaying)
             {
                 MusicSource.Pause();
-                TimerManager.Instance.Pause(_timerId);
-                Tween.Instance.SetIsPause(AudioTween, true);
+                TimerManager.Instance?.Pause(_timerId);
+                Tween.Instance?.SetIsPause(AudioTween, true);
             }
         }
 
@@ -112,8 +112,8 @@ namespace F8Framework.Core
             if (!MusicSource.isPlaying && MusicSource.clip != null)
             {
                 MusicSource.Play();
-                TimerManager.Instance.Resume(_timerId);
-                Tween.Instance.SetIsPause(AudioTween, false);
+                TimerManager.Instance?.Resume(_timerId);
+                Tween.Instance?.SetIsPause(AudioTween, false);
             }
         }
         
@@ -131,7 +131,7 @@ namespace F8Framework.Core
             StopCurrentPlayback();
             foreach (var item in _audios)
             {
-                AssetManager.Instance.Unload(item.Key, unloadAllLoadedObjects);
+                AssetManager.Instance?.Unload(item.Key, unloadAllLoadedObjects);
             }
             _audios.Clear();
         }

@@ -19,10 +19,10 @@ namespace F8Framework.Core
         private float maxPitch = 1.2f;
         private GameObject OneShotAudio;
         
-        public AudioEffect()
+        public AudioEffect(Transform transform)
         {
-            OneShotAudio = new GameObject("AudioEffect3D", typeof (AudioSource));
-            Object.DontDestroyOnLoad(OneShotAudio);
+            OneShotAudio = new GameObject("AudioEffect3D", typeof(AudioSource));
+            OneShotAudio.transform.SetParent(transform);
         }
         
         public void Load(string url, Vector3 position, float volume = 1f, float spatialBlend = 1f,
@@ -96,7 +96,7 @@ namespace F8Framework.Core
         {
             foreach (var item in _effects)
             {
-                AssetManager.Instance.Unload(item.Key, unloadAllLoadedObjects);
+                AssetManager.Instance?.Unload(item.Key, unloadAllLoadedObjects);
             }
             _effects.Clear();
             _effectsNum.Clear();

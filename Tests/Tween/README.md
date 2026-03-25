@@ -134,7 +134,7 @@ void Start()
     
     /*-----------------------------------------动画组合-----------------------------------------*/
     // 初始化，依次执行动画/并行执行动画，回调
-    var sequence = SequenceManager.GetSequence();
+    var sequence = FF8.Tween.GetSequence();
     
     sequence.Append(valueTween); // 第一个动画
     sequence.Join(gameObjectTween);   // 与第一个动画同时执行
@@ -151,14 +151,14 @@ void Start()
     sequence.RunAtTime(gameObjectTween, 2.0f); // 在2秒时开始执行特定动画
     
     // 回收Sequence，并停止所有动画
-    SequenceManager.KillSequence(sequence);
+    FF8.Tween.KillSequence(sequence);
 }
 
 /*-----------------------------------------使用协程等待动画和动画组-----------------------------------------*/
 IEnumerator Coroutine() {
     yield return gameObject.Move(Vector3.one, 1f);
     
-    var sequence = SequenceManager.GetSequence();
+    var sequence = FF8.Tween.GetSequence();
     var baseTween = gameObject.Move(Vector3.one, 1f);
     sequence.Append(baseTween);
     yield return sequence;
@@ -168,7 +168,7 @@ IEnumerator Coroutine() {
 async void Async() {
     await gameObject.Move(Vector3.one, 1f);
     
-    var sequence = SequenceManager.GetSequence();
+    var sequence = FF8.Tween.GetSequence();
     var baseTween = gameObject.Move(Vector3.one, 1f);
     sequence.Append(baseTween);
     await sequence;

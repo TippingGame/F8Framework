@@ -132,7 +132,7 @@ namespace F8Framework.Tests
         // 自定义打开界面动画
         protected override void OnPlayViewTween()
         {
-            // ViewOpenSequence.Append(transform.ScaleTween(Vector3.one, 0.7f));
+            // ViewOpenSequence?.Append(transform.ScaleTween(Vector3.one, 0.7f));
         }
     
         // 打开界面动画完成后
@@ -143,7 +143,7 @@ namespace F8Framework.Tests
         // 自定义关闭界面动画
         protected override void OnPlayViewCloseTween()
         {
-            // ViewCloseSequence.Append(transform.ScaleTween(Vector3.zero, 0.7f));
+            // ViewCloseSequence?.Append(transform.ScaleTween(Vector3.zero, 0.7f));
         }
     
         // 删除之前，每次UI关闭前调用

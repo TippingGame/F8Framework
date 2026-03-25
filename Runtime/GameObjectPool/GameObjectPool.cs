@@ -8,8 +8,65 @@ using UnityEditor;
 
 namespace F8Framework.Core
 {
-    public class GameObjectPool : ModuleSingleton<GameObjectPool>, IModule
+#if UNITY_EDITOR
+    [DisallowMultipleComponent]
+#endif
+    [UpdateRefresh]
+    [FixedUpdateRefresh]
+    [LateUpdateRefresh]
+    public class GameObjectPool : ModuleSingletonMono<GameObjectPool>, IModule
     {
+        [Header("Main")]
+        [Tooltip(Constants.Tooltips.GlobalUpdateType)]
+        [SerializeField] private UpdateType _updateType = UpdateType.Update;
+
+        [Header("Preload Pools")]
+        [Tooltip(Constants.Tooltips.GlobalPreloadType)]
+        [SerializeField] private PreloadType preloadPoolsType = PreloadType.Disabled;
+
+        [Tooltip(Constants.Tooltips.PoolsToPreload)]
+        [SerializeField] private PoolsPreset poolsPreset;
+
+        [Header("Global Pool Settings")]
+        [Tooltip(Constants.Tooltips.OverflowBehaviour)]
+        [SerializeField] internal BehaviourOnCapacityReached _behaviourOnCapacityReached =
+            Constants.DefaultBehaviourOnCapacityReached;
+
+        [Tooltip(Constants.Tooltips.DespawnType)]
+        [SerializeField] internal DespawnType _despawnType = Constants.DefaultDespawnType;
+
+        [Tooltip(Constants.Tooltips.CallbacksType)]
+        [SerializeField] internal CallbacksType _callbacksType = Constants.DefaultCallbacksType;
+
+        [Tooltip(Constants.Tooltips.Capacity)]
+        [SerializeField, Min(0)] internal int _capacity = 64;
+
+        [Tooltip(Constants.Tooltips.Persistent)]
+        [SerializeField] internal bool _dontDestroyOnLoad = true;
+
+        [Tooltip(Constants.Tooltips.Warnings)]
+        [SerializeField] internal bool _sendWarnings = true;
+
+        [Header("Safety")]
+        [Tooltip(Constants.Tooltips.F8PoolMode)]
+        [SerializeField] internal F8PoolMode _f8PoolMode = Constants.DefaultF8PoolMode;
+
+        [Tooltip(Constants.Tooltips.DelayedDespawnReaction)]
+        [SerializeField] internal ReactionOnRepeatedDelayedDespawn _reactionOnRepeatedDelayedDespawn =
+            Constants.DefaultDelayedDespawnHandleType;
+
+        [Tooltip(Constants.Tooltips.DespawnPersistentClonesOnDestroy)]
+        [SerializeField] private bool _despawnPersistentClonesOnDestroy = true;
+
+        [Tooltip(Constants.Tooltips.CheckClonesForNull)]
+        [SerializeField] private bool _checkClonesForNull = true;
+
+        [Tooltip(Constants.Tooltips.CheckForPrefab)]
+        [SerializeField] private bool _checkForPrefab;
+
+        [Tooltip(Constants.Tooltips.ClearEventsOnDestroy)]
+        [SerializeField] private bool _clearEventsOnDestroy;
+
         internal readonly Dictionary<GameObject, Poolable> ClonesMap =
             new Dictionary<GameObject, Poolable>(Constants.DefaultClonesCapacity);
 
@@ -22,7 +79,6 @@ namespace F8Framework.Core
         internal bool s_despawnPersistentClonesOnDestroy = true;
         internal bool s_checkClonesForNull = true;
         internal bool s_checkForPrefab = false;
-        internal F8PoolGlobal s_instance = null;
 
         private readonly Dictionary<GameObject, F8GameObjectPool> AllPoolsMap =
             new Dictionary<GameObject, F8GameObjectPool>(Constants.DefaultPoolsMapCapacity);
@@ -38,39 +94,47 @@ namespace F8Framework.Core
 
         private readonly object SecurityLock = new object();
 
-        private BehaviourOnCapacityReached BehaviourOnCapacityReached => s_hasTheF8PoolInitialized
-            ? s_instance._behaviourOnCapacityReached
-            : Constants.DefaultBehaviourOnCapacityReached;
+        private BehaviourOnCapacityReached BehaviourOnCapacityReached => _behaviourOnCapacityReached;
 
-        private DespawnType DespawnType => s_hasTheF8PoolInitialized
-            ? s_instance._despawnType
-            : Constants.DefaultDespawnType;
+        private DespawnType DespawnType => _despawnType;
 
-        private CallbacksType CallbacksType => s_hasTheF8PoolInitialized
-            ? s_instance._callbacksType
-            : Constants.DefaultCallbacksType;
+        private CallbacksType CallbacksType => _callbacksType;
 
-        private ReactionOnRepeatedDelayedDespawn ReactionOnRepeatedDelayedDespawn =>
-            s_hasTheF8PoolInitialized
-                ? s_instance._reactionOnRepeatedDelayedDespawn
-                : Constants.DefaultDelayedDespawnHandleType;
+        private ReactionOnRepeatedDelayedDespawn ReactionOnRepeatedDelayedDespawn => _reactionOnRepeatedDelayedDespawn;
 
-        private int Capacity => s_hasTheF8PoolInitialized
-            ? s_instance._capacity
-            : Constants.DefaultPoolCapacity;
+        private int Capacity => _capacity;
 
-        private bool Persistent => s_hasTheF8PoolInitialized
-            ? s_instance._dontDestroyOnLoad
-            : Constants.DefaultPoolPersistenceStatus;
+        private bool Persistent => _dontDestroyOnLoad;
 
-        private bool Warnings => s_hasTheF8PoolInitialized
-            ? s_instance._sendWarnings
-            : Constants.DefaultSendWarningsStatus;
+        private bool Warnings => _sendWarnings;
 
         /// <summary>
         /// The actions will be performed on a game object created in any pool.
         /// </summary>
         public readonly F8PoolEvent<GameObject> GameObjectInstantiated = new F8PoolEvent<GameObject>();
+
+        private void Start()
+        {
+            PreloadPools(PreloadType.OnStart);
+        }
+
+        private void OnApplicationQuit()
+        {
+            s_isApplicationQuitting = true;
+        }
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            if (Application.isPlaying == false || Instance != this)
+                return;
+
+            s_f8PoolMode = _f8PoolMode;
+            s_checkForPrefab = _checkForPrefab;
+            s_checkClonesForNull = _checkClonesForNull;
+            s_despawnPersistentClonesOnDestroy = _despawnPersistentClonesOnDestroy;
+        }
+#endif
 
         /// <summary>
         /// Installs a pools by PoolPreset.
@@ -667,6 +731,7 @@ namespace F8Framework.Core
         {
             ResetLists();
             ResetClonesDictionary();
+            ResetPoolDictionaries();
             HandlePersistentPoolsOnDestroy();
             s_hasTheF8PoolInitialized = false;
         }
@@ -701,45 +766,11 @@ namespace F8Framework.Core
         {
             lock (SecurityLock)
             {
-                if (s_instance == null)
-                {
-                    if (TryFindF8PoolInstanceAsSingle(out s_instance) == false)
-                    {
-                        CreateF8PoolInstance();
-#if DEBUG
-                        LogF8.LogEntity($"<{nameof(F8PoolGlobal)}> 实例已自动创建。也可以手动添加以修改默认参数。");
-#endif
-                    }
-                }
+                if (s_hasTheF8PoolInitialized)
+                    return;
 
-                s_hasTheF8PoolInitialized = true;
+                Initialize();
             }
-        }
-
-        private bool TryFindF8PoolInstanceAsSingle(out F8PoolGlobal f8Pool)
-        {
-            var instances = Object.FindObjectsOfType<F8PoolGlobal>();
-            var length = instances.Length;
-
-            if (length > 0)
-            {
-#if DEBUG
-                if (length > 1)
-                {
-                    for (var i = 1; i < length; i++)
-                    {
-                        Object.Destroy(instances[i]);
-                    }
-
-                    LogF8.LogError($"场景中 {nameof(F8PoolGlobal)} 实例的数量大于一个！");
-                }
-#endif
-                f8Pool = instances[0];
-                return true;
-            }
-
-            f8Pool = null;
-            return false;
         }
 
         private F8GameObjectPool GetPoolByPrefabOrCreate(GameObject prefab)
@@ -761,11 +792,6 @@ namespace F8Framework.Core
             }
 
             return pool;
-        }
-
-        private void CreateF8PoolInstance()
-        {
-            s_instance = F8PoolGlobal.Instance;
         }
 
         private F8GameObjectPool CreateNewGameObjectPool(GameObject prefab)
@@ -984,9 +1010,9 @@ namespace F8Framework.Core
             if (s_isApplicationQuitting)
             {
 #if UNITY_EDITOR
-                if (UnityEditor.EditorSettings.enterPlayModeOptionsEnabled && s_instance == null)
+                if (EditorSettings.enterPlayModeOptionsEnabled && Instance == null)
                 {
-                    LogF8.LogError($"<{nameof(F8PoolGlobal)}> 实例为空！");
+                    LogF8.LogError($"<{nameof(GameObjectPool)}> 实例为空！");
                 }
 #endif
                 return false;
@@ -1171,10 +1197,13 @@ namespace F8Framework.Core
 
         private void ResetClonesDictionary()
         {
-            if (s_isApplicationQuitting)
-            {
-                ClonesMap.Clear();
-            }
+            ClonesMap.Clear();
+        }
+
+        private void ResetPoolDictionaries()
+        {
+            AllPoolsMap.Clear();
+            PersistentPoolsMap.Clear();
         }
 
         private void ClearListAndSetCapacity<T>(List<T> list, int capacity)
@@ -1191,23 +1220,112 @@ namespace F8Framework.Core
 
         public void OnInit(object createParam)
         {
+            Initialize();
+            PreloadPools(PreloadType.OnAwake);
         }
 
         public void OnUpdate()
         {
+            if (_updateType == UpdateType.Update)
+            {
+                HandleDespawnRequests(Time.deltaTime);
+            }
         }
 
         public void OnLateUpdate()
         {
+            if (_updateType == UpdateType.LateUpdate)
+            {
+                HandleDespawnRequests(Time.deltaTime);
+            }
         }
 
         public void OnFixedUpdate()
         {
+            if (_updateType == UpdateType.FixedUpdate)
+            {
+                HandleDespawnRequests(Time.fixedDeltaTime);
+            }
         }
 
         public void OnTermination()
         {
-            base.Destroy();
+            DestroyRegisteredPools(Application.isPlaying == false);
+            ResetPool();
+
+            if (_clearEventsOnDestroy || s_isApplicationQuitting)
+            {
+                GameObjectInstantiated.Clear();
+            }
+
+            Destroy(gameObject);
+        }
+
+        private void Initialize()
+        {
+#if DEBUG
+            if (Instance != null && Instance != this)
+                LogF8.LogError($"场景中的 {nameof(GameObjectPool)} 实例数量大于一个！");
+
+            if (enabled == false)
+                LogF8.LogEntity($"<{nameof(GameObjectPool)}> 实例已禁用！因此，某些功能可能无法正常工作！", this);
+#endif
+            s_isApplicationQuitting = false;
+            s_hasTheF8PoolInitialized = true;
+            s_f8PoolMode = _f8PoolMode;
+            s_checkForPrefab = _checkForPrefab;
+            s_checkClonesForNull = _checkClonesForNull;
+            s_despawnPersistentClonesOnDestroy = _despawnPersistentClonesOnDestroy;
+        }
+
+        private void PreloadPools(PreloadType requiredType)
+        {
+            if (requiredType != preloadPoolsType)
+                return;
+
+            InstallPools(poolsPreset);
+        }
+
+        private void DestroyRegisteredPools(bool immediately)
+        {
+            if (AllPoolsMap.Count == 0)
+                return;
+
+            var pools = new List<F8GameObjectPool>(AllPoolsMap.Values);
+            foreach (F8GameObjectPool pool in pools)
+            {
+                if (pool == null)
+                    continue;
+
+                if (immediately)
+                    pool.DestroyPoolImmediate();
+                else
+                    pool.DestroyPool();
+            }
+        }
+
+        private void HandleDespawnRequests(float deltaTime)
+        {
+            for (int i = 0; i < DespawnRequests._count; i++)
+            {
+                ref DespawnRequest request = ref DespawnRequests._components[i];
+
+                if (request.Poolable._status == PoolableStatus.Despawned)
+                {
+                    DespawnRequests.RemoveUnorderedAt(i);
+                    i--;
+                    continue;
+                }
+
+                request.TimeToDespawn -= deltaTime;
+
+                if (request.TimeToDespawn <= 0f)
+                {
+                    DespawnImmediate(request.Poolable);
+                    DespawnRequests.RemoveUnorderedAt(i);
+                    i--;
+                }
+            }
         }
     }
 }

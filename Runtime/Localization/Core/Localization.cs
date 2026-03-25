@@ -39,8 +39,8 @@ namespace F8Framework.Core
             {
                 try
                 {
-                    Util.Assembly.InvokeMethod("F8DataManager", "LoadLocalizedStrings", new object[] { });
-                    tb = Util.Assembly.InvokeMethod("F8DataManager", "GetLocalizedStrings", new object[] { }) as IDictionary;
+                    Util.Assembly.InvokeMethod("F8DataManager", "LoadLocalizedStrings", "EditorInstance", new object[] { });
+                    tb = Util.Assembly.InvokeMethod("F8DataManager", "GetLocalizedStrings", "EditorInstance", new object[] { }) as IDictionary;
                 }
                 catch
                 {
@@ -52,7 +52,7 @@ namespace F8Framework.Core
                 try
                 {
                     ReadExcel.Instance.LoadAllExcelData();
-                    tb = Util.Assembly.InvokeMethod("F8DataManager", "GetLocalizedStrings", new object[] { }) as IDictionary;
+                    tb = Util.Assembly.InvokeMethod("F8DataManager", "GetLocalizedStrings", "EditorInstance", new object[] { }) as IDictionary;
                 }
                 catch
                 {
@@ -319,6 +319,10 @@ namespace F8Framework.Core
 
         public void OnTermination()
         {
+            Localizers.Clear();
+            LanguageList.Clear();
+            LocalizedStrings.Clear();
+            CurrentLanguageName = null;
             base.Destroy();
         }
     }

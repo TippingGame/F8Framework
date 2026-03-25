@@ -617,6 +617,11 @@ namespace F8Framework.Core.Editor
             source.Append("\t\t}\n\n");
             source.Append("\t\tpublic void OnTermination()\n");
             source.Append("\t\t{\n");
+            foreach (string t in types)
+            {
+                source.Append("\t\t\tp_" + t + " = null;\n");
+            }
+            source.Append("\t\t\tVariantName = null;\n");
             source.Append("\t\t\tbase.Destroy();\n");
             source.Append("\t\t}\n");
             source.Append("\t}\n");

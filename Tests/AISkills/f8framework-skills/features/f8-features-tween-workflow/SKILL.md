@@ -112,7 +112,7 @@ rectTransform.MoveUI(new Vector2(1f, 1f), canvasRect, 1f)
 
 ### Sequences
 ```csharp
-var seq = SequenceManager.GetSequence();
+var seq = FF8.Tween.GetSequence();
 seq.Append(tween1);                   // Sequential
 seq.Join(tween2);                     // Parallel with previous
 seq.Append(() => LogF8.Log("Done"));  // Callback
@@ -120,7 +120,7 @@ seq.SetOnComplete(() => { });
 seq.SetLoops(3);                      // -1 = infinite
 seq.RunAtTime(() => { }, 1.5f);       // Event at specific time
 seq.RunAtTime(tween3, 2.0f);          // Tween at specific time
-SequenceManager.KillSequence(seq);    // Stop and recycle
+FF8.Tween.KillSequence(seq);    // Stop and recycle
 ```
 
 ### Coroutine and async support

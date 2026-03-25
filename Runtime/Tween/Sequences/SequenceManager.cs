@@ -1,40 +1,20 @@
-﻿using System.Collections.Generic;
-
 namespace F8Framework.Core
 {
 	public static class SequenceManager
 	{
-		private static Stack<Sequence> sequencePool = new Stack<Sequence>();
-		
 		public static Sequence GetSequence()
 		{
-			if (sequencePool.Count <= 0)
-			{
-				return ProcessSequence(new Sequence(), false);
-			}
-
-			return ProcessSequence(sequencePool.Pop());
-		}
-
-		private static Sequence ProcessSequence(Sequence sequence, bool reset = true)
-		{
-			if (reset)
-			{
-				sequence.Reset();
-			}
-
-			sequence.Recycle = sequence.KillSequence;
-			Tween.Instance.OnUpdateAction += sequence.Update;
-			return sequence;
+			return Tween.Instance?.GetSequence();
 		}
 
 		public static void KillSequence(this Sequence sequence)
 		{
-			Tween.Instance.OnUpdateAction -= sequence.Update;
-			sequence.Reset();
-			sequencePool.Push(sequence);
+			Tween.Instance?.KillSequence(sequence);
+		}
+		
+		public static void KillAllSequences()
+		{
+			Tween.Instance?.KillAllSequences();
 		}
 	}
-
 }
-

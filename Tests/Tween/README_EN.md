@@ -133,7 +133,7 @@ void Start()
     
     /*-----------------------------------------Animation Sequences-----------------------------------------*/
     // Initialize, execute animations sequentially/parallel, with callbacks
-    var sequence = SequenceManager.GetSequence();
+    var sequence = FF8.Tween.GetSequence();
     
     sequence.Append(valueTween); // First animation
     sequence.Join(gameObjectTween);   // Execute simultaneously with first animation
@@ -150,14 +150,14 @@ void Start()
     sequence.RunAtTime(gameObjectTween, 2.0f); // Start specific animation at 2 seconds
     
     // Recycle Sequence and stop all animations
-    SequenceManager.KillSequence(sequence);
+    FF8.Tween.KillSequence(sequence);
 }
 
 /*-----------------------------------------Using Coroutines to Wait for Animations and Sequences-----------------------------------------*/
 IEnumerator Coroutine() {
     yield return gameObject.Move(Vector3.one, 1f);
     
-    var sequence = SequenceManager.GetSequence();
+    var sequence = FF8.Tween.GetSequence();
     var baseTween = gameObject.Move(Vector3.one, 1f);
     sequence.Append(baseTween);
     yield return sequence;
@@ -167,7 +167,7 @@ IEnumerator Coroutine() {
 async void Async() {
     await gameObject.Move(Vector3.one, 1f);
     
-    var sequence = SequenceManager.GetSequence();
+    var sequence = FF8.Tween.GetSequence();
     var baseTween = gameObject.Move(Vector3.one, 1f);
     sequence.Append(baseTween);
     await sequence;

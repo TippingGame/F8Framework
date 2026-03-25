@@ -97,6 +97,11 @@ namespace F8Framework.Core
 
         public void OnTermination()
         {
+            Application.logMessageReceived -= LogHandler;
+            OnQuitGame();
+            logInfos.Clear();
+            writer?.Dispose();
+            writer = null;
             base.Destroy();
         }
         
@@ -108,7 +113,7 @@ namespace F8Framework.Core
             
             if (Application.isEditor) return;
             
-            Application.logMessageReceived += (LogHandler);
+            Application.logMessageReceived += LogHandler;
 
             var files = Directory.GetFiles(Application.persistentDataPath, "log-*.txt",
                 SearchOption.TopDirectoryOnly);

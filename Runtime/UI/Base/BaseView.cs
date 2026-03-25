@@ -85,9 +85,9 @@ namespace F8Framework.Core
         {
         }
 
-        protected Sequence ViewOpenSequence => _viewOpenSequence ??= SequenceManager.GetSequence();
+        protected Sequence ViewOpenSequence => _viewOpenSequence ??= Tween.Instance?.GetSequence();
 
-        protected Sequence ViewCloseSequence => _viewCloseSequence ??= SequenceManager.GetSequence();
+        protected Sequence ViewCloseSequence => _viewCloseSequence ??= Tween.Instance?.GetSequence();
 
         protected virtual void ButtonClick(UIBehaviour ui)
         {
@@ -185,7 +185,7 @@ namespace F8Framework.Core
                 return;
             }
 
-            SequenceManager.KillSequence(_viewOpenSequence);
+            Tween.Instance.KillSequence(_viewOpenSequence);
             _viewOpenSequence = null;
         }
 
@@ -196,7 +196,7 @@ namespace F8Framework.Core
                 return;
             }
 
-            SequenceManager.KillSequence(_viewCloseSequence);
+            Tween.Instance.KillSequence(_viewCloseSequence);
             _viewCloseSequence = null;
         }
 

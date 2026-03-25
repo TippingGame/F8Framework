@@ -146,7 +146,7 @@ namespace F8Framework.Core
                 string _class = "F8DataManager";
                 string method= "RuntimeLoadAll";
                 object[] parameters = new object[] { objs };
-                Util.Assembly.InvokeMethod(_class, method, parameters);
+                Util.Assembly.InvokeMethod(_class, method, "EditorInstance", parameters);
             }
             LogF8.LogConfig("<color=green>运行时导表成功！</color>");
         }

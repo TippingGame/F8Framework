@@ -313,6 +313,10 @@ namespace F8Framework.Core
 
         public void OnTermination()
         {
+            DestoryAllFSM();
+            fsmDict = null;
+            fsmGroupDict = null;
+            fsmCache = null;
             base.Destroy();
         }
     }

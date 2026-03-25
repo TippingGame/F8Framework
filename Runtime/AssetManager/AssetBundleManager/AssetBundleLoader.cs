@@ -391,12 +391,12 @@ namespace F8Framework.Core
         /// </param>
         public virtual void Unload(bool unloadAllLoadedObjects = false)
         {
+            if (assetBundleContent == null)
+                return;
+            
             unloadType = LoaderType.LOCAL_SYNC;
-            if (assetBundleContent != null)
-            {
-                assetBundleContent.Unload(unloadAllLoadedObjects);
-                bundleStream?.Close();
-            }
+            assetBundleContent.Unload(unloadAllLoadedObjects);
+            bundleStream?.Close();
             if (unloadAllLoadedObjects)
             {
                 ClearLoadedData();
@@ -414,17 +414,20 @@ namespace F8Framework.Core
         /// <param name="callback">异步卸载完成的回调。</param>
         public virtual void UnloadAsync(bool unloadAllLoadedObjects = false, OnUnloadFinished callback = null)
         {
-            if (assetBundleContent == null)
-                assetBundleUnloadState = LoaderState.FINISHED;
-
             onUnloadFinished += callback;
-
+            
+            if (assetBundleContent == null)
+                return;
+            
             if (assetBundleUnloadState == LoaderState.NONE)
             {
                 assetBundleUnloadState = LoaderState.WORKING;
                 unloadType = LoaderType.LOCAL_ASYNC;
                 assetBundleUnloadRequest = assetBundleContent.UnloadAsync(unloadAllLoadedObjects);
-                ClearLoadedData();
+                if (unloadAllLoadedObjects)
+                {
+                    ClearLoadedData();
+                }
             }
         }
         
@@ -696,8 +699,11 @@ namespace F8Framework.Core
         {
             assetBundlePath = "";
             assetPaths.Clear();
-            if (assetBundleContent != null)
-                Unload(unloadAllLoadedObjects);
+            if (assetBundleLoadRequest?.assetBundle)
+            {
+                assetBundleLoadRequest?.assetBundle.Unload(unloadAllLoadedObjects);
+            }
+            Unload(unloadAllLoadedObjects);
 
             loadType = LoaderType.NONE;
             unloadType = LoaderType.NONE;
@@ -705,7 +711,7 @@ namespace F8Framework.Core
             assetBundleLoadState = LoaderState.NONE;
             assetBundleExpandState = LoaderState.NONE;
             assetBundleUnloadState = LoaderState.NONE;
-
+            
             assetBundleLoadRequest = null;
             assetBundleDownloadRequest?.Dispose();
             assetBundleDownloadRequest = null;

@@ -1907,6 +1907,21 @@ namespace F8Framework.Core
 
             public void OnTermination()
             {
+                _assetBundleManager = null;
+                _resourcesManager = null;
+                AssetBundleMap.Mappings.Clear();
+                ResourceMap.Mappings.Clear();
+
+                if (ModuleCenter.Contains<AssetBundleManager>())
+                {
+                    ModuleCenter.DestroyModule<AssetBundleManager>();
+                }
+
+                if (ModuleCenter.Contains<ResourcesManager>())
+                {
+                    ModuleCenter.DestroyModule<ResourcesManager>();
+                }
+
                 base.Destroy();
             }
     }

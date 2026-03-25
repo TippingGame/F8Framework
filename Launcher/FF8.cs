@@ -57,11 +57,7 @@ namespace F8Framework.Launcher
                     _message = ModuleCenter.CreateModule<MessageManager>();
                 return _message;
             }
-            set
-            {
-                if (_message == null)
-                    _message = value;
-            }
+            set => _message = value;
         }
 
         public static InputManager Input
@@ -72,11 +68,7 @@ namespace F8Framework.Launcher
                     _inputManager = ModuleCenter.CreateModule<InputManager>(new DefaultInputHelper());
                 return _inputManager;
             }
-            set
-            {
-                if (_inputManager == null)
-                    _inputManager = value;
-            }
+            set => _inputManager = value;
         }
         
         public static StorageManager Storage
@@ -87,11 +79,7 @@ namespace F8Framework.Launcher
                     _storage = ModuleCenter.CreateModule<StorageManager>();
                 return _storage;
             }
-            set
-            {
-                if (_storage == null)
-                    _storage = value;
-            }
+            set => _storage = value;
         }
 
         public static TimerManager Timer
@@ -102,11 +90,7 @@ namespace F8Framework.Launcher
                     _timer = ModuleCenter.CreateModule<TimerManager>();
                 return _timer;
             }
-            set
-            {
-                if (_timer == null)
-                    _timer = value;
-            }
+            set => _timer = value;
         }
 
         public static ProcedureManager Procedure
@@ -117,11 +101,7 @@ namespace F8Framework.Launcher
                     _procedure = ModuleCenter.CreateModule<ProcedureManager>();
                 return _procedure;
             }
-            set
-            {
-                if (_procedure == null)
-                    _procedure = value;
-            }
+            set => _procedure = value;
         }
 
         public static NetworkManager Network
@@ -132,11 +112,7 @@ namespace F8Framework.Launcher
                     _networkManager = ModuleCenter.CreateModule<NetworkManager>();
                 return _networkManager;
             }
-            set
-            {
-                if (_networkManager == null)
-                    _networkManager = value;
-            }
+            set => _networkManager = value;
         }
         
         public static FSMManager FSM
@@ -147,11 +123,7 @@ namespace F8Framework.Launcher
                     _fsm = ModuleCenter.CreateModule<FSMManager>();
                 return _fsm;
             }
-            set
-            {
-                if (_fsm == null)
-                    _fsm = value;
-            }
+            set => _fsm = value;
         }
 
         public static GameObjectPool GameObjectPool
@@ -161,19 +133,11 @@ namespace F8Framework.Launcher
                 if (_gameObjectPool == null)
                 {
                     _gameObjectPool = ModuleCenter.CreateModule<GameObjectPool>();
-                    ModuleCenter.CreateModule<F8PoolGlobal>();
                 }
                     
                 return _gameObjectPool;
             }
-            set
-            {
-                if (_gameObjectPool == null)
-                {
-                    _gameObjectPool = value;
-                    ModuleCenter.CreateModule<F8PoolGlobal>();
-                }
-            }
+            set => _gameObjectPool = value;
         }
 
         public static AssetManager Asset
@@ -184,11 +148,7 @@ namespace F8Framework.Launcher
                     _asset = ModuleCenter.CreateModule<AssetManager>();
                 return _asset;
             }
-            set
-            {
-                if (_asset == null)
-                    _asset = value;
-            }
+            set => _asset = value;
         }
         
         public static F8DataManager Config
@@ -199,11 +159,7 @@ namespace F8Framework.Launcher
                     _config = ModuleCenter.CreateModule<F8DataManager>();
                 return _config;
             }
-            set
-            {
-                if (_config == null)
-                    _config = value;
-            }
+            set => _config = value;
         }
         
         public static AudioManager Audio
@@ -214,11 +170,7 @@ namespace F8Framework.Launcher
                     _audio = ModuleCenter.CreateModule<AudioManager>();
                 return _audio;
             }
-            set
-            {
-                if (_audio == null)
-                    _audio = value;
-            }
+            set => _audio = value;
         }
 
         public static Tween Tween
@@ -229,11 +181,7 @@ namespace F8Framework.Launcher
                     _tween = ModuleCenter.CreateModule<Tween>();
                 return _tween;
             }
-            set
-            {
-                if (_tween == null)
-                    _tween = value;
-            }
+            set => _tween = value;
         }
 
         public static UIManager UI
@@ -244,11 +192,7 @@ namespace F8Framework.Launcher
                     _ui = ModuleCenter.CreateModule<UIManager>();
                 return _ui;
             }
-            set
-            {
-                if (_ui == null)
-                    _ui = value;
-            }
+            set => _ui = value;
         }
 
         public static Localization Local
@@ -259,11 +203,7 @@ namespace F8Framework.Launcher
                     _localization = ModuleCenter.CreateModule<Localization>(F8DataManager.Instance.GetLocalizedStrings());
                 return _localization;
             }
-            set
-            {
-                if (_localization == null)
-                    _localization = value;
-            }
+            set => _localization = value;
         }
         
         public static SDKManager SDK
@@ -274,11 +214,7 @@ namespace F8Framework.Launcher
                     _sdkManager = ModuleCenter.CreateModule<SDKManager>();
                 return _sdkManager;
             }
-            set
-            {
-                if (_sdkManager == null)
-                    _sdkManager = value;
-            }
+            set => _sdkManager = value;
         }
         
         public static DownloadManager Download
@@ -289,11 +225,7 @@ namespace F8Framework.Launcher
                     _downloadManager = ModuleCenter.CreateModule<DownloadManager>();
                 return _downloadManager;
             }
-            set
-            {
-                if (_downloadManager == null)
-                    _downloadManager = value;
-            }
+            set => _downloadManager = value;
         }
         
         public static F8LogWriter LogWriter
@@ -304,11 +236,7 @@ namespace F8Framework.Launcher
                     _logWriter = ModuleCenter.CreateModule<F8LogWriter>();
                 return _logWriter;
             }
-            set
-            {
-                if (_logWriter == null)
-                    _logWriter = value;
-            }
+            set => _logWriter = value;
         }
         
         public static HotUpdateManager HotUpdate
@@ -319,11 +247,7 @@ namespace F8Framework.Launcher
                     _hotUpdateManager = ModuleCenter.CreateModule<HotUpdateManager>();
                 return _hotUpdateManager;
             }
-            set
-            {
-                if (_hotUpdateManager == null)
-                    _hotUpdateManager = value;
-            }
+            set => _hotUpdateManager = value;
         }
     }
 }

@@ -73,7 +73,7 @@ namespace F8Framework.Core
 		/// </summary>
 		public static void Update()
 		{
-			if (_frame < 2)
+			if (_frame < 3)
 			{
 				if (_lastUpdateFrame == Time.frameCount)
 				{
@@ -287,6 +287,7 @@ namespace F8Framework.Core
 				_comsFixedUpdate.Add(wrapper);
 				_isDirtyFixed = true;
 			}
+			_frame = 1;
 			return module;
 		}
 
@@ -297,41 +298,29 @@ namespace F8Framework.Core
 		public static bool DestroyModule<T>()
 		{
 			var moduleType = typeof(T);
-			for (int i = 0; i < _comsUpdate.Count; i++)
-			{
-				if (_comsUpdate[i].Module.GetType() == moduleType)
-				{
-					_comsUpdate[i].ShouldBeRemoved = true;
-				}
-			}
-			
-			for (int i = 0; i < _comsLateUpdate.Count; i++)
-			{
-				if (_comsLateUpdate[i].Module.GetType() == moduleType)
-				{
-					_comsLateUpdate[i].ShouldBeRemoved = true;
-				}
-			}
-			
-			for (int i = 0; i < _comsFixedUpdate.Count; i++)
-			{
-				if (_comsFixedUpdate[i].Module.GetType() == moduleType)
-				{
-					_comsFixedUpdate[i].ShouldBeRemoved = true;
-				}
-			}
-			
-			for (int i = 0; i < _coms.Count; i++)
+			ModuleWrapper target = null;
+			for (int i = _coms.Count - 1; i >= 0; i--)
 			{
 				if (_coms[i].Module.GetType() == moduleType)
 				{
-					_coms[i].Module.OnTermination();
+					target = _coms[i];
 					_coms.RemoveAt(i);
-					return true;
+					break;
 				}
 			}
-			
-			return false;
+
+			if (target == null)
+			{
+				return false;
+			}
+
+			target.ShouldBeRemoved = true;
+			_comsUpdate.RemoveAll(wrapper => ReferenceEquals(wrapper, target));
+			_comsLateUpdate.RemoveAll(wrapper => ReferenceEquals(wrapper, target));
+			_comsFixedUpdate.RemoveAll(wrapper => ReferenceEquals(wrapper, target));
+
+			target.Module.OnTermination();
+			return true;
 		}
 
 		/// <summary>

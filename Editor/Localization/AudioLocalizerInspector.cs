@@ -23,18 +23,18 @@ namespace F8Framework.Core.Editor
 		{
 			// base.OnInspectorGUI();
 
-			Localization.Instance.LoadInEditor();
+			Localization.EditorInstance.LoadInEditor();
 			serializedObject.Update();
 
-			var langCount = Localization.Instance.LanguageList.Count;
+			var langCount = Localization.EditorInstance.LanguageList.Count;
 
 			UpdateAudioClipInspector(langCount);
 
 			serializedObject.ApplyModifiedProperties();
 			
 			GUI.skin.GetStyle("HelpBox").richText = true;
-			Localization.Instance.LoadInEditor();
-			var keys = Localization.Instance.GetAllIds();
+			Localization.EditorInstance.LoadInEditor();
+			var keys = Localization.EditorInstance.GetAllIds();
 
 			if (keys.Count == 0)
 			{
@@ -51,7 +51,7 @@ namespace F8Framework.Core.Editor
 				return;
 			}
 
-			var dict = Localization.Instance.GetDictionaryFromId(localizer.localizedTextID);
+			var dict = Localization.EditorInstance.GetDictionaryFromId(localizer.localizedTextID);
 			if (dict != null)
 			{
 				var helpText = dict.Aggregate("", (current, item) => current + $"{item.Key}: {item.Value}\n");
@@ -118,7 +118,7 @@ namespace F8Framework.Core.Editor
 
 			for (var i = 0; i < langCount; i++)
 			{
-				var clip = EditorGUILayout.ObjectField(Localization.Instance.LanguageList[i], localizer.clips[i], typeof(AudioClip), false) as AudioClip;
+				var clip = EditorGUILayout.ObjectField(Localization.EditorInstance.LanguageList[i], localizer.clips[i], typeof(AudioClip), false) as AudioClip;
 				if (localizer.clips[i] != clip)
 				{
 					localizer.clips[i] = clip;

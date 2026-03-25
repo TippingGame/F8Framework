@@ -160,7 +160,6 @@ namespace F8Framework.Tests
                 if (_gameObjectPool == null)
                 {
                     _gameObjectPool = ModuleCenter.CreateModule<GameObjectPool>();
-                    ModuleCenter.CreateModule<F8PoolGlobal>();
                 }
                     
                 return _gameObjectPool;
@@ -170,7 +169,6 @@ namespace F8Framework.Tests
                 if (_gameObjectPool == null)
                 {
                     _gameObjectPool = value;
-                    ModuleCenter.CreateModule<F8PoolGlobal>();
                 }
             }
         }

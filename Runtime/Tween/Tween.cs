@@ -14,11 +14,65 @@ namespace F8Framework.Core
     public class Tween : ModuleSingleton<Tween>, IModule
     {
         #region PRIVATE
+        private Stack<Sequence> sequencePool = new Stack<Sequence>();
+        private HashSet<Sequence> activeSequences = new HashSet<Sequence>();
         public List<BaseTween> tweens = new List<BaseTween>();
         private Dictionary<GameObject, List<int>> tweenConnections = new Dictionary<GameObject, List<int>>();
         #endregion
 
         public Action OnUpdateAction;
+
+        public Sequence GetSequence()
+        {
+            if (sequencePool.Count <= 0)
+            {
+                return ProcessSequence(new Sequence(), false);
+            }
+
+            return ProcessSequence(sequencePool.Pop());
+        }
+
+        private Sequence ProcessSequence(Sequence sequence, bool reset = true)
+        {
+            if (reset)
+            {
+                sequence.Reset();
+            }
+
+            activeSequences.Add(sequence);
+            sequence.Recycle = delegate { KillSequence(sequence); };
+            OnUpdateAction += sequence.Update;
+            return sequence;
+        }
+
+        public void KillSequence(Sequence sequence)
+        {
+            if (sequence == null)
+            {
+                return;
+            }
+
+            OnUpdateAction -= sequence.Update;
+            sequence.Reset();
+            if (activeSequences.Remove(sequence))
+            {
+                sequencePool.Push(sequence);
+            }
+        }
+
+        public void KillAllSequences()
+        {
+            if (activeSequences.Count <= 0)
+            {
+                return;
+            }
+
+            var sequences = new List<Sequence>(activeSequences);
+            for (int i = 0; i < sequences.Count; i++)
+            {
+                KillSequence(sequences[i]);
+            }
+        }
         
         #region UNITY_EVENTS
         
@@ -87,6 +141,7 @@ namespace F8Framework.Core
 
         public void OnTermination()
         {
+            KillAllSequences();
             for (int i = 0; i < tweens.Count; i++)
             {
                 tweens[i].CanRecycle = true;
@@ -1472,7 +1527,7 @@ namespace F8Framework.Core
         
         public Sequence ShakePosition(Transform obj, Vector3 vibrato, int shakeCount = 8, float t = 0.05f, bool fadeOut = false)
         {
-            var sequence = SequenceManager.GetSequence();
+            var sequence = this.GetSequence();
             
             for (int i = 1; i <= shakeCount; i++)
             {
@@ -1515,7 +1570,7 @@ namespace F8Framework.Core
         
         public Sequence ShakeRotation(Transform obj, Vector3 vibrato, int shakeCount = 8, float t = 0.05f, bool fadeOut = false)
         {
-            var sequence = SequenceManager.GetSequence();
+            var sequence = this.GetSequence();
             
             for (int i = 1; i <= shakeCount; i++)
             {
@@ -1558,7 +1613,7 @@ namespace F8Framework.Core
         
         public Sequence ShakeScale(Transform obj, Vector3 vibrato, int shakeCount = 8, float t = 0.05f, bool fadeOut = false)
         {
-            var sequence = SequenceManager.GetSequence();
+            var sequence = this.GetSequence();
             
             for (int i = 1; i <= shakeCount; i++)
             {

@@ -42,7 +42,7 @@ description: Use when onboarding F8Framework, initializing first-run setup, or e
 | `ProcedureManager` | Game flow/procedure node management. |
 | `NetworkManager` | TCP/KCP/WebSocket networking. |
 | `FSMManager` | Finite state machine management. |
-| `GameObjectPool` | GameObject pooling. Also creates `F8PoolGlobal` module automatically. |
+| `GameObjectPool` | GameObject pooling. Also carries the global pool configuration and delayed-despawn behavior. |
 | `AssetManager` | Asset loading (Resources / AssetBundle / Remote). |
 | `AssetBundleManager` | AssetBundle manifest loading. Must call `LoadAssetBundleManifest()` after `AssetManager` creation. |
 | `F8DataManager` | Excel config data manager. Accessed via `FF8.Config`. |
@@ -167,7 +167,7 @@ public static class FF8
 **重要特性**：
 - 如果 `GameLauncher` 中已通过 `set` 赋值，后续 `get` 直接返回已创建的实例
 - 如果未通过 `GameLauncher` 初始化，首次 `get` 会自动创建模块（懒加载）
-- `GameObjectPool` 的 `set` 和 `get` 会额外创建 `F8PoolGlobal` 模块
+- `GameObjectPool` 的 `set` 和 `get` 都以 `GameObjectPool` 自身作为唯一对象池入口
 - `Localization` 的 `get` 会自动调用 `F8DataManager.Instance.GetLocalizedStrings()` 获取翻译数据
 - `InputManager` 的 `get` 会自动传入 `new DefaultInputHelper()` 作为参数
 
@@ -185,7 +185,7 @@ TimerManager                    ← 依赖 Message
 ProcedureManager
 NetworkManager
 FSMManager
-GameObjectPool + F8PoolGlobal
+GameObjectPool
 AssetManager
     ↓
 yield return LoadAssetBundleManifest()  ← 异步！必须在 AssetManager 之后
@@ -254,7 +254,7 @@ F8LogWriter
 | AssetBundleManifest load fails | 必须在 `AssetManager` 创建之后才能调用 `LoadAssetBundleManifest()`。 |
 | Localization 初始化失败 | 必须先 `yield return LoadLocalizedStringsIEnumerator()`，再创建 `Localization` 模块。 |
 | ModuleCenter.Update 被多处调用 | 只在 GameLauncher 的 Update/LateUpdate/FixedUpdate 中调用，切勿在其他地方重复调用。 |
-| FF8.GameObjectPool 创建异常 | 注意 `GameObjectPool` 的 get/set 会自动额外创建 `F8PoolGlobal` 模块。 |
+| FF8.GameObjectPool 创建异常 | 注意 `GameObjectPool` 现在是对象池唯一入口，同时承载全局池配置。 |
 
 ## Output checklist
 

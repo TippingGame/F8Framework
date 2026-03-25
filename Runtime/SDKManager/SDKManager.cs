@@ -61,6 +61,12 @@ namespace F8Framework.Core
         /// </summary>
         public void OnTermination()
         {
+            sdk = null;
+            platformId = string.Empty;
+            channelId = string.Empty;
+            userId = string.Empty;
+            userName = string.Empty;
+            token = string.Empty;
             Destroy(gameObject);
         }
         

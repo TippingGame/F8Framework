@@ -18,15 +18,7 @@ namespace F8Framework.Core
 
         private static int GenerateId()
         {
-            try
-            {
-                counter++;
-            }
-            catch (OverflowException)
-            {
-                counter = 0;
-            }
-
+            counter++;
             return counter;
         }
 

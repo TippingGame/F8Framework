@@ -9,6 +9,18 @@
 			{
 				if (_instance == null)
 				{
+					LogF8.LogError($"模块 {typeof(T)} 未创建。");
+				}
+				return _instance;
+			}
+		}
+
+		public static T EditorInstance
+		{
+			get
+			{
+				if (_instance == null)
+				{
 #if UNITY_EDITOR
 					_instance = new T();
 					LogF8.Log($"模块 {typeof(T)} 不是通过模块中心创建并控制（无法轮询Update），仅在编辑器下可以临时使用");
@@ -19,7 +31,7 @@
 				return _instance;
 			}
 		}
-
+		
 		protected ModuleSingleton()
 		{
 			if (_instance != null)

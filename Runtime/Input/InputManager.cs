@@ -445,8 +445,8 @@ namespace F8Framework.Core
                 _helper.LoadDevice(new StandardInputDevice());
                 _helper.OnInit();
 
-                MessageManager.Instance.AddEventListener(MessageEvent.ApplicationFocus, ResetAll, this);
-                MessageManager.Instance.AddEventListener(MessageEvent.NotApplicationFocus, ResetAll, this);
+                MessageManager.Instance?.AddEventListener(MessageEvent.ApplicationFocus, ResetAll, this);
+                MessageManager.Instance?.AddEventListener(MessageEvent.NotApplicationFocus, ResetAll, this);
             }
             else
             {
@@ -487,8 +487,8 @@ namespace F8Framework.Core
 
         public void OnTermination()
         {
-            MessageManager.Instance.RemoveEventListener(MessageEvent.ApplicationFocus, ResetAll, this);
-            MessageManager.Instance.RemoveEventListener(MessageEvent.NotApplicationFocus, ResetAll, this);
+            MessageManager.Instance?.RemoveEventListener(MessageEvent.ApplicationFocus, ResetAll, this);
+            MessageManager.Instance?.RemoveEventListener(MessageEvent.NotApplicationFocus, ResetAll, this);
             _helper.OnTerminate();
             FrameCount = 0;
             base.Destroy();

@@ -961,8 +961,9 @@ namespace F8Framework.Core
             /// <param name="className">类名</param>
             /// <param name="methodName">方法名</param>
             /// <param name="parameters">方法参数</param>
+            /// <param name="instanceName">实例名</param>
             /// <returns>返回值</returns>
-            public static object InvokeMethod(string className, string methodName, object[] parameters = null)
+            public static object InvokeMethod(string className, string methodName, string instanceName = "Instance", object[] parameters = null)
             {
                 // 查找指定类名的类型
                 var type = domainAssemblies.SelectMany(assembly => assembly.GetTypes()).FirstOrDefault(t => t.Name == className);
@@ -972,7 +973,7 @@ namespace F8Framework.Core
                 }
 
                 // 获取单例的实例
-                var property = type.BaseType?.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static);
+                var property = type.BaseType?.GetProperty(instanceName, BindingFlags.Public | BindingFlags.Static);
                 if (property == null)
                 {
                     throw new Exception($"无法获取 {className} 的单例实例!");
