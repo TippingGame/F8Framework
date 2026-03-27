@@ -67,7 +67,7 @@ namespace F8Framework.Tests
 
 		public void Cycle()
 		{
-			Localization.Instance.ActivateNextLanguage();
+			Localization.Instance?.ActivateNextLanguage();
 		}
 	}
 }

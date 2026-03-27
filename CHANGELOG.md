@@ -1,5 +1,8 @@
 # Changelog
 
+## [2.9.274] - 2025-03-27
+1.优化Event模块DispatchEvent时缺少的参数使用默认数据填充  
+
 ## [2.9.273] - 2025-03-27
 1.新增HotUpdate模块热更新包的断点续传  
 2.新增Download模块当前下载总大小TotalDownloadedLength  

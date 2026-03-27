@@ -8,7 +8,7 @@ namespace F8Framework.Core
 
 		protected virtual void Awake()
 		{
-			Localization.Instance.AddLocalizer(this);
+			Localization.Instance?.AddLocalizer(this);
 			Prepare();
 		}
 

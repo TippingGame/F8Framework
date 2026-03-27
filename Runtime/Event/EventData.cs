@@ -16,6 +16,46 @@ namespace F8Framework.Core
         object Handle { get; }
     }
 
+    public interface IInvokableEventData
+    {
+        void Invoke();
+    }
+
+    public interface IInvokableEventData<T1>
+    {
+        void Invoke(T1 arg1);
+    }
+
+    public interface IInvokableEventData<T1, T2>
+    {
+        void Invoke(T1 arg1, T2 arg2);
+    }
+
+    public interface IInvokableEventData<T1, T2, T3>
+    {
+        void Invoke(T1 arg1, T2 arg2, T3 arg3);
+    }
+
+    public interface IInvokableEventData<T1, T2, T3, T4>
+    {
+        void Invoke(T1 arg1, T2 arg2, T3 arg3, T4 arg4);
+    }
+
+    public interface IInvokableEventData<T1, T2, T3, T4, T5>
+    {
+        void Invoke(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5);
+    }
+
+    public interface IInvokableEventData<T1, T2, T3, T4, T5, T6>
+    {
+        void Invoke(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6);
+    }
+
+    public interface IInvokableEventData<T1, T2, T3, T4, T5, T6, T7>
+    {
+        void Invoke(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7);
+    }
+
     public abstract class EventDataBase : IEventData
     {
         public int Event;
@@ -77,7 +117,7 @@ namespace F8Framework.Core
         public abstract void RemoveFrom(MessageManager manager);
     }
 
-    public class EventData : EventDataBase
+    public class EventData : EventDataBase, IInvokableEventData
     {
         public Action Listener;
 
@@ -95,9 +135,14 @@ namespace F8Framework.Core
         {
             manager.RemoveEventListener(Event, Listener, Handle);
         }
+
+        public void Invoke()
+        {
+            Listener?.Invoke();
+        }
     }
 
-    public class EventData<T1> : EventDataBase
+    public class EventData<T1> : EventDataBase, IInvokableEventData, IInvokableEventData<T1>
     {
         public Action<T1> Listener;
 
@@ -115,9 +160,19 @@ namespace F8Framework.Core
         {
             manager.RemoveEventListener(Event, Listener, Handle);
         }
+
+        public void Invoke()
+        {
+            Listener?.Invoke(default);
+        }
+
+        public void Invoke(T1 arg1)
+        {
+            Listener?.Invoke(arg1);
+        }
     }
 
-    public class EventData<T1, T2> : EventDataBase
+    public class EventData<T1, T2> : EventDataBase, IInvokableEventData, IInvokableEventData<T1>, IInvokableEventData<T1, T2>
     {
         public Action<T1, T2> Listener;
 
@@ -135,9 +190,24 @@ namespace F8Framework.Core
         {
             manager.RemoveEventListener(Event, Listener, Handle);
         }
+
+        public void Invoke()
+        {
+            Listener?.Invoke(default, default);
+        }
+
+        public void Invoke(T1 arg1)
+        {
+            Listener?.Invoke(arg1, default);
+        }
+
+        public void Invoke(T1 arg1, T2 arg2)
+        {
+            Listener?.Invoke(arg1, arg2);
+        }
     }
 
-    public class EventData<T1, T2, T3> : EventDataBase
+    public class EventData<T1, T2, T3> : EventDataBase, IInvokableEventData, IInvokableEventData<T1>, IInvokableEventData<T1, T2>, IInvokableEventData<T1, T2, T3>
     {
         public Action<T1, T2, T3> Listener;
 
@@ -155,9 +225,29 @@ namespace F8Framework.Core
         {
             manager.RemoveEventListener(Event, Listener, Handle);
         }
+
+        public void Invoke()
+        {
+            Listener?.Invoke(default, default, default);
+        }
+
+        public void Invoke(T1 arg1)
+        {
+            Listener?.Invoke(arg1, default, default);
+        }
+
+        public void Invoke(T1 arg1, T2 arg2)
+        {
+            Listener?.Invoke(arg1, arg2, default);
+        }
+
+        public void Invoke(T1 arg1, T2 arg2, T3 arg3)
+        {
+            Listener?.Invoke(arg1, arg2, arg3);
+        }
     }
 
-    public class EventData<T1, T2, T3, T4> : EventDataBase
+    public class EventData<T1, T2, T3, T4> : EventDataBase, IInvokableEventData, IInvokableEventData<T1>, IInvokableEventData<T1, T2>, IInvokableEventData<T1, T2, T3>, IInvokableEventData<T1, T2, T3, T4>
     {
         public Action<T1, T2, T3, T4> Listener;
 
@@ -175,9 +265,34 @@ namespace F8Framework.Core
         {
             manager.RemoveEventListener(Event, Listener, Handle);
         }
+
+        public void Invoke()
+        {
+            Listener?.Invoke(default, default, default, default);
+        }
+
+        public void Invoke(T1 arg1)
+        {
+            Listener?.Invoke(arg1, default, default, default);
+        }
+
+        public void Invoke(T1 arg1, T2 arg2)
+        {
+            Listener?.Invoke(arg1, arg2, default, default);
+        }
+
+        public void Invoke(T1 arg1, T2 arg2, T3 arg3)
+        {
+            Listener?.Invoke(arg1, arg2, arg3, default);
+        }
+
+        public void Invoke(T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+        {
+            Listener?.Invoke(arg1, arg2, arg3, arg4);
+        }
     }
 
-    public class EventData<T1, T2, T3, T4, T5> : EventDataBase
+    public class EventData<T1, T2, T3, T4, T5> : EventDataBase, IInvokableEventData, IInvokableEventData<T1>, IInvokableEventData<T1, T2>, IInvokableEventData<T1, T2, T3>, IInvokableEventData<T1, T2, T3, T4>, IInvokableEventData<T1, T2, T3, T4, T5>
     {
         public Action<T1, T2, T3, T4, T5> Listener;
 
@@ -195,9 +310,39 @@ namespace F8Framework.Core
         {
             manager.RemoveEventListener(Event, Listener, Handle);
         }
+
+        public void Invoke()
+        {
+            Listener?.Invoke(default, default, default, default, default);
+        }
+
+        public void Invoke(T1 arg1)
+        {
+            Listener?.Invoke(arg1, default, default, default, default);
+        }
+
+        public void Invoke(T1 arg1, T2 arg2)
+        {
+            Listener?.Invoke(arg1, arg2, default, default, default);
+        }
+
+        public void Invoke(T1 arg1, T2 arg2, T3 arg3)
+        {
+            Listener?.Invoke(arg1, arg2, arg3, default, default);
+        }
+
+        public void Invoke(T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+        {
+            Listener?.Invoke(arg1, arg2, arg3, arg4, default);
+        }
+
+        public void Invoke(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
+        {
+            Listener?.Invoke(arg1, arg2, arg3, arg4, arg5);
+        }
     }
 
-    public class EventData<T1, T2, T3, T4, T5, T6> : EventDataBase
+    public class EventData<T1, T2, T3, T4, T5, T6> : EventDataBase, IInvokableEventData, IInvokableEventData<T1>, IInvokableEventData<T1, T2>, IInvokableEventData<T1, T2, T3>, IInvokableEventData<T1, T2, T3, T4>, IInvokableEventData<T1, T2, T3, T4, T5>, IInvokableEventData<T1, T2, T3, T4, T5, T6>
     {
         public Action<T1, T2, T3, T4, T5, T6> Listener;
 
@@ -215,9 +360,44 @@ namespace F8Framework.Core
         {
             manager.RemoveEventListener(Event, Listener, Handle);
         }
+
+        public void Invoke()
+        {
+            Listener?.Invoke(default, default, default, default, default, default);
+        }
+
+        public void Invoke(T1 arg1)
+        {
+            Listener?.Invoke(arg1, default, default, default, default, default);
+        }
+
+        public void Invoke(T1 arg1, T2 arg2)
+        {
+            Listener?.Invoke(arg1, arg2, default, default, default, default);
+        }
+
+        public void Invoke(T1 arg1, T2 arg2, T3 arg3)
+        {
+            Listener?.Invoke(arg1, arg2, arg3, default, default, default);
+        }
+
+        public void Invoke(T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+        {
+            Listener?.Invoke(arg1, arg2, arg3, arg4, default, default);
+        }
+
+        public void Invoke(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
+        {
+            Listener?.Invoke(arg1, arg2, arg3, arg4, arg5, default);
+        }
+
+        public void Invoke(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
+        {
+            Listener?.Invoke(arg1, arg2, arg3, arg4, arg5, arg6);
+        }
     }
 
-    public class EventData<T1, T2, T3, T4, T5, T6, T7> : EventDataBase
+    public class EventData<T1, T2, T3, T4, T5, T6, T7> : EventDataBase, IInvokableEventData, IInvokableEventData<T1>, IInvokableEventData<T1, T2>, IInvokableEventData<T1, T2, T3>, IInvokableEventData<T1, T2, T3, T4>, IInvokableEventData<T1, T2, T3, T4, T5>, IInvokableEventData<T1, T2, T3, T4, T5, T6>, IInvokableEventData<T1, T2, T3, T4, T5, T6, T7>
     {
         public Action<T1, T2, T3, T4, T5, T6, T7> Listener;
 
@@ -234,6 +414,46 @@ namespace F8Framework.Core
         public override void RemoveFrom(MessageManager manager)
         {
             manager.RemoveEventListener(Event, Listener, Handle);
+        }
+
+        public void Invoke()
+        {
+            Listener?.Invoke(default, default, default, default, default, default, default);
+        }
+
+        public void Invoke(T1 arg1)
+        {
+            Listener?.Invoke(arg1, default, default, default, default, default, default);
+        }
+
+        public void Invoke(T1 arg1, T2 arg2)
+        {
+            Listener?.Invoke(arg1, arg2, default, default, default, default, default);
+        }
+
+        public void Invoke(T1 arg1, T2 arg2, T3 arg3)
+        {
+            Listener?.Invoke(arg1, arg2, arg3, default, default, default, default);
+        }
+
+        public void Invoke(T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+        {
+            Listener?.Invoke(arg1, arg2, arg3, arg4, default, default, default);
+        }
+
+        public void Invoke(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
+        {
+            Listener?.Invoke(arg1, arg2, arg3, arg4, arg5, default, default);
+        }
+
+        public void Invoke(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
+        {
+            Listener?.Invoke(arg1, arg2, arg3, arg4, arg5, arg6, default);
+        }
+
+        public void Invoke(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
+        {
+            Listener?.Invoke(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
         }
     }
 }

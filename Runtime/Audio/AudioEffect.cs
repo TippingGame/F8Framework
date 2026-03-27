@@ -67,7 +67,7 @@ namespace F8Framework.Core
         public void PlayClipAtPoint(string url, AudioClip clip, Vector3 position, [DefaultValue("1.0F")] float volume, [DefaultValue("1.0F")] float spatialBlend,
             Action callback = null, AudioMixerGroup audioEffectMixerGroup = null, bool isRandom = false)
         {
-            GameObject gameObject = GameObjectPool.Instance.Spawn(OneShotAudio);
+            GameObject gameObject = GameObjectPool.Instance?.Spawn(OneShotAudio);
             gameObject.transform.position = position;
             AudioSource audioSource = gameObject.GetComponent<AudioSource>();
             audioSource.clip = clip;
@@ -80,9 +80,9 @@ namespace F8Framework.Core
             audioSource.Play();
             
             float time = clip.length * ((double)Time.timeScale < 0.009999999776482582 ? 0.01f : Time.timeScale);
-            TimerManager.Instance.AddTimer(this, 1f, time, 1, null, () =>
+            TimerManager.Instance?.AddTimer(this, 1f, time, 1, null, () =>
             {
-                GameObjectPool.Instance.Despawn(gameObject);
+                GameObjectPool.Instance?.Despawn(gameObject);
                 if (_effectsNum.TryGetValue(url, out int num))
                 {
                     _effectsNum[url] = num - 1;

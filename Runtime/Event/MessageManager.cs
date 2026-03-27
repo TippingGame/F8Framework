@@ -173,6 +173,70 @@ namespace F8Framework.Core
             ClearCallStack();
         }
 
+        private void InvokeEventData(IEventDataBase eventDataBase)
+        {
+            if (eventDataBase is IInvokableEventData eventData)
+            {
+                eventData.Invoke();
+            }
+        }
+
+        private void InvokeEventData<T1>(IEventDataBase eventDataBase, T1 arg1)
+        {
+            if (eventDataBase is IInvokableEventData<T1> eventData)
+            {
+                eventData.Invoke(arg1);
+            }
+        }
+
+        private void InvokeEventData<T1, T2>(IEventDataBase eventDataBase, T1 arg1, T2 arg2)
+        {
+            if (eventDataBase is IInvokableEventData<T1, T2> eventData)
+            {
+                eventData.Invoke(arg1, arg2);
+            }
+        }
+
+        private void InvokeEventData<T1, T2, T3>(IEventDataBase eventDataBase, T1 arg1, T2 arg2, T3 arg3)
+        {
+            if (eventDataBase is IInvokableEventData<T1, T2, T3> eventData)
+            {
+                eventData.Invoke(arg1, arg2, arg3);
+            }
+        }
+
+        private void InvokeEventData<T1, T2, T3, T4>(IEventDataBase eventDataBase, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+        {
+            if (eventDataBase is IInvokableEventData<T1, T2, T3, T4> eventData)
+            {
+                eventData.Invoke(arg1, arg2, arg3, arg4);
+            }
+        }
+
+        private void InvokeEventData<T1, T2, T3, T4, T5>(IEventDataBase eventDataBase, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
+        {
+            if (eventDataBase is IInvokableEventData<T1, T2, T3, T4, T5> eventData)
+            {
+                eventData.Invoke(arg1, arg2, arg3, arg4, arg5);
+            }
+        }
+
+        private void InvokeEventData<T1, T2, T3, T4, T5, T6>(IEventDataBase eventDataBase, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
+        {
+            if (eventDataBase is IInvokableEventData<T1, T2, T3, T4, T5, T6> eventData)
+            {
+                eventData.Invoke(arg1, arg2, arg3, arg4, arg5, arg6);
+            }
+        }
+
+        private void InvokeEventData<T1, T2, T3, T4, T5, T6, T7>(IEventDataBase eventDataBase, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
+        {
+            if (eventDataBase is IInvokableEventData<T1, T2, T3, T4, T5, T6, T7> eventData)
+            {
+                eventData.Invoke(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+            }
+        }
+
         public void AddEventListener<T>(T eventName, Action listener, object handle) where T : Enum, IConvertible
         {
             AddEventListener((int)(object)eventName, listener, handle);
@@ -362,10 +426,7 @@ namespace F8Framework.Core
             while (queue.Count > 0)
             {
                 var obj = queue.Dequeue();
-                if (obj is EventData eventData)
-                {
-                    eventData.Listener?.Invoke();
-                }
+                InvokeEventData(obj);
             }
 
             FinishDispatch();
@@ -387,14 +448,7 @@ namespace F8Framework.Core
             while (queue.Count > 0)
             {
                 var obj = queue.Dequeue();
-                if (obj is EventData<T1> eventData)
-                {
-                    eventData.Listener?.Invoke(arg1);
-                }
-                else if (obj is EventData eventData0)
-                {
-                    eventData0.Listener?.Invoke();
-                }
+                InvokeEventData(obj, arg1);
             }
 
             FinishDispatch();
@@ -416,14 +470,7 @@ namespace F8Framework.Core
             while (queue.Count > 0)
             {
                 var obj = queue.Dequeue();
-                if (obj is EventData<T1, T2> eventData)
-                {
-                    eventData.Listener?.Invoke(arg1, arg2);
-                }
-                else if (obj is EventData eventData0)
-                {
-                    eventData0.Listener?.Invoke();
-                }
+                InvokeEventData(obj, arg1, arg2);
             }
 
             FinishDispatch();
@@ -445,14 +492,7 @@ namespace F8Framework.Core
             while (queue.Count > 0)
             {
                 var obj = queue.Dequeue();
-                if (obj is EventData<T1, T2, T3> eventData)
-                {
-                    eventData.Listener?.Invoke(arg1, arg2, arg3);
-                }
-                else if (obj is EventData eventData0)
-                {
-                    eventData0.Listener?.Invoke();
-                }
+                InvokeEventData(obj, arg1, arg2, arg3);
             }
 
             FinishDispatch();
@@ -474,14 +514,7 @@ namespace F8Framework.Core
             while (queue.Count > 0)
             {
                 var obj = queue.Dequeue();
-                if (obj is EventData<T1, T2, T3, T4> eventData)
-                {
-                    eventData.Listener?.Invoke(arg1, arg2, arg3, arg4);
-                }
-                else if (obj is EventData eventData0)
-                {
-                    eventData0.Listener?.Invoke();
-                }
+                InvokeEventData(obj, arg1, arg2, arg3, arg4);
             }
 
             FinishDispatch();
@@ -503,14 +536,7 @@ namespace F8Framework.Core
             while (queue.Count > 0)
             {
                 var obj = queue.Dequeue();
-                if (obj is EventData<T1, T2, T3, T4, T5> eventData)
-                {
-                    eventData.Listener?.Invoke(arg1, arg2, arg3, arg4, arg5);
-                }
-                else if (obj is EventData eventData0)
-                {
-                    eventData0.Listener?.Invoke();
-                }
+                InvokeEventData(obj, arg1, arg2, arg3, arg4, arg5);
             }
 
             FinishDispatch();
@@ -532,14 +558,7 @@ namespace F8Framework.Core
             while (queue.Count > 0)
             {
                 var obj = queue.Dequeue();
-                if (obj is EventData<T1, T2, T3, T4, T5, T6> eventData)
-                {
-                    eventData.Listener?.Invoke(arg1, arg2, arg3, arg4, arg5, arg6);
-                }
-                else if (obj is EventData eventData0)
-                {
-                    eventData0.Listener?.Invoke();
-                }
+                InvokeEventData(obj, arg1, arg2, arg3, arg4, arg5, arg6);
             }
 
             FinishDispatch();
@@ -561,14 +580,7 @@ namespace F8Framework.Core
             while (queue.Count > 0)
             {
                 var obj = queue.Dequeue();
-                if (obj is EventData<T1, T2, T3, T4, T5, T6, T7> eventData)
-                {
-                    eventData.Listener?.Invoke(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-                }
-                else if (obj is EventData eventData0)
-                {
-                    eventData0.Listener?.Invoke();
-                }
+                InvokeEventData(obj, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
             }
 
             FinishDispatch();
