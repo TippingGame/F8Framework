@@ -113,12 +113,10 @@ public class LoadDll : MonoBehaviour
         yield return HotUpdate.InitAssetVersion();
             
         // 检查需要热更的资源，总大小
-        Tuple<Dictionary<string, string>, long> result  = HotUpdate.CheckHotUpdate();
-        var hotUpdateAssetUrl = result.Item1;
-        var allSize = result.Item2;
+        var (downloadInfos, allSize) = HotUpdate.CheckHotUpdate();
         
         // 资源热更新
-        HotUpdate.StartHotUpdate(hotUpdateAssetUrl, () =>
+        HotUpdate.StartHotUpdate(downloadInfos, () =>
         {
             LogF8.Log("完成");
             // 先补充元数据（可选）
@@ -158,8 +156,8 @@ public class LoadDll : MonoBehaviour
             LogF8.Log("失败");
         }, eventArgs =>
         {
-            ulong downloadedBytes = eventArgs.DownloadInfo.DownloadedLength;
-            double speedBytesPerSecond = downloadedBytes / eventArgs.DownloadInfo.DownloadTimeSpan.TotalSeconds;
+            long downloadedBytes = eventArgs.TotalDownloadedLength;
+            double speedBytesPerSecond = eventArgs.DownloadInfo.DownloadedLength / eventArgs.DownloadInfo.DownloadTimeSpan.TotalSeconds;
             LogF8.Log($"进度：{downloadedBytes}B/{allSize}B, 速度：{speedBytesPerSecond}B/s");
         });
     }

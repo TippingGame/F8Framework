@@ -96,6 +96,44 @@ namespace F8Framework.Core
             }
         }
 
+        public void InsertRange(IList<Log.LogData> datas, int startIndex, int count, bool showPlayTime, bool showSceneName)
+        {
+            if (datas == null || count <= 0 || startIndex < 0 || startIndex >= datas.Count)
+            {
+                return;
+            }
+
+            int insertCount = Mathf.Min(count, datas.Count - startIndex);
+            if (insertCount <= 0)
+            {
+                return;
+            }
+
+            LogItemData[] itemDatas = new LogItemData[insertCount];
+            int baseIndex = logItemDatas.Count;
+            for (int index = 0; index < insertCount; ++index)
+            {
+                itemDatas[index] = new LogItemData()
+                {
+                    logData = datas[startIndex + index],
+                    index = baseIndex + index,
+                    showPlayTime = showPlayTime,
+                    showSceneName = showSceneName,
+                    isSelect = false
+                };
+            }
+
+            bool isMoveToLastData = infiniteScroll.IsMoveToLastData();
+
+            logItemDatas.AddRange(itemDatas);
+            infiniteScroll.InsertData(itemDatas);
+
+            if (isMoveToLastData == true)
+            {
+                infiniteScroll.MoveToLastData();
+            }
+        }
+
         private void OnSelect(InfiniteScrollData scrollData)
         {
             LogItemData itemData = (LogItemData)scrollData;

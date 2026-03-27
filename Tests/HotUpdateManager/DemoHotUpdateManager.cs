@@ -14,6 +14,7 @@ namespace F8Framework.Tests
             FF8.HotUpdate = ModuleCenter.CreateModule<HotUpdateManager>();
             FF8.Asset = ModuleCenter.CreateModule<AssetManager>();
             FF8.Download = ModuleCenter.CreateModule<DownloadManager>();
+            yield return AssetBundleManager.Instance.LoadAssetBundleManifest();
             
             // 初始化本地版本
             FF8.HotUpdate.InitLocalVersion();
@@ -25,12 +26,10 @@ namespace F8Framework.Tests
             yield return FF8.HotUpdate.InitAssetVersion();
             
             // 检查需要热更的资源，总大小
-            Tuple<Dictionary<string, string>, long> result  = FF8.HotUpdate.CheckHotUpdate();
-            var hotUpdateAssetUrl = result.Item1;
-            var allSize = result.Item2;
+            var (downloadInfos, allSize) = FF8.HotUpdate.CheckHotUpdate();
             
             // 资源热更新
-            FF8.HotUpdate.StartHotUpdate(hotUpdateAssetUrl, () =>
+            FF8.HotUpdate.StartHotUpdate(downloadInfos, () =>
             {
                 LogF8.Log("完成");
             }, () =>
@@ -39,13 +38,13 @@ namespace F8Framework.Tests
             }, eventArgs =>
             {
                 // 已下载大小（字节）
-                ulong downloadedBytes = eventArgs.DownloadInfo.DownloadedLength;
+                long downloadedBytes = eventArgs.TotalDownloadedLength;
     
                 // 总大小（字节）- 需要累加之前已完成的任务大小
                 long totalBytes = allSize;
     
                 // 下载速度计算（字节/秒）
-                double speedBytesPerSecond = downloadedBytes / eventArgs.DownloadInfo.DownloadTimeSpan.TotalSeconds;
+                double speedBytesPerSecond = eventArgs.DownloadInfo.DownloadedLength / eventArgs.DownloadInfo.DownloadTimeSpan.TotalSeconds;
     
                 // 单位转换：字节 -> MB
                 double downloadedMB = downloadedBytes / (1024.0 * 1024.0);
@@ -57,10 +56,10 @@ namespace F8Framework.Tests
             });
 
             // 检查未加载的分包
-            List<string> subPackage = FF8.HotUpdate.CheckPackageUpdate(GameConfig.LocalGameVersion.SubPackage);
+            var (packageDownloadTasks, packageAllSize) = FF8.HotUpdate.CheckPackageUpdate(GameConfig.LocalGameVersion.SubPackage);
             
-            // 分包加载
-            FF8.HotUpdate.StartPackageUpdate(subPackage, () =>
+            // 分包下载并解压
+            FF8.HotUpdate.StartPackageUpdate(packageDownloadTasks, () =>
             {
                 LogF8.Log("完成");
             }, () =>
@@ -68,7 +67,7 @@ namespace F8Framework.Tests
                 LogF8.Log("失败");
             }, eventArgs =>
             {
-                // 同上
+                // 同上，可使用 packageAllSize 作为剩余总下载量
             });
         }
     }

@@ -46,9 +46,14 @@ void Start()
     foreach (var fileInfo in fileInfos)
     {
         count++;
+        // Get existing file size for resume support (optional)
+        FileInfo file = new FileInfo(Application.persistentDataPath + "F8Download/download" + count + ".png");
+        long fileSizeInBytes = file.Length;
         downloader.AddDownload(
             fileInfo, 
-            Application.persistentDataPath + "F8Download/download" + count + ".png"
+            Application.persistentDataPath + "F8Download/download" + count + ".png",
+            fileSizeInBytes,
+            true
         );
     }
     
@@ -69,7 +74,7 @@ void OnDownloadStart(DownloadStartEventArgs eventArgs)
 }
 
 // Progress update callback
-void OnDownloadOverall(DownloadUpdateEventArgs eventArgs)
+void OnDownloadOverall(DonwloadUpdateEventArgs eventArgs)
 {
     // Some download tasks only have download URLs and cannot obtain the binary length, 
     // making it impossible to use more precise progress tracking.
@@ -80,10 +85,10 @@ void OnDownloadOverall(DownloadUpdateEventArgs eventArgs)
     float progress = currentTaskIndex / taskCount * 100f;
     
     // Downloaded size (bytes)
-    ulong downloadedBytes = eventArgs.DownloadInfo.DownloadedLength;
+    long downloadedBytes = eventArgs.TotalDownloadedLength;
     
     // Download speed calculation (bytes/second)
-    double speedBytesPerSecond = downloadedBytes / eventArgs.DownloadInfo.DownloadTimeSpan.TotalSeconds;
+    double speedBytesPerSecond = eventArgs.DownloadInfo.DownloadedLength / eventArgs.DownloadInfo.DownloadTimeSpan.TotalSeconds;
     
     // Unit conversion: bytes → MB
     double downloadedMB = downloadedBytes / (1024.0 * 1024.0);

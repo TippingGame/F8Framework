@@ -149,7 +149,7 @@ namespace F8Framework.Core.Editor
         private void DrawResourcesList()
         {
             // 获取Resources加载器数据
-            resourceLoaders = ResourcesManager.EditorInstance.GetResourceLoaders();
+            resourceLoaders = ResourcesManager.Instance?.GetResourceLoaders();
             if (resourceLoaders == null || resourceLoaders.Count == 0)
             {
                 EditorGUILayout.HelpBox("没有通过Resources加载的资源", MessageType.Info);
@@ -346,7 +346,7 @@ namespace F8Framework.Core.Editor
         private void DrawAssetDatabaseList()
         {
             // 获取AssetDatabase加载器数据
-            editorLoaders = AssetDatabaseManager.Instance.GetEditorLoaders();
+            editorLoaders = AssetDatabaseManager.Instance?.GetEditorLoaders();
             if (editorLoaders == null || editorLoaders.Count == 0)
             {
                 EditorGUILayout.HelpBox("没有通过AssetDatabase加载的资源", MessageType.Info);
@@ -519,7 +519,7 @@ namespace F8Framework.Core.Editor
         
         private void DrawAssetBundleList()
         {
-            assetBundleLoaders = AssetBundleManager.EditorInstance.GetAssetBundleLoaders();
+            assetBundleLoaders = AssetBundleManager.Instance?.GetAssetBundleLoaders();
             if (assetBundleLoaders == null)
             {
                 return;

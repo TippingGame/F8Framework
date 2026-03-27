@@ -11,6 +11,7 @@ namespace F8Framework.Core
 
         public int CurrentDownloadTaskIndex { get; private set; }
         public int DownloadTaskCount { get; private set; }
+        public long TotalDownloadedLength { get; private set; }
         public TimeSpan TimeSpan { get; private set; }
 
         public void Clear()
@@ -18,16 +19,18 @@ namespace F8Framework.Core
             DownloadInfo = default;
             CurrentDownloadTaskIndex = 0;
             DownloadTaskCount = 0;
+            TotalDownloadedLength = 0;
             TimeSpan = TimeSpan.Zero;
         }
 
         public static DonwloadUpdateEventArgs Create(DownloadInfo downloadInfo, int currentTaskIndex, int taskCount,
-            TimeSpan timeSpan)
+            long totalDownloadedLength, TimeSpan timeSpan)
         {
             var eventArgs = ReferencePool.Acquire<DonwloadUpdateEventArgs>();
             eventArgs.DownloadInfo = downloadInfo;
             eventArgs.CurrentDownloadTaskIndex = currentTaskIndex;
             eventArgs.DownloadTaskCount = taskCount;
+            eventArgs.TotalDownloadedLength = totalDownloadedLength;
             eventArgs.TimeSpan = timeSpan;
             return eventArgs;
         }

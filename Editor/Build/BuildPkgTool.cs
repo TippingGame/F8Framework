@@ -362,7 +362,7 @@ namespace F8Framework.Core.Editor
                     FileTools.SafeDeleteDir(packagePath);
                     LogF8.LogVersion("分包输出目录：" + zipName + " ，手动上传至CDN资源服务器。");
                 }
-               
+                WriteGameVersion();
                 AssetDatabase.Refresh();
                 string locationPathName = buildPath + "/" + buildTarget.ToString() + "_Optional_" + toVersion  + "/" + appName;
                 locationPathName = FileTools.FormatToUnityPath(locationPathName);
@@ -1246,7 +1246,29 @@ namespace F8Framework.Core.Editor
             {
                 packageList = new List<string>();
             }
-            GameVersion gameVersion = new GameVersion(toVersion, assetRemoteAddress, enableHotUpdate, new List<string>(), _enablePackage, packageList);
+
+            Dictionary<string, (long size, string md5)> subPackageInfo = new Dictionary<string, (long size, string md5)>();
+            if (_enablePackage && packageList.Count > 0)
+            {
+                string remotePackageDir = buildPath + HotUpdateManager.RemoteDirName + HotUpdateManager.PackageDirName;
+                foreach (var package in packageList)
+                {
+                    if (string.IsNullOrEmpty(package))
+                    {
+                        continue;
+                    }
+
+                    string packageZipPath = remotePackageDir + HotUpdateManager.Separator + package + ".zip";
+                    if (File.Exists(packageZipPath))
+                    {
+                        string md5 = FileTools.CreateMd5ForFile(packageZipPath);
+                        long size = new FileInfo(packageZipPath).Length;
+                        subPackageInfo[package] = (size, md5);
+                    }
+                }
+            }
+
+            GameVersion gameVersion = new GameVersion(toVersion, assetRemoteAddress, enableHotUpdate, new List<string>(), _enablePackage, packageList, subPackageInfo);
             // 写入到文件
             string gameVersionResourcesPath = Application.dataPath + "/F8Framework/AssetMap/Resources/" + nameof(GameVersion) + ".json";
             // 序列化对象

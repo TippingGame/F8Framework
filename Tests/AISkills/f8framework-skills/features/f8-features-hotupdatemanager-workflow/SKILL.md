@@ -46,24 +46,24 @@ yield return FF8.HotUpdate.InitRemoteVersion();
 yield return FF8.HotUpdate.InitAssetVersion();
 
 // Check for updates
-Tuple<Dictionary<string, string>, long> result = FF8.HotUpdate.CheckHotUpdate();
-var hotUpdateAssetUrl = result.Item1;
-var allSize = result.Item2;
+var (downloadInfos, allSize) = FF8.HotUpdate.CheckHotUpdate();
+// `allSize` is the remaining download size after local file checks / resume offsets.
+// Both hot update and package checks return `List<HotUpdateManager.DownloadTaskInfo>`.
 
 // Start hot update
-FF8.HotUpdate.StartHotUpdate(hotUpdateAssetUrl,
+FF8.HotUpdate.StartHotUpdate(downloadInfos,
     () => { LogF8.Log("Success"); },
     () => { LogF8.Log("Failed"); },
     (eventArgs) =>
     {
-        ulong downloaded = eventArgs.DownloadInfo.DownloadedLength;
-        double speed = downloaded / eventArgs.DownloadInfo.DownloadTimeSpan.TotalSeconds;
+        long downloaded = eventArgs.TotalDownloadedLength;
+        double speed = eventArgs.DownloadInfo.DownloadedLength / eventArgs.DownloadInfo.DownloadTimeSpan.TotalSeconds;
         LogF8.Log($"Progress: {downloaded/(1024.0*1024.0):F2}MB/{allSize/(1024.0*1024.0):F2}MB, Speed: {speed/(1024.0*1024.0):F2}MB/s");
     });
 
 // Sub-package support
-List<string> subPackage = FF8.HotUpdate.CheckPackageUpdate(GameConfig.LocalGameVersion.SubPackage);
-FF8.HotUpdate.StartPackageUpdate(subPackage,
+var (packageDownloadTasks, packageAllSize) = FF8.HotUpdate.CheckPackageUpdate(GameConfig.LocalGameVersion.SubPackage);
+FF8.HotUpdate.StartPackageUpdate(packageDownloadTasks,
     () => { LogF8.Log("Success"); },
     () => { LogF8.Log("Failed"); },
     (eventArgs) => { /* same progress tracking */ });
@@ -73,11 +73,11 @@ FF8.HotUpdate.StartPackageUpdate(subPackage,
 
 1. Initialize modules in strict order: HotUpdate → Asset → Download → LoadManifest.
 2. Initialize local version, then remote version, then asset version.
-3. Call `CheckHotUpdate()` to get the update manifest and total size.
+3. Call `CheckHotUpdate()` to get prepared download infos and the actual remaining download size.
 4. Show update dialog with size info to user.
-5. Call `StartHotUpdate()` with success/failure/progress callbacks.
-6. For sub-packages (DLC), use `CheckPackageUpdate()` and `StartPackageUpdate()`.
-7. After update, reload affected assets.
+5. Call `StartHotUpdate()` directly with the returned `downloadInfos` and success/failure/progress callbacks.
+6. Read overall downloaded bytes from `eventArgs.TotalDownloadedLength`; `eventArgs.DownloadInfo.DownloadedLength` is only for the current file.
+7. For sub-packages (DLC), use `CheckPackageUpdate(GameConfig.LocalGameVersion.SubPackage)` to prepare `DownloadTaskInfo` items and pass them directly to `StartPackageUpdate()`.
 
 ## Common error handling
 
@@ -86,6 +86,7 @@ FF8.HotUpdate.StartPackageUpdate(subPackage,
 | Remote version check fails | CDN unreachable | Check remote URL config in F5 build tool |
 | Module init order crash | Wrong initialization order | Must be HotUpdate → Asset → Download → Manifest |
 | Sub-package not found | Package naming wrong | Use `Package_ + identifier` folder naming |
+| Progress only shows current file | Read wrong field | Use `eventArgs.TotalDownloadedLength` for overall progress |
 | Local sandbox stale files | Previous test data | Clear sandbox directory before testing |
 
 ## Cross-module dependencies

@@ -51,8 +51,8 @@ downloader.OnDownloadFailure += (DownloadFailureEventArgs e) => { };
 downloader.OnDownloadOverallProgress += (DonwloadUpdateEventArgs e) =>
 {
     float progress = (float)e.CurrentDownloadTaskIndex / e.DownloadTaskCount * 100f;
-    ulong downloadedBytes = e.DownloadInfo.DownloadedLength;
-    double speed = downloadedBytes / e.DownloadInfo.DownloadTimeSpan.TotalSeconds;
+    long downloadedBytes = e.TotalDownloadedLength;
+    double speed = e.DownloadInfo.DownloadedLength / e.DownloadInfo.DownloadTimeSpan.TotalSeconds;
     double downloadedMB = downloadedBytes / (1024.0 * 1024.0);
     double speedMB = speed / (1024.0 * 1024.0);
     LogF8.Log($"Progress: {progress:F1}%, {downloadedMB:F2}MB, Speed: {speedMB:F2}MB/s");
@@ -60,7 +60,9 @@ downloader.OnDownloadOverallProgress += (DonwloadUpdateEventArgs e) =>
 downloader.OnAllDownloadTaskCompleted += (DownloadTasksCompletedEventArgs e) => { };
 
 // Add download tasks
-downloader.AddDownload(url, Application.persistentDataPath + "/file.png");
+FileInfo file = new FileInfo(Application.persistentDataPath + "/file.png");
+long fileSizeInBytes = file.Length;
+downloader.AddDownload(url, Application.persistentDataPath + "/file.png", fileSizeInBytes, true);
 
 // Start downloading
 downloader.LaunchDownload();
@@ -77,11 +79,13 @@ FF8.Download.GetUrlFilesSizeAsync(url, (long size) => LogF8.Log(size));
 1. Create a downloader with `FF8.Download.CreateDownloader()`.
 2. Configure timeout if needed.
 3. Register all callbacks before adding tasks.
-4. Add download items with source URL and local save path.
-5. Call `LaunchDownload()` to begin.
-6. Monitor progress via `OnDownloadOverallProgress`.
-7. Handle success/failure per file.
-8. Cancel with `CancelDownload()` if needed.
+4. If you need resume support, read the local file size and pass it as `downloadByteOffset`, with `downloadAppend = true`.
+5. Add download items with source URL and local save path.
+6. Call `LaunchDownload()` to begin.
+7. Monitor progress via `OnDownloadOverallProgress`; use `e.TotalDownloadedLength` for accumulated bytes and `e.DownloadInfo.DownloadedLength` for the current file.
+8. Handle success/failure per file.
+9. Use `GetUrlFilesSizeAsync()` only when you need to query remote file size separately.
+10. Cancel with `CancelDownload()` if needed.
 
 ## Common error handling
 
@@ -91,6 +95,7 @@ FF8.Download.GetUrlFilesSizeAsync(url, (long size) => LogF8.Log(size));
 | File write fails | Invalid save path or no permission | Ensure path is in `Application.persistentDataPath` |
 | Progress shows 0% | Some servers don't provide Content-Length | Use task index ratio instead of byte-based progress |
 | Resume not working | Server doesn't support Range headers | Check server configuration |
+| Overall bytes only show current file | Using wrong event field | Use `e.TotalDownloadedLength` instead of `e.DownloadInfo.DownloadedLength` |
 
 ## Cross-module dependencies
 

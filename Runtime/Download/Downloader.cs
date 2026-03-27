@@ -261,6 +261,9 @@ namespace F8Framework.Core
             onAllDownloadTaskCompleted = null;
             // 重置下载任务计数
             downloadTaskCount = 0;
+            completedDownloadLength = 0;
+            totalRequirementDownloadLength = 0;
+            currentDownloadTaskIndex = 0;
         }
 
         /// <summary>
@@ -278,8 +281,10 @@ namespace F8Framework.Core
                 pendingTaskDict.Remove(downloadTask.DownloadId);
             }
 
-            OnPendingTasksCompleted();
+            // Mark the downloader idle before firing completion callbacks so retry flows
+            // can enqueue tasks and call LaunchDownload() immediately.
             Downloading = false;
+            OnPendingTasksCompleted();
         }
 
         /// <summary>
@@ -340,6 +345,7 @@ namespace F8Framework.Core
                         onDownloadSuccess?.Invoke(successEventArgs);
                         OnFileDownloading(downloadInfo);
                         DownloadSuccessEventArgs.Release(successEventArgs);
+                        completedDownloadLength += (long)downloadInfo.DownloadedLength;
                         successedInfos.Add(downloadInfo);
                     }
                 }
@@ -393,7 +399,8 @@ namespace F8Framework.Core
         void OnFileDownloading(DownloadInfo info)
         {
             var timeSpan = DateTime.Now - downloadStartTime;
-            var eventArgs = DonwloadUpdateEventArgs.Create(info, currentDownloadTaskIndex, downloadTaskCount, timeSpan);
+            long totalDownloadedLength = completedDownloadLength + (long)info.DownloadedLength;
+            var eventArgs = DonwloadUpdateEventArgs.Create(info, currentDownloadTaskIndex, downloadTaskCount, totalDownloadedLength, timeSpan);
             onDownloadOverall?.Invoke(eventArgs);
             DonwloadUpdateEventArgs.Release(eventArgs);
         }
@@ -415,6 +422,9 @@ namespace F8Framework.Core
             pendingTasks.Clear();
             downloadTaskCount = 0;
             pendingTaskDict.Clear();
+            completedDownloadLength = 0;
+            totalRequirementDownloadLength = 0;
+            currentDownloadTaskIndex = 0;
         }
 
         void OnCancelDownload()
@@ -436,6 +446,9 @@ namespace F8Framework.Core
             successedInfos.Clear();
             canDownload = false;
             Downloading = false;
+            completedDownloadLength = 0;
+            totalRequirementDownloadLength = 0;
+            currentDownloadTaskIndex = 0;
         }
     }
 }

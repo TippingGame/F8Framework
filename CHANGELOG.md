@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.9.273] - 2025-03-27
+1.新增HotUpdate模块热更新包的断点续传  
+2.新增Download模块当前下载总大小TotalDownloadedLength  
+3.优化HotUpdate模块下载完成后MD5校验，修改CheckHotUpdate和CheckPackageUpdate返回的数据类型  
+4.优化LogViewer首次打开的速度  
+
 ## [2.8.272] - 2025-03-26
 1.移除Event模块Action<object[]>参数方法  
 

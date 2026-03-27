@@ -111,12 +111,10 @@ public class LoadDll : MonoBehaviour
         yield return HotUpdate.InitAssetVersion();
             
         // Check resources needing updates
-        Tuple<Dictionary<string, string>, long> result  = HotUpdate.CheckHotUpdate();
-        var hotUpdateAssetUrl = result.Item1;
-        var allSize = result.Item2;
+        var (downloadInfos, allSize) = HotUpdate.CheckHotUpdate();
         
         // Execute hot update
-        HotUpdate.StartHotUpdate(hotUpdateAssetUrl, () =>
+        HotUpdate.StartHotUpdate(downloadInfos, () =>
         {
             LogF8.Log("Complete");
             // Optional metadata supplementation
@@ -156,8 +154,8 @@ public class LoadDll : MonoBehaviour
             LogF8.Log("Failed");
         }, eventArgs =>
         {
-            ulong downloadedBytes = eventArgs.DownloadInfo.DownloadedLength;
-            double speedBytesPerSecond = downloadedBytes / eventArgs.DownloadInfo.DownloadTimeSpan.TotalSeconds;
+            long downloadedBytes = eventArgs.TotalDownloadedLength;
+            double speedBytesPerSecond = eventArgs.DownloadInfo.DownloadedLength / eventArgs.DownloadInfo.DownloadTimeSpan.TotalSeconds;
             LogF8.Log($"Progress: {downloadedBytes}B/{allSize}B, Speed: {speedBytesPerSecond}B/s");
         });
     }

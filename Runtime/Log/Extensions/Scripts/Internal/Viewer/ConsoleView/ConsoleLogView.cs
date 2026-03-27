@@ -7,6 +7,8 @@ namespace F8Framework.Core
 {
     public class ConsoleLogView : LogViewBase
     {
+        private const int MAX_INSERT_LOG_COUNT_PER_FRAME = 200;
+
         public Dropdown categoryDropdown = null;
         public Transform addonMenuRoot = null;
         public LogTypeView logTypeView = null;
@@ -206,11 +208,9 @@ namespace F8Framework.Core
 
             if (showLogCount < logs.Count)
             {
-                for (int index = showLogCount; index < logs.Count; ++index)
-                {
-                    logList.Insert(logs[index], showPlayTime, showSceneName);
-                    ++showLogCount;
-                }
+                int insertCount = Mathf.Min(MAX_INSERT_LOG_COUNT_PER_FRAME, logs.Count - showLogCount);
+                logList.InsertRange(logs, showLogCount, insertCount, showPlayTime, showSceneName);
+                showLogCount += insertCount;
             }
         }
 

@@ -49,6 +49,7 @@ IEnumerator Start()
     FF8.HotUpdate = ModuleCenter.CreateModule<HotUpdateManager>();
     FF8.Asset = ModuleCenter.CreateModule<AssetManager>();
     FF8.Download = ModuleCenter.CreateModule<DownloadManager>();
+    yield return AssetBundleManager.Instance.LoadAssetBundleManifest();
     
     // 初始化本地版本
     FF8.HotUpdate.InitLocalVersion();
@@ -60,12 +61,10 @@ IEnumerator Start()
     yield return FF8.HotUpdate.InitAssetVersion();
     
     // 检查需要热更的资源，总大小
-    Tuple<Dictionary<string, string>, long> result  = FF8.HotUpdate.CheckHotUpdate();
-    var hotUpdateAssetUrl = result.Item1;
-    var allSize = result.Item2;
+    var (downloadInfos, allSize) = FF8.HotUpdate.CheckHotUpdate();
     
     // 资源热更新
-    FF8.HotUpdate.StartHotUpdate(hotUpdateAssetUrl, () =>
+    FF8.HotUpdate.StartHotUpdate(downloadInfos, () =>
     {
         LogF8.Log("完成");
     }, () =>
@@ -74,13 +73,13 @@ IEnumerator Start()
     }, eventArgs =>
     {
         // 已下载大小（字节）
-        ulong downloadedBytes = eventArgs.DownloadInfo.DownloadedLength;
+        long downloadedBytes = eventArgs.TotalDownloadedLength;
         
-        // 总大小（字节）- 需要累加之前已完成的任务大小
+        // 总大小（字节）
         long totalBytes = allSize;
         
         // 下载速度计算（字节/秒）
-        double speedBytesPerSecond = downloadedBytes / eventArgs.DownloadInfo.DownloadTimeSpan.TotalSeconds;
+        double speedBytesPerSecond = eventArgs.DownloadInfo.DownloadedLength / eventArgs.DownloadInfo.DownloadTimeSpan.TotalSeconds;
         
         // 单位转换：字节 -> MB
         double downloadedMB = downloadedBytes / (1024.0 * 1024.0);
@@ -91,11 +90,11 @@ IEnumerator Start()
         LogF8.Log($"进度：{downloadedMB:F2}MB/{totalMB:F2}MB, 速度：{speedMBPerSecond:F2}MB/s");
     });
 
-    // 检查未加载的分包
-    List<string> subPackage = FF8.HotUpdate.CheckPackageUpdate(GameConfig.LocalGameVersion.SubPackage);
+    // 检查未加载的分包，总大小
+    var (packageDownloadTasks, packageAllSize) = FF8.HotUpdate.CheckPackageUpdate(GameConfig.LocalGameVersion.SubPackage);
     
     // 分包加载
-    FF8.HotUpdate.StartPackageUpdate(subPackage, () =>
+    FF8.HotUpdate.StartPackageUpdate(packageDownloadTasks, () =>
     {
         LogF8.Log("完成");
     }, () =>
@@ -103,7 +102,7 @@ IEnumerator Start()
         LogF8.Log("失败");
     }, eventArgs =>
     {
-        // 同上
+        // 同上，可使用 packageAllSize 作为总下载量
     });
 }
 ```

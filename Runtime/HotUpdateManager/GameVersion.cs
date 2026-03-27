@@ -12,9 +12,11 @@ namespace F8Framework.Core
         public List<string> HotUpdateVersion;
         public bool EnablePackage;
         public List<string> SubPackage;
+        public Dictionary<string, (long size, string md5)> SubPackageInfo;
 
         public GameVersion(string version, string assetRemoteAddress = null, bool enableHotUpdate = false, 
-            List<string> hotUpdateVersion = null, bool enablePackage = false, List<string> subPackage = null)
+            List<string> hotUpdateVersion = null, bool enablePackage = false, List<string> subPackage = null,
+            Dictionary<string, (long size, string md5)> subPackageInfo = null)
         {
             Version = version;
             AssetRemoteAddress = assetRemoteAddress;
@@ -22,6 +24,7 @@ namespace F8Framework.Core
             HotUpdateVersion = hotUpdateVersion;
             EnablePackage = enablePackage;
             SubPackage = subPackage;
+            SubPackageInfo = subPackageInfo;
         }
         
         public GameVersion()

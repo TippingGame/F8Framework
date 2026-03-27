@@ -47,7 +47,10 @@ void Start()
     foreach (var fileInfo in fileInfos)
     {
         count += 1;
-        downloader.AddDownload(fileInfo, Application.persistentDataPath + "F8Download/download" + count + ".png");
+        // 获取文件大小，用于断点续传（可选）
+        FileInfo file = new FileInfo(Application.persistentDataPath + "F8Download/download" + count + ".png");
+        long fileSizeInBytes = file.Length;
+        downloader.AddDownload(fileInfo, Application.persistentDataPath + "F8Download/download" + count + ".png", fileSizeInBytes, true);
     }
     
     // 下载器开始下载
@@ -76,10 +79,10 @@ void OnDownloadOverall(DonwloadUpdateEventArgs eventArgs)
     float progress = currentTaskIndex / taskCount * 100f;
     
     // 已下载大小（字节）
-    ulong downloadedBytes = eventArgs.DownloadInfo.DownloadedLength;
+    long downloadedBytes = eventArgs.TotalDownloadedLength;
     
     // 下载速度计算（字节/秒）
-    double speedBytesPerSecond = downloadedBytes / eventArgs.DownloadInfo.DownloadTimeSpan.TotalSeconds;
+    double speedBytesPerSecond = eventArgs.DownloadInfo.DownloadedLength / eventArgs.DownloadInfo.DownloadTimeSpan.TotalSeconds;
     
     // 单位转换：字节 -> MB
     double downloadedMB = downloadedBytes / (1024.0 * 1024.0);

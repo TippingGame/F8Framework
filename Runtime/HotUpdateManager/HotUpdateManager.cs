@@ -12,12 +12,22 @@ namespace F8Framework.Core
 {
     public class HotUpdateManager : ModuleSingleton<HotUpdateManager>, IModule
     {
+        public class DownloadTaskInfo
+        {
+            public string Name;
+            public string LocalPath;
+            public string RemoteUrl;
+            public string ExpectedMd5;
+            public long ExpectedSize;
+            public long DownloadOffset;
+            public bool Append;
+        }
+
         public static string Separator = "_";
         public static string PackageSplit = "Package" + Separator;
         public static string RemoteDirName = "/Remote/" + URLSetting.GetPlatformName();
         public static string HotUpdateDirName = "/HotUpdate";
         public static string PackageDirName = "/Package";
-
         private Downloader hotUpdateDownloader;
         
         private Downloader packageDownloader;
@@ -117,25 +127,25 @@ namespace F8Framework.Core
         /// 检查需要热更的资源
         /// </summary>
         /// <returns></returns>
-        public Tuple<Dictionary<string, string>, long> CheckHotUpdate()
+        public (List<DownloadTaskInfo> DownloadInfos, long AllSize) CheckHotUpdate()
         {
             long allSize = 0;
-            Dictionary<string, string> hotUpdateAssetUrl = new Dictionary<string, string>();
+            List<DownloadTaskInfo> downloadInfos = new List<DownloadTaskInfo>();
             if (!GameConfig.LocalGameVersion.EnableHotUpdate) // 启用热更
             {
-                return Tuple.Create(hotUpdateAssetUrl, allSize);
+                return (downloadInfos, allSize);
             }
 
             if (GameConfig.RemoteAssetBundleMap.Count <= 0) // 热更资产Map数量
             {
-                return Tuple.Create(hotUpdateAssetUrl, allSize);
+                return (downloadInfos, allSize);
             }
             
             int result = GameConfig.CompareVersions(GameConfig.LocalGameVersion.Version,
                 GameConfig.RemoteGameVersion.Version);
             if (result >= 0) // 此版本无需热更新
             {
-                return Tuple.Create(hotUpdateAssetUrl, allSize);
+                return (downloadInfos, allSize);
             }
             
             var resAssetBundleMappings = GameConfig.RemoteAssetBundleMap;
@@ -150,41 +160,69 @@ namespace F8Framework.Core
                     && !resAssetMapping.Value.AbName.IsNullOrEmpty() && !resAssetMapping.Value.MD5.IsNullOrEmpty())
                 {
                     string abPath = resAssetMapping.Value.Version + "/" + URLSetting.AssetBundlesName + "/" +
-                                              URLSetting.GetPlatformName() + "/" + resAssetMapping.Value.AbName;
-                    
-                    string persistentAbPath = Application.persistentDataPath + HotUpdateDirName + Separator + abPath;
-                    
-                    // 校验本地热更资源文件md5
-                    if (File.Exists(persistentAbPath) && FileTools.CreateMd5ForFile(persistentAbPath) == resAssetMapping.Value.MD5)
+                                    URLSetting.GetPlatformName() + "/" + resAssetMapping.Value.AbName;
+                    string remoteUrl = GameConfig.LocalGameVersion.AssetRemoteAddress + HotUpdateDirName + Separator + abPath;
+                    int index = abPath.IndexOf('/');
+                    string relativePath = abPath.Substring(index + 1);
+                    string localPath = Application.persistentDataPath + HotUpdateDirName + "/" + relativePath;
+
+                    long expectedSize = 0;
+                    long.TryParse(resAssetMapping.Value.Size, out expectedSize);
+
+                    long downloadOffset = 0;
+                    bool append = false;
+                    if (File.Exists(localPath))
                     {
-                        continue;
+                        long localSize = new FileInfo(localPath).Length;
+                        if (expectedSize > 0 && localSize >= expectedSize)
+                        {
+                            FileTools.SafeDeleteFile(localPath);
+                        }
+                        else
+                        {
+                            downloadOffset = localSize;
+                            append = downloadOffset > 0;
+                        }
                     }
-                    allSize += string.IsNullOrEmpty(resAssetMapping.Value.Size) ? 0 : long.Parse(resAssetMapping.Value.Size) ;
-                    hotUpdateAssetUrl.TryAdd(resAssetMapping.Key, abPath);
+
+                    long remainingSize = expectedSize > 0 ? Math.Max(0, expectedSize - downloadOffset) : 0;
+                    allSize += remainingSize;
+
+                    downloadInfos.Add(new DownloadTaskInfo
+                    {
+                        Name = resAssetMapping.Key,
+                        LocalPath = localPath,
+                        RemoteUrl = remoteUrl,
+                        ExpectedMd5 = resAssetMapping.Value.MD5,
+                        ExpectedSize = expectedSize,
+                        DownloadOffset = downloadOffset,
+                        Append = append
+                    });
                 }
             }
             
-            return Tuple.Create(hotUpdateAssetUrl, allSize);
+            return (downloadInfos, allSize);
         }
         
         /// <summary>
         /// 开始热更新包下载
         /// </summary>
-        /// <param name="hotUpdateAssetUrl"></param>
+        /// <param name="downloadInfos"></param>
         /// <param name="completed"></param>
         /// <param name="failure"></param>
         /// <param name="overallProgress"></param>
-        public void StartHotUpdate(Dictionary<string, string> hotUpdateAssetUrl, Action completed = null, Action failure = null, Action<DonwloadUpdateEventArgs> overallProgress = null)
+        public void StartHotUpdate(List<DownloadTaskInfo> downloadInfos, Action completed = null, Action failure = null, Action<DonwloadUpdateEventArgs> overallProgress = null)
         {
-            if (!GameConfig.LocalGameVersion.EnableHotUpdate || hotUpdateAssetUrl.Count <= 0 || F8GamePrefs.GetBool(nameof(F8GameConfig.ForceRemoteAssetBundle)))
+            if (!GameConfig.LocalGameVersion.EnableHotUpdate || downloadInfos == null || downloadInfos.Count <= 0 || F8GamePrefs.GetBool(nameof(F8GameConfig.ForceRemoteAssetBundle)))
             {
                 WriteVersion();
                 completed?.Invoke();
                 return;
             }
 
-            // 创建热更下载器
-            hotUpdateDownloader = DownloadManager.Instance.CreateDownloader("hotUpdateDownloader", new Downloader());
+            hotUpdateDownloader ??= DownloadManager.Instance.CreateDownloader("hotUpdateDownloader", new Downloader());
+            hotUpdateDownloader.Release();
+            bool networkFailure = false;
             
             // 设置热更下载器回调
             hotUpdateDownloader.OnDownloadSuccess += (eventArgs) =>
@@ -193,8 +231,8 @@ namespace F8Framework.Core
             };
             hotUpdateDownloader.OnDownloadFailure += (eventArgs) =>
             {
+                networkFailure = true;
                 LogF8.LogError($"获取热更资源失败。：{eventArgs.DownloadInfo.DownloadUrl}\n{eventArgs.ErrorMessage}");
-                failure?.Invoke();
             };
             hotUpdateDownloader.OnDownloadStart += (eventArgs) =>
             {
@@ -206,24 +244,40 @@ namespace F8Framework.Core
             };
             hotUpdateDownloader.OnAllDownloadTaskCompleted += (eventArgs) =>
             {
+                if (networkFailure || eventArgs.FailedInfos.Length > 0)
+                {
+                    failure?.Invoke();
+                    return;
+                }
+                var invalidDownloadInfos = CheckMD5(downloadInfos);
+                if (invalidDownloadInfos != null)
+                {
+                    LogF8.LogError(string.Join("\n", invalidDownloadInfos.Select(info => info.LocalPath + " MD5校验失败！")));
+                    failure?.Invoke();
+                    return;
+                }
                 LogF8.LogVersion($"所有热更资源获取完成！，用时：{eventArgs.TimeSpan}");
                 WriteVersion();
                 completed?.Invoke();
             };
 
-            List<string> tempDownloadUrl = new List<string>(hotUpdateAssetUrl.Count);
-            // 添加下载清单
-            foreach (var assetUrl in hotUpdateAssetUrl.Values)
+            foreach (var downloadInfo in downloadInfos)
             {
-                if (!tempDownloadUrl.Contains(assetUrl))
+                if (downloadInfo == null || downloadInfo.LocalPath.IsNullOrEmpty() || downloadInfo.RemoteUrl.IsNullOrEmpty())
                 {
-                    int index = assetUrl.IndexOf('/');
-                    string result = assetUrl.Substring(index + 1);
-                    hotUpdateDownloader.AddDownload(GameConfig.LocalGameVersion.AssetRemoteAddress + HotUpdateDirName + Separator + assetUrl,
-                        Application.persistentDataPath + HotUpdateDirName + "/" + result);
-                    tempDownloadUrl.Add(assetUrl);
+                    continue;
                 }
+
+                hotUpdateDownloader.AddDownload(downloadInfo.RemoteUrl, downloadInfo.LocalPath, downloadInfo.DownloadOffset, downloadInfo.Append);
             }
+
+            if (hotUpdateDownloader.DownloadingCount <= 0)
+            {
+                WriteVersion();
+                completed?.Invoke();
+                return;
+            }
+
             void WriteVersion()
             {
                 if (!GameConfig.RemoteGameVersion.Version.IsNullOrEmpty())
@@ -246,38 +300,90 @@ namespace F8Framework.Core
         }
         
         // 检查需要下载的分包
-        public List<string> CheckPackageUpdate(List<string> subPackage)
+        public (List<DownloadTaskInfo> DownloadInfos, long AllSize) CheckPackageUpdate(List<string> subPackages)
         {
-            List<string> temp = new List<string>(subPackage.Count);
-            foreach (var package in subPackage)
+            List<DownloadTaskInfo> downloadInfos = new List<DownloadTaskInfo>();
+            long allSize = 0;
+            if (!GameConfig.LocalGameVersion.EnablePackage || subPackages == null || subPackages.Count <= 0)
             {
-                if (GameConfig.LocalGameVersion.SubPackage.Contains(package))
-                {
-                    temp.Add(package);
-                }
+                return (downloadInfos, allSize);
             }
-            return temp;
+
+            foreach (var package in subPackages)
+            {
+                if (!GameConfig.LocalGameVersion.SubPackage.Contains(package))
+                {
+                    continue;
+                }
+
+                string persistentPackagePath = Application.persistentDataPath + "/" + PackageSplit + package + ".zip";
+                string remotePackageUrl = GameConfig.LocalGameVersion.AssetRemoteAddress + "/" + PackageSplit + package + ".zip";
+
+                string expectedMd5 = null;
+                long expectedSize = 0;
+                TryGetPackageInfo(package, out expectedMd5, out expectedSize);
+
+                long downloadOffset = 0;
+                bool append = false;
+                if (File.Exists(persistentPackagePath))
+                {
+                    long fileSizeInBytes = new FileInfo(persistentPackagePath).Length;
+                    if (expectedSize > 0)
+                    {
+                        if (fileSizeInBytes > expectedSize)
+                        {
+                            FileTools.SafeDeleteFile(persistentPackagePath);
+                        }
+                        else if (fileSizeInBytes < expectedSize)
+                        {
+                            downloadOffset = fileSizeInBytes;
+                            append = downloadOffset > 0;
+                        }
+                    }
+                    else
+                    {
+                        downloadOffset = fileSizeInBytes;
+                        append = downloadOffset > 0;
+                    }
+                }
+
+                long remainingSize = expectedSize > 0 ? Math.Max(0, expectedSize - downloadOffset) : 0;
+                allSize += remainingSize;
+
+                downloadInfos.Add(new DownloadTaskInfo
+                {
+                    Name = package,
+                    LocalPath = persistentPackagePath,
+                    RemoteUrl = remotePackageUrl,
+                    ExpectedMd5 = expectedMd5,
+                    ExpectedSize = expectedSize,
+                    DownloadOffset = downloadOffset,
+                    Append = append
+                });
+            }
+
+            return (downloadInfos, allSize);
         }
-        
+
         /// <summary>
         /// 开始分包下载
         /// </summary>
-        /// <param name="subPackages"></param>
+        /// <param name="downloadInfos"></param>
         /// <param name="completed"></param>
         /// <param name="failure"></param>
         /// <param name="overallProgress"></param>
-        public void StartPackageUpdate(List<string> subPackages, Action completed = null, Action failure = null, Action<DonwloadUpdateEventArgs> overallProgress = null)
+        public void StartPackageUpdate(List<DownloadTaskInfo> downloadInfos, Action completed = null, Action failure = null, Action<DonwloadUpdateEventArgs> overallProgress = null)
         {
-            if (!GameConfig.LocalGameVersion.EnablePackage || subPackages.Count <= 0 || F8GamePrefs.GetBool(nameof(F8GameConfig.ForceRemoteAssetBundle)))
+            if (!GameConfig.LocalGameVersion.EnablePackage || downloadInfos == null || downloadInfos.Count <= 0 || F8GamePrefs.GetBool(nameof(F8GameConfig.ForceRemoteAssetBundle)))
             {
                 completed?.Invoke();
                 return;
             }
 
-            List<string> downloadPaths = new List<string>(subPackages.Count);
-            
-            // 创建分包下载器
-            packageDownloader = DownloadManager.Instance.CreateDownloader("packageDownloader", new Downloader());
+            packageDownloader ??= DownloadManager.Instance.CreateDownloader("packageDownloader", new Downloader());
+            packageDownloader.Release();
+            bool networkFailure = false;
+            List<string> downloadPaths = new List<string>(downloadInfos.Count);
             
             // 设置分包下载器回调
             packageDownloader.OnDownloadSuccess += (eventArgs) =>
@@ -286,8 +392,8 @@ namespace F8Framework.Core
             };
             packageDownloader.OnDownloadFailure += (eventArgs) =>
             {
+                networkFailure = true;
                 LogF8.LogError($"获取分包资源失败。：{eventArgs.DownloadInfo.DownloadUrl}\n{eventArgs.ErrorMessage}");
-                failure?.Invoke();
             };
             packageDownloader.OnDownloadStart += (eventArgs) =>
             {
@@ -299,6 +405,18 @@ namespace F8Framework.Core
             };
             packageDownloader.OnAllDownloadTaskCompleted += (eventArgs) =>
             {
+                if (networkFailure || eventArgs.FailedInfos.Length > 0)
+                {
+                    failure?.Invoke();
+                    return;
+                }
+                var invalidDownloadInfos = CheckMD5(downloadInfos);
+                if (invalidDownloadInfos != null)
+                {
+                    LogF8.LogError(string.Join("\n", invalidDownloadInfos.Select(info => "MD5校验失败！" + info.LocalPath)));
+                    failure?.Invoke();
+                    return;
+                }
                 LogF8.LogVersion($"所有分包资源获取完成！，用时：{eventArgs.TimeSpan}");
 #if UNITY_WEBGL
                 // 使用协程
@@ -310,24 +428,85 @@ namespace F8Framework.Core
             };
             
             // 添加下载清单
-            foreach (var package in subPackages)
+            foreach (var downloadInfo in downloadInfos)
             {
-                string persistentPackagePath = Application.persistentDataPath + "/" + PackageSplit + package + ".zip";
-                long fileSizeInBytes = 0;
-                if (File.Exists(persistentPackagePath))
+                if (downloadInfo == null || downloadInfo.LocalPath.IsNullOrEmpty() || downloadInfo.RemoteUrl.IsNullOrEmpty())
                 {
-                    FileInfo fileInfo = new FileInfo(persistentPackagePath);
-                    fileSizeInBytes = fileInfo.Length;
+                    continue;
                 }
-                // 断点续传
-                packageDownloader.AddDownload(GameConfig.LocalGameVersion.AssetRemoteAddress + "/" + PackageSplit + package + ".zip",
-                    persistentPackagePath, fileSizeInBytes, true);
+
+                string persistentPackagePath = downloadInfo.LocalPath;
                 downloadPaths.Add(persistentPackagePath);
+
+                packageDownloader.AddDownload(downloadInfo.RemoteUrl, persistentPackagePath, downloadInfo.DownloadOffset, downloadInfo.Append);
             }
-            
+
+            if (packageDownloader.DownloadingCount <= 0)
+            {
+#if UNITY_WEBGL
+                Util.Unity.StartCoroutine(UnZipPackagePathsCo(downloadPaths, completed));
+#else
+                _ = UnZipPackagePaths(downloadPaths, completed);
+#endif
+                return;
+            }
+
             packageDownloader.LaunchDownload();
         }
-        
+
+        private List<DownloadTaskInfo> CheckMD5(List<DownloadTaskInfo> downloadInfos)
+        {
+            if (downloadInfos == null || downloadInfos.Count <= 0)
+            {
+                return null;
+            }
+
+            List<DownloadTaskInfo> invalidDownloadInfos = null;
+            foreach (var downloadInfo in downloadInfos)
+            {
+                if (downloadInfo == null || downloadInfo.LocalPath.IsNullOrEmpty() || downloadInfo.ExpectedMd5.IsNullOrEmpty())
+                {
+                    continue;
+                }
+
+                if (!TryValidateFileMd5(downloadInfo.LocalPath, downloadInfo.ExpectedMd5))
+                {
+                    invalidDownloadInfos ??= new List<DownloadTaskInfo>();
+                    invalidDownloadInfos.Add(downloadInfo);
+                }
+            }
+
+            return invalidDownloadInfos;
+        }
+
+        private bool TryGetPackageInfo(string package, out string expectedMd5, out long expectedSize)
+        {
+            expectedMd5 = null;
+            expectedSize = 0;
+
+            Dictionary<string, (long size, string md5)> packageInfoDict = GameConfig.RemoteGameVersion.SubPackageInfo;
+            if (packageInfoDict == null || !packageInfoDict.TryGetValue(package, out (long size, string md5) packageInfo))
+            {
+                return false;
+            }
+
+            expectedMd5 = packageInfo.md5;
+            expectedSize = packageInfo.size;
+
+            return true;
+        }
+
+        private bool TryValidateFileMd5(string filePath, string expectedMd5)
+        {
+            if (expectedMd5.IsNullOrEmpty() || !File.Exists(filePath))
+            {
+                return false;
+            }
+
+            string fileMd5 = FileTools.CreateMd5ForFile(filePath);
+            return string.Equals(fileMd5, expectedMd5, StringComparison.OrdinalIgnoreCase);
+        }
+
         public IEnumerator UnZipPackagePathsCo(List<string> downloadPaths, Action completed = null)
         {
             string optionalPackagePassword = F8GamePrefs.GetString(nameof(F8GameConfig.OptionalPackagePassword), "");
