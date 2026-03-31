@@ -16,6 +16,8 @@ namespace F8Framework.Core
         private MultiLayout multiLayout = null;
         private SystemInformation.Information information = null;
 
+        public Button refreshButton = null;
+
         public override void SetOrientation(ScreenOrientation orientation)
         {
             if (orientation == ScreenOrientation.Portrait || orientation == ScreenOrientation.PortraitUpsideDown)
@@ -32,6 +34,7 @@ namespace F8Framework.Core
 
         public override void InitializeView()
         {
+            refreshButton.onClick.AddListener(UpdateRefresh);
             multiLayout = GetComponent<MultiLayout>();
             information = SystemInformation.Instance.GetInformation();
 

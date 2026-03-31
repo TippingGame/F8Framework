@@ -22,6 +22,17 @@ namespace F8Framework.Core
         private bool showSceneName = true;
         private MultiLayout multiLayout = null;
 
+        public Toggle logToggle = null;
+        public Toggle warningToggle = null;
+        public Toggle errorToggle = null;
+        public InputField filterInput = null;
+        public Toggle changeFilterIgnoreCase = null;
+        public Toggle playTimeToggle = null;
+        public Toggle sceneNameToggle = null;
+        public Button clearButton = null;
+        public Button sendMailButton = null;
+        public Button copyButton = null;
+
         public interface IConsolMenuAddon
         {
             GameObject CreateUI(Transform parent);
@@ -35,6 +46,17 @@ namespace F8Framework.Core
 
         public override void InitializeView()
         {
+            copyButton.onClick.AddListener(CopyStackTrace);
+            sendMailButton.onClick.AddListener(SendMail);
+            clearButton.onClick.AddListener(Clear);
+            sceneNameToggle.onValueChanged.AddListener(ShowSceneName);
+            playTimeToggle.onValueChanged.AddListener(ShowPlayTime);
+            changeFilterIgnoreCase.onValueChanged.AddListener(ChangeFilterIgnoreCase);
+            filterInput.onSubmit.AddListener(SetFilter);
+            categoryDropdown.onValueChanged.AddListener(SelectCategory);
+            logToggle.onValueChanged.AddListener(SelectLogType);
+            warningToggle.onValueChanged.AddListener(SelectWarningType);
+            errorToggle.onValueChanged.AddListener(SelectErrorType);
             multiLayout = GetComponent<MultiLayout>();
             logList.AddSelectCallback(UpdateStackTrace);
 
@@ -120,9 +142,8 @@ namespace F8Framework.Core
             });
         }
 
-        public void SelectCategory()
+        public void SelectCategory(int index)
         {
-            int index = categoryDropdown.value;
             if (index == 0)
             {
                 Log.Instance.SetCurrentCategory(LogConst.DEFAULT_CATEGORY_NAME);

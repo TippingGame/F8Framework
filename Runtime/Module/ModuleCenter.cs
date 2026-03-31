@@ -21,10 +21,10 @@ namespace F8Framework.Core
 		}
 
 		private static MonoBehaviour _behaviour;
-		private static List<ModuleWrapper> _coms = new List<ModuleWrapper>(100);
-		private static List<ModuleWrapper> _comsUpdate = new List<ModuleWrapper>(100);
-		private static List<ModuleWrapper> _comsLateUpdate = new List<ModuleWrapper>(100);
-		private static List<ModuleWrapper> _comsFixedUpdate = new List<ModuleWrapper>(100);
+		private static List<ModuleWrapper> _coms = new List<ModuleWrapper>(32);
+		private static List<ModuleWrapper> _comsUpdate = new List<ModuleWrapper>(32);
+		private static List<ModuleWrapper> _comsLateUpdate = new List<ModuleWrapper>(32);
+		private static List<ModuleWrapper> _comsFixedUpdate = new List<ModuleWrapper>(32);
 		
 		private static bool _isDirty = false;
 		private static bool _isDirtyLate = false;

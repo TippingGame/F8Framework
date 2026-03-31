@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace F8Framework.Core
@@ -34,6 +35,13 @@ namespace F8Framework.Core
         private Color bgNormalColor1 = new Color(0.215f, 0.215f, 0.215f);
         private Color bgNormalColor2 = new Color(0.235f, 0.235f, 0.235f);
         private Color bgNormalColor;
+        
+        public Button select = null;
+
+        private void Awake()
+        {
+            select.onClick.AddListener(OnTouch);
+        }
 
         public void ShowPlayTime(bool show)
         {

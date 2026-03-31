@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.9.275] - 2025-03-31
+1.修复Obfuz混淆后LogViewer不能点击的问题  
+2.优化Asset模块和模块中心  
+
 ## [2.9.274] - 2025-03-27
 1.优化Event模块DispatchEvent时缺少的参数使用默认数据填充  
 

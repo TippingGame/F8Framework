@@ -16,7 +16,7 @@ namespace F8Framework.Core
         
         private AssetBundleManifest manifest;
         private Dictionary<string, AssetBundleLoader> assetBundleLoaders = new Dictionary<string, AssetBundleLoader>();
-        private List<AssetBundleLoader> assetBundleLoadersList = new List<AssetBundleLoader>();
+        private readonly List<AssetBundleLoader> assetBundleLoadersList = new List<AssetBundleLoader>();
 
         public Dictionary<string, AssetBundleLoader> GetAssetBundleLoaders()
         {
@@ -49,9 +49,9 @@ namespace F8Framework.Core
             foreach (string assetBundlePath in assetBundlePaths)
             {
                 AssetBundleLoader loader;
-                if (assetBundleLoaders.ContainsKey(assetBundlePath))
+                if (assetBundleLoaders.TryGetValue(assetBundlePath, out var bundleLoader))
                 {
-                    loader = assetBundleLoaders[assetBundlePath];
+                    loader = bundleLoader;
                     loader.AddParentBundle(info.AssetBundlePath);
                 }
                 else
@@ -113,9 +113,9 @@ namespace F8Framework.Core
             {
                 string assetBundlePath = assetBundlePaths[i];
                 AssetBundleLoader loader;
-                if (assetBundleLoaders.ContainsKey(assetBundlePath))
+                if (assetBundleLoaders.TryGetValue(assetBundlePath, out var bundleLoader))
                 {
-                    loader = assetBundleLoaders[assetBundlePath];
+                    loader = bundleLoader;
                     loader.AddParentBundle(info.AssetBundlePath);
                 }
                 else
@@ -1084,14 +1084,10 @@ namespace F8Framework.Core
         public void OnUpdate()
         {
             assetBundleLoadersList.Clear();
-            foreach (AssetBundleLoader abl in assetBundleLoaders.Values)
-            {
-                if (abl != null)
-                    assetBundleLoadersList.Add(abl);
-            }
+            assetBundleLoadersList.AddRange(assetBundleLoaders.Values);
             for (int i = 0; i < assetBundleLoadersList.Count; i++)
             {
-                assetBundleLoadersList[i].OnUpdate();
+                assetBundleLoadersList[i]?.OnUpdate();
             }
         }
 

@@ -17,10 +17,15 @@ namespace F8Framework.Core
         public float maxHeight = 620;
 
         public float margin = 18;
+        
+        public Button bgButton = null;
+        public Button closeButton = null;
 
         protected override void Init()
         {
             Show(false);
+            bgButton.onClick.AddListener(OnClickCloseButton);
+            closeButton.onClick.AddListener(OnClickCloseButton);
         }
 
         public void ShowPopup(string message, string title = "")

@@ -1,12 +1,19 @@
 ﻿using System.Collections.Generic;
+using UnityEngine.UI;
 
 namespace F8Framework.Core
 {
     public class FunctionLogView : LogViewBase
     {
         public CommandList commandList = null;
+        public InputField inputCheatKey = null;
 
         private int showCommandCount = 0;
+        
+        public override void InitializeView()
+        {
+            inputCheatKey.onSubmit.AddListener(InputCheatKey);
+        }
 
         public void InputCheatKey(string cheatKey)
         {

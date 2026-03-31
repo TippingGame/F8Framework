@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using UnityEngine.UI;
 
 namespace F8Framework.Core
@@ -11,6 +12,12 @@ namespace F8Framework.Core
     public class CommandItem : InfiniteScrollItem
     {
         public Text commandName = null;
+        public Button invokeButton = null;
+
+        private void Awake()
+        {
+            invokeButton.onClick.AddListener(InvokeCommand);
+        }
 
         public override void UpdateData(InfiniteScrollData scrollData)
         {

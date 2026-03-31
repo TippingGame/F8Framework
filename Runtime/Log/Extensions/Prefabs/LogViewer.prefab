@@ -58,6 +58,16 @@ MonoBehaviour:
   logList: {fileID: 6481662229907553765}
   stackTrace: {fileID: 1958336415422876662}
   selectLogAddonMenuRoot: {fileID: 5154206404896172246}
+  logToggle: {fileID: 9093571082050527332}
+  warningToggle: {fileID: 4400270820402916699}
+  errorToggle: {fileID: 566999546843923853}
+  filterInput: {fileID: 6710006588168326690}
+  changeFilterIgnoreCase: {fileID: 551282938016283284}
+  playTimeToggle: {fileID: 8694230799397044312}
+  sceneNameToggle: {fileID: 8777843778285839942}
+  clearButton: {fileID: 3936369071425853704}
+  sendMailButton: {fileID: 5526571820013365174}
+  copyButton: {fileID: 2617763052617172427}
 --- !u!114 &2079823409889376314
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -739,6 +749,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   commandList: {fileID: 200793042710655592}
+  inputCheatKey: {fileID: 2450608239561289452}
 --- !u!1 &1006816525
 GameObject:
   m_ObjectHideFlags: 0
@@ -860,19 +871,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1006816528}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 3307016546278491647}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: SelectFunction
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!1 &1020497189
 GameObject:
   m_ObjectHideFlags: 0
@@ -1012,6 +1011,7 @@ MonoBehaviour:
   playInfoGroup: {fileID: 9204140683804421841}
   featureInfoGroup: {fileID: 1952820422121266019}
   graphicsInfoGroup: {fileID: 2478954712482083234}
+  refreshButton: {fileID: 7745422149324803049}
 --- !u!114 &173261405
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1313,19 +1313,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1706466627}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 3307016546278491647}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: SelectConsole
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &3342110317161923487
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2166,19 +2154,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1953221688}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 3307016546278491647}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: SelectSystem
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!1 &1970398587
 GameObject:
   m_ObjectHideFlags: 0
@@ -2616,19 +2592,7 @@ MonoBehaviour:
     m_Options: []
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 98434336}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: SelectCategory
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   m_AlphaFadeSpeed: 0.15
 --- !u!1 &62310098584469834
 GameObject:
@@ -2762,19 +2726,7 @@ MonoBehaviour:
   m_CharacterLimit: 0
   m_OnSubmit:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 810331110}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: InputCheatKey
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   m_OnDidEndEdit:
     m_PersistentCalls:
       m_Calls: []
@@ -3228,19 +3180,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1557993163038224396}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 3211449186886488598}
-        m_TargetAssemblyTypeName: F8Framework.Core.Popup, F8Framework.Core
-        m_MethodName: OnClickCloseButton
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!1 &530304099020028551
 GameObject:
   m_ObjectHideFlags: 0
@@ -3456,7 +3396,7 @@ MonoBehaviour:
     m_AlignByGeometry: 0
     m_RichText: 0
     m_HorizontalOverflow: 1
-    m_VerticalOverflow: 0
+    m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: 
 --- !u!1 &792270101460124512
@@ -3535,8 +3475,8 @@ MonoBehaviour:
     m_Alignment: 3
     m_AlignByGeometry: 0
     m_RichText: 1
-    m_HorizontalOverflow: 0
-    m_VerticalOverflow: 0
+    m_HorizontalOverflow: 1
+    m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: Category
 --- !u!1 &871229218497557607
@@ -3857,19 +3797,7 @@ MonoBehaviour:
   m_Group: {fileID: 0}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 98434336}
-        m_TargetAssemblyTypeName: F8Framework.Core.ConsoleView, F8Framework.Core
-        m_MethodName: SelectLogType
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   m_IsOn: 1
 --- !u!1 &1129468130871724803
 GameObject:
@@ -3947,8 +3875,8 @@ MonoBehaviour:
     m_Alignment: 0
     m_AlignByGeometry: 0
     m_RichText: 1
-    m_HorizontalOverflow: 0
-    m_VerticalOverflow: 0
+    m_HorizontalOverflow: 1
+    m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: Enter cheat key...
 --- !u!1 &1136032912824354900
@@ -4178,14 +4106,14 @@ MonoBehaviour:
     m_Font: {fileID: 12800000, guid: c099191c7802cc840989a711cbee8507, type: 3}
     m_FontSize: 14
     m_FontStyle: 2
-    m_BestFit: 0
+    m_BestFit: 1
     m_MinSize: 10
     m_MaxSize: 40
     m_Alignment: 0
     m_AlignByGeometry: 0
     m_RichText: 1
-    m_HorizontalOverflow: 0
-    m_VerticalOverflow: 0
+    m_HorizontalOverflow: 1
+    m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: 
 --- !u!1 &1452280432831362029
@@ -5205,8 +5133,8 @@ MonoBehaviour:
     m_Alignment: 0
     m_AlignByGeometry: 0
     m_RichText: 1
-    m_HorizontalOverflow: 0
-    m_VerticalOverflow: 0
+    m_HorizontalOverflow: 1
+    m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: Play Time(Second)
 --- !u!1 &2402532913017653528
@@ -5437,8 +5365,8 @@ MonoBehaviour:
     m_Alignment: 3
     m_AlignByGeometry: 0
     m_RichText: 1
-    m_HorizontalOverflow: 0
-    m_VerticalOverflow: 0
+    m_HorizontalOverflow: 1
+    m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: Option A
 --- !u!1 &2508105532668919924
@@ -6093,8 +6021,8 @@ MonoBehaviour:
     m_Alignment: 3
     m_AlignByGeometry: 0
     m_RichText: 1
-    m_HorizontalOverflow: 0
-    m_VerticalOverflow: 0
+    m_HorizontalOverflow: 1
+    m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: Mail
 --- !u!1 &2959602199568214523
@@ -6415,19 +6343,7 @@ MonoBehaviour:
   m_Group: {fileID: 0}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 98434336}
-        m_TargetAssemblyTypeName: F8Framework.Core.ConsoleView, F8Framework.Core
-        m_MethodName: SelectWarningType
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   m_IsOn: 1
 --- !u!1 &3086401791939628388
 GameObject:
@@ -6514,19 +6430,7 @@ MonoBehaviour:
   m_Group: {fileID: 0}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 98434336}
-        m_TargetAssemblyTypeName: F8Framework.Core.ConsoleView, F8Framework.Core
-        m_MethodName: ChangeFilterIgnoreCase
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   m_IsOn: 1
 --- !u!1 &3114590659941054264
 GameObject:
@@ -6997,6 +6901,8 @@ MonoBehaviour:
   minHeight: 100
   maxHeight: 460
   margin: 18
+  bgButton: {fileID: 1888841543977332763}
+  closeButton: {fileID: 8475541555249857089}
 --- !u!1 &3219910730220046588
 GameObject:
   m_ObjectHideFlags: 0
@@ -7082,19 +6988,7 @@ MonoBehaviour:
   m_Group: {fileID: 0}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 98434336}
-        m_TargetAssemblyTypeName: F8Framework.Core.ConsoleView, F8Framework.Core
-        m_MethodName: ShowSceneName
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   m_IsOn: 1
 --- !u!1 &3307016546278491646
 GameObject:
@@ -7218,6 +7112,11 @@ MonoBehaviour:
   consoleLogView: {fileID: 98434336}
   functionLogView: {fileID: 810331110}
   systemLogView: {fileID: 7017151122991144253}
+  consoleButton: {fileID: 1706466626}
+  functionButton: {fileID: 1006816527}
+  systemButton: {fileID: 1953221687}
+  alphaSlider: {fileID: 3098798558877614488}
+  closeBtn: {fileID: 6941147812086378600}
 --- !u!225 &1508399110
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -8018,8 +7917,8 @@ MonoBehaviour:
     m_Alignment: 0
     m_AlignByGeometry: 0
     m_RichText: 1
-    m_HorizontalOverflow: 0
-    m_VerticalOverflow: 0
+    m_HorizontalOverflow: 1
+    m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: Ignore Case
 --- !u!1 &3957107540807840399
@@ -8333,19 +8232,7 @@ MonoBehaviour:
   m_Value: 1
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 3307016546278491647}
-        m_TargetAssemblyTypeName: F8Framework.Core.Viewer, F8Framework.Core
-        m_MethodName: OnAlphaValueChanged
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!1 &4125798579981156778
 GameObject:
   m_ObjectHideFlags: 0
@@ -8698,19 +8585,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 9051922399508247258}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 98434336}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: CopyStackTrace
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!1 &4320126678092928605
 GameObject:
   m_ObjectHideFlags: 0
@@ -8797,19 +8672,7 @@ MonoBehaviour:
   m_Group: {fileID: 0}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 98434336}
-        m_TargetAssemblyTypeName: F8Framework.Core.ConsoleView, F8Framework.Core
-        m_MethodName: SelectErrorType
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   m_IsOn: 1
 --- !u!1 &4473715049446839520
 GameObject:
@@ -9007,19 +8870,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5699361703001808347}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 3211449186886488598}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: OnClickCloseButton
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!1 &4826263216836872654
 GameObject:
   m_ObjectHideFlags: 0
@@ -9153,19 +9004,7 @@ MonoBehaviour:
   m_CharacterLimit: 0
   m_OnSubmit:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 98434336}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: SetFilter
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   m_OnDidEndEdit:
     m_PersistentCalls:
       m_Calls: []
@@ -10058,19 +9897,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 4171412400684771797}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 7017151122991144253}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: Refresh
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!1 &5422783314179197641
 GameObject:
   m_ObjectHideFlags: 0
@@ -10355,8 +10182,8 @@ MonoBehaviour:
     m_Alignment: 3
     m_AlignByGeometry: 0
     m_RichText: 1
-    m_HorizontalOverflow: 0
-    m_VerticalOverflow: 0
+    m_HorizontalOverflow: 1
+    m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: Filter
 --- !u!1 &5819656136025757771
@@ -10480,19 +10307,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 7261737035989389026}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 98434336}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: SendMail
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!1 &6073498014944724211
 GameObject:
   m_ObjectHideFlags: 0
@@ -10670,8 +10485,8 @@ MonoBehaviour:
     m_Alignment: 3
     m_AlignByGeometry: 0
     m_RichText: 1
-    m_HorizontalOverflow: 0
-    m_VerticalOverflow: 0
+    m_HorizontalOverflow: 1
+    m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: 
 --- !u!1 &6313555580591467293
@@ -10865,7 +10680,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   keyCodeBackQuote: 1
   gestureEnable: 1
-  autoPopupOnError: 1
+  autoPopupOnExceptionOrAssert: 1
   mailSetting:
     to: to@mail.com
     userName: username@mail.com
@@ -12549,7 +12364,7 @@ MonoBehaviour:
     m_AlignByGeometry: 0
     m_RichText: 0
     m_HorizontalOverflow: 1
-    m_VerticalOverflow: 0
+    m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: 
 --- !u!1 &8186472164784385108
@@ -13309,19 +13124,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8327743148534634829}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 98434336}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: Clear
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!1 &8617362116690837144
 GameObject:
   m_ObjectHideFlags: 0
@@ -13680,8 +13483,8 @@ MonoBehaviour:
     m_Alignment: 0
     m_AlignByGeometry: 0
     m_RichText: 1
-    m_HorizontalOverflow: 0
-    m_VerticalOverflow: 0
+    m_HorizontalOverflow: 1
+    m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: Scene Name
 --- !u!1 &8804593147924318974
@@ -14090,19 +13893,7 @@ MonoBehaviour:
   m_Group: {fileID: 0}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 98434336}
-        m_TargetAssemblyTypeName: F8Framework.Core.ConsoleView, F8Framework.Core
-        m_MethodName: ShowPlayTime
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   m_IsOn: 1
 --- !u!1 &9103419421550340805
 GameObject:
@@ -14225,19 +14016,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 3622921077192825483}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 6481662229907553765}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: MoveToBottom
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!1 &9129940214339567918
 GameObject:
   m_ObjectHideFlags: 0

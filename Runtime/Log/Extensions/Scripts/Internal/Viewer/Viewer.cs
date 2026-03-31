@@ -25,8 +25,19 @@ namespace F8Framework.Core
         private bool isTouchBegin = false;
         private float touchTime = 0f;
 
+        public Button consoleButton = null;
+        public Button functionButton = null;
+        public Button systemButton = null;
+        public Slider alphaSlider = null;
+        public Button closeBtn = null;
+
         private void Awake()
         {
+            closeBtn.onClick.AddListener(Close);
+            alphaSlider.onValueChanged.AddListener(OnAlphaValueChanged);
+            systemButton.onClick.AddListener(SelectSystem);
+            functionButton.onClick.AddListener(SelectFunction);
+            consoleButton.onClick.AddListener(SelectConsole);
             canvasGroup = GetComponent<CanvasGroup>();
             canvasScaler = GetComponent<CanvasScaler>();
 

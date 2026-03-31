@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace F8Framework.Core
 {
@@ -18,6 +19,7 @@ namespace F8Framework.Core
             toBottomButton.SetActive(false);
             infiniteScroll = GetComponent<InfiniteScroll>();
             infiniteScroll.AddSelectCallback(OnSelect);
+            toBottomButton.GetComponent<Button>().onClick.AddListener(MoveToBottom);
         }
 
         private void Update()
