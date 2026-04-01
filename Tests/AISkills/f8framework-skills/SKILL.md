@@ -5,7 +5,6 @@ description: Use as the master index and router for the full F8Framework skill l
 
 # F8Framework Skills Index
 
-> **⚠️ IMPORTANT**: Before using any F8Framework features, you **MUST** formally initialize the framework. Ensure `ModuleCenter.Initialize(this);` and all required modules (e.g. `FF8.Message = ModuleCenter.CreateModule<MessageManager>();`) are instantiated in the launch sequence (e.g. `GameLauncher.cs` or `GameManager.cs`)!
 
 
 Use this skill as the human-readable master index for the F8 skill library.

@@ -5,62 +5,77 @@ description: Use when implementing or troubleshooting Obfuz feature workflows �
 
 # Obfuz Feature Workflow
 
-> **⚠️ IMPORTANT**: Before using any F8Framework features, you **MUST** formally initialize the framework. Ensure `ModuleCenter.Initialize(this);` and all required modules (e.g. `FF8.Message = ModuleCenter.CreateModule<MessageManager>();`) are instantiated in the launch sequence (e.g. `GameLauncher.cs` or `GameManager.cs`)!
+> **⚠️ IMPORTANT**: Before using this feature, you **MUST** formally initialize F8Framework in the launch sequence. Ensure `ModuleCenter.Initialize(this);` has run first.
 
 
 ## Use this skill when
 
 - The task is about code obfuscation or protection using Obfuz.
 - The user asks about protecting compiled assemblies from reverse engineering.
+- The task includes Obfuz + HybridCLR integration or hot-update DLL obfuscation.
 
 ## Path resolution
 
 1. Prefer project source at Assets/F8Framework.
-2. For usage docs, read: Assets/F8Framework/Tests/Obfuz/README.md
+2. For usage docs, read both:
+   - `Assets/F8Framework/Tests/Obfuz/README.md`
+   - `Assets/F8Framework/Tests/Obfuz/README_EN.md`
+3. If docs need updates, keep the Chinese and English README files aligned.
 
 ## Sources of truth
 
-- Runtime module: Assets/F8Framework/Runtime/Obfuz
-- Editor module: Assets/F8Framework/Editor/Obfuz
-- Test docs: Assets/F8Framework/Tests/Obfuz
+- Test docs: `Assets/F8Framework/Tests/Obfuz`
+- Launcher/build integration points:
+  - `Assets/F8Framework/Editor/F8Helper/F8Helper.cs`
+  - hot-update entry `LoadDll.cs` in the target project
+- Obfuz package / extension behavior as referenced by the test docs:
+  - `Assets/Packages/com.code-philosophy.obfuz4hybridclr/README.md`
 
-## Key concepts
+## Key settings and integration points
 
-| Concept | Description |
-|---------|-------------|
-| Obfuz | Code obfuscation tool integrated with F8Framework. |
-| Name obfuscation | Renames classes, methods, fields to unreadable names. |
-| Control flow obfuscation | Makes code logic harder to follow. |
-| String encryption | Encrypts string literals in compiled code. |
+| Item | Guidance |
+|------|----------|
+| Obfuz import | Import Obfuz first from `https://github.com/focus-creative-games/obfuz.git`. |
+| `AssembliesToObfuscate` | Add `Assembly-CSharp`, `F8Framework.Core`, `F8Framework.Launcher`, `F8Framework.F8ExcelDataClass`. |
+| `NonObfuscatedButReferenceingObfuscatedAssemblies` | Add `F8Framework.Core.Editor`, `F8Framework.Tests`. |
+| HybridCLR prebuild | Replace the HybridCLR-only prebuild command with `Obfuz4HybridCLR.PrebuildCommandExt.GenerateAll();`. |
+| Encryption init | Move Obfuz `EncryptionService` initialization code to the hot-update entry `LoadDll.cs`. |
+| API compatibility | Set `Api Compatibility Level` to `.NET Framework`. |
 
 ## Workflow
 
-1. Configure Obfuz settings in Editor (which assemblies to obfuscate).
-2. Define exclusion rules for public APIs that should not be renamed.
-3. Build with obfuscation enabled.
-4. Verify obfuscated builds work correctly.
-5. **HybridCLR Integration**:
-    - Use `Obfuz4HybridCLR.PrebuildCommandExt.GenerateAll()` in `F8Helper.cs`.
-    - Move `EncryptionService` initialization to `LoadDll.cs`.
-    - Set `Api Compatibility Level` to `.NET Framework`.
+1. Import Obfuz into Unity first.
+2. Generate the Obfuz key by following the official quick-start guide, and mount the generated initialization code.
+3. Open the `ObfuzSettings` window and populate the two assembly lists exactly as documented in `Tests/Obfuz/README.md` and `README_EN.md`.
+4. If the project uses HybridCLR, update `F8Helper.cs`:
+   - in `GenerateCopyHotUpdateDll`, replace the prebuild command with `Obfuz4HybridCLR.PrebuildCommandExt.GenerateAll();`
+   - uncomment the branch that redirects DLL output to `GetObfuscatedHotUpdateAssemblyOutputPath(...)`
+5. Move the Obfuz `EncryptionService` initialization code into the hot-update entry `LoadDll.cs`.
+6. Set `Api Compatibility Level` to `.NET Framework`.
+7. Run F8 / build the project and verify the obfuscated output still works.
 
 ## Common error handling
 
 | Error | Cause | Solution |
 |-------|-------|----------|
-| Reflection fails | Obfuscated names break reflection calls | Add exclusion rules for reflected types |
-| Serialization breaks | Field names changed | Exclude serialized classes from obfuscation |
-| Unity callbacks missing | Method names obfuscated | Exclude MonoBehaviour methods |
-| LogViewer broken | Method lookup fails | LogViewer does not support obfuscation of UI-called methods |
+| API compatibility errors | Compatibility level is too low | Switch `Api Compatibility Level` to `.NET Framework` |
+| F8Framework code breaks after obfuscation | Too many framework assemblies are obfuscated | Try setting all F8Framework assemblies to non-obfuscated first, then narrow scope |
+| Real-time Excel loading fails | Obfuz affects runtime config loading path | Use `FF8.Config.RuntimeLoadAll()` for runtime Excel reload |
+| `GeneratedEncryptionVirtualMachine.cs` init error | Generated file path is wrong | Fix the path in the `ObfuzSettings` window |
+| HybridCLR hot-update DLL not found | F8Helper prebuild/output path not switched to Obfuz | Use `Obfuz4HybridCLR.PrebuildCommandExt.GenerateAll()` and the obfuscated output-path branch |
 
 ## Cross-module dependencies
 
-- **HybridCLR**: Obfuscated code can be hot-updated.
-- **Build**: Obfuscation applies during the build process.
+- **HybridCLR**: Required when hot-update DLLs also need Obfuz processing.
+- **Build/F8Helper**: Obfuscation is wired into the prebuild/build pipeline.
+- **ExcelTool / Config**: Real-time Excel reload may need `FF8.Config.RuntimeLoadAll()` after integration.
 
 ## Output checklist
 
+- Obfuz import path confirmed.
 - Obfuscation target assemblies defined.
-- Exclusion rules configured.
+- Non-obfuscated referencing assemblies defined.
+- HybridCLR integration points updated when applicable.
+- Encryption initialization location confirmed.
 - Build test passed with obfuscation.
 - Validation status and remaining risks.

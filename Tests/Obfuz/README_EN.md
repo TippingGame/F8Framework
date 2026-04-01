@@ -42,7 +42,6 @@ Method 2: Unity -> Click Menu Bar -> Window -> Package Manager -> Click + -> Add
 ### Common Errors:
 * Switch Api Compatibility Level to .Net Framework
 * Try setting all F8Framework assemblies to non-obfuscated
-* Mounting scripts through the interface for method invocation will cause loss of references, so LogViewer cannot work properly after obfuscation
 * To read Excel in real-time, you need to use FF8.Config.RuntimeLoadAll instead
     ```C#
   // Read Excel in real-time

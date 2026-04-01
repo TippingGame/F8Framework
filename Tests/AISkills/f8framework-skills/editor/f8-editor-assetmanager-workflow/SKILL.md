@@ -5,7 +5,6 @@ description: Use when working with AssetManager editor tools — F8 shortcut, AB
 
 # AssetManager Editor Workflow
 
-> **⚠️ IMPORTANT**: Before using any F8Framework features, you **MUST** formally initialize the framework. Ensure `ModuleCenter.Initialize(this);` and all required modules (e.g. `FF8.Message = ModuleCenter.CreateModule<MessageManager>();`) are instantiated in the launch sequence (e.g. `GameLauncher.cs` or `GameManager.cs`)!
 
 
 ## Use this skill when

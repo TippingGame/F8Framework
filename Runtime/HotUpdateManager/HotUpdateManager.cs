@@ -12,15 +12,25 @@ namespace F8Framework.Core
 {
     public class HotUpdateManager : ModuleSingleton<HotUpdateManager>, IModule
     {
+        [Serializable]
         public class DownloadTaskInfo
         {
             public string Name;
             public string LocalPath;
             public string RemoteUrl;
+            public string ExpectedVersion;
             public string ExpectedMd5;
             public long ExpectedSize;
             public long DownloadOffset;
             public bool Append;
+        }
+
+        [Serializable]
+        private class PartialDownloadState
+        {
+            public string Version;
+            public string Md5;
+            public long Size;
         }
 
         public static string Separator = "_";
@@ -28,6 +38,7 @@ namespace F8Framework.Core
         public static string RemoteDirName = "/Remote/" + URLSetting.GetPlatformName();
         public static string HotUpdateDirName = "/HotUpdate";
         public static string PackageDirName = "/Package";
+        private const string PartialDownloadStateExtension = ".downloadstate";
         private Downloader hotUpdateDownloader;
         
         private Downloader packageDownloader;
@@ -174,14 +185,23 @@ namespace F8Framework.Core
                     if (File.Exists(localPath))
                     {
                         long localSize = new FileInfo(localPath).Length;
+                        PartialDownloadState partialDownloadState = ReadPartialDownloadState(localPath);
+                        bool canResume = IsSamePartialDownload(partialDownloadState, resAssetMapping.Value, expectedSize);
+
                         if (expectedSize > 0 && localSize >= expectedSize)
                         {
                             FileTools.SafeDeleteFile(localPath);
+                            DeletePartialDownloadState(localPath);
                         }
-                        else
+                        else if (canResume)
                         {
                             downloadOffset = localSize;
                             append = downloadOffset > 0;
+                        }
+                        else
+                        {
+                            FileTools.SafeDeleteFile(localPath);
+                            DeletePartialDownloadState(localPath);
                         }
                     }
 
@@ -193,6 +213,7 @@ namespace F8Framework.Core
                         Name = resAssetMapping.Key,
                         LocalPath = localPath,
                         RemoteUrl = remoteUrl,
+                        ExpectedVersion = resAssetMapping.Value.Version,
                         ExpectedMd5 = resAssetMapping.Value.MD5,
                         ExpectedSize = expectedSize,
                         DownloadOffset = downloadOffset,
@@ -227,6 +248,7 @@ namespace F8Framework.Core
             // 设置热更下载器回调
             hotUpdateDownloader.OnDownloadSuccess += (eventArgs) =>
             {
+                DeletePartialDownloadState(eventArgs.DownloadInfo.DownloadPath);
                 LogF8.LogVersion($"获取热更资源完成！：{eventArgs.DownloadInfo.DownloadUrl}");
             };
             hotUpdateDownloader.OnDownloadFailure += (eventArgs) =>
@@ -268,6 +290,7 @@ namespace F8Framework.Core
                     continue;
                 }
 
+                WritePartialDownloadState(downloadInfo);
                 hotUpdateDownloader.AddDownload(downloadInfo.RemoteUrl, downloadInfo.LocalPath, downloadInfo.DownloadOffset, downloadInfo.Append);
             }
 
@@ -328,22 +351,38 @@ namespace F8Framework.Core
                 if (File.Exists(persistentPackagePath))
                 {
                     long fileSizeInBytes = new FileInfo(persistentPackagePath).Length;
+                    PartialDownloadState partialDownloadState = ReadPartialDownloadState(persistentPackagePath);
+                    bool canResume = IsSamePartialDownload(partialDownloadState, null, expectedSize, expectedMd5);
                     if (expectedSize > 0)
                     {
                         if (fileSizeInBytes > expectedSize)
                         {
                             FileTools.SafeDeleteFile(persistentPackagePath);
+                            DeletePartialDownloadState(persistentPackagePath);
                         }
-                        else if (fileSizeInBytes < expectedSize)
+                        else if (fileSizeInBytes < expectedSize && canResume)
                         {
                             downloadOffset = fileSizeInBytes;
                             append = downloadOffset > 0;
                         }
+                        else if (fileSizeInBytes < expectedSize)
+                        {
+                            FileTools.SafeDeleteFile(persistentPackagePath);
+                            DeletePartialDownloadState(persistentPackagePath);
+                        }
                     }
                     else
                     {
-                        downloadOffset = fileSizeInBytes;
-                        append = downloadOffset > 0;
+                        if (canResume)
+                        {
+                            downloadOffset = fileSizeInBytes;
+                            append = downloadOffset > 0;
+                        }
+                        else
+                        {
+                            FileTools.SafeDeleteFile(persistentPackagePath);
+                            DeletePartialDownloadState(persistentPackagePath);
+                        }
                     }
                 }
 
@@ -388,6 +427,7 @@ namespace F8Framework.Core
             // 设置分包下载器回调
             packageDownloader.OnDownloadSuccess += (eventArgs) =>
             {
+                DeletePartialDownloadState(eventArgs.DownloadInfo.DownloadPath);
                 LogF8.LogVersion($"获取分包资源完成！：{eventArgs.DownloadInfo.DownloadUrl}");
             };
             packageDownloader.OnDownloadFailure += (eventArgs) =>
@@ -438,6 +478,7 @@ namespace F8Framework.Core
                 string persistentPackagePath = downloadInfo.LocalPath;
                 downloadPaths.Add(persistentPackagePath);
 
+                WritePartialDownloadState(downloadInfo);
                 packageDownloader.AddDownload(downloadInfo.RemoteUrl, persistentPackagePath, downloadInfo.DownloadOffset, downloadInfo.Append);
             }
 
@@ -477,6 +518,78 @@ namespace F8Framework.Core
             }
 
             return invalidDownloadInfos;
+        }
+
+        private string GetPartialDownloadStatePath(string localPath)
+        {
+            return localPath + PartialDownloadStateExtension;
+        }
+
+        private PartialDownloadState ReadPartialDownloadState(string localPath)
+        {
+            string statePath = GetPartialDownloadStatePath(localPath);
+            if (!File.Exists(statePath))
+            {
+                return null;
+            }
+
+            string json = FileTools.SafeReadAllText(statePath);
+            if (json.IsNullOrEmpty())
+            {
+                return null;
+            }
+
+            try
+            {
+                return Util.LitJson.ToObject<PartialDownloadState>(json);
+            }
+            catch (Exception e)
+            {
+                LogF8.LogWarning($"读取热更断点状态失败，已忽略：{statePath}\n{e}");
+                return null;
+            }
+        }
+
+        private bool IsSamePartialDownload(PartialDownloadState partialDownloadState, AssetBundleMap.AssetMapping remoteAssetMapping, long expectedSize, string expectedMd5 = null)
+        {
+            if (partialDownloadState == null)
+            {
+                return false;
+            }
+
+            string targetVersion = remoteAssetMapping?.Version;
+            string targetMd5 = expectedMd5 ?? remoteAssetMapping?.MD5;
+            return string.Equals(partialDownloadState.Version, targetVersion, StringComparison.Ordinal) &&
+                   string.Equals(partialDownloadState.Md5, targetMd5, StringComparison.OrdinalIgnoreCase) &&
+                   partialDownloadState.Size == expectedSize;
+        }
+
+        private void WritePartialDownloadState(DownloadTaskInfo downloadInfo)
+        {
+            if (downloadInfo == null || downloadInfo.LocalPath.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            string statePath = GetPartialDownloadStatePath(downloadInfo.LocalPath);
+            PartialDownloadState partialDownloadState = new PartialDownloadState
+            {
+                Version = downloadInfo.ExpectedVersion,
+                Md5 = downloadInfo.ExpectedMd5,
+                Size = downloadInfo.ExpectedSize
+            };
+
+            FileTools.SafeWriteAllText(statePath, Util.LitJson.ToJson(partialDownloadState));
+        }
+
+        private void DeletePartialDownloadState(string localPath)
+        {
+            if (localPath.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            FileTools.SafeDeleteFile(GetPartialDownloadStatePath(localPath));
         }
 
         private bool TryGetPackageInfo(string package, out string expectedMd5, out long expectedSize)

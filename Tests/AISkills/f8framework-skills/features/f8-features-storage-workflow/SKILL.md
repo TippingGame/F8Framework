@@ -5,7 +5,7 @@ description: Use when implementing, documenting, or troubleshooting Storage work
 
 # Storage Feature Workflow
 
-> **Important**: Before using any F8Framework feature, initialize the framework first. Make sure `ModuleCenter.Initialize(this);` has been called and the required modules are created in the launcher flow.
+> **⚠️ IMPORTANT**: Before using this feature, you **MUST** formally initialize F8Framework in the launch sequence. Ensure `ModuleCenter.Initialize(this);` has run first, then create the required module, for example `FF8.Storage = ModuleCenter.CreateModule<StorageManager>();`.
 
 ## Use this skill when
 
