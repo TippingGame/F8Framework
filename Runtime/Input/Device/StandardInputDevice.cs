@@ -93,6 +93,7 @@ namespace F8Framework.Core
         
         public override void OnRun()
         {
+#if ENABLE_LEGACY_INPUT_MANAGER
             //标准PC平台：鼠标和键盘做为输入设备
             if (Input.GetMouseButtonDown(0))
             {
@@ -170,6 +171,7 @@ namespace F8Framework.Core
             }
             
             SetVirtualMousePosition(Input.mousePosition);
+#endif
         }
         
         public override void OnShutdown()

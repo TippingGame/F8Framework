@@ -54,7 +54,7 @@ namespace F8Framework.Core
         {
             get
             {
-                return IsEnableInputDevice ? Input.anyKey : false;
+                return IsEnableInputDevice ? GetAnyKey() : false;
             }
         }
         
@@ -65,7 +65,7 @@ namespace F8Framework.Core
         {
             get
             {
-                return IsEnableInputDevice ? Input.anyKeyDown : false;
+                return IsEnableInputDevice ? GetAnyKeyDown() : false;
             }
         }
 
@@ -407,7 +407,7 @@ namespace F8Framework.Core
         /// <returns>是否按住</returns>
         public bool GetKey(KeyCode keyCode)
         {
-            return IsEnableInputDevice ? Input.GetKey(keyCode) : false;
+            return IsEnableInputDevice ? GetLegacyKey(keyCode) : false;
         }
         
         /// <summary>
@@ -417,7 +417,7 @@ namespace F8Framework.Core
         /// <returns>是否按下</returns>
         public bool GetKeyDown(KeyCode keyCode)
         {
-            return IsEnableInputDevice ? Input.GetKeyDown(keyCode) : false;
+            return IsEnableInputDevice ? GetLegacyKeyDown(keyCode) : false;
         }
         
         /// <summary>
@@ -427,7 +427,7 @@ namespace F8Framework.Core
         /// <returns>是否抬起</returns>
         public bool GetKeyUp(KeyCode keyCode)
         {
-            return IsEnableInputDevice ? Input.GetKeyUp(keyCode) : false;
+            return IsEnableInputDevice ? GetLegacyKeyUp(keyCode) : false;
         }
         
         /// <summary>
@@ -438,7 +438,7 @@ namespace F8Framework.Core
         /// <returns>是否按住</returns>
         public bool GetKey(KeyCode keyCode1, KeyCode keyCode2)
         {
-            return IsEnableInputDevice ? (Input.GetKey(keyCode1) && Input.GetKey(keyCode2)) : false;
+            return IsEnableInputDevice ? (GetLegacyKey(keyCode1) && GetLegacyKey(keyCode2)) : false;
         }
         
         /// <summary>
@@ -451,7 +451,7 @@ namespace F8Framework.Core
         {
             if (IsEnableInputDevice)
             {
-                if (Input.GetKeyDown(keyCode2) && Input.GetKey(keyCode1))
+                if (GetLegacyKeyDown(keyCode2) && GetLegacyKey(keyCode1))
                 {
                     return true;
                 }
@@ -469,7 +469,7 @@ namespace F8Framework.Core
         {
             if (IsEnableInputDevice)
             {
-                if (Input.GetKeyUp(keyCode2) && Input.GetKey(keyCode1))
+                if (GetLegacyKeyUp(keyCode2) && GetLegacyKey(keyCode1))
                 {
                     return true;
                 }
@@ -486,7 +486,7 @@ namespace F8Framework.Core
         /// <returns>是否按住</returns>
         public bool GetKey(KeyCode keyCode1, KeyCode keyCode2, KeyCode keyCode3)
         {
-            return IsEnableInputDevice ? (Input.GetKey(keyCode1) && Input.GetKey(keyCode2) && Input.GetKey(keyCode3)) : false;
+            return IsEnableInputDevice ? (GetLegacyKey(keyCode1) && GetLegacyKey(keyCode2) && GetLegacyKey(keyCode3)) : false;
         }
         
         /// <summary>
@@ -500,7 +500,7 @@ namespace F8Framework.Core
         {
             if (IsEnableInputDevice)
             {
-                if (Input.GetKeyDown(keyCode3) && Input.GetKey(keyCode1) && Input.GetKey(keyCode2))
+                if (GetLegacyKeyDown(keyCode3) && GetLegacyKey(keyCode1) && GetLegacyKey(keyCode2))
                 {
                     return true;
                 }
@@ -519,7 +519,7 @@ namespace F8Framework.Core
         {
             if (IsEnableInputDevice)
             {
-                if (Input.GetKeyUp(keyCode3) && Input.GetKey(keyCode1) && Input.GetKey(keyCode2))
+                if (GetLegacyKeyUp(keyCode3) && GetLegacyKey(keyCode1) && GetLegacyKey(keyCode2))
                 {
                     return true;
                 }
@@ -564,6 +564,51 @@ namespace F8Framework.Core
             {
                 item.Value.ClearAction();
             }
+        }
+
+        private static bool GetAnyKey()
+        {
+#if ENABLE_LEGACY_INPUT_MANAGER
+            return Input.anyKey;
+#else
+            return false;
+#endif
+        }
+
+        private static bool GetAnyKeyDown()
+        {
+#if ENABLE_LEGACY_INPUT_MANAGER
+            return Input.anyKeyDown;
+#else
+            return false;
+#endif
+        }
+
+        private static bool GetLegacyKey(KeyCode keyCode)
+        {
+#if ENABLE_LEGACY_INPUT_MANAGER
+            return Input.GetKey(keyCode);
+#else
+            return false;
+#endif
+        }
+
+        private static bool GetLegacyKeyDown(KeyCode keyCode)
+        {
+#if ENABLE_LEGACY_INPUT_MANAGER
+            return Input.GetKeyDown(keyCode);
+#else
+            return false;
+#endif
+        }
+
+        private static bool GetLegacyKeyUp(KeyCode keyCode)
+        {
+#if ENABLE_LEGACY_INPUT_MANAGER
+            return Input.GetKeyUp(keyCode);
+#else
+            return false;
+#endif
         }
         
         /// <summary>

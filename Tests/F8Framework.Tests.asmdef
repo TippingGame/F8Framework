@@ -3,6 +3,7 @@
     "rootNamespace": "",
     "references": [
         "F8Framework.Core",
+        "Unity.InputSystem",
         "Unity.TextMeshPro",
         "Unity.Timeline",
         "ICSharpCode.SharpZipLib",

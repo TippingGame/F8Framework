@@ -191,7 +191,11 @@ namespace F8Framework.Core
                 LogF8.LogView("场景中缺少：EventSystem 组件，已自动添加");
                 GameObject eventSystem = new GameObject("EventSystem");
                 eventSystem.AddComponent<EventSystem>();
+#if ENABLE_LEGACY_INPUT_MANAGER
                 eventSystem.AddComponent<StandaloneInputModule>();
+#elif ENABLE_INPUT_SYSTEM
+                eventSystem.AddComponent<UnityEngine.InputSystem.UI.InputSystemUIInputModule>();
+#endif
                 eventSystem.SetParent(transform);
             }
         }

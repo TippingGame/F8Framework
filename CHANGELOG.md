@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.9.277] - 2025-04-02
+1.优化Input模块和UI模块对InputSystem的适配  
+2.优化SpriteSequenceFrame延迟初始化  
+
 ## [2.9.276] - 2025-04-01
 1.修复HotUpdate模块断点续传时错误判断的问题  
 2.完善SKILL和文档  

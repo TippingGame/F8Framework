@@ -29,14 +29,6 @@ namespace F8Framework.Core
 
         private List<string> spriteNames = new List<string>();
 
-        private void Awake()
-        {
-            for (int i = 0; i < aniNum; i++)
-            {
-                spriteNames.Add(atlasName + "_" + i);
-            }
-        }
-
         private void OnEnable()
         {
             if (autoPlay)
@@ -48,6 +40,15 @@ namespace F8Framework.Core
         [UnityEngine.ContextMenu("Play")]
         public void Play()
         {
+            if (spriteNames.Count != aniNum)
+            {
+                spriteNames.Clear();
+                for (int i = 0; i < aniNum; i++)
+                {
+                    spriteNames.Add(atlasName + "_" + i);
+                }
+            }
+
             if (image == null)
             {
                 image = GetComponent<Image>();
