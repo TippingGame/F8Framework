@@ -18,5 +18,5 @@ namespace F8Framework.Core
         public int FixedNumberOfSplitScreens { get; set; } = -1;
         public InputAction JoinAction { get; set; }
     }
-#endif
 }
+#endif

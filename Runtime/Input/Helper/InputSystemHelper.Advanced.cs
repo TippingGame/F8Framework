@@ -1299,5 +1299,5 @@ namespace F8Framework.Core
             field.SetValue(manager, value);
         }
     }
-#endif
 }
+#endif

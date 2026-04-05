@@ -1768,5 +1768,5 @@ namespace F8Framework.Core
         }
 
     }
-#endif
 }
+#endif
