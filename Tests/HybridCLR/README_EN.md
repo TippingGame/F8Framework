@@ -11,10 +11,10 @@ Method 2: Unity → Menu Bar → Window → Package Manager → "+" → Add Pack
 
 ## Introduction (Simply press F8 to start game development without distractions)
 **Integrated HybridCLR Hot Update Code Component**
-1. First, follow this[ Official Quickstart Guide ](https://hybridclr.doc.code-philosophy.com/docs/beginner/quickstart)to create a HotUpdate assembly
+1. First, follow this[ Official Quickstart Guide ](https://www.hybridclr.cn/docs/beginner/quickstart)to create a HotUpdate assembly
 2. Locate the[ F8Helper.cs ](https://github.com/TippingGame/F8Framework/blob/main/Editor/F8Helper/F8Helper.cs)code file:
    * Uncomment the following code section
-3. Add metadata - see[ Official Generic Types Tutorial ](https://hybridclr.doc.code-philosophy.com/docs/beginner/generic)
+3. Add metadata - see[ Official Generic Types Tutorial ](https://www.hybridclr.cn/docs/beginner/generic)
 
 ```C#
 // Metadata supplementation - DLLs here won't be hot updated. Typically found in {project}/HybridCLRData/AssembliesPostIl2CppStrip/{target}
@@ -178,3 +178,7 @@ public class LoadDll : MonoBehaviour
     }
 }
 ```
+### Frequently Asked Questions:
+1. Packaging HybridCLR takes a long time. After the first execution, you can switch to this API: `HybridCLR.Editor.Commands.CompileDllCommand.CompileDll(EditorUserBuildSettings.activeBuildTarget);`
+   * If Obfuz is enabled, you can use this API instead: `Obfuz4HybridCLR.PrebuildCommandExt.CompileAndObfuscateDll();`
+   * [Reference Documentation (Working with HybridCLR)](https://www.obfuz.com/docs/manual/hybridclr/work-with-hybridclr)

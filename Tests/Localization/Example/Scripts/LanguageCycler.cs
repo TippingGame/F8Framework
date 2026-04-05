@@ -48,15 +48,15 @@ namespace F8Framework.Tests
 		{
 			// 更新框架
 			ModuleCenter.Update();
-#if ENABLE_LEGACY_INPUT_MANAGER
-			if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
-			{
-				Cycle();
-			}
-#elif ENABLE_INPUT_SYSTEM
+#if ENABLE_INPUT_SYSTEM
 			if (UnityEngine.InputSystem.Keyboard.current != null &&
 			    (UnityEngine.InputSystem.Keyboard.current.enterKey.wasPressedThisFrame ||
 			     UnityEngine.InputSystem.Keyboard.current.numpadEnterKey.wasPressedThisFrame))
+			{
+				Cycle();
+			}
+#elif ENABLE_LEGACY_INPUT_MANAGER
+			if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
 			{
 				Cycle();
 			}

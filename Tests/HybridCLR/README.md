@@ -13,10 +13,10 @@
 
 ## 简介（希望自己点击F8，就能开始制作游戏，不想多余的事）
 接入HybridCLR热更新代码组件。
-1. 使用这个[ 官方教程（快速上手） ](https://hybridclr.doc.code-philosophy.com/docs/beginner/quickstart)创建HotUpdate程序集后。  
+1. 使用这个[ 官方教程（快速上手） ](https://www.hybridclr.cn/docs/beginner/quickstart)创建HotUpdate程序集后。  
 2. 找到代码[ F8Helper.cs ](https://github.com/TippingGame/F8Framework/blob/main/Editor/F8Helper/F8Helper.cs)  
 	* 解除注释状态，如下代码  
-3. 补充元数据，具体看[ 官方教程（使用泛型） ](https://hybridclr.doc.code-philosophy.com/docs/beginner/generic)
+3. 补充元数据，具体看[ 官方教程（使用泛型） ](https://www.hybridclr.cn/docs/beginner/generic)
 
 ```C#
 // 补充元数据，不会热更新此处的dll，一般在{project}/HybridCLRData/AssembliesPostIl2CppStrip/{target}目录下
@@ -180,3 +180,7 @@ public class LoadDll : MonoBehaviour
     }
 }
 ```
+### 常见问题：
+1. 打包HybridCLR，用时很久，可在第一次执行后，改为这个API：`HybridCLR.Editor.Commands.CompileDllCommand.CompileDll(EditorUserBuildSettings.activeBuildTarget);`
+    * 启用了Obfuz，可以改为这个API：`Obfuz4HybridCLR.PrebuildCommandExt.CompileAndObfuscateDll();`
+    * [参考文档（与HybridCLR协同工作）](https://www.obfuz.com/docs/manual/hybridclr/work-with-hybridclr)

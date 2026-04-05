@@ -18,7 +18,9 @@ namespace F8Framework.Core
             RegisterVirtualAxis(InputAxisType.MouseY);
             RegisterVirtualAxis(InputAxisType.MouseScrollWheel);
             RegisterVirtualAxis(InputAxisType.Horizontal);
+            RegisterVirtualAxis(InputAxisType.HorizontalRaw);
             RegisterVirtualAxis(InputAxisType.Vertical);
+            RegisterVirtualAxis(InputAxisType.VerticalRaw);
             RegisterVirtualAxis(InputAxisType.UpperLower);
         }
 
@@ -87,7 +89,9 @@ namespace F8Framework.Core
             UnRegisterVirtualAxis(InputAxisType.MouseY);
             UnRegisterVirtualAxis(InputAxisType.MouseScrollWheel);
             UnRegisterVirtualAxis(InputAxisType.Horizontal);
+            UnRegisterVirtualAxis(InputAxisType.HorizontalRaw);
             UnRegisterVirtualAxis(InputAxisType.Vertical);
+            UnRegisterVirtualAxis(InputAxisType.VerticalRaw);
             UnRegisterVirtualAxis(InputAxisType.UpperLower);
         }
     }

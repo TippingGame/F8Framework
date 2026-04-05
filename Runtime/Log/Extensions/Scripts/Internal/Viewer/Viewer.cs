@@ -165,30 +165,7 @@ namespace F8Framework.Core
 
         private void CheckGesture(bool show)
         {
-#if ENABLE_LEGACY_INPUT_MANAGER
-            if (Input.touchCount == ViewerConst.GESTURE_TOUCH_COUNT)
-            {
-                if (isTouchBegin == false)
-                {
-                    isTouchBegin = true;
-                    touchTime = Time.unscaledTime;
-                }
-                else
-                {
-                    if (Time.unscaledTime - touchTime >= ViewerConst.GESTURE_TOUCH_TIME_INTERVAL)
-                    {
-                        isTouchBegin = false;
-                        touchTime = 0;
-                        Show(show);
-                    }
-                }
-            }
-            else
-            {
-                isTouchBegin = false;
-                touchTime = 0;
-            }
-#elif ENABLE_INPUT_SYSTEM
+#if ENABLE_INPUT_SYSTEM
             int pressedTouchCount = 0;
 
             if (UnityEngine.InputSystem.Touchscreen.current != null)
@@ -222,20 +199,43 @@ namespace F8Framework.Core
                 isTouchBegin = false;
                 touchTime = 0;
             }
+#elif ENABLE_LEGACY_INPUT_MANAGER
+            if (Input.touchCount == ViewerConst.GESTURE_TOUCH_COUNT)
+            {
+                if (isTouchBegin == false)
+                {
+                    isTouchBegin = true;
+                    touchTime = Time.unscaledTime;
+                }
+                else
+                {
+                    if (Time.unscaledTime - touchTime >= ViewerConst.GESTURE_TOUCH_TIME_INTERVAL)
+                    {
+                        isTouchBegin = false;
+                        touchTime = 0;
+                        Show(show);
+                    }
+                }
+            }
+            else
+            {
+                isTouchBegin = false;
+                touchTime = 0;
+            }
 #endif
         }
 
         private void CheckKey(bool show)
         {
-#if ENABLE_LEGACY_INPUT_MANAGER
-            if (Input.GetKeyDown(KeyCode.BackQuote) == true && keyCodeEnable)
-            {
-                Show(show);
-            }
-#elif ENABLE_INPUT_SYSTEM
+#if ENABLE_INPUT_SYSTEM
             if (UnityEngine.InputSystem.Keyboard.current != null &&
                 UnityEngine.InputSystem.Keyboard.current.backquoteKey.wasPressedThisFrame &&
                 keyCodeEnable)
+            {
+                Show(show);
+            }
+#elif ENABLE_LEGACY_INPUT_MANAGER
+            if (Input.GetKeyDown(KeyCode.BackQuote) == true && keyCodeEnable)
             {
                 Show(show);
             }

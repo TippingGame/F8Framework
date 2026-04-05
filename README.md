@@ -44,7 +44,7 @@ Unity 2021、2022、2023、6000
 * [12. 有限状态机（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/FSM/README.md) - 自定义有限状态机 FSMState / FSMSwitch，创建/切换状态/轮询/销毁。
 * [13. 下载管理器（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Download/README.md) - 支持localhost与http地址文件的下载，可**本地写入、监听下载进度、断点续传**，支持动态添加、移除、暂停、恢复下载。
 * [14. UI界面管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/UI/README.md) - 处理界面加载、打开、关闭、查询、层级控制、自定义动画、自动获取组件索引。UI界面分为三大类：**普通UI、模态弹窗、非模态弹窗**，内置各种常用组件。
-* [15. 输入系统管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Input/README.md) - 使用同一套代码，通过自定义输入设备，适配多平台，可热切换输入设备，或同时启用多套输入设备。
+* [15. 输入系统管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Input/README.md) - 使用同一套代码，通过自定义输入设备，适配多平台，可热切换输入设备，或同时启用多套输入设备，重绑定，本地多人输入。
 * [16. 游戏流程管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Procedure/README.md) - 自定义流程节点 ProcedureNode，控制游戏流程的，添加/运行/轮询/移除。
 * [17. 本地数据存储（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/Storage/README.md) - 本地数据存储/读取/加密/压缩。
 * [18. SDK接入管理（内置）](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/README.md) - 与**原生平台交互**，接入多个平台或者渠道SDK，登录/退出/切换/支付/视频广告/退出游戏/原生Toast。
@@ -142,7 +142,7 @@ Build targets: Win / Android / iOS / Mac / Linux / WebGL / WeChat Mini Games / T
 * [12. Finite state machine (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/FSM/README_EN.md) - Custom FSMState/FSMSwitch for state creation/switching/polling/destruction.
 * [13. Download Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Download/README_EN.md) - Supports localhost/HTTP downloads with **local write, progress tracking, and resumable transfers**. Dynamic add/remove/pause/resume.
 * [14. UI interface manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/UI/README_EN.md) - Handles loading/opening/closing/querying/layering/custom animations/auto-component indexing. UI types: **Standard UI, Modal Popup, Non-Modal Popup**, with built-in common components.
-* [15. Input System Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Input/README_EN.md) - Unified multi-platform input via customizable devices, with hot-swapping or multi-device support.
+* [15. Input System Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Input/README_EN.md) - Unified multi-platform input via customizable devices, with hot-swapping or multi-device support, Rebinding, Local Multiplayer Input.
 * [16. Game Procedure Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Procedure/README_EN.md) - Custom ProcedureNode for flow control: add/run/poll/remove.
 * [17. Local data storage (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/Storage/README_EN.md) - Local data save/load/encryption/compression.
 * [18. SDK Manager (built-in)](https://github.com/TippingGame/F8Framework/blob/main/Tests/SDKManager/README_EN.md) - **Native platform interoperability**: Supports integration with multiple platform/channel SDKs for login/logout/account switching/payments/video ads/game exit/native toast notifications.

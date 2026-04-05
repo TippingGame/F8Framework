@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,19 +10,22 @@ namespace F8Framework.Core
     public sealed class DefaultInputHelper : IInputHelper
     {
         private bool _isEnableInputDevice = true;
-        private Dictionary<string, VirtualAxis> _virtualAxes = new Dictionary<string, VirtualAxis>();
-        private Dictionary<string, VirtualButton> _virtualButtons = new Dictionary<string, VirtualButton>();
+        private readonly Dictionary<string, VirtualAxis> _virtualAxes = new Dictionary<string, VirtualAxis>(StringComparer.Ordinal);
+        private readonly Dictionary<string, VirtualButton> _virtualButtons = new Dictionary<string, VirtualButton>(StringComparer.Ordinal);
+        private readonly Dictionary<string, VirtualAxis> _stagedVirtualAxes = new Dictionary<string, VirtualAxis>(StringComparer.Ordinal);
+        private readonly Dictionary<string, VirtualButton> _stagedVirtualButtons = new Dictionary<string, VirtualButton>(StringComparer.Ordinal);
+        private bool _isSwitchingDevice;
 
         /// <summary>
         /// 所属的内置模块
         /// </summary>
         public IModule Module { get; set; }
-        
+
         /// <summary>
         /// 输入设备
         /// </summary>
         public InputDeviceBase Device { get; private set; }
-        
+
         /// <summary>
         /// 是否启用输入设备
         /// </summary>
@@ -34,19 +37,21 @@ namespace F8Framework.Core
             }
             set
             {
-                _isEnableInputDevice = value;
-                if (!_isEnableInputDevice)
+                if (_isEnableInputDevice == value)
                 {
-                    ResetAll();
+                    return;
                 }
+
+                _isEnableInputDevice = value;
+                ResetAll();
             }
         }
-        
+
         /// <summary>
         /// 鼠标位置
         /// </summary>
         public Vector3 MousePosition { get; private set; }
-        
+
         /// <summary>
         /// 任意键按住
         /// </summary>
@@ -57,7 +62,7 @@ namespace F8Framework.Core
                 return IsEnableInputDevice ? GetAnyKey() : false;
             }
         }
-        
+
         /// <summary>
         /// 任意键按下
         /// </summary>
@@ -74,9 +79,9 @@ namespace F8Framework.Core
         /// </summary>
         public void OnInit()
         {
-            Device.OnStartUp();
+            Device?.OnStartUp();
         }
-        
+
         /// <summary>
         /// 刷新助手
         /// </summary>
@@ -84,18 +89,18 @@ namespace F8Framework.Core
         {
             if (IsEnableInputDevice)
             {
-                Device.OnRun();
+                Device?.OnRun();
             }
         }
-        
+
         /// <summary>
         /// 终结助手
         /// </summary>
         public void OnTerminate()
         {
-            Device.OnShutdown();
+            Device?.OnShutdown();
         }
-        
+
         /// <summary>
         /// 暂停助手
         /// </summary>
@@ -103,13 +108,12 @@ namespace F8Framework.Core
         {
             ResetAll();
         }
-        
+
         /// <summary>
         /// 恢复助手
         /// </summary>
         public void OnResume()
         {
-
         }
 
         /// <summary>
@@ -119,9 +123,9 @@ namespace F8Framework.Core
         /// <returns>是否存在</returns>
         public bool IsExistVirtualAxis(string name)
         {
-            return _virtualAxes.ContainsKey(name);
+            return !string.IsNullOrEmpty(name) && _virtualAxes.ContainsKey(name);
         }
-        
+
         /// <summary>
         /// 是否存在虚拟按钮
         /// </summary>
@@ -129,49 +133,125 @@ namespace F8Framework.Core
         /// <returns>是否存在</returns>
         public bool IsExistVirtualButton(string name)
         {
-            return _virtualButtons.ContainsKey(name);
+            return !string.IsNullOrEmpty(name) && _virtualButtons.ContainsKey(name);
         }
-        
+
         /// <summary>
         /// 注册虚拟轴线
         /// </summary>
         /// <param name="name">轴线名称</param>
         public void RegisterVirtualAxis(string name)
         {
-            _virtualAxes.TryAdd(name, new VirtualAxis(name));
+            if (string.IsNullOrEmpty(name))
+            {
+                return;
+            }
+
+            if (_virtualAxes.ContainsKey(name))
+            {
+                return;
+            }
+
+            if (_isSwitchingDevice && _stagedVirtualAxes.TryGetValue(name, out var axis))
+            {
+                _stagedVirtualAxes.Remove(name);
+                _virtualAxes.Add(name, axis);
+                return;
+            }
+
+            _virtualAxes.Add(name, new VirtualAxis());
         }
-        
+
         /// <summary>
         /// 注册虚拟按钮
         /// </summary>
         /// <param name="name">按钮名称</param>
         public void RegisterVirtualButton(string name)
         {
-            _virtualButtons.TryAdd(name, new VirtualButton(name));
+            if (string.IsNullOrEmpty(name))
+            {
+                return;
+            }
+
+            if (_virtualButtons.ContainsKey(name))
+            {
+                return;
+            }
+
+            if (_isSwitchingDevice && _stagedVirtualButtons.TryGetValue(name, out var button))
+            {
+                _stagedVirtualButtons.Remove(name);
+                _virtualButtons.Add(name, button);
+                return;
+            }
+
+            _virtualButtons.Add(name, new VirtualButton(name));
         }
-        
+
         /// <summary>
         /// 取消注册虚拟轴线
         /// </summary>
         /// <param name="name">轴线名称</param>
         public void UnRegisterVirtualAxis(string name)
         {
-            if (_virtualAxes.ContainsKey(name))
+            if (string.IsNullOrEmpty(name))
             {
-                _virtualAxes.Remove(name);
+                return;
             }
+
+            if (_isSwitchingDevice)
+            {
+                if (_virtualAxes.TryGetValue(name, out var axis))
+                {
+                    _virtualAxes.Remove(name);
+                    _stagedVirtualAxes[name] = axis;
+                }
+
+                return;
+            }
+
+            _virtualAxes.Remove(name);
+            _stagedVirtualAxes.Remove(name);
         }
-        
+
+        internal void BeginDeviceSwitch()
+        {
+            _isSwitchingDevice = true;
+            _stagedVirtualAxes.Clear();
+            _stagedVirtualButtons.Clear();
+        }
+
+        internal void EndDeviceSwitch()
+        {
+            _isSwitchingDevice = false;
+            _stagedVirtualAxes.Clear();
+            _stagedVirtualButtons.Clear();
+        }
+
         /// <summary>
         /// 取消注册虚拟按钮
         /// </summary>
         /// <param name="name">按钮名称</param>
         public void UnRegisterVirtualButton(string name)
         {
-            if (_virtualButtons.ContainsKey(name))
+            if (string.IsNullOrEmpty(name))
             {
-                _virtualButtons.Remove(name);
+                return;
             }
+
+            if (_isSwitchingDevice)
+            {
+                if (_virtualButtons.TryGetValue(name, out var button))
+                {
+                    _virtualButtons.Remove(name);
+                    _stagedVirtualButtons[name] = button;
+                }
+
+                return;
+            }
+
+            _virtualButtons.Remove(name);
+            _stagedVirtualButtons.Remove(name);
         }
 
         /// <summary>
@@ -189,11 +269,7 @@ namespace F8Framework.Core
         /// <param name="name">按钮名称</param>
         public void SetButtonStart(string name)
         {
-            if (!IsExistVirtualButton(name))
-            {
-                RegisterVirtualButton(name);
-            }
-            _virtualButtons[name].Began();
+            GetOrCreateVirtualButton(name)?.Began();
         }
 
         /// <summary>
@@ -202,65 +278,45 @@ namespace F8Framework.Core
         /// <param name="name">按钮名称</param>
         public void SetButtonDown(string name)
         {
-            if (!IsExistVirtualButton(name))
-            {
-                RegisterVirtualButton(name);
-            }
-            _virtualButtons[name].Pressed();
+            GetOrCreateVirtualButton(name)?.Pressed();
         }
-        
+
         /// <summary>
         /// 设置按钮抬起
         /// </summary>
         /// <param name="name">按钮名称</param>
         public void SetButtonUp(string name)
         {
-            if (!IsExistVirtualButton(name))
-            {
-                RegisterVirtualButton(name);
-            }
-            _virtualButtons[name].Released();
+            GetOrCreateVirtualButton(name)?.Released();
         }
-        
+
         /// <summary>
         /// 设置轴线值为正方向1
         /// </summary>
         /// <param name="name">轴线名称</param>
         public void SetAxisPositive(string name)
         {
-            if (!IsExistVirtualAxis(name))
-            {
-                RegisterVirtualAxis(name);
-            }
-            _virtualAxes[name].Update(1);
+            GetOrCreateVirtualAxis(name)?.SetValue(1f);
         }
-        
+
         /// <summary>
         /// 设置轴线值为负方向-1
         /// </summary>
         /// <param name="name">轴线名称</param>
         public void SetAxisNegative(string name)
         {
-            if (!IsExistVirtualAxis(name))
-            {
-                RegisterVirtualAxis(name);
-            }
-            _virtualAxes[name].Update(-1);
+            GetOrCreateVirtualAxis(name)?.SetValue(-1f);
         }
-        
+
         /// <summary>
         /// 设置轴线值为0
         /// </summary>
         /// <param name="name">轴线名称</param>
         public void SetAxisZero(string name)
         {
-            if (!IsExistVirtualAxis(name))
-            {
-                RegisterVirtualAxis(name);
-            }
-            _virtualAxes[name].Update(0);
+            GetOrCreateVirtualAxis(name)?.SetValue(0f);
         }
-        
+
         /// <summary>
         /// 设置轴线值
         /// </summary>
@@ -268,49 +324,45 @@ namespace F8Framework.Core
         /// <param name="value">轴线值</param>
         public void SetAxis(string name, float value)
         {
-            if (!IsExistVirtualAxis(name))
-            {
-                RegisterVirtualAxis(name);
-            }
-            _virtualAxes[name].Update(value);
+            GetOrCreateVirtualAxis(name)?.SetValue(value);
         }
 
         public void AddButtonStarted(string name, Action<string> started)
         {
-            if (!IsExistVirtualButton(name))
+            var button = GetOrCreateVirtualButton(name);
+            if (button != null)
             {
-                RegisterVirtualButton(name);
+                button.Started += started;
             }
-            _virtualButtons[name].Started += started;
         }
 
         public void AddButtonPerformed(string name, Action<string> performed)
         {
-            if (!IsExistVirtualButton(name))
+            var button = GetOrCreateVirtualButton(name);
+            if (button != null)
             {
-                RegisterVirtualButton(name);
+                button.Performed += performed;
             }
-            _virtualButtons[name].Performed += performed;
         }
 
         public void AddButtonCanceled(string name, Action<string> canceled)
         {
-            if (!IsExistVirtualButton(name))
+            var button = GetOrCreateVirtualButton(name);
+            if (button != null)
             {
-                RegisterVirtualButton(name);
+                button.Canceled += canceled;
             }
-            _virtualButtons[name].Canceled += canceled;
         }
-        
+
         public void AddAxisValueChanged(string name, Action<float> valueChanged)
         {
-            if (!IsExistVirtualAxis(name))
+            var axis = GetOrCreateVirtualAxis(name);
+            if (axis != null)
             {
-                RegisterVirtualAxis(name);
+                axis.ValueChanged += valueChanged;
             }
-            _virtualAxes[name].ValueChanged += valueChanged;
         }
-        
+
         public void RemoveButtonStarted(string name, Action<string> started)
         {
             if (IsExistVirtualButton(name))
@@ -342,7 +394,7 @@ namespace F8Framework.Core
                 _virtualAxes[name].ValueChanged -= valueChanged;
             }
         }
-        
+
         /// <summary>
         /// 按钮按住
         /// </summary>
@@ -350,13 +402,9 @@ namespace F8Framework.Core
         /// <returns>是否按住</returns>
         public bool GetButton(string name)
         {
-            if (!IsExistVirtualButton(name))
-            {
-                RegisterVirtualButton(name);
-            }
-            return _virtualButtons[name].GetButton;
+            return GetOrCreateVirtualButton(name)?.GetButton == true;
         }
-        
+
         /// <summary>
         /// 按钮按下
         /// </summary>
@@ -364,13 +412,9 @@ namespace F8Framework.Core
         /// <returns>是否按下</returns>
         public bool GetButtonDown(string name)
         {
-            if (!IsExistVirtualButton(name))
-            {
-                RegisterVirtualButton(name);
-            }
-            return _virtualButtons[name].GetButtonDown;
+            return GetOrCreateVirtualButton(name)?.GetButtonDown == true;
         }
-        
+
         /// <summary>
         /// 按钮抬起
         /// </summary>
@@ -378,13 +422,9 @@ namespace F8Framework.Core
         /// <returns>是否抬起</returns>
         public bool GetButtonUp(string name)
         {
-            if (!IsExistVirtualButton(name))
-            {
-                RegisterVirtualButton(name);
-            }
-            return _virtualButtons[name].GetButtonUp;
+            return GetOrCreateVirtualButton(name)?.GetButtonUp == true;
         }
-        
+
         /// <summary>
         /// 获取轴线值
         /// </summary>
@@ -393,11 +433,13 @@ namespace F8Framework.Core
         /// <returns>轴线值</returns>
         public float GetAxis(string name, bool raw)
         {
-            if (!IsExistVirtualAxis(name))
+            var axis = GetOrCreateVirtualAxis(name);
+            if (axis == null)
             {
-                RegisterVirtualAxis(name);
+                return 0f;
             }
-            return raw ? _virtualAxes[name].GetValueRaw : _virtualAxes[name].GetValue;
+
+            return raw ? axis.GetValueRaw : axis.GetValue;
         }
 
         /// <summary>
@@ -409,7 +451,7 @@ namespace F8Framework.Core
         {
             return IsEnableInputDevice ? GetLegacyKey(keyCode) : false;
         }
-        
+
         /// <summary>
         /// 键盘按键按下
         /// </summary>
@@ -419,7 +461,7 @@ namespace F8Framework.Core
         {
             return IsEnableInputDevice ? GetLegacyKeyDown(keyCode) : false;
         }
-        
+
         /// <summary>
         /// 键盘按键抬起
         /// </summary>
@@ -429,7 +471,7 @@ namespace F8Framework.Core
         {
             return IsEnableInputDevice ? GetLegacyKeyUp(keyCode) : false;
         }
-        
+
         /// <summary>
         /// 键盘组合按键按住（两个组合键）
         /// </summary>
@@ -440,7 +482,7 @@ namespace F8Framework.Core
         {
             return IsEnableInputDevice ? (GetLegacyKey(keyCode1) && GetLegacyKey(keyCode2)) : false;
         }
-        
+
         /// <summary>
         /// 键盘组合按键按下（两个组合键）
         /// </summary>
@@ -449,16 +491,9 @@ namespace F8Framework.Core
         /// <returns>是否按下</returns>
         public bool GetKeyDown(KeyCode keyCode1, KeyCode keyCode2)
         {
-            if (IsEnableInputDevice)
-            {
-                if (GetLegacyKeyDown(keyCode2) && GetLegacyKey(keyCode1))
-                {
-                    return true;
-                }
-            }
-            return false;
+            return IsEnableInputDevice && GetLegacyKey(keyCode1) && GetLegacyKeyDown(keyCode2);
         }
-        
+
         /// <summary>
         /// 键盘组合按键抬起（两个组合键）
         /// </summary>
@@ -467,16 +502,9 @@ namespace F8Framework.Core
         /// <returns>是否抬起</returns>
         public bool GetKeyUp(KeyCode keyCode1, KeyCode keyCode2)
         {
-            if (IsEnableInputDevice)
-            {
-                if (GetLegacyKeyUp(keyCode2) && GetLegacyKey(keyCode1))
-                {
-                    return true;
-                }
-            }
-            return false;
+            return IsEnableInputDevice && GetLegacyKey(keyCode1) && GetLegacyKeyUp(keyCode2);
         }
-        
+
         /// <summary>
         /// 键盘组合按键按住（三个组合键）
         /// </summary>
@@ -488,7 +516,7 @@ namespace F8Framework.Core
         {
             return IsEnableInputDevice ? (GetLegacyKey(keyCode1) && GetLegacyKey(keyCode2) && GetLegacyKey(keyCode3)) : false;
         }
-        
+
         /// <summary>
         /// 键盘组合按键按下（三个组合键）
         /// </summary>
@@ -498,16 +526,9 @@ namespace F8Framework.Core
         /// <returns>是否按下</returns>
         public bool GetKeyDown(KeyCode keyCode1, KeyCode keyCode2, KeyCode keyCode3)
         {
-            if (IsEnableInputDevice)
-            {
-                if (GetLegacyKeyDown(keyCode3) && GetLegacyKey(keyCode1) && GetLegacyKey(keyCode2))
-                {
-                    return true;
-                }
-            }
-            return false;
+            return IsEnableInputDevice && GetLegacyKey(keyCode1) && GetLegacyKey(keyCode2) && GetLegacyKeyDown(keyCode3);
         }
-        
+
         /// <summary>
         /// 键盘组合按键抬起（三个组合键）
         /// </summary>
@@ -517,14 +538,7 @@ namespace F8Framework.Core
         /// <returns>是否抬起</returns>
         public bool GetKeyUp(KeyCode keyCode1, KeyCode keyCode2, KeyCode keyCode3)
         {
-            if (IsEnableInputDevice)
-            {
-                if (GetLegacyKeyUp(keyCode3) && GetLegacyKey(keyCode1) && GetLegacyKey(keyCode2))
-                {
-                    return true;
-                }
-            }
-            return false;
+            return IsEnableInputDevice && GetLegacyKey(keyCode1) && GetLegacyKey(keyCode2) && GetLegacyKeyUp(keyCode3);
         }
 
         /// <summary>
@@ -543,12 +557,15 @@ namespace F8Framework.Core
         {
             foreach (var item in _virtualAxes)
             {
-                item.Value.Update(0);
+                item.Value.SetValue(0f);
             }
+
             foreach (var item in _virtualButtons)
             {
                 item.Value.Released();
             }
+
+            MousePosition = Vector3.zero;
         }
 
         /// <summary>
@@ -560,129 +577,124 @@ namespace F8Framework.Core
             {
                 item.Value.ClearAction();
             }
+
             foreach (var item in _virtualButtons)
             {
                 item.Value.ClearAction();
             }
         }
 
+        private VirtualAxis GetOrCreateVirtualAxis(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return null;
+            }
+
+            if (!_virtualAxes.TryGetValue(name, out var axis))
+            {
+                axis = new VirtualAxis();
+                _virtualAxes.Add(name, axis);
+            }
+
+            return axis;
+        }
+
+        private VirtualButton GetOrCreateVirtualButton(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return null;
+            }
+
+            if (!_virtualButtons.TryGetValue(name, out var button))
+            {
+                button = new VirtualButton(name);
+                _virtualButtons.Add(name, button);
+            }
+
+            return button;
+        }
+
         private static bool GetAnyKey()
         {
-#if ENABLE_LEGACY_INPUT_MANAGER
             return Input.anyKey;
-#else
-            return false;
-#endif
         }
 
         private static bool GetAnyKeyDown()
         {
-#if ENABLE_LEGACY_INPUT_MANAGER
             return Input.anyKeyDown;
-#else
-            return false;
-#endif
         }
 
         private static bool GetLegacyKey(KeyCode keyCode)
         {
-#if ENABLE_LEGACY_INPUT_MANAGER
             return Input.GetKey(keyCode);
-#else
-            return false;
-#endif
         }
 
         private static bool GetLegacyKeyDown(KeyCode keyCode)
         {
-#if ENABLE_LEGACY_INPUT_MANAGER
             return Input.GetKeyDown(keyCode);
-#else
-            return false;
-#endif
         }
 
         private static bool GetLegacyKeyUp(KeyCode keyCode)
         {
-#if ENABLE_LEGACY_INPUT_MANAGER
             return Input.GetKeyUp(keyCode);
-#else
-            return false;
-#endif
         }
-        
-        /// <summary>
-        /// 虚拟按钮
-        /// </summary>
+
         private sealed class VirtualButton
         {
-            public string Name { get; private set; }
-
+            private readonly string _name;
             private long _pressedFrame = -5;
             private long _releasedFrame = -5;
-            private bool _pressed = false;
-            
+            private bool _pressed;
+
             public event Action<string> Started;
             public event Action<string> Performed;
             public event Action<string> Canceled;
-            
+
             public VirtualButton(string name)
             {
-                Name = name;
+                _name = name;
             }
-            
+
+            public bool GetButton => _pressed;
+
+            public bool GetButtonDown => _pressedFrame == InputManager.Instance.FrameCount;
+
+            public bool GetButtonUp => _releasedFrame == InputManager.Instance.FrameCount;
+
             public void Began()
             {
                 _pressedFrame = -5;
                 _releasedFrame = -5;
                 _pressed = false;
-                Started?.Invoke(Name);
+                Started?.Invoke(_name);
             }
-            
+
             public void Pressed()
             {
                 if (_pressed)
+                {
                     return;
+                }
 
                 _pressed = true;
                 _pressedFrame = InputManager.Instance.FrameCount + 1;
-                Performed?.Invoke(Name);
+                Performed?.Invoke(_name);
             }
-            
+
             public void Released()
             {
                 if (!_pressed)
+                {
                     return;
+                }
 
                 _pressed = false;
                 _releasedFrame = InputManager.Instance.FrameCount + 1;
-                Canceled?.Invoke(Name);
+                Canceled?.Invoke(_name);
             }
 
-            public bool GetButton
-            {
-                get
-                {
-                    return _pressed;
-                }
-            }
-
-            public bool GetButtonDown
-            {
-                get
-                {
-                    return _pressedFrame == InputManager.Instance.FrameCount;
-                }
-            }
-
-            public bool GetButtonUp
-            {
-                get
-                {
-                    return _releasedFrame == InputManager.Instance.FrameCount;
-                }
-            }
-            
             public void ClearAction()
             {
                 Started = null;
@@ -690,26 +702,35 @@ namespace F8Framework.Core
                 Canceled = null;
             }
         }
-        
-        /// <summary>
-        /// 虚拟轴线
-        /// </summary>
+
         private sealed class VirtualAxis
         {
-            public string Name { get; private set; }
-
             private float _value;
-            
+
             public event Action<float> ValueChanged;
-            
-            public VirtualAxis(string name)
+
+            public float GetValue => _value;
+
+            public float GetValueRaw
             {
-                Name = name;
+                get
+                {
+                    if (_value < 0f)
+                    {
+                        return -1f;
+                    }
+
+                    if (_value > 0f)
+                    {
+                        return 1f;
+                    }
+
+                    return 0f;
+                }
             }
 
-            public void Update(float value)
+            public void SetValue(float value)
             {
-                // unity的比较浮点数，比较两个浮点数是否“足够接近”
                 if (!Mathf.Approximately(_value, value))
                 {
                     _value = value;
@@ -717,24 +738,6 @@ namespace F8Framework.Core
                 }
             }
 
-            public float GetValue
-            {
-                get
-                {
-                    return _value;
-                }
-            }
-
-            public float GetValueRaw
-            {
-                get
-                {
-                    if (_value < 0) return -1;
-                    else if (_value > 0) return 1;
-                    else return 0;
-                }
-            }
-            
             public void ClearAction()
             {
                 ValueChanged = null;

@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.9.278] - 2025-04-05
+1.新增Input模块对新版InputSystem的支持，可无缝使用进阶API  
+2.完善文档  
+
 ## [2.9.277] - 2025-04-02
 1.优化Input模块和UI模块对InputSystem的适配  
 2.优化SpriteSequenceFrame延迟初始化  
