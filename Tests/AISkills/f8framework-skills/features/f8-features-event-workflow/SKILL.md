@@ -61,6 +61,12 @@ FF8.Message.DispatchEvent(10002, 123, "data");
 FF8.Message.DispatchEvent(MessageEvent.ApplicationFocus, 123, "data");
 FF8.Message.DispatchEvent(10004, 123, "data", true, 1.5f, 999L, (byte)7, 'F');
 
+// Async frame-sliced dispatch (executes 1 listener per frame)
+FF8.Message.DispatchEventAsync(MessageEvent.ApplicationFocus);
+FF8.Message.DispatchEventAsync(10002, 123, "data");
+FF8.Message.DispatchEventAsync(MessageEvent.ApplicationFocus, 123, "data");
+FF8.Message.DispatchEventAsync(10004, 123, "data", true, 1.5f, 999L, (byte)7, 'F');
+
 // Remove listener
 FF8.Message.RemoveEventListener(MessageEvent.ApplicationFocus, OnEvent, this);
 FF8.Message.RemoveEventListener<int, string>(10002, OnEventNoGC, this);
@@ -82,6 +88,9 @@ AddEventListener<int, string, bool, float, long, byte, char>(10004, OnEventT7);
 DispatchEvent(MessageEvent.ApplicationFocus);
 DispatchEvent(10002, 123, "data");
 DispatchEvent(10004, 123, "data", true, 1.5f, 999L, (byte)7, 'F');
+DispatchEventAsync(MessageEvent.ApplicationFocus);
+DispatchEventAsync(10002, 123, "data");
+DispatchEventAsync(10004, 123, "data", true, 1.5f, 999L, (byte)7, 'F');
 RemoveEventListener(MessageEvent.ApplicationFocus, OnEvent);
 RemoveEventListener<int, string>(10002, OnEventNoGC);
 RemoveEventListener<int, string, bool, float, long, byte, char>(10004, OnEventT7);
@@ -93,12 +102,15 @@ RemoveEventListener<int, string, bool, float, long, byte, char>(10004, OnEventT7
 // Use the fixed-parameter overload matching the event payload size.
 FF8.Message.AddEventListener<int>(10010, OnHpChanged, this);
 FF8.Message.DispatchEvent(10010, 99);
+FF8.Message.DispatchEventAsync(10010, 99);
 
 FF8.Message.AddEventListener<int, int>(10011, OnDamage, this);
 FF8.Message.DispatchEvent(10011, 12, 3);
+FF8.Message.DispatchEventAsync(10011, 12, 3);
 
 FF8.Message.AddEventListener<int, int, int, int, int, int, int>(10012, OnCombo, this);
 FF8.Message.DispatchEvent(10012, 1, 2, 3, 4, 5, 6, 7);
+FF8.Message.DispatchEventAsync(10012, 1, 2, 3, 4, 5, 6, 7);
 
 void OnHpChanged(int hp) { }
 void OnDamage(int damage, int criticalType) { }
@@ -111,9 +123,10 @@ void OnCombo(int a, int b, int c, int d, int e, int f, int g) { }
 2. Choose pattern: global `FF8.Message` or `EventDispatcher` mixin.
 3. For UI/entity classes, prefer `EventDispatcher` for automatic cleanup.
 4. Use the strongly typed overload matching the event payload size; the event module now supports 0~7 fixed parameters.
-5. Always pass `this` as the last parameter to `AddEventListener` for lifecycle binding.
-6. The framework has built-in dead-loop prevention.
-7. Use the Event System Monitor editor window to debug active listeners.
+5. If you need to spread callback cost across frames, use `DispatchEventAsync(...)`; the current implementation executes 1 listener per frame.
+6. Always pass `this` as the last parameter to `AddEventListener` for lifecycle binding.
+7. The framework has built-in dead-loop prevention.
+8. Use the Event System Monitor editor window to debug active listeners.
 
 ## Common error handling
 

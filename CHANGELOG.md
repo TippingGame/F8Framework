@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.9.279] - 2025-04-10
+1.新增Event模块异步方法DispatchEventAsync  
+2.新增红点系统异步方法ChangeAsync  
+3.新增UI模块2022.3以上使用InstantiateAsync  
+4.新增活动模块ActivityModule  
+
 ## [2.9.278] - 2025-04-05
 1.新增Input模块对新版InputSystem的支持，可无缝使用进阶API  
 2.完善文档  

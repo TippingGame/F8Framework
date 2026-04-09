@@ -40,6 +40,12 @@ private void Start()
     FF8.Message.DispatchEvent(10002, 123123, "asdasd");
     FF8.Message.DispatchEvent(MessageEvent.ApplicationFocus, 123123, "asdasd");
     FF8.Message.DispatchEvent(10004, 123123, "asdasd", true, 1.5f, 999L, (byte)7, 'F');
+
+    // Async frame-sliced dispatch (executes 1 listener per frame)
+    FF8.Message.DispatchEventAsync(MessageEvent.ApplicationFocus);
+    FF8.Message.DispatchEventAsync(10002, 123123, "asdasd");
+    FF8.Message.DispatchEventAsync(MessageEvent.ApplicationFocus, 123123, "asdasd");
+    FF8.Message.DispatchEventAsync(10004, 123123, "asdasd", true, 1.5f, 999L, (byte)7, 'F');
     
     // Remove listeners
     FF8.Message.RemoveEventListener(MessageEvent.ApplicationFocus, OnPlayerSpawned, this);
@@ -73,6 +79,10 @@ AddEventListener<int, string>(10002, OnPlayerSpawnedNoGC);
 DispatchEvent(MessageEvent.ApplicationFocus);
 DispatchEvent(10002, 123123, "asdasd");
 
+// Async frame-sliced dispatch (executes 1 listener per frame)
+DispatchEventAsync(MessageEvent.ApplicationFocus);
+DispatchEventAsync(10002, 123123, "asdasd");
+
 // Optional: Clear() will remove all listeners from this script
 RemoveEventListener(MessageEvent.ApplicationFocus, OnPlayerSpawned);
 RemoveEventListener<int, string>(10002, OnPlayerSpawnedNoGC);
@@ -84,10 +94,12 @@ The event API now uses strongly typed overloads only. Use the generic overload m
 ```C#
 FF8.Message.AddEventListener<int, string>(10002, OnPlayerSpawnedNoGC, this);
 FF8.Message.DispatchEvent(10002, 123123, "asdasd");
+FF8.Message.DispatchEventAsync(10002, 123123, "asdasd");
 FF8.Message.RemoveEventListener<int, string>(10002, OnPlayerSpawnedNoGC, this);
 
 AddEventListener<int, string>(10002, OnPlayerSpawnedNoGC);
 DispatchEvent(10002, 123123, "asdasd");
+DispatchEventAsync(10002, 123123, "asdasd");
 RemoveEventListener<int, string>(10002, OnPlayerSpawnedNoGC);
 
 void OnPlayerSpawnedNoGC(int id, string name)

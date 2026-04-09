@@ -170,6 +170,23 @@ namespace F8Framework.Core
                 viewParams.UILoader.Guid = viewParams.Guid;
                 AssetManager.Instance.LoadAsync<GameObject>(viewParams.PrefabPath, (res) =>
                 {
+#if UNITY_2022_3_OR_NEWER
+                    var op = InstantiateAsync(res, gameObject.transform);
+
+                    op.completed += _ =>
+                    {
+                        var childNode = op.Result[0];
+                        childNode.name = viewParams.PrefabPath;
+                        viewParams.Go = childNode;
+
+                        DelegateComponent comp = childNode.AddComponent<DelegateComponent>();
+                        viewParams.DelegateComponent = comp;
+                        viewParams.BaseView = childNode.GetComponent<BaseView>();
+                        comp.ViewParams = viewParams;
+                        CreateNode(viewParams);
+                        viewParams.UILoader.UILoadSuccess();
+                    };
+#else
                     GameObject childNode = Instantiate(res, gameObject.transform, false);
                     childNode.name = viewParams.PrefabPath;
                     viewParams.Go = childNode;
@@ -180,6 +197,7 @@ namespace F8Framework.Core
                     comp.ViewParams = viewParams;
                     CreateNode(viewParams);
                     viewParams.UILoader.UILoadSuccess();
+#endif
                 });
                 
                 return viewParams.UILoader;

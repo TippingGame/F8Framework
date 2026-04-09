@@ -17,13 +17,13 @@ namespace F8Framework.Core
                 languageName = Application.systemLanguage.ToString();
             }
 
-            Localization.Instance.CurrentLanguageName = languageName;
+            Localization.EditorInstance.CurrentLanguageName = languageName;
             return languageName;
         }
 
         public static void SaveLanguageSettings()
         {
-            string languageName = Localization.Instance.CurrentLanguageName;
+            string languageName = Localization.EditorInstance.CurrentLanguageName;
 
 #if UNITY_EDITOR
             F8EditorPrefs.SetString(LocalizationConst.CurrentLanguageKey, languageName);

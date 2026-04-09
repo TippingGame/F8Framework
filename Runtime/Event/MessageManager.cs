@@ -1,14 +1,26 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace F8Framework.Core
 {
     public class MessageManager : ModuleSingletonMono<MessageManager>, IMessageManager, IModule
     {
+        private const int MaxAsyncDispatchPerFrame = 1;
         internal Dictionary<int, List<IEventDataBase>> events = new Dictionary<int, List<IEventDataBase>>();
         private readonly List<IEventDataBase> delects = new List<IEventDataBase>();
         internal HashSet<IEventDataBase> callStack = new HashSet<IEventDataBase>();
         internal Dictionary<int, Queue<IEventDataBase>> dispatchInvokes = new Dictionary<int, Queue<IEventDataBase>>();
+        private readonly Queue<AsyncDispatchTask> _asyncDispatchTasks = new Queue<AsyncDispatchTask>();
+        private readonly HashSet<IEventDataBase> _asyncInvokingCallStack = new HashSet<IEventDataBase>();
+        private Coroutine _asyncDispatchCoroutine;
+
+        private sealed class AsyncDispatchTask
+        {
+            public Queue<IEventDataBase> Targets;
+            public Action<IEventDataBase> Invoker;
+        }
 
         private void MessageLoop(string debugInfo)
         {
@@ -27,7 +39,7 @@ namespace F8Framework.Core
 
         private void NotEventLogDispatch(string eventId)
         {
-            LogF8.LogEvent("没有创建监听，发送事件：【{0}】", eventId);
+            LogF8.LogEvent("没有创建监听，接收到事件：【{0}】", eventId);
         }
 
         private void NotEventLogRemove(string eventId)
@@ -59,7 +71,18 @@ namespace F8Framework.Core
 
         private bool IsInCallStack(IEventDataBase eventData)
         {
-            return callStack.Contains(eventData);
+            return callStack.Contains(eventData) || _asyncInvokingCallStack.Contains(eventData);
+        }
+
+        private Queue<IEventDataBase> GetOrCreateDispatchQueue(int eventId)
+        {
+            if (!dispatchInvokes.TryGetValue(eventId, out var queue))
+            {
+                queue = new Queue<IEventDataBase>();
+                dispatchInvokes[eventId] = queue;
+            }
+
+            return queue;
         }
 
         private List<IEventDataBase> GetOrCreateEventList(int eventId)
@@ -125,17 +148,6 @@ namespace F8Framework.Core
             delects.Clear();
         }
 
-        private Queue<IEventDataBase> GetOrCreateDispatchQueue(int eventId)
-        {
-            if (!dispatchInvokes.TryGetValue(eventId, out var queue))
-            {
-                queue = new Queue<IEventDataBase>();
-                dispatchInvokes[eventId] = queue;
-            }
-
-            return queue;
-        }
-
         private Queue<IEventDataBase> CollectDispatchTargets(int eventId)
         {
             if (!events.TryGetValue(eventId, out var eventDatas))
@@ -144,7 +156,7 @@ namespace F8Framework.Core
                 return null;
             }
 
-            var queue = GetOrCreateDispatchQueue(eventId);
+            var queue = new Queue<IEventDataBase>();
 
             foreach (var obj in eventDatas)
             {
@@ -157,7 +169,6 @@ namespace F8Framework.Core
                 if (obj.EventDataShouldBeInvoked())
                 {
                     queue.Enqueue(obj);
-                    callStack.Add(obj);
                 }
                 else
                 {
@@ -235,6 +246,99 @@ namespace F8Framework.Core
             {
                 eventData.Invoke(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
             }
+        }
+
+        private Coroutine EnqueueAsyncDispatch(int eventId, Action<IEventDataBase> invoker)
+        {
+            var queue = CollectDispatchTargets(eventId);
+            if (queue == null)
+            {
+                return _asyncDispatchCoroutine;
+            }
+
+            if (queue.Count == 0)
+            {
+                return _asyncDispatchCoroutine;
+            }
+
+            _asyncDispatchTasks.Enqueue(new AsyncDispatchTask
+            {
+                Targets = queue,
+                Invoker = invoker
+            });
+
+            if (_asyncDispatchCoroutine == null)
+            {
+                _asyncDispatchCoroutine = StartCoroutine(ProcessAsyncDispatchQueue());
+            }
+
+            return _asyncDispatchCoroutine;
+        }
+
+        private IEnumerator ProcessAsyncDispatchQueue()
+        {
+            while (_asyncDispatchTasks.Count > 0)
+            {
+                int dispatchCount = 0;
+
+                while (_asyncDispatchTasks.Count > 0 && dispatchCount < MaxAsyncDispatchPerFrame)
+                {
+                    var task = _asyncDispatchTasks.Peek();
+                    if (task.Targets.Count == 0)
+                    {
+                        _asyncDispatchTasks.Dequeue();
+                        continue;
+                    }
+
+                    var eventData = task.Targets.Dequeue();
+                    if (eventData.EventDataShouldBeInvoked())
+                    {
+                        _asyncInvokingCallStack.Add(eventData);
+                        try
+                        {
+                            task.Invoker?.Invoke(eventData);
+                        }
+                        finally
+                        {
+                            _asyncInvokingCallStack.Remove(eventData);
+                        }
+                    }
+                    else
+                    {
+                        NotListenerLog(eventData.LogDebugInfo());
+                    }
+
+                    dispatchCount++;
+
+                    if (task.Targets.Count == 0)
+                    {
+                        _asyncDispatchTasks.Dequeue();
+                    }
+                }
+
+                if (_asyncDispatchTasks.Count > 0)
+                {
+                    yield return null;
+                }
+            }
+
+            _asyncDispatchCoroutine = null;
+        }
+
+        private void StopAsyncDispatch()
+        {
+            if (_asyncDispatchCoroutine != null)
+            {
+                StopCoroutine(_asyncDispatchCoroutine);
+                _asyncDispatchCoroutine = null;
+            }
+
+            while (_asyncDispatchTasks.Count > 0)
+            {
+                _asyncDispatchTasks.Dequeue();
+            }
+
+            _asyncInvokingCallStack.Clear();
         }
 
         public void AddEventListener<T>(T eventName, Action listener, object handle) where T : Enum, IConvertible
@@ -426,10 +530,21 @@ namespace F8Framework.Core
             while (queue.Count > 0)
             {
                 var obj = queue.Dequeue();
+                callStack.Add(obj);
                 InvokeEventData(obj);
             }
 
             FinishDispatch();
+        }
+
+        public Coroutine DispatchEventAsync<T>(T eventName) where T : Enum, IConvertible
+        {
+            return DispatchEventAsync((int)(object)eventName);
+        }
+
+        public Coroutine DispatchEventAsync(int eventId)
+        {
+            return EnqueueAsyncDispatch(eventId, InvokeEventData);
         }
 
         public void DispatchEvent<T, T1>(T eventName, T1 arg1) where T : Enum, IConvertible
@@ -448,10 +563,21 @@ namespace F8Framework.Core
             while (queue.Count > 0)
             {
                 var obj = queue.Dequeue();
+                callStack.Add(obj);
                 InvokeEventData(obj, arg1);
             }
 
             FinishDispatch();
+        }
+
+        public Coroutine DispatchEventAsync<T, T1>(T eventName, T1 arg1) where T : Enum, IConvertible
+        {
+            return DispatchEventAsync((int)(object)eventName, arg1);
+        }
+
+        public Coroutine DispatchEventAsync<T1>(int eventId, T1 arg1)
+        {
+            return EnqueueAsyncDispatch(eventId, eventData => InvokeEventData(eventData, arg1));
         }
 
         public void DispatchEvent<T, T1, T2>(T eventName, T1 arg1, T2 arg2) where T : Enum, IConvertible
@@ -470,10 +596,21 @@ namespace F8Framework.Core
             while (queue.Count > 0)
             {
                 var obj = queue.Dequeue();
+                callStack.Add(obj);
                 InvokeEventData(obj, arg1, arg2);
             }
 
             FinishDispatch();
+        }
+
+        public Coroutine DispatchEventAsync<T, T1, T2>(T eventName, T1 arg1, T2 arg2) where T : Enum, IConvertible
+        {
+            return DispatchEventAsync((int)(object)eventName, arg1, arg2);
+        }
+
+        public Coroutine DispatchEventAsync<T1, T2>(int eventId, T1 arg1, T2 arg2)
+        {
+            return EnqueueAsyncDispatch(eventId, eventData => InvokeEventData(eventData, arg1, arg2));
         }
 
         public void DispatchEvent<T, T1, T2, T3>(T eventName, T1 arg1, T2 arg2, T3 arg3) where T : Enum, IConvertible
@@ -492,10 +629,21 @@ namespace F8Framework.Core
             while (queue.Count > 0)
             {
                 var obj = queue.Dequeue();
+                callStack.Add(obj);
                 InvokeEventData(obj, arg1, arg2, arg3);
             }
 
             FinishDispatch();
+        }
+
+        public Coroutine DispatchEventAsync<T, T1, T2, T3>(T eventName, T1 arg1, T2 arg2, T3 arg3) where T : Enum, IConvertible
+        {
+            return DispatchEventAsync((int)(object)eventName, arg1, arg2, arg3);
+        }
+
+        public Coroutine DispatchEventAsync<T1, T2, T3>(int eventId, T1 arg1, T2 arg2, T3 arg3)
+        {
+            return EnqueueAsyncDispatch(eventId, eventData => InvokeEventData(eventData, arg1, arg2, arg3));
         }
 
         public void DispatchEvent<T, T1, T2, T3, T4>(T eventName, T1 arg1, T2 arg2, T3 arg3, T4 arg4) where T : Enum, IConvertible
@@ -514,10 +662,21 @@ namespace F8Framework.Core
             while (queue.Count > 0)
             {
                 var obj = queue.Dequeue();
+                callStack.Add(obj);
                 InvokeEventData(obj, arg1, arg2, arg3, arg4);
             }
 
             FinishDispatch();
+        }
+
+        public Coroutine DispatchEventAsync<T, T1, T2, T3, T4>(T eventName, T1 arg1, T2 arg2, T3 arg3, T4 arg4) where T : Enum, IConvertible
+        {
+            return DispatchEventAsync((int)(object)eventName, arg1, arg2, arg3, arg4);
+        }
+
+        public Coroutine DispatchEventAsync<T1, T2, T3, T4>(int eventId, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+        {
+            return EnqueueAsyncDispatch(eventId, eventData => InvokeEventData(eventData, arg1, arg2, arg3, arg4));
         }
 
         public void DispatchEvent<T, T1, T2, T3, T4, T5>(T eventName, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5) where T : Enum, IConvertible
@@ -536,10 +695,21 @@ namespace F8Framework.Core
             while (queue.Count > 0)
             {
                 var obj = queue.Dequeue();
+                callStack.Add(obj);
                 InvokeEventData(obj, arg1, arg2, arg3, arg4, arg5);
             }
 
             FinishDispatch();
+        }
+
+        public Coroutine DispatchEventAsync<T, T1, T2, T3, T4, T5>(T eventName, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5) where T : Enum, IConvertible
+        {
+            return DispatchEventAsync((int)(object)eventName, arg1, arg2, arg3, arg4, arg5);
+        }
+
+        public Coroutine DispatchEventAsync<T1, T2, T3, T4, T5>(int eventId, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
+        {
+            return EnqueueAsyncDispatch(eventId, eventData => InvokeEventData(eventData, arg1, arg2, arg3, arg4, arg5));
         }
 
         public void DispatchEvent<T, T1, T2, T3, T4, T5, T6>(T eventName, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6) where T : Enum, IConvertible
@@ -558,10 +728,21 @@ namespace F8Framework.Core
             while (queue.Count > 0)
             {
                 var obj = queue.Dequeue();
+                callStack.Add(obj);
                 InvokeEventData(obj, arg1, arg2, arg3, arg4, arg5, arg6);
             }
 
             FinishDispatch();
+        }
+
+        public Coroutine DispatchEventAsync<T, T1, T2, T3, T4, T5, T6>(T eventName, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6) where T : Enum, IConvertible
+        {
+            return DispatchEventAsync((int)(object)eventName, arg1, arg2, arg3, arg4, arg5, arg6);
+        }
+
+        public Coroutine DispatchEventAsync<T1, T2, T3, T4, T5, T6>(int eventId, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
+        {
+            return EnqueueAsyncDispatch(eventId, eventData => InvokeEventData(eventData, arg1, arg2, arg3, arg4, arg5, arg6));
         }
 
         public void DispatchEvent<T, T1, T2, T3, T4, T5, T6, T7>(T eventName, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7) where T : Enum, IConvertible
@@ -580,14 +761,26 @@ namespace F8Framework.Core
             while (queue.Count > 0)
             {
                 var obj = queue.Dequeue();
+                callStack.Add(obj);
                 InvokeEventData(obj, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
             }
 
             FinishDispatch();
         }
 
+        public Coroutine DispatchEventAsync<T, T1, T2, T3, T4, T5, T6, T7>(T eventName, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7) where T : Enum, IConvertible
+        {
+            return DispatchEventAsync((int)(object)eventName, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+        }
+
+        public Coroutine DispatchEventAsync<T1, T2, T3, T4, T5, T6, T7>(int eventId, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
+        {
+            return EnqueueAsyncDispatch(eventId, eventData => InvokeEventData(eventData, arg1, arg2, arg3, arg4, arg5, arg6, arg7));
+        }
+
         public void Clear()
         {
+            StopAsyncDispatch();
             events.Clear();
             delects.Clear();
             callStack.Clear();

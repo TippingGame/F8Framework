@@ -42,6 +42,12 @@ private void Start()
     FF8.Message.DispatchEvent(10002, 123123, "asdasd");
     FF8.Message.DispatchEvent(MessageEvent.ApplicationFocus, 123123, "asdasd");
     FF8.Message.DispatchEvent(10004, 123123, "asdasd", true, 1.5f, 999L, (byte)7, 'F');
+
+    // 异步分帧发送全局消息（每帧只执行 1 个监听器）
+    FF8.Message.DispatchEventAsync(MessageEvent.ApplicationFocus);
+    FF8.Message.DispatchEventAsync(10002, 123123, "asdasd");
+    FF8.Message.DispatchEventAsync(MessageEvent.ApplicationFocus, 123123, "asdasd");
+    FF8.Message.DispatchEventAsync(10004, 123123, "asdasd", true, 1.5f, 999L, (byte)7, 'F');
     
     // 移除监听
     FF8.Message.RemoveEventListener(MessageEvent.ApplicationFocus, OnPlayerSpawned, this);
@@ -75,6 +81,10 @@ AddEventListener<int, string>(10002, OnPlayerSpawnedNoGC);
 DispatchEvent(MessageEvent.ApplicationFocus);
 DispatchEvent(10002, 123123, "asdasd");
 
+// 异步分帧发送全局消息（每帧只执行 1 个监听器）
+DispatchEventAsync(MessageEvent.ApplicationFocus);
+DispatchEventAsync(10002, 123123, "asdasd");
+
 // 可不执行，Clear()时会清理此脚本所有监听
 RemoveEventListener(MessageEvent.ApplicationFocus, OnPlayerSpawned);
 RemoveEventListener<int, string>(10002, OnPlayerSpawnedNoGC);
@@ -86,10 +96,12 @@ RemoveEventListener<int, string>(10002, OnPlayerSpawnedNoGC);
 ```C#
 FF8.Message.AddEventListener<int, string>(10002, OnPlayerSpawnedNoGC, this);
 FF8.Message.DispatchEvent(10002, 123123, "asdasd");
+FF8.Message.DispatchEventAsync(10002, 123123, "asdasd");
 FF8.Message.RemoveEventListener<int, string>(10002, OnPlayerSpawnedNoGC, this);
 
 AddEventListener<int, string>(10002, OnPlayerSpawnedNoGC);
 DispatchEvent(10002, 123123, "asdasd");
+DispatchEventAsync(10002, 123123, "asdasd");
 RemoveEventListener<int, string>(10002, OnPlayerSpawnedNoGC);
 
 void OnPlayerSpawnedNoGC(int id, string name)

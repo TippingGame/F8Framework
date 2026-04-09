@@ -20,6 +20,12 @@ namespace F8Framework.Tests
             DispatchEvent(10002, 123123, "asdasd");
             DispatchEvent(MessageEvent.ApplicationFocus, 123123, "asdasd");
             DispatchEvent(10004, 123123, "asdasd", true, 1.5f, 999L, (byte)7, 'F');
+
+            // 异步分帧分发，每帧只会执行 1 个监听器
+            DispatchEventAsync(MessageEvent.ApplicationFocus);
+            DispatchEventAsync(10002, 123123, "asdasd");
+            DispatchEventAsync(MessageEvent.ApplicationFocus, 123123, "asdasd");
+            DispatchEventAsync(10004, 123123, "asdasd", true, 1.5f, 999L, (byte)7, 'F');
             //可不执行，OnDestroy时会清理此脚本所有监听
             RemoveEventListener(MessageEvent.ApplicationFocus, OnPlayerSpawned);
             RemoveEventListener<int, string>(10002, OnPlayerSpawnedNoGC);
@@ -151,9 +157,19 @@ namespace F8Framework.Tests
             EventDispatcher.DispatchEvent(eventName);
         }
 
+        public Coroutine DispatchEventAsync<T>(T eventName) where T : struct, Enum, IConvertible
+        {
+            return EventDispatcher.DispatchEventAsync(eventName);
+        }
+
         public void DispatchEvent<T, T1>(T eventName, T1 arg1) where T : struct, Enum, IConvertible
         {
             EventDispatcher.DispatchEvent(eventName, arg1);
+        }
+
+        public Coroutine DispatchEventAsync<T, T1>(T eventName, T1 arg1) where T : struct, Enum, IConvertible
+        {
+            return EventDispatcher.DispatchEventAsync(eventName, arg1);
         }
 
         public void DispatchEvent<T, T1, T2>(T eventName, T1 arg1, T2 arg2) where T : struct, Enum, IConvertible
@@ -161,9 +177,19 @@ namespace F8Framework.Tests
             EventDispatcher.DispatchEvent(eventName, arg1, arg2);
         }
 
+        public Coroutine DispatchEventAsync<T, T1, T2>(T eventName, T1 arg1, T2 arg2) where T : struct, Enum, IConvertible
+        {
+            return EventDispatcher.DispatchEventAsync(eventName, arg1, arg2);
+        }
+
         public void DispatchEvent<T, T1, T2, T3>(T eventName, T1 arg1, T2 arg2, T3 arg3) where T : struct, Enum, IConvertible
         {
             EventDispatcher.DispatchEvent(eventName, arg1, arg2, arg3);
+        }
+
+        public Coroutine DispatchEventAsync<T, T1, T2, T3>(T eventName, T1 arg1, T2 arg2, T3 arg3) where T : struct, Enum, IConvertible
+        {
+            return EventDispatcher.DispatchEventAsync(eventName, arg1, arg2, arg3);
         }
 
         public void DispatchEvent<T, T1, T2, T3, T4>(T eventName, T1 arg1, T2 arg2, T3 arg3, T4 arg4) where T : struct, Enum, IConvertible
@@ -171,9 +197,19 @@ namespace F8Framework.Tests
             EventDispatcher.DispatchEvent(eventName, arg1, arg2, arg3, arg4);
         }
 
+        public Coroutine DispatchEventAsync<T, T1, T2, T3, T4>(T eventName, T1 arg1, T2 arg2, T3 arg3, T4 arg4) where T : struct, Enum, IConvertible
+        {
+            return EventDispatcher.DispatchEventAsync(eventName, arg1, arg2, arg3, arg4);
+        }
+
         public void DispatchEvent<T, T1, T2, T3, T4, T5>(T eventName, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5) where T : struct, Enum, IConvertible
         {
             EventDispatcher.DispatchEvent(eventName, arg1, arg2, arg3, arg4, arg5);
+        }
+
+        public Coroutine DispatchEventAsync<T, T1, T2, T3, T4, T5>(T eventName, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5) where T : struct, Enum, IConvertible
+        {
+            return EventDispatcher.DispatchEventAsync(eventName, arg1, arg2, arg3, arg4, arg5);
         }
 
         public void DispatchEvent<T, T1, T2, T3, T4, T5, T6>(T eventName, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6) where T : struct, Enum, IConvertible
@@ -181,9 +217,19 @@ namespace F8Framework.Tests
             EventDispatcher.DispatchEvent(eventName, arg1, arg2, arg3, arg4, arg5, arg6);
         }
 
+        public Coroutine DispatchEventAsync<T, T1, T2, T3, T4, T5, T6>(T eventName, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6) where T : struct, Enum, IConvertible
+        {
+            return EventDispatcher.DispatchEventAsync(eventName, arg1, arg2, arg3, arg4, arg5, arg6);
+        }
+
         public void DispatchEvent<T, T1, T2, T3, T4, T5, T6, T7>(T eventName, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7) where T : struct, Enum, IConvertible
         {
             EventDispatcher.DispatchEvent(eventName, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+        }
+
+        public Coroutine DispatchEventAsync<T, T1, T2, T3, T4, T5, T6, T7>(T eventName, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7) where T : struct, Enum, IConvertible
+        {
+            return EventDispatcher.DispatchEventAsync(eventName, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
         }
 
 
@@ -272,9 +318,19 @@ namespace F8Framework.Tests
             EventDispatcher.DispatchEvent(eventId);
         }
 
+        public Coroutine DispatchEventAsync(int eventId)
+        {
+            return EventDispatcher.DispatchEventAsync(eventId);
+        }
+
         public void DispatchEvent<T1>(int eventId, T1 arg1)
         {
             EventDispatcher.DispatchEvent(eventId, arg1);
+        }
+
+        public Coroutine DispatchEventAsync<T1>(int eventId, T1 arg1)
+        {
+            return EventDispatcher.DispatchEventAsync(eventId, arg1);
         }
 
         public void DispatchEvent<T1, T2>(int eventId, T1 arg1, T2 arg2)
@@ -282,9 +338,19 @@ namespace F8Framework.Tests
             EventDispatcher.DispatchEvent(eventId, arg1, arg2);
         }
 
+        public Coroutine DispatchEventAsync<T1, T2>(int eventId, T1 arg1, T2 arg2)
+        {
+            return EventDispatcher.DispatchEventAsync(eventId, arg1, arg2);
+        }
+
         public void DispatchEvent<T1, T2, T3>(int eventId, T1 arg1, T2 arg2, T3 arg3)
         {
             EventDispatcher.DispatchEvent(eventId, arg1, arg2, arg3);
+        }
+
+        public Coroutine DispatchEventAsync<T1, T2, T3>(int eventId, T1 arg1, T2 arg2, T3 arg3)
+        {
+            return EventDispatcher.DispatchEventAsync(eventId, arg1, arg2, arg3);
         }
 
         public void DispatchEvent<T1, T2, T3, T4>(int eventId, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
@@ -292,9 +358,19 @@ namespace F8Framework.Tests
             EventDispatcher.DispatchEvent(eventId, arg1, arg2, arg3, arg4);
         }
 
+        public Coroutine DispatchEventAsync<T1, T2, T3, T4>(int eventId, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+        {
+            return EventDispatcher.DispatchEventAsync(eventId, arg1, arg2, arg3, arg4);
+        }
+
         public void DispatchEvent<T1, T2, T3, T4, T5>(int eventId, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
         {
             EventDispatcher.DispatchEvent(eventId, arg1, arg2, arg3, arg4, arg5);
+        }
+
+        public Coroutine DispatchEventAsync<T1, T2, T3, T4, T5>(int eventId, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
+        {
+            return EventDispatcher.DispatchEventAsync(eventId, arg1, arg2, arg3, arg4, arg5);
         }
 
         public void DispatchEvent<T1, T2, T3, T4, T5, T6>(int eventId, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
@@ -302,9 +378,19 @@ namespace F8Framework.Tests
             EventDispatcher.DispatchEvent(eventId, arg1, arg2, arg3, arg4, arg5, arg6);
         }
 
+        public Coroutine DispatchEventAsync<T1, T2, T3, T4, T5, T6>(int eventId, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
+        {
+            return EventDispatcher.DispatchEventAsync(eventId, arg1, arg2, arg3, arg4, arg5, arg6);
+        }
+
         public void DispatchEvent<T1, T2, T3, T4, T5, T6, T7>(int eventId, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
         {
             EventDispatcher.DispatchEvent(eventId, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+        }
+
+        public Coroutine DispatchEventAsync<T1, T2, T3, T4, T5, T6, T7>(int eventId, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
+        {
+            return EventDispatcher.DispatchEventAsync(eventId, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
         }
 
         void OnDestroy()

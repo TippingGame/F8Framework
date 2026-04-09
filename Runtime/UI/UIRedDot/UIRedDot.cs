@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace F8Framework.Core
@@ -63,15 +64,22 @@ namespace F8Framework.Core
     /// </summary>
     public class UIRedDot : Singleton<UIRedDot>
     {
+        private const int MaxAsyncRefreshPerFrame = 1;
         private Dictionary<string, RedDotNode> _redDotMapping = new Dictionary<string, RedDotNode>();
         private Dictionary<string, List<GameObject>> reddotDic;
         private Dictionary<string, RedDotNode> reddotList;
+        private readonly Queue<string> _asyncRefreshQueue = new Queue<string>();
+        private readonly HashSet<string> _asyncRefreshSet = new HashSet<string>();
+        private Coroutine _asyncChangeCoroutine;
 
         /// <summary>
         /// 初始化红点系统。
         /// </summary>
         public void Init()
         {
+            StopAsyncRefresh();
+            _asyncRefreshQueue.Clear();
+            _asyncRefreshSet.Clear();
             reddotDic = new Dictionary<string, List<GameObject>>();
             reddotList = new Dictionary<string, RedDotNode>();
 
@@ -156,6 +164,27 @@ namespace F8Framework.Core
         }
 
         /// <summary>
+        /// 根据计数异步更改红点节点的状态，并按帧分批刷新红点。
+        /// </summary>
+        /// <param name="type">红点节点的类型。</param>
+        /// <param name="count">要设置的计数。</param>
+        /// <returns>异步刷新的协程。</returns>
+        public Coroutine ChangeAsync(string type, int count)
+        {
+            if (reddotList.TryGetValue(type, out RedDotNode redDotNode))
+            {
+                if (redDotNode.Count != count)
+                {
+                    redDotNode.State = count > 0;
+                    redDotNode.Count = count;
+                    QueueRefreshChain(type);
+                }
+            }
+
+            return _asyncChangeCoroutine;
+        }
+
+        /// <summary>
         /// 根据文本状态更改红点节点的状态。
         /// </summary>
         /// <param name="type">红点节点的类型。</param>
@@ -179,6 +208,27 @@ namespace F8Framework.Core
         }
 
         /// <summary>
+        /// 根据文本状态异步更改红点节点的状态，并按帧分批刷新红点。
+        /// </summary>
+        /// <param name="type">红点节点的类型。</param>
+        /// <param name="textState">要设置的文本状态。</param>
+        /// <returns>异步刷新的协程。</returns>
+        public Coroutine ChangeAsync(string type, string textState = null)
+        {
+            if (reddotList.TryGetValue(type, out RedDotNode redDotNode))
+            {
+                if (redDotNode.TextState != textState)
+                {
+                    redDotNode.State = textState != null;
+                    redDotNode.TextState = textState;
+                    QueueRefreshChain(type);
+                }
+            }
+
+            return _asyncChangeCoroutine;
+        }
+
+        /// <summary>
         /// 更改红点节点的状态。
         /// </summary>
         /// <param name="type">红点节点的类型。</param>
@@ -197,6 +247,26 @@ namespace F8Framework.Core
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// 异步更改红点节点的状态，并按帧分批刷新红点。
+        /// </summary>
+        /// <param name="type">红点节点的类型。</param>
+        /// <param name="state">要设置的状态。</param>
+        /// <returns>异步刷新的协程。</returns>
+        public Coroutine ChangeAsync(string type, bool state)
+        {
+            if (reddotList.TryGetValue(type, out RedDotNode redDotNode))
+            {
+                if (redDotNode.State != state)
+                {
+                    redDotNode.State = state;
+                    QueueRefreshChain(type);
+                }
+            }
+
+            return _asyncChangeCoroutine;
         }
 
         /// <summary>
@@ -231,6 +301,81 @@ namespace F8Framework.Core
                 {
                     ParentChange(redDotNode.Parent.Name);
                 }
+            }
+        }
+
+        /// <summary>
+        /// 将当前节点和父节点加入异步刷新队列。
+        /// </summary>
+        /// <param name="type">当前红点节点类型。</param>
+        private void QueueRefreshChain(string type)
+        {
+            if (reddotList.TryGetValue(type, out RedDotNode redDotNode))
+            {
+                EnqueueRefresh(type);
+
+                while (redDotNode.Parent != null)
+                {
+                    redDotNode = redDotNode.Parent;
+                    EnqueueRefresh(redDotNode.Name);
+                }
+
+                if (_asyncChangeCoroutine == null)
+                {
+                    _asyncChangeCoroutine = Util.Unity.StartCoroutine(ProcessRefreshQueue());
+                }
+            }
+        }
+
+        /// <summary>
+        /// 将节点加入刷新队列，避免同一节点重复排队。
+        /// </summary>
+        /// <param name="type">红点节点类型。</param>
+        private void EnqueueRefresh(string type)
+        {
+            if (_asyncRefreshSet.Add(type))
+            {
+                _asyncRefreshQueue.Enqueue(type);
+            }
+        }
+
+        /// <summary>
+        /// 分帧处理红点刷新队列。
+        /// </summary>
+        private IEnumerator ProcessRefreshQueue()
+        {
+            while (_asyncRefreshQueue.Count > 0)
+            {
+                int refreshCount = 0;
+
+                while (_asyncRefreshQueue.Count > 0 && refreshCount < MaxAsyncRefreshPerFrame)
+                {
+                    string type = _asyncRefreshQueue.Dequeue();
+                    _asyncRefreshSet.Remove(type);
+
+                    if (reddotList.TryGetValue(type, out _))
+                    {
+                        OnStatusChangedEvent(type, GetState(type));
+                    }
+
+                    refreshCount++;
+                }
+
+                if (_asyncRefreshQueue.Count > 0)
+                {
+                    yield return null;
+                }
+            }
+
+            _asyncChangeCoroutine = null;
+        }
+
+        private void StopAsyncRefresh()
+        {
+            if (_asyncChangeCoroutine != null)
+            {
+                Util.Unity.StopCoroutine(_asyncChangeCoroutine);
+                _asyncChangeCoroutine = null;
             }
         }
 
@@ -425,6 +570,9 @@ namespace F8Framework.Core
             }
 
             reddotDic.Clear();
+            _asyncRefreshQueue.Clear();
+            _asyncRefreshSet.Clear();
+            StopAsyncRefresh();
         }
     }
 }

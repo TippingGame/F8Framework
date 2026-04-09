@@ -39,6 +39,11 @@ namespace F8Framework.Tests
             // 改变文本状态
             UIRedDot.Instance.Change(DemoUIRedDot.UIMain_AutoIntensify2, "空闲");
             LogF8.Log(UIRedDot.Instance.GetTextState(DemoUIRedDot.UIMain_AutoIntensify3));
+
+            // 异步分帧改变状态，每帧只会刷新 1 个红点节点
+            UIRedDot.Instance.ChangeAsync(DemoUIRedDot.UIMain_AutoIntensify2, false);
+            UIRedDot.Instance.ChangeAsync(DemoUIRedDot.UIMain_AutoIntensify2, 20);
+            UIRedDot.Instance.ChangeAsync(DemoUIRedDot.UIMain_AutoIntensify2, "忙碌");
             
             // 绑定，解绑GameObject
             UIRedDot.Instance.Binding(DemoUIRedDot.UIMain_AutoIntensify2, this.gameObject);
