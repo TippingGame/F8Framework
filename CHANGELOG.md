@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.9.280] - 2025-04-10
+1.还原UI模块2022.3以上使用InstantiateAsync  
+2.完善构建文档  
+
 ## [2.9.279] - 2025-04-10
 1.新增Event模块异步方法DispatchEventAsync  
 2.新增红点系统异步方法ChangeAsync  

@@ -127,8 +127,11 @@ Method 2: Unity → Menu Bar → Window → Package Manager → "+" → Add Pack
   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20241203214624.png)
 * Build settings.  
   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_20240329230924.png)
+* When the first package resource loading method is CDN, upload the first package to CDN.
+  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1775831404786.png)
 * To use WeChat's cache system, manually enter the CDN address and Bundle Path Identifier in MiniGameConfig (default is `StreamingAssets`, should be changed to `AssetBundles`).
   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1760931585420.png)
+### If the build fails: 1. Use Unity's built-in Build once and try again, 2. Use Build and convert once and try again
 
 ---
 ## Douyin Mini Game Integration Method
@@ -138,7 +141,7 @@ Method 2: Unity → Menu Bar → Window → Package Manager → "+" → Add Pack
 
 * To use Douyin's cache system, also need to enter the cache resource domain in the BuildTool interface.
   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/SDKManager/ui_1760932083174.png)
-### If build fails: Try using Unity's built-in Build once before attempting again
+### If the build fails: 1. Use Unity's built-in Build once and try again, 2. Use Build WebGL once and try again
 
 ---
 
