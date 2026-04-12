@@ -10,6 +10,7 @@ namespace F8Framework.Core.Editor
 			public string DefaultLanguage = Application.systemLanguage.ToString();
 			public int maxSuggestion = 50;
 			public bool enableTMP = false;
+			public bool enableTimeline = false;
 
 			public SettingsDefinition Clone() => (SettingsDefinition)MemberwiseClone();
 		}

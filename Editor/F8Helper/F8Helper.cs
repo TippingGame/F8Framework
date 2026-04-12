@@ -132,6 +132,7 @@ namespace F8Framework.Core.Editor
             LocalizationEditorSettings.LoadEditorSettings();
 
             TMPIntegrationSwitcher.EnsureIntegrationState();
+            TimelineIntegrationSwitcher.EnsureIntegrationState();
             
             // 注册编辑器退出事件
             EditorApplication.quitting += OnEditorQuit;

@@ -1,5 +1,8 @@
 # Changelog
 
+## [3.0.282] - 2025-04-12
+1.新增Localization模块项目使用Timeline开关  
+
 ## [3.0.281] - 2025-04-12
 1.新增Asset模块Unload使用引用计数方式卸载  
 2.新增Asset模块UnloadScene，UnloadUnused同步和异步API  

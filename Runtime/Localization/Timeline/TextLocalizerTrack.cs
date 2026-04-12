@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿#if LOCALIZER_TIMELINE
+using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
 
@@ -21,3 +22,4 @@ namespace F8Framework.Core
 		}
 	}
 }
+#endif

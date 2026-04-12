@@ -69,6 +69,20 @@ namespace F8Framework.Core.Editor
 				}
 			}
 
+			if (prevSettings.enableTimeline != LocalizationEditorSettings.current.enableTimeline)
+			{
+				if (LocalizationEditorSettings.current.enableTimeline)
+				{
+					var enableTimeline = AskToEnableTimeline();
+					LocalizationEditorSettings.current.enableTimeline = enableTimeline;
+					if (enableTimeline) TimelineIntegrationSwitcher.Enable();
+				}
+				else
+				{
+					TimelineIntegrationSwitcher.Disable();
+				}
+			}
+
 			if (LocalizationEditorSettings.current != prevSettings) LocalizationEditorSettings.SaveEditorSettings();
 		}
 
@@ -78,6 +92,7 @@ namespace F8Framework.Core.Editor
 			settings.DefaultLanguage = EditorGUILayout.TextField("当前语言（只读）", LocalizationSettings.LoadLanguageSettings());
 			settings.maxSuggestion = EditorGUILayout.IntField("最大显示ID个数", settings.maxSuggestion);
 			settings.enableTMP = EditorGUILayout.Toggle("项目使用 TextMesh Pro", settings.enableTMP);
+			settings.enableTimeline = EditorGUILayout.Toggle("项目使用 Timeline", settings.enableTimeline);
 			EditorGUILayout.Space();
 			if (GUILayout.Button("Reset All")) ResetAllSettings();
 		}
@@ -88,10 +103,17 @@ namespace F8Framework.Core.Editor
 			return EditorUtility.DisplayDialog("启用 TextMesh Pro 集成", message, "确定", "取消");
 		}
 
+		static bool AskToEnableTimeline()
+		{
+			const string message = "如果您的项目没有 Timeline，这将导致编译错误。是否继续开启？";
+			return EditorUtility.DisplayDialog("启用 Timeline 集成", message, "确定", "取消");
+		}
+
 		static void ResetAllSettings()
 		{
 			LocalizationEditorSettings.ResetAll();
 			TMPIntegrationSwitcher.Disable();
+			TimelineIntegrationSwitcher.Disable();
 		}
 	}
 }
