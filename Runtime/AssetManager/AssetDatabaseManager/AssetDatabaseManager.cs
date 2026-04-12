@@ -16,9 +16,10 @@ namespace F8Framework.Core
 
         private void EditorLoaderPool(string assetPath, out EditorLoader loader)
         {
-            if (editorLoaders.ContainsKey(assetPath))
+            if (editorLoaders.TryGetValue(assetPath, out var editorLoader))
             {
-                loader = editorLoaders[assetPath];
+                loader = editorLoader;
+                loader.Reset();
             }
             else
             {
@@ -70,6 +71,7 @@ namespace F8Framework.Core
 
                 Object o2 = UnityEditor.AssetDatabase.LoadAssetAtPath(assetPath, assetType);
                 loader.Asset = o2;
+                loader.AssetDatabaseLoadSuccess();
                 return o2;
             }
             else
@@ -105,9 +107,7 @@ namespace F8Framework.Core
         {
             if (editorLoaders.TryGetValue(assetPath, out EditorLoader loader))
             {
-                loader.isLoadSuccess = false;
-                loader.Asset = null;
-                loader.AllAsset = null;
+                loader.Reset();
             }
         }
     }

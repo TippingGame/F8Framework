@@ -16,6 +16,20 @@ namespace F8Framework.Core
             Asset = asset;
             AllAsset = allAsset;
         }
+
+        public void Reset(bool clearAssets = true)
+        {
+            isLoadSuccess = false;
+            Asset = null;
+            if (AllAsset == null)
+            {
+                AllAsset = new Dictionary<string, Object>();
+            }
+            else if (clearAssets)
+            {
+                AllAsset.Clear();
+            }
+        }
         
         public void AssetDatabaseLoadSuccess()
         {
@@ -36,6 +50,10 @@ namespace F8Framework.Core
         public override Dictionary<string, TObject> GetAllAssetObject<TObject>()
         {
             Dictionary<string, TObject> allAsset = new Dictionary<string, TObject>();
+            if (AllAsset == null)
+            {
+                return allAsset;
+            }
             foreach (var item in AllAsset)
             {
                 if (item.Value is TObject value)
@@ -48,7 +66,7 @@ namespace F8Framework.Core
         
         public override Dictionary<string, Object> GetAllAssetObject()
         {
-            return AllAsset;
+            return AllAsset ?? new Dictionary<string, Object>();
         }
     }
 }

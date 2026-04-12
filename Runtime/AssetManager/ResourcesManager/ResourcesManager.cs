@@ -10,7 +10,6 @@ namespace F8Framework.Core
     /// </summary> 
     public class ResourcesManager : ModuleSingleton<ResourcesManager>, IModule
     {
-        
         private Dictionary<string, ResourcesLoader> resourceLoaders = new Dictionary<string, ResourcesLoader>();
         
         public Dictionary<string, ResourcesLoader> GetResourceLoaders()
@@ -21,6 +20,16 @@ namespace F8Framework.Core
         public ResourcesLoader GetResourceLoader(string resourcePath)
         {
             return resourceLoaders.GetValueOrDefault(resourcePath);
+        }
+
+        public int Retain(string resourcePath)
+        {
+            if (resourceLoaders.TryGetValue(resourcePath, out ResourcesLoader loader))
+            {
+                return loader.Retain();
+            }
+
+            return 0;
         }
         
         /// <summary>
@@ -45,6 +54,7 @@ namespace F8Framework.Core
                 resourceLoaders.Add(resourcePath, loader);
             }
 
+            loader.Retain();
             return loader.Load<T>();
         }
 
@@ -69,6 +79,7 @@ namespace F8Framework.Core
                 resourceLoaders.Add(resourcePath, loader);
             }
 
+            loader.Retain();
             return loader.Load(resourceType);
         }
 
@@ -92,6 +103,7 @@ namespace F8Framework.Core
                 resourceLoaders.Add(resourcePath, loader);
             }
 
+            loader.Retain();
             return loader.Load();
         }
 
@@ -119,6 +131,7 @@ namespace F8Framework.Core
                 resourceLoaders.Add(resourcePath, loader);
             }
 
+            loader.Retain();
             loader.LoadAsync<T>(callback);
             return loader;
         }
@@ -147,6 +160,7 @@ namespace F8Framework.Core
                 resourceLoaders.Add(resourcePath, loader);
             }
 
+            loader.Retain();
             loader.LoadAsync(resourceType, callback);
             return loader;
         }
@@ -173,6 +187,7 @@ namespace F8Framework.Core
                 resourceLoaders.Add(resourcePath, loader);
             }
 
+            loader.Retain();
             loader.LoadAsync(callback);
             return loader;
         }
@@ -184,11 +199,16 @@ namespace F8Framework.Core
         /// <param name="unloadAllLoadedObjects"></param>
         public void Unload(string resourcePath, bool unloadAllLoadedObjects = false)
         {
-            if (!unloadAllLoadedObjects)
-                return;
             if (resourceLoaders.TryGetValue(resourcePath, out ResourcesLoader loader))
             {
-                loader.Clear();
+                if (loader.Release() > 0)
+                    return;
+
+                if (unloadAllLoadedObjects)
+                {
+                    loader.Clear();
+                    resourceLoaders.Remove(resourcePath);
+                }
             }
         }
 
@@ -200,8 +220,6 @@ namespace F8Framework.Core
         public void Unload(ResourcesLoader loader, bool unloadAllLoadedObjects = false)
         {
             if (loader == null)
-                return;
-            if (!unloadAllLoadedObjects)
                 return;
             if (resourceLoaders.ContainsValue(loader))
             {
@@ -221,7 +239,10 @@ namespace F8Framework.Core
             }
             else
             {
-                loader.Clear();
+                if (loader.Release() <= 0 && unloadAllLoadedObjects)
+                {
+                    loader.Clear();
+                }
             }
         }
 
@@ -257,6 +278,47 @@ namespace F8Framework.Core
         }
 
         /// <summary>
+        /// 卸载当前所有零引用资源。
+        /// </summary>
+        /// <param name="unloadAllLoadedObjects">完全卸载。</param>
+        public void UnloadUnused(bool unloadAllLoadedObjects = true)
+        {
+            if (!unloadAllLoadedObjects)
+                return;
+
+            List<string> keys = new List<string>();
+            foreach (var kv in resourceLoaders)
+            {
+                if (kv.Value == null || kv.Value.RefCount <= 0)
+                {
+                    keys.Add(kv.Key);
+                }
+            }
+
+            foreach (string key in keys)
+            {
+                if (resourceLoaders.TryGetValue(key, out ResourcesLoader loader))
+                {
+                    loader?.Clear();
+                    resourceLoaders.Remove(key);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 异步卸载当前所有零引用资源。
+        /// </summary>
+        /// <param name="unloadAllLoadedObjects">完全卸载。</param>
+        /// <param name="callback">卸载完成回调。</param>
+        public void UnloadUnusedAsync(
+            bool unloadAllLoadedObjects = true,
+            AssetBundleLoader.OnUnloadFinished callback = null)
+        {
+            UnloadUnused(unloadAllLoadedObjects);
+            callback?.Invoke();
+        }
+
+        /// <summary>
         /// 加载所有资源。
         /// </summary>
         /// <param name="resourcePath">资源文件夹的相对路径。</param>
@@ -272,9 +334,9 @@ namespace F8Framework.Core
             where T : Object
         {
             ResourcesLoader loader2;
-            if (resourceLoaders.ContainsKey(resourcePath))
+            if (resourceLoaders.TryGetValue(resourcePath, out var resourceLoader))
             {
-                loader2 = resourceLoaders[resourcePath];
+                loader2 = resourceLoader;
             }
             else
             {
@@ -282,6 +344,7 @@ namespace F8Framework.Core
                 loader2.Init(resourcePath);
                 resourceLoaders.Add(resourcePath, loader2);
             }
+            loader2.Retain();
             loader = loader2;
             Object result = loader2.LoadAll(typeof(T), subAssetName, isLoadAll);
             return result as T;
@@ -304,9 +367,9 @@ namespace F8Framework.Core
             bool isLoadAll = false)
         {
             ResourcesLoader loader2;
-            if (resourceLoaders.ContainsKey(resourcePath))
+            if (resourceLoaders.TryGetValue(resourcePath, out var resourceLoader))
             {
-                loader2 = resourceLoaders[resourcePath];
+                loader2 = resourceLoader;
             }
             else
             {
@@ -314,6 +377,7 @@ namespace F8Framework.Core
                 loader2.Init(resourcePath);
                 resourceLoaders.Add(resourcePath, loader2);
             }
+            loader2.Retain();
             loader = loader2;
             Object result = loader2.LoadAll(assetType, subAssetName, isLoadAll);
             return result;

@@ -190,6 +190,7 @@ namespace F8Framework.Core.Editor
                               loader.resourceLoadState == ResourcesLoader.LoaderState.NONE;
             bool isLoaded = loader.IsLoadFinished && !isUnloaded;
             bool isLoading = loader.resourceLoadState == ResourcesLoader.LoaderState.WORKING;
+            int refCount = loader.RefCount;
 
             // 获取整行矩形
             Rect rowRect = EditorGUILayout.BeginHorizontal();
@@ -220,7 +221,10 @@ namespace F8Framework.Core.Editor
                 EditorGUILayout.LabelField(stateText, GUILayout.Width(80));
                 GUI.color = originalColor;
 
-                // 4. 内存占用
+                // 4. 引用计数
+                EditorGUILayout.LabelField(refCount.ToString(), EditorStyles.miniLabel, GUILayout.Width(60));
+
+                // 5. 内存占用
                 if (isLoaded)
                 {
                     long memorySize = 0;
@@ -280,6 +284,7 @@ namespace F8Framework.Core.Editor
             // 基本信息
             EditorGUILayout.LabelField($"加载状态: {loader.resourceLoadState}");
             EditorGUILayout.LabelField($"加载类型: {loader.loadType}");
+            EditorGUILayout.LabelField($"引用计数: {loader.RefCount}");
 
             // 主资源显示
             if (loader.ResouceObject != null)
@@ -582,6 +587,7 @@ namespace F8Framework.Core.Editor
             bool isLoaded = loader.assetBundleLoadState == AssetBundleLoader.LoaderState.FINISHED && !isUnloaded;
             bool isLoading = loader.assetBundleLoadState == AssetBundleLoader.LoaderState.WORKING;
             bool isFullUnloaded = isUnloaded && loader.assetBundleLoadState == AssetBundleLoader.LoaderState.NONE;
+            int refCount = loader.TotalParentRefCount;
 
             // 获取整行矩形
             Rect rowRect = EditorGUILayout.BeginHorizontal();
@@ -618,7 +624,10 @@ namespace F8Framework.Core.Editor
                 EditorGUILayout.LabelField(stateText, GUILayout.Width(80));
                 GUI.color = originalColor;
 
-                // 4. 文件大小（固定宽度80）
+                // 4. 引用计数（固定宽度60）
+                EditorGUILayout.LabelField(refCount.ToString(), EditorStyles.miniLabel, GUILayout.Width(60));
+
+                // 5. 文件大小（固定宽度80）
                 if (isLoaded && loader.AssetBundleContent != null)
                 {
                     long memorySize = Profiler.GetRuntimeMemorySizeLong(loader.AssetBundleContent);
@@ -661,6 +670,8 @@ namespace F8Framework.Core.Editor
             EditorGUILayout.LabelField($"卸载状态: {loader.assetBundleUnloadState}");
             EditorGUILayout.LabelField($"加载类型: {loader.loadType}");
             EditorGUILayout.LabelField($"卸载类型: {loader.unloadType}");
+            EditorGUILayout.LabelField($"总引用计数: {loader.TotalParentRefCount}");
+            EditorGUILayout.LabelField($"引用方数量: {loader.parentBundleNames.Count}");
 
             // 主资源显示
             if (loader.GetAssetObject() != null)
@@ -707,7 +718,7 @@ namespace F8Framework.Core.Editor
                     EditorGUILayout.LabelField("被以下AB包依赖:");
                     foreach (var parent in loader.parentBundleNames)
                     {
-                        EditorGUILayout.LabelField($"- {parent}");
+                        EditorGUILayout.LabelField($"- {parent} (Ref: {loader.GetParentBundleRefCount(parent)})");
                     }
                 }
 

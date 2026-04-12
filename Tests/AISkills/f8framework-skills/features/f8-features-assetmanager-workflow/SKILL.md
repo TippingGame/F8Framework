@@ -103,6 +103,10 @@ GameObject cachedCube = FF8.Asset.GetAssetObject<GameObject>("Cube"); // Get cac
 FF8.Asset.Unload("Cube", false);               // Keep dependencies
 FF8.Asset.Unload("Cube", true);                // Full unload
 FF8.Asset.UnloadAsync("Cube", false, () => {}); // Async unload
+FF8.Asset.UnloadScene("Scene");
+FF8.Asset.UnloadUnused(true);
+FF8.Asset.UnloadSceneAsync("Scene");
+FF8.Asset.UnloadUnusedAsync(true);
 ```
 
 ## Workflow

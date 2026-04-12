@@ -167,9 +167,13 @@ IEnumerator Start()
     // Asset unloading
     FF8.Asset.Unload("Cube", false); // Keep dependencies
     FF8.Asset.Unload("Cube", true); // Complete unload
+    FF8.Asset.UnloadScene("Scene");
+    FF8.Asset.UnloadUnused(true);
 
     // Asynchronous unloading
     FF8.Asset.UnloadAsync("Cube", false, () => { LogF8.Log("Asset unloaded"); });
+    FF8.Asset.UnloadSceneAsync("Scene");
+    FF8.Asset.UnloadUnusedAsync(true);
     
     
     /*========== 6. Note: Common Issues ==========*/

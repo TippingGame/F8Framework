@@ -14,6 +14,7 @@ namespace F8Framework.Core
         public string resourcePath = "";
         private Object resouceObject;
         private Dictionary<string, Object> resouceObjects = new Dictionary<string, Object>();
+        private int refCount;
         
         public LoaderType loadType;
         public LoaderState resourceLoadState;
@@ -54,6 +55,7 @@ namespace F8Framework.Core
             loadType = LoaderType.NONE;
             resourceLoadState = LoaderState.NONE;
             resourceLoadRequest = null;
+            refCount = 0;
         }
 
         /// <summary>
@@ -71,7 +73,24 @@ namespace F8Framework.Core
             resouceObject = obj;
             resourceLoadState = LoaderState.FINISHED;
             resourceLoadRequest = null;
+            refCount = 0;
         }
+
+        public int Retain()
+        {
+            return ++refCount;
+        }
+
+        public int Release()
+        {
+            if (refCount > 0)
+            {
+                refCount--;
+            }
+            return refCount;
+        }
+
+        public int RefCount => refCount;
 
         public override T GetAssetObject<T>(string subAssetName = null)
         {
@@ -457,6 +476,7 @@ namespace F8Framework.Core
             loadType = LoaderType.NONE;
             resourceLoadState = LoaderState.NONE;
             resourceLoadRequest = null;
+            refCount = 0;
         }
 
         /// <summary>

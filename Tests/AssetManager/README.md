@@ -163,10 +163,13 @@ IEnumerator Start()
     // 资源卸载
     FF8.Asset.Unload("Cube", false); // 保留依赖
     FF8.Asset.Unload("Cube", true); // 完全卸载
+    FF8.Asset.UnloadScene("Scene");
+    FF8.Asset.UnloadUnused(true);
 
     // 异步卸载
     FF8.Asset.UnloadAsync("Cube", false, () => { LogF8.Log("资源卸载完成"); });
-    
+    FF8.Asset.UnloadSceneAsync("Scene");
+    FF8.Asset.UnloadUnusedAsync(true);
     
     /*========== 6. 注意：常见问题 ==========*/
     
