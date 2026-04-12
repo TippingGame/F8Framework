@@ -3,13 +3,14 @@ Don't Edit it*/
 
 using System;
 using System.Collections.Generic;
+using F8Framework.Core;
 using UnityEngine.Scripting;
 using UnityEngine;
 
 namespace F8Framework.Tests
 {
 	[Serializable]
-	internal class DemoSheet1Item
+	internal class Sheet1Item
 	{
 		[Preserve]
 		public System.Int32 id;
@@ -25,22 +26,22 @@ namespace F8Framework.Tests
 		public System.Int32[] dfdfd;
 		[Preserve]
 		public System.String[] gggaa;
-		[Preserve]
-		public DemoSheet1.MyEnum meiju;
 	}
 	
 	[Serializable]
-	internal class DemoSheet1
+	internal class Sheet1
 	{
 		[Preserve]
-		public Dictionary<System.Int32, DemoSheet1Item> Dict = new Dictionary<System.Int32, DemoSheet1Item>();
-		[Preserve]
-		public enum MyEnum : System.Byte
+		public static void PreRegister()
 		{
-			Value1 = 1,
-			Value2 = 2,
-			Value3 = 4,
-			Value4 = 8,
+			TypeHandlerFactory.PreRegister<System.Single[]>(new F8Framework.Core.ArrayHandler<System.Single>());
+			TypeHandlerFactory.PreRegister<System.Int32[]>(new F8Framework.Core.ArrayHandler<System.Int32>());
+			TypeHandlerFactory.PreRegister<System.String[]>(new F8Framework.Core.ArrayHandler<System.String>());
+			TypeHandlerFactory.PreRegister<F8Framework.Tests.Sheet1Item>(new F8Framework.Core.ObjectHandler<F8Framework.Tests.Sheet1Item>());
+			TypeHandlerFactory.PreRegister<System.Collections.Generic.Dictionary<System.Int32, F8Framework.Tests.Sheet1Item>>(new F8Framework.Core.DictionaryHandler<System.Int32, F8Framework.Tests.Sheet1Item>());
+			TypeHandlerFactory.PreRegister<F8Framework.Tests.Sheet1>(new F8Framework.Core.ObjectHandler<F8Framework.Tests.Sheet1>());
 		}
+		[Preserve]
+		public Dictionary<System.Int32, F8Framework.Tests.Sheet1Item> Dict = new Dictionary<System.Int32, F8Framework.Tests.Sheet1Item>();
 	}
 }

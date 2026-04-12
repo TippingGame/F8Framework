@@ -1,9 +1,14 @@
 ﻿using UnityEngine;
+#if LOCALIZER_TIMELINE
 using UnityEngine.Timeline;
+#endif
 
 namespace F8Framework.Tests
 {
-	public class FireController : MonoBehaviour, ITimeControl
+	public class FireController : MonoBehaviour
+#if LOCALIZER_TIMELINE
+		, ITimeControl
+#endif
 	{
 		[SerializeField] ParticleSystem particle;
 		[SerializeField] ScaleRandomizer floorLight;
