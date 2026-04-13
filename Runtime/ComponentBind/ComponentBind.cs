@@ -292,7 +292,7 @@ namespace F8Framework.Core
             }
             else
             {
-                LogF8.Log("在脚本中找不到插入标记。请在要生成代码的位置添加“// 自动获取组件（自动生成，不能删除）”。");
+                LogF8.Log("在脚本中找不到插入标记。请在要生成代码的位置添加【// 自动获取组件（自动生成，不能删除）(.*?)// 自动获取组件（自动生成，不能删除）】");
             }
         }
 
@@ -398,31 +398,31 @@ namespace F8Framework.Core
 
             if (componentType.Equals("UnityEngine.UI.Button"))
             {
-                return $"private UnityAction unityAction_{normalizedFieldName};";
+                return $"private UnityEngine.Events.UnityAction unityAction_{normalizedFieldName};";
             }
             else if (componentType.Equals("UnityEngine.UI.Slider"))
             {
-                return $"private UnityAction<float> unityAction_{normalizedFieldName};";
+                return $"private UnityEngine.Events.UnityAction<float> unityAction_{normalizedFieldName};";
             }
             else if (componentType.Equals("UnityEngine.UI.Scrollbar"))
             {
-                return $"private UnityAction<float> unityAction_{normalizedFieldName};";
+                return $"private UnityEngine.Events.UnityAction<float> unityAction_{normalizedFieldName};";
             }
             else if (componentType.Equals("UnityEngine.UI.Dropdown"))
             {
-                return $"private UnityAction<int> unityAction_{normalizedFieldName};";
+                return $"private UnityEngine.Events.UnityAction<int> unityAction_{normalizedFieldName};";
             }
             else if (componentType.Equals("UnityEngine.UI.Toggle"))
             {
-                return $"private UnityAction<bool> unityAction_{normalizedFieldName};";
+                return $"private UnityEngine.Events.UnityAction<bool> unityAction_{normalizedFieldName};";
             }
             else if (componentType.Equals("UnityEngine.UI.InputField"))
             {
-                return $"private UnityAction<string> unityAction_{normalizedFieldName};";
+                return $"private UnityEngine.Events.UnityAction<string> unityAction_{normalizedFieldName};";
             }
             else if (componentType.Equals("UnityEngine.UI.ScrollRect"))
             {
-                return $"private UnityAction<Vector2> unityAction_{normalizedFieldName};";
+                return $"private UnityEngine.Events.UnityAction<Vector2> unityAction_{normalizedFieldName};";
             }
 
             return string.Empty;

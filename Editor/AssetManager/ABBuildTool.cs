@@ -436,11 +436,19 @@ namespace F8Framework.Core.Editor
                     }
                     else
                     {
-                        if (File.Exists(URLSetting.GetAssetBundlesOutPath() + "/" + URLSetting.GetPlatformName()) && assetMapping.Count > 0)
+                        string platformManifestPath = URLSetting.GetAssetBundlesOutPath() + "/" + URLSetting.GetPlatformName();
+                        if (File.Exists(platformManifestPath) && assetMapping.Count > 0)
                         {
-                            assetMapping.Add(URLSetting.GetPlatformName(), new AssetBundleMap.AssetMapping(URLSetting.GetPlatformName(), new string[]{},
-                                BuildPkgTool.ToVersion, FileTools.GetFileSize(URLSetting.GetAssetBundlesOutPath() + "/" + URLSetting.GetPlatformName()).ToString(),
-                                FileTools.CreateMd5ForFile(URLSetting.GetAssetBundlesOutPath() + "/" + URLSetting.GetPlatformName()), "", ""));
+                            string platformManifestAbName = URLSetting.GetPlatformName();
+                            if (F8GamePrefs.GetBool(nameof(F8GameConfig.AppendHashToAssetBundleName)))
+                            {
+                                platformManifestAbName = RenamePlatformManifestWithMd5(platformManifestPath);
+                                platformManifestPath = URLSetting.GetAssetBundlesOutPath() + "/" + platformManifestAbName;
+                            }
+
+                            assetMapping.Add(URLSetting.GetPlatformName(), new AssetBundleMap.AssetMapping(platformManifestAbName, new string[]{},
+                                BuildPkgTool.ToVersion, FileTools.GetFileSize(platformManifestPath).ToString(),
+                                FileTools.CreateMd5ForFile(platformManifestPath), "", ""));
                         }
                     }
 
@@ -778,6 +786,23 @@ namespace F8Framework.Core.Editor
             string rightPart = original.Substring(lastDotIndex); // 包括 '.'
 
             return leftPart + insertStr + rightPart;
+        }
+
+        private static string RenamePlatformManifestWithMd5(string platformManifestPath)
+        {
+            string md5 = FileTools.CreateMd5ForFile(platformManifestPath);
+            string targetFileName = URLSetting.GetPlatformName() + "_" + md5;
+            string targetPath = Path.Combine(URLSetting.GetAssetBundlesOutPath(), targetFileName);
+
+            if (!platformManifestPath.Equals(targetPath, StringComparison.OrdinalIgnoreCase))
+            {
+                if (!FileTools.SafeRenameFile(platformManifestPath, targetPath))
+                {
+                    return Path.GetFileName(platformManifestPath);
+                }
+            }
+
+            return targetFileName;
         }
     }
 }

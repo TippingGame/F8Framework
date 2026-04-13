@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.0.283] - 2025-04-13
+1.优化Asset模块勾选AB名加上MD5时AssetBundleManifest也会改名  
+2.优化ComponentBind生成代码带上名称空间  
+
 ## [3.0.282] - 2025-04-12
 1.新增Localization模块项目使用Timeline开关  
 

@@ -1175,7 +1175,7 @@ namespace F8Framework.Core
             if (AssetManager.Instance.IsEditorMode)
                 yield break;
 #endif
-            string manifestPath = GetAssetBundlePathByAbName(URLSetting.GetPlatformName());
+            string manifestPath = GetAssetBundlePathByAbName(AssetBundleMap.Mappings.GetOrDefault(URLSetting.GetPlatformName()).AbName);
             if (manifestPath == null)
                 yield break;
             
