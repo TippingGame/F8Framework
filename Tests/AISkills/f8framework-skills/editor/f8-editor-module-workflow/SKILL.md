@@ -1,6 +1,6 @@
 ---
 name: f8-editor-module-workflow
-description: Use when working with Module editor tools — right-click context menu for creating Module, ModuleMono, and StaticModule templates in F8Framework.
+description: Use when working with Module editor tools — right-click context menu for creating Module, ModuleMono, StaticModule, and ActivityModule templates in F8Framework.
 ---
 
 # Module Editor Workflow
@@ -28,13 +28,14 @@ description: Use when working with Module editor tools — right-click context m
 | **Create Module** | Right-click → F8 Module Center → Create Module template (ModuleSingleton) |
 | **Create ModuleMono** | Right-click → F8 Module Center → Create ModuleMono template (ModuleSingletonMono) |
 | **Create StaticModule** | Right-click → F8 Module Center → Create StaticModule template |
+| **Create ActivityModule** | Right-click → F8 Module Center → Create ActivityModule template for activity state logic |
 
 ## Workflow
 
 1. Right-click on a project folder.
 2. Select **F8 Module Center** → desired module type.
 3. Name the generated script file.
-4. Implement the generated interface methods.
+4. Implement the generated lifecycle or state methods.
 5. Register with ModuleCenter in GameLauncher.
 
 ## Output checklist

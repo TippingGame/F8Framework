@@ -8,14 +8,37 @@ namespace F8Framework.Core
     {
         // 用于存储子类的元数据，使用子类的类型作为索引
         private static Dictionary<Type, StaticModule> _staticModules;
-  
+        private static readonly List<StaticModule> _tempStaticModules = new List<StaticModule>();
+        
         static StaticModule()
         {
             // 在静态构造函数中初始化字典
             InitializeStaticModules();
         }
-
-        public static Dictionary<Type, StaticModule> GetStaticModule()
+        
+        public static void EnterGameAllModules()
+        {
+            _tempStaticModules.Clear();
+            _tempStaticModules.AddRange(_staticModules.Values);
+            foreach (var module in _tempStaticModules)
+            {
+                module.OnEnterGame();
+            }
+            _tempStaticModules.Clear();
+        }
+        
+        public static void QuitGameAllModules()
+        {
+            _tempStaticModules.Clear();
+            _tempStaticModules.AddRange(_staticModules.Values);
+            foreach (var module in _tempStaticModules)
+            {
+                module.OnEnterGame();
+            }
+            _tempStaticModules.Clear();
+        }
+        
+        public static IReadOnlyDictionary<Type, StaticModule> GetStaticModule()
         {
             return StaticModule._staticModules;
         }

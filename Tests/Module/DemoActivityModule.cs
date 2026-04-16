@@ -9,6 +9,8 @@ namespace F8Framework.Tests
         {
             LogF8.Log("已发现活动模块数量: " + ActivityModule.GetActivityModuleTypes().Count);
 
+            ActivityModule.EnterGameAllModules();
+            
             var levelActivity = LevelUnlockActivityModule.Instance;
             var limitedActivity = LimitedOpenActivityModule.Instance;
 
@@ -17,11 +19,13 @@ namespace F8Framework.Tests
 
             DemoActivityContext.PlayerLevel = 20;
             DemoActivityContext.IsActivitySwitchEnabled = true;
-            ActivityModule.RefreshInstantiatedModules();
+            ActivityModule.RefreshAllModules();
 
             PrintState(levelActivity);
             PrintState(limitedActivity);
 
+            ActivityModule.QuitGameAllModules();
+            
             ActivityModule.ReleaseActivityModule<LevelUnlockActivityModule>();
             ActivityModule.ReleaseActivityModule(typeof(LimitedOpenActivityModule));
             ActivityModule.ReleaseAllModules();

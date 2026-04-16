@@ -1,0 +1,77 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using F8Framework.Core;
+
+    #ROOTNAMESPACEBEGIN#
+public class #SCRIPTNAME# : ActivityModule
+{
+    public static #SCRIPTNAME# Instance => GetInstance<#SCRIPTNAME#>();
+
+    // 初始化活动模块
+    protected override void Init()
+    {
+        #NOTRIM#
+    }
+
+    // 进入游戏
+    public override void OnEnterGame()
+    {
+        #NOTRIM#
+    }
+
+    // 退出游戏
+    public override void OnQuitGame()
+    {
+        #NOTRIM#
+    }
+
+    // 模块释放
+    protected override void OnDispose()
+    {
+        #NOTRIM#
+    }
+
+    // 状态变化
+    protected override void OnStateChanged(ActivityModuleState previousState, ActivityModuleState currentState)
+    {
+        #NOTRIM#
+    }
+
+    // 解锁状态变化
+    protected override void OnUnlockStateChanged(bool previousValue, bool currentValue)
+    {
+        #NOTRIM#
+    }
+
+    // 显示状态变化
+    protected override void OnVisibleStateChanged(bool previousValue, bool currentValue)
+    {
+        #NOTRIM#
+    }
+
+    // 开启状态变化
+    protected override void OnOpenStateChanged(bool previousValue, bool currentValue)
+    {
+        #NOTRIM#
+    }
+
+    // 解锁条件（需自定义条件）
+    protected override bool EvaluateUnlockedCore()
+    {
+        return false;
+    }
+
+    // 显示条件（需自定义条件）
+    protected override bool EvaluateVisibleCore(bool isUnlocked)
+    {
+        return false;
+    }
+
+    // 开启条件（需自定义条件）
+    protected override bool EvaluateOpenCore(bool isUnlocked)
+    {
+        return false;
+    }
+}
+#ROOTNAMESPACEEND#

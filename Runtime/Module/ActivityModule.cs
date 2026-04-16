@@ -54,6 +54,7 @@ namespace F8Framework.Core
     {
         private static readonly Dictionary<Type, ActivityModule> _activityModules = new Dictionary<Type, ActivityModule>();
         private static readonly List<Type> _activityModuleTypes = new List<Type>();
+        private static readonly List<ActivityModule> _tempActivityModules = new List<ActivityModule>();
 
         private readonly List<Func<bool>> _unlockConditions = new List<Func<bool>>();
         private readonly List<Func<bool>> _visibleConditions = new List<Func<bool>>();
@@ -78,9 +79,9 @@ namespace F8Framework.Core
             return _activityModuleTypes;
         }
 
-        public static IReadOnlyCollection<ActivityModule> GetInstantiatedActivityModules()
+        public static IReadOnlyDictionary<Type, ActivityModule> GetActivityModules()
         {
-            return _activityModules.Values;
+            return _activityModules;
         }
 
         public static T GetActivityModule<T>() where T : ActivityModule, new()
@@ -106,12 +107,37 @@ namespace F8Framework.Core
             return module;
         }
 
-        public static void RefreshInstantiatedModules()
+        public static void EnterGameAllModules()
         {
-            foreach (var module in _activityModules.Values)
+            _tempActivityModules.Clear();
+            _tempActivityModules.AddRange(_activityModules.Values);
+            foreach (var module in _tempActivityModules)
+            {
+                module.OnEnterGame();
+            }
+            _tempActivityModules.Clear();
+        }
+        
+        public static void QuitGameAllModules()
+        {
+            _tempActivityModules.Clear();
+            _tempActivityModules.AddRange(_activityModules.Values);
+            foreach (var module in _tempActivityModules)
+            {
+                module.OnEnterGame();
+            }
+            _tempActivityModules.Clear();
+        }
+        
+        public static void RefreshAllModules()
+        {
+            _tempActivityModules.Clear();
+            _tempActivityModules.AddRange(_activityModules.Values);
+            foreach (var module in _tempActivityModules)
             {
                 module.RefreshState();
             }
+            _tempActivityModules.Clear();
         }
 
         public static void ReleaseAllModules()
@@ -137,12 +163,11 @@ namespace F8Framework.Core
                 return false;
             }
 
-            if (!_activityModules.TryGetValue(type, out var module))
+            if (!_activityModules.TryRemove(type, out var module))
             {
                 return false;
             }
 
-            _activityModules.Remove(type);
             module.OnDispose();
             return true;
         }
@@ -185,6 +210,9 @@ namespace F8Framework.Core
                     if (!_activityModuleTypes.Contains(type))
                     {
                         _activityModuleTypes.Add(type);
+                        ActivityModule module = (ActivityModule)Activator.CreateInstance(type);
+                        _activityModules[type] = module;
+                        module.Initialize();
                     }
                 }
             }

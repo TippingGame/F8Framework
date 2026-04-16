@@ -13,6 +13,10 @@ namespace F8Framework.Tests
                 center.Value.OnEnterGame();
             }
 
+            StaticModule.EnterGameAllModules();
+            
+            StaticModule.QuitGameAllModules();
+            
             // 获取指定静态模块
             StaticModule demo = StaticModule.GetStaticModuleByType(typeof(StaticModuleClass));
 

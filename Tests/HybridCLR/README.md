@@ -181,6 +181,7 @@ public class LoadDll : MonoBehaviour
 }
 ```
 ### 常见问题：
-1. 打包HybridCLR，用时很久，可在第一次执行后，改为这个API：`HybridCLR.Editor.Commands.CompileDllCommand.CompileDll(EditorUserBuildSettings.activeBuildTarget);`
-    * 启用了Obfuz，可以改为这个API：`Obfuz4HybridCLR.PrebuildCommandExt.CompileAndObfuscateDll();`
+1. 打包报错，区分不出AOT和热更新代码，就只把`LoadDll.cs`当作AOT代码，参考上面第5点。
+2. 打包HybridCLR，用时很久，可在第一次执行后，把`HybridCLR.Editor.Commands.PrebuildCommand.GenerateAll();`，改为这个API：`HybridCLR.Editor.Commands.CompileDllCommand.CompileDll(EditorUserBuildSettings.activeBuildTarget);`
+    * 启用了Obfuz，可以把`Obfuz4HybridCLR.PrebuildCommandExt.GenerateAll();`，改为这个API：`Obfuz4HybridCLR.PrebuildCommandExt.CompileAndObfuscateDll();`
     * [参考文档（与HybridCLR协同工作）](https://www.obfuz.com/docs/manual/hybridclr/work-with-hybridclr)

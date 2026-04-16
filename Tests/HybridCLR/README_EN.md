@@ -179,6 +179,7 @@ public class LoadDll : MonoBehaviour
 }
 ```
 ### Frequently Asked Questions:
-1. Packaging HybridCLR takes a long time. After the first execution, you can switch to this API: `HybridCLR.Editor.Commands.CompileDllCommand.CompileDll(EditorUserBuildSettings.activeBuildTarget);`
-   * If Obfuz is enabled, you can use this API instead: `Obfuz4HybridCLR.PrebuildCommandExt.CompileAndObfuscateDll();`
+1. Packaging error, unable to distinguish between AOT and hot update code, only `LoadDll.cs` is treated as AOT code, refer to point 5 above.
+2. Packaging HybridCLR takes a long time. After the first execution, you can replace `HybridCLR.Editor.Commands.PrebuildCommand.GenerateAll();` switch to this API: `HybridCLR.Editor.Commands.CompileDllCommand.CompileDll(EditorUserBuildSettings.activeBuildTarget);`
+   * If Obfuz is enabled, you can replace `Obfuz4HybridCLR.PrebuildCommandExt.GenerateAll();` switch to this API: `Obfuz4HybridCLR.PrebuildCommandExt.CompileAndObfuscateDll();`
    * [Reference Documentation (Working with HybridCLR)](https://www.obfuz.com/docs/manual/hybridclr/work-with-hybridclr)

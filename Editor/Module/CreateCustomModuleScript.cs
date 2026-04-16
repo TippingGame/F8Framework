@@ -31,6 +31,15 @@ namespace F8Framework.Core.Editor
             
             ProjectWindowUtil.CreateScriptAssetFromTemplateFile(path, "StaticModule.cs");
         }
+
+        [MenuItem("Assets/（F8模块中心功能）/（ActivityModule.cs）", false, 1033)]
+        static void CreateActivityModuleScript()
+        {
+            string path = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 1)) +
+                          "/ActivityModuleTemplate.cs.txt";
+
+            ProjectWindowUtil.CreateScriptAssetFromTemplateFile(path, "ActivityModule.cs");
+        }
         
         private static string GetScriptPath()
         {

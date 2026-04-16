@@ -32,7 +32,7 @@ description: Use when working with Assembly Reflection tools — type discovery,
 
 1. Use Assembly.cs static methods for type discovery.
 2. Results are typically cached internally for performance.
-3. Used internally by ModuleCenter for auto-discovering StaticModules.
+3. Used internally by ModuleCenter for auto-discovering StaticModules and ActivityModules.
 4. Used by ProcedureManager for auto-discovering ProcedureNodes.
 
 ## Output checklist

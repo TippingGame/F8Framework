@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.0.284] - 2025-04-16
+1.新增活动模块ActivityModule创建模板  
+2.新增组件绑定名字  
+3.完善文档  
+
 ## [3.0.283] - 2025-04-13
 1.优化Asset模块勾选AB名加上MD5时AssetBundleManifest也会改名  
 2.优化ComponentBind生成代码带上名称空间  

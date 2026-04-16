@@ -41,7 +41,7 @@ description: Use as the routing skill for selecting the correct F8Framework laye
 | `f8-features-input-workflow` | Input | Multi-platform input, virtual buttons, device switching |
 | `f8-features-localization-workflow` | Localization | Multi-language, component localization, Excel-based |
 | `f8-features-log-workflow` | Log | Logging, file writing, LogViewer, error reporting |
-| `f8-features-module-workflow` | Module | ModuleCenter lifecycle, StaticModule, module creation |
+| `f8-features-module-workflow` | Module | ModuleCenter lifecycle, StaticModule, ActivityModule, module creation |
 | `f8-features-network-workflow` | Network | TCP/KCP/WebSocket client and server |
 | `f8-features-obfuz-workflow` | Obfuz | Code obfuscation and protection via Obfuz |
 | `f8-features-procedure-workflow` | Procedure | Game flow control, ProcedureNode management |

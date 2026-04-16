@@ -23,7 +23,7 @@ namespace F8Framework.Core
             { "Button", typeof(UnityEngine.UI.Button).ToString() },{ "btn", typeof(UnityEngine.UI.Button).ToString() },
             { "Image", typeof(UnityEngine.UI.Image).ToString() },{ "img", typeof(UnityEngine.UI.Image).ToString() },
             { "RawImage", typeof(UnityEngine.UI.RawImage).ToString() },{ "rimg", typeof(UnityEngine.UI.RawImage).ToString() },
-            { "Text (Legacy)", typeof(UnityEngine.UI.Text).ToString() },{ "txt", typeof(UnityEngine.UI.Text).ToString() },
+            { "Text", typeof(UnityEngine.UI.Text).ToString() },{ "Text (Legacy)", typeof(UnityEngine.UI.Text).ToString() },{ "txt", typeof(UnityEngine.UI.Text).ToString() },
             { "InputField", typeof(UnityEngine.UI.InputField).ToString() },
             { "Slider", typeof(UnityEngine.UI.Slider).ToString() },
             { "Mask", typeof(UnityEngine.UI.Mask).ToString() },
