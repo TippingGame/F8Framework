@@ -63,6 +63,8 @@ namespace F8Framework.Core
                 FileTools.SafeWriteAllText(Application.persistentDataPath + "/" + nameof(GameVersion) + ".json",
                     Util.LitJson.ToJson(GameConfig.LocalGameVersion));
             }
+
+            LogF8.Log($"初始化本地版本成功：Version={GameConfig.LocalGameVersion.Version}，EnableHotUpdate={GameConfig.LocalGameVersion.EnableHotUpdate}，EnablePackage={GameConfig.LocalGameVersion.EnablePackage}");
         }
         
         // 初始化远程版本
@@ -87,6 +89,7 @@ namespace F8Framework.Core
                 string text = webRequest.downloadHandler.text;
                 GameVersion gameVersion = Util.LitJson.ToObject<GameVersion>(text);
                 GameConfig.RemoteGameVersion = gameVersion;
+                LogF8.Log($"初始化远程版本成功：Version={GameConfig.RemoteGameVersion.Version}，Address={GameConfig.RemoteGameVersion.AssetRemoteAddress}");
             }
             webRequest.Dispose();
             webRequest = null;
@@ -112,8 +115,9 @@ namespace F8Framework.Core
             else
             {
                 string text = webRequest.downloadHandler.text;
-                Dictionary<string, AssetBundleMap.AssetMapping> assetBundleMap = Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(text);
+                Dictionary<string, AssetBundleMap.AssetMapping> assetBundleMap = Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(text) ?? new Dictionary<string, AssetBundleMap.AssetMapping>();
                 GameConfig.RemoteAssetBundleMap = assetBundleMap;
+                LogF8.Log($"初始化资源版本成功：Count={GameConfig.RemoteAssetBundleMap.Count}");
             }
             webRequest.Dispose();
             webRequest = null;
@@ -123,6 +127,27 @@ namespace F8Framework.Core
                 string json = FileTools.SafeReadAllText(Application.persistentDataPath + "/" + nameof(AssetBundleMap) + ".json");
                 AssetBundleMap.Mappings = Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(json);
             }
+        }
+
+        private static Dictionary<string, AssetBundleMap.AssetMapping> MergeAssetBundleMappings(
+            Dictionary<string, AssetBundleMap.AssetMapping> baseMappings,
+            Dictionary<string, AssetBundleMap.AssetMapping> deltaMappings)
+        {
+            Dictionary<string, AssetBundleMap.AssetMapping> mergedMappings = baseMappings != null
+                ? new Dictionary<string, AssetBundleMap.AssetMapping>(baseMappings)
+                : new Dictionary<string, AssetBundleMap.AssetMapping>();
+
+            if (deltaMappings == null)
+            {
+                return mergedMappings;
+            }
+
+            foreach (var mapping in deltaMappings)
+            {
+                mergedMappings[mapping.Key] = mapping.Value;
+            }
+
+            return mergedMappings;
         }
         
         // 游戏修复，资源清理
@@ -313,7 +338,7 @@ namespace F8Framework.Core
                 
                 if (GameConfig.RemoteAssetBundleMap.Count > 0)
                 {
-                    AssetBundleMap.Mappings = GameConfig.RemoteAssetBundleMap;
+                    AssetBundleMap.Mappings = MergeAssetBundleMappings(AssetBundleMap.Mappings, GameConfig.RemoteAssetBundleMap);
                     FileTools.SafeWriteAllText(Application.persistentDataPath + "/" + nameof(AssetBundleMap) + ".json",
                         Util.LitJson.ToJson(AssetBundleMap.Mappings));
                 }

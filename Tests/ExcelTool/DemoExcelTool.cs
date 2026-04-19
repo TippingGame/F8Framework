@@ -11,7 +11,7 @@ namespace F8Framework.Tests
         IEnumerator Start()
         {
             // 指定名字加载
-            Sheet1 sheet1 = FF8.Config.Load<Sheet1>("Sheet1");
+            DemoSheet1 sheet1 = FF8.Config.Load<DemoSheet1>("Sheet1");
             LogF8.Log(sheet1.Dict[2].name);
             
             // 同步加载全部配置

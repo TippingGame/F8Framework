@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -15,7 +16,7 @@ namespace F8Framework.Core.Editor
         private readonly Texture icon = Resources.Load<Texture2D>("com.disillusion.play-mode-plus/CustomMissingReferences");
 
         protected override string Name => "Find Missing References";
-        protected override string Tooltip => "Scan the scene and opens a window with the missing references.";
+        protected override string Tooltip => "Scan the current prefab or scene and opens a window with the missing references.";
 
         private readonly static HashSet<string> IgnoredComponentTypes = new()
         {
@@ -46,9 +47,14 @@ namespace F8Framework.Core.Editor
 
                 if (GUILayout.Button(content, ToolbarStyles.CommandButtonStyle, GUILayout.Width(this.Width)))
                 {
-                    StartScan();
+                    RequestScan();
                 }
             }
+        }
+
+        internal static void RequestScan()
+        {
+            StartScan();
         }
 
         private static void StartScan()
@@ -58,19 +64,40 @@ namespace F8Framework.Core.Editor
                 return;
             }
 
-            Scene scene = SceneManager.GetActiveScene();
-            GameObject[] allGameObjects = scene.GetRootGameObjects();
-
             allObjectsToScan = new List<GameObject>();
 
-            foreach (GameObject rootGo in allGameObjects)
+            foreach (GameObject rootGo in GetScanRoots())
             {
+                if (rootGo == null)
+                {
+                    continue;
+                }
+
                 CollectAllGameObjects(rootGo, allObjectsToScan);
             }
 
             scanResults = new Dictionary<GameObject, List<MissingReferenceInfo>>();
             currentIndex = 0;
             isScanning = true;
+        }
+
+        private static IEnumerable<GameObject> GetScanRoots()
+        {
+            PrefabStage prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
+
+            if (prefabStage != null && prefabStage.prefabContentsRoot != null)
+            {
+                yield return prefabStage.prefabContentsRoot;
+                yield break;
+            }
+
+            Scene scene = SceneManager.GetActiveScene();
+            GameObject[] allGameObjects = scene.GetRootGameObjects();
+
+            foreach (GameObject rootGo in allGameObjects)
+            {
+                yield return rootGo;
+            }
         }
 
         private static void UpdateScan()
@@ -130,14 +157,22 @@ namespace F8Framework.Core.Editor
         private static void ScanSingleGameObject(GameObject go,
             Dictionary<GameObject, List<MissingReferenceInfo>> results)
         {
+            foreach (MissingReferenceInfo info in GetMissingReferenceInfos(go))
+            {
+                AddResult(go, info, results);
+            }
+        }
+
+        internal static List<MissingReferenceInfo> GetMissingReferenceInfos(GameObject go)
+        {
+            var results = new List<MissingReferenceInfo>();
             MonoBehaviour[] components = go.GetComponents<MonoBehaviour>();
 
             foreach (MonoBehaviour component in components)
             {
                 if (component == null)
                 {
-                    AddResult(go, new MissingReferenceInfo { IsScriptMissing = true }, results);
-
+                    results.Add(new MissingReferenceInfo { IsScriptMissing = true });
                     continue;
                 }
 
@@ -155,24 +190,29 @@ namespace F8Framework.Core.Editor
                     {
                         continue;
                     }
-                    
-                    if (property.objectReferenceValue == null && 
-                        property.objectReferenceInstanceIDValue != 0)
-                    {
-                        if (IgnoredFieldNames.Contains(property.name))
-                        {
-                            continue;
-                        }
 
-                        AddResult(go, new MissingReferenceInfo
-                        {
-                            ComponentName = component.GetType().Name,
-                            FieldName = property.displayName,
-                            IsScriptMissing = false
-                        }, results);
+                    if (property.objectReferenceValue != null || property.objectReferenceInstanceIDValue == 0)
+                    {
+                        continue;
                     }
+
+                    if (IgnoredFieldNames.Contains(property.name))
+                    {
+                        continue;
+                    }
+
+                    results.Add(new MissingReferenceInfo
+                    {
+                        ComponentName = component.GetType().Name,
+                        FieldName = property.displayName,
+                        PropertyPath = property.propertyPath,
+                        ComponentIndex = System.Array.IndexOf(components, component),
+                        IsScriptMissing = false
+                    });
                 }
             }
+
+            return results;
         }
 
         private static void AddResult(GameObject go, MissingReferenceInfo info,

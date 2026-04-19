@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace F8Framework.Core.Editor
@@ -32,17 +32,11 @@ namespace F8Framework.Core.Editor
 
         public static void ShowWindow(Dictionary<GameObject, List<MissingReferenceInfo>> results)
         {
-            if (HasOpenInstances<MissingReferencesWindow>())
-            {
-                EditorWindow.GetWindow<MissingReferencesWindow>("Missing References").Close();
-            }
-            else
-            {
-                MissingReferencesWindow window = EditorWindow.GetWindow<MissingReferencesWindow>("Missing References");
-                window.minSize = new Vector2(800, 500);
-                window.Setup(results);
-                window.Show();
-            }
+            MissingReferencesWindow window = EditorWindow.GetWindow<MissingReferencesWindow>("Missing References");
+            window.minSize = new Vector2(800, 500);
+            window.Setup(results);
+            window.Show();
+            window.Repaint();
         }
 
         private void Setup(Dictionary<GameObject, List<MissingReferenceInfo>> results)
@@ -356,7 +350,7 @@ namespace F8Framework.Core.Editor
         {
             EditorGUILayout.BeginHorizontal();
 
-            string itemKey = $"{go.GetInstanceID()}_missing_script";
+            string itemKey = BuildMissingScriptSelectionKey(go);
             bool isSelected = _selectedItems.Contains(itemKey);
 
             string countText = infos.Count > 1 ? $" ({infos.Count})" : "";
@@ -385,7 +379,7 @@ namespace F8Framework.Core.Editor
             {
                 EditorGUILayout.BeginHorizontal();
 
-                string itemKey = $"{go.GetInstanceID()}_{info.ComponentName}_{info.FieldName}";
+                string itemKey = BuildNullReferenceSelectionKey(go, info);
                 bool isSelected = _selectedItems.Contains(itemKey);
 
                 EditorGUI.indentLevel++;
@@ -437,14 +431,14 @@ namespace F8Framework.Core.Editor
 
                     if (hasMissingScript)
                     {
-                        _selectedItems.Add($"{go.GetInstanceID()}_missing_script");
+                        _selectedItems.Add(BuildMissingScriptSelectionKey(go));
                     }
 
                     foreach (MissingReferenceInfo info in infos)
                     {
                         if (!info.IsScriptMissing)
                         {
-                            _selectedItems.Add($"{go.GetInstanceID()}_{info.ComponentName}_{info.FieldName}");
+                            _selectedItems.Add(BuildNullReferenceSelectionKey(go, info));
                         }
                     }
                 }
@@ -452,14 +446,14 @@ namespace F8Framework.Core.Editor
                 {
                     if (infos.Count > 0) // 在MissingScripts标签下，所有都是缺失脚本
                     {
-                        _selectedItems.Add($"{go.GetInstanceID()}_missing_script");
+                        _selectedItems.Add(BuildMissingScriptSelectionKey(go));
                     }
                 }
                 else // TabType.NullReferences
                 {
                     foreach (MissingReferenceInfo info in infos)
                     {
-                        _selectedItems.Add($"{go.GetInstanceID()}_{info.ComponentName}_{info.FieldName}");
+                        _selectedItems.Add(BuildNullReferenceSelectionKey(go, info));
                     }
                 }
             }
@@ -473,6 +467,44 @@ namespace F8Framework.Core.Editor
         private int CountMissingScripts(Dictionary<GameObject, List<MissingReferenceInfo>> results)
         {
             return results.Values.Sum(static list => list.Count(static info => info.IsScriptMissing));
+        }
+
+        private static string BuildMissingScriptSelectionKey(GameObject go)
+        {
+            return $"{go.GetInstanceID()}|missing_script";
+        }
+
+        private static string BuildNullReferenceSelectionKey(GameObject go, MissingReferenceInfo info)
+        {
+            return $"{go.GetInstanceID()}|null_ref|{info.ComponentIndex}|{info.ComponentName}|{info.PropertyPath}";
+        }
+
+        private static bool TryParseNullReferenceSelectionKey(string itemKey, out int instanceId, out MissingReferenceInfo info)
+        {
+            instanceId = 0;
+            info = default;
+
+            string[] parts = itemKey.Split('|');
+
+            if (parts.Length < 5 || !string.Equals(parts[1], "null_ref", StringComparison.Ordinal))
+            {
+                return false;
+            }
+
+            if (!int.TryParse(parts[0], out instanceId) || !int.TryParse(parts[2], out int componentIndex))
+            {
+                return false;
+            }
+
+            info = new MissingReferenceInfo
+            {
+                ComponentIndex = componentIndex,
+                ComponentName = parts[3],
+                PropertyPath = string.Join("|", parts.Skip(4)),
+                IsScriptMissing = false
+            };
+
+            return true;
         }
 
         private Dictionary<GameObject, List<MissingReferenceInfo>> GetCurrentResults()
@@ -493,49 +525,19 @@ namespace F8Framework.Core.Editor
 
             foreach (string itemKey in _selectedItems)
             {
-                if (!itemKey.Contains("_missing_script", StringComparison.OrdinalIgnoreCase))
+                if (TryParseNullReferenceSelectionKey(itemKey, out int instanceId, out MissingReferenceInfo info))
                 {
-                    string[] parts = itemKey.Split('_');
-
-                    if (parts.Length >= 3)
-                    {
-                        int instanceId = int.Parse(parts[0]);
 #if UNITY_6000_3_OR_NEWER
-                        var go = EditorUtility.EntityIdToObject(instanceId) as GameObject;
+                    var go = EditorUtility.EntityIdToObject(instanceId) as GameObject;
 #else
-                        var go = EditorUtility.InstanceIDToObject(instanceId) as GameObject;
+                    var go = EditorUtility.InstanceIDToObject(instanceId) as GameObject;
 #endif
 
-                        if (go)
-                        {
-                            string componentName = parts[1];
-
-                            string fieldName = "";
-
-                            for (int i = 2; i < parts.Length; i++)
-                            {
-                                if (i > 2)
-                                {
-                                    fieldName += "_";
-                                }
-
-                                fieldName += parts[i];
-                            }
-
-                            var info = new MissingReferenceInfo
-                            {
-                                ComponentName = componentName,
-                                FieldName = fieldName,
-                                IsScriptMissing = false
-                            };
-
-                            if (RemoveComponentFromObject(go, info))
-                            {
-                                removedCount++;
-                                itemsToRemove.Add(itemKey);
-                                processedObjects.Add(go);
-                            }
-                        }
+                    if (go && RemoveComponentFromObject(go, info))
+                    {
+                        removedCount++;
+                        itemsToRemove.Add(itemKey);
+                        processedObjects.Add(go);
                     }
                 }
             }
@@ -562,10 +564,13 @@ namespace F8Framework.Core.Editor
 
             foreach (string itemKey in _selectedItems)
             {
-                if (itemKey.Contains("_missing_script", StringComparison.OrdinalIgnoreCase))
+                if (itemKey.EndsWith("|missing_script", StringComparison.Ordinal))
                 {
-                    string[] parts = itemKey.Split('_');
-                    int instanceId = int.Parse(parts[0]);
+                    string[] parts = itemKey.Split('|');
+                    if (parts.Length == 0 || !int.TryParse(parts[0], out int instanceId))
+                    {
+                        continue;
+                    }
 #if UNITY_6000_3_OR_NEWER
                     var go = EditorUtility.EntityIdToObject(instanceId) as GameObject;
 #else
@@ -662,23 +667,44 @@ namespace F8Framework.Core.Editor
             try
             {
                 MonoBehaviour[] components = go.GetComponents<MonoBehaviour>();
+                MonoBehaviour componentToRemove = null;
 
-                foreach (MonoBehaviour component in components)
+                if (info.ComponentIndex >= 0 && info.ComponentIndex < components.Length)
                 {
-                    if (component && component.GetType().Name == info.ComponentName)
+                    MonoBehaviour indexedComponent = components[info.ComponentIndex];
+                    if (indexedComponent && indexedComponent.GetType().Name == info.ComponentName && ComponentContainsMissingReference(indexedComponent, info))
                     {
-                        if (EditorUtility.DisplayDialog("Remove Component", $"Remove component '{info.ComponentName}' from '{go.name}'?\n\nThis action cannot be undone.", "Remove",
-                                "Cancel"))
-                        {
-                            DestroyImmediate(component);
-                            EditorUtility.SetDirty(go);
-
-                            return true;
-                        }
-
-                        return false;
+                        componentToRemove = indexedComponent;
                     }
                 }
+
+                if (!componentToRemove)
+                {
+                    foreach (MonoBehaviour component in components)
+                    {
+                        if (component && component.GetType().Name == info.ComponentName && ComponentContainsMissingReference(component, info))
+                        {
+                            componentToRemove = component;
+                            break;
+                        }
+                    }
+                }
+
+                if (!componentToRemove)
+                {
+                    return false;
+                }
+
+                if (EditorUtility.DisplayDialog("Remove Component", $"Remove component '{info.ComponentName}' from '{go.name}'?\n\nYou can undo this action from the Edit menu.", "Remove",
+                        "Cancel"))
+                {
+                    Undo.DestroyObjectImmediate(componentToRemove);
+                    MarkObjectDirty(go);
+
+                    return true;
+                }
+
+                return false;
             }
             catch (Exception e)
             {
@@ -695,26 +721,71 @@ namespace F8Framework.Core.Editor
             try
             {
                 Component[] components = go.GetComponents<Component>();
-                int removedCount = 0;
 
                 for (int i = components.Length - 1; i >= 0; i--)
                 {
                     if (!components[i])
                     {
-                        GameObjectUtility.RemoveMonoBehavioursWithMissingScript(go);
-                        removedCount++;
+                        Undo.RegisterCompleteObjectUndo(go, "Remove Missing Scripts");
+                        int removedCount = GameObjectUtility.RemoveMonoBehavioursWithMissingScript(go);
+                        if (removedCount > 0)
+                        {
+                            MarkObjectDirty(go);
+                            return true;
+                        }
 
-                        break;
+                        return false;
                     }
                 }
 
-                return removedCount > 0;
+                return false;
             }
             catch (Exception e)
             {
                 LogF8.LogWarning($"Failed to remove missing script from {go.name}: {e.Message}");
 
                 return false;
+            }
+        }
+
+        private static bool ComponentContainsMissingReference(MonoBehaviour component, MissingReferenceInfo info)
+        {
+            var serializedObject = new SerializedObject(component);
+            SerializedProperty property = serializedObject.GetIterator();
+
+            while (property.NextVisible(true))
+            {
+                if (property.propertyType != SerializedPropertyType.ObjectReference)
+                {
+                    continue;
+                }
+
+                if (property.objectReferenceValue != null || property.objectReferenceInstanceIDValue == 0)
+                {
+                    continue;
+                }
+
+                if (!string.IsNullOrEmpty(info.PropertyPath) && string.Equals(property.propertyPath, info.PropertyPath, StringComparison.Ordinal))
+                {
+                    return true;
+                }
+
+                if (string.IsNullOrEmpty(info.PropertyPath) && string.Equals(property.displayName, info.FieldName, StringComparison.Ordinal))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static void MarkObjectDirty(GameObject go)
+        {
+            EditorUtility.SetDirty(go);
+
+            if (go.scene.IsValid())
+            {
+                EditorSceneManager.MarkSceneDirty(go.scene);
             }
         }
 
@@ -738,16 +809,7 @@ namespace F8Framework.Core.Editor
             ShowActionResult("🔄 Refreshing...");
             EditorApplication.delayCall += () =>
             {
-                MethodInfo scanMethod = typeof(ToolbarFindMissingReferences).GetMethod("StartScanCoroutine", BindingFlags.NonPublic | BindingFlags.Static);
-
-                if (scanMethod != null)
-                {
-                    scanMethod.Invoke(null, null);
-                }
-                else
-                {
-                    Repaint();
-                }
+                ToolbarFindMissingReferences.RequestScan();
             };
         }
 
@@ -823,54 +885,15 @@ namespace F8Framework.Core.Editor
         /// </summary>
         private List<MissingReferenceInfo> RescanGameObject(GameObject go)
         {
-            var results = new List<MissingReferenceInfo>();
-            
             try
             {
-                MonoBehaviour[] components = go.GetComponents<MonoBehaviour>();
-                
-                foreach (MonoBehaviour component in components)
-                {
-                    if (!component)
-                    {
-                        // 缺失脚本
-                        results.Add(new MissingReferenceInfo
-                        {
-                            ComponentName = "Missing Script",
-                            FieldName = "",
-                            IsScriptMissing = true
-                        });
-                        continue;
-                    }
-                    
-                    // 检查空引用
-                    Type componentType = component.GetType();
-                    FieldInfo[] fields = componentType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                    
-                    foreach (FieldInfo field in fields)
-                    {
-                        if (field.FieldType.IsSubclassOf(typeof(UnityEngine.Object)) || field.FieldType == typeof(UnityEngine.Object))
-                        {
-                            object value = field.GetValue(component);
-                            if (value == null || value.Equals(null))
-                            {
-                                results.Add(new MissingReferenceInfo
-                                {
-                                    ComponentName = componentType.Name,
-                                    FieldName = field.Name,
-                                    IsScriptMissing = false
-                                });
-                            }
-                        }
-                    }
-                }
+                return ToolbarFindMissingReferences.GetMissingReferenceInfos(go);
             }
             catch (Exception e)
             {
                 LogF8.LogWarning($"Failed to rescan {go.name}: {e.Message}");
+                return new List<MissingReferenceInfo>();
             }
-            
-            return results;
         }
     }
 }

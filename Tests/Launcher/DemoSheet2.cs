@@ -10,7 +10,7 @@ using UnityEngine;
 namespace F8Framework.Tests
 {
 	[Serializable]
-	internal class Sheet2Item
+	internal class DemoSheet2Item
 	{
 		[Preserve]
 		public System.Int32 id;
@@ -29,7 +29,7 @@ namespace F8Framework.Tests
 	}
 	
 	[Serializable]
-	internal class Sheet2
+	internal class DemoSheet2
 	{
 		[Preserve]
 		public static void PreRegister()
@@ -37,11 +37,11 @@ namespace F8Framework.Tests
 			TypeHandlerFactory.PreRegister<System.Single[]>(new F8Framework.Core.ArrayHandler<System.Single>());
 			TypeHandlerFactory.PreRegister<System.Int32[]>(new F8Framework.Core.ArrayHandler<System.Int32>());
 			TypeHandlerFactory.PreRegister<System.String[]>(new F8Framework.Core.ArrayHandler<System.String>());
-			TypeHandlerFactory.PreRegister<F8Framework.Tests.Sheet2Item>(new F8Framework.Core.ObjectHandler<F8Framework.Tests.Sheet2Item>());
-			TypeHandlerFactory.PreRegister<System.Collections.Generic.Dictionary<System.Int32, F8Framework.Tests.Sheet2Item>>(new F8Framework.Core.DictionaryHandler<System.Int32, F8Framework.Tests.Sheet2Item>());
-			TypeHandlerFactory.PreRegister<F8Framework.Tests.Sheet2>(new F8Framework.Core.ObjectHandler<F8Framework.Tests.Sheet2>());
+			TypeHandlerFactory.PreRegister<F8Framework.Tests.DemoSheet2Item>(new F8Framework.Core.ObjectHandler<F8Framework.Tests.DemoSheet2Item>());
+			TypeHandlerFactory.PreRegister<System.Collections.Generic.Dictionary<System.Int32, F8Framework.Tests.DemoSheet2Item>>(new F8Framework.Core.DictionaryHandler<System.Int32, F8Framework.Tests.DemoSheet2Item>());
+			TypeHandlerFactory.PreRegister<F8Framework.Tests.DemoSheet2>(new F8Framework.Core.ObjectHandler<F8Framework.Tests.DemoSheet2>());
 		}
 		[Preserve]
-		public Dictionary<System.Int32, F8Framework.Tests.Sheet2Item> Dict = new Dictionary<System.Int32, F8Framework.Tests.Sheet2Item>();
+		public Dictionary<System.Int32, F8Framework.Tests.DemoSheet2Item> Dict = new Dictionary<System.Int32, F8Framework.Tests.DemoSheet2Item>();
 	}
 }

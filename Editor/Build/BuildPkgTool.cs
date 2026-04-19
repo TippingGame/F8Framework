@@ -204,9 +204,10 @@ namespace F8Framework.Core.Editor
             var resAssetBundleMappings = Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(Resources.Load<TextAsset>(nameof(AssetBundleMap)).ToString());
 
             var assetBundleMappings = Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(FileTools.SafeReadAllText(assetBundleMapPath));
+            Dictionary<string, AssetBundleMap.AssetMapping> hotUpdateAssetBundleMappings = new Dictionary<string, AssetBundleMap.AssetMapping>();
             if (File.Exists(hotUpdateMapPath))
             {
-                assetBundleMappings = Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(FileTools.SafeReadAllText(hotUpdateMapPath));
+                hotUpdateAssetBundleMappings = Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(FileTools.SafeReadAllText(hotUpdateMapPath)) ?? new Dictionary<string, AssetBundleMap.AssetMapping>();
             }
 
             Dictionary<string, AssetBundleMap.AssetMapping> generateAssetBundleMappings = new Dictionary<string, AssetBundleMap.AssetMapping>();
@@ -238,7 +239,13 @@ namespace F8Framework.Core.Editor
                 remoteGameVersion.HotUpdateVersion.Add(toVersion);
             FileTools.SafeWriteAllText(gameVersionPath, Util.LitJson.ToJson(remoteGameVersion));
             
-            FileTools.SafeWriteAllText(hotUpdateMapPath, Util.LitJson.ToJson(assetBundleMappings));
+            foreach (var assetMapping in generateAssetBundleMappings)
+            {
+                hotUpdateAssetBundleMappings[assetMapping.Key] = assetMapping.Value;
+            }
+
+            FileTools.SafeWriteAllText(assetBundleMapPath, Util.LitJson.ToJson(assetBundleMappings));
+            FileTools.SafeWriteAllText(hotUpdateMapPath, Util.LitJson.ToJson(hotUpdateAssetBundleMappings));
             
             LogF8.LogVersion("构建热更新包版本成功！版本：" + toVersion);
             
@@ -1222,7 +1229,8 @@ namespace F8Framework.Core.Editor
             FileTools.SafeCopyFile(assetBundleMapPath, buildPath + HotUpdateManager.RemoteDirName + "/" + nameof(AssetBundleMap) + ".json");
             
             string hotUpdateMapPath = buildPath + HotUpdateManager.RemoteDirName + HotUpdateManager.HotUpdateDirName + HotUpdateManager.Separator + nameof(AssetBundleMap) + ".json";
-            FileTools.SafeCopyFile(assetBundleMapPath, hotUpdateMapPath);
+            FileTools.CheckFileAndCreateDirWhenNeeded(hotUpdateMapPath);
+            FileTools.SafeWriteAllText(hotUpdateMapPath, Util.LitJson.ToJson(new Dictionary<string, AssetBundleMap.AssetMapping>()));
             UnityEditor.AssetDatabase.Refresh();
         }
 

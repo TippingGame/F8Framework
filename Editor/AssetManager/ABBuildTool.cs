@@ -142,15 +142,16 @@ namespace F8Framework.Core.Editor
                     continue;
                 }
 
-                string relativePath = ToOutputRelativePath(abBundlesPath, filePath);
+                string tempFilePath = FileTools.FormatToUnityPath(filePath);
+                string relativePath = ToOutputRelativePath(abBundlesPath, tempFilePath);
                 if (extension == ".manifest")
                 {
                     string manifestLogicalPath = FileTools.FormatToUnityPath(Path.ChangeExtension(relativePath, null));
                     if (!expectedManifestPaths.Contains(manifestLogicalPath) &&
                         !AssetPathsContainsDiscrepantAssetBundle(expectedManifestPaths, manifestLogicalPath))
                     {
-                        DeleteFileAndMeta(filePath);
-                        LogF8.LogAsset("删除多余AB.manifest文件：" + filePath);
+                        DeleteFileAndMeta(tempFilePath);
+                        LogF8.LogAsset("删除多余AB.manifest文件：" + tempFilePath);
                     }
                 }
                 else
@@ -158,8 +159,8 @@ namespace F8Framework.Core.Editor
                     if (!expectedBundlePaths.Contains(relativePath) &&
                         !AssetPathsContainsDiscrepantAssetBundle(expectedBundlePaths, relativePath))
                     {
-                        DeleteFileAndMeta(filePath);
-                        LogF8.LogAsset("删除多余AB文件：" + filePath);
+                        DeleteFileAndMeta(tempFilePath);
+                        LogF8.LogAsset("删除多余AB文件：" + tempFilePath);
                     }
                 }
             }
@@ -167,13 +168,14 @@ namespace F8Framework.Core.Editor
             foreach (string directoryPath in Directory.GetDirectories(abBundlesPath, "*", SearchOption.AllDirectories)
                          .OrderByDescending(path => path.Length))
             {
-                string relativePath = ToOutputRelativePath(abBundlesPath, directoryPath);
+                string tempDirectoryPath = FileTools.FormatToUnityPath(directoryPath);
+                string relativePath = ToOutputRelativePath(abBundlesPath, tempDirectoryPath);
                 if (!expectedDirectoryPaths.Contains(relativePath))
                 {
-                    if (FileTools.SafeDeleteDir(directoryPath))
+                    if (FileTools.SafeDeleteDir(tempDirectoryPath))
                     {
-                        DeleteFileIfExists(directoryPath + ".meta");
-                        LogF8.LogAsset("删除多余AB文件夹：" + directoryPath);
+                        DeleteFileIfExists(tempDirectoryPath + ".meta");
+                        LogF8.LogAsset("删除多余AB文件夹：" + tempDirectoryPath);
                     }
                 }
             }
@@ -210,7 +212,7 @@ namespace F8Framework.Core.Editor
 
         private static string ToOutputRelativePath(string basePath, string targetPath)
         {
-            return FileTools.FormatToUnityPath(targetPath.Replace(basePath, ""));
+            return targetPath.Replace(basePath, "");
         }
 
         private static string GetExpectedManifestPath(string bundlePath)

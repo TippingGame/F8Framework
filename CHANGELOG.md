@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.1.286] - 2025-04-19
+1.优化HotUpdate模块使用下载增量信息热更  
+2.新增Missing引用查找界面能在Prefab Mode下使用  
+
 ## [3.0.285] - 2025-04-19
 1.修复活动模块ActivityModule的QuitGame调用错误  
 2.修复ABBuildTool，AB名加上MD5时错误清理.manifest的问题  

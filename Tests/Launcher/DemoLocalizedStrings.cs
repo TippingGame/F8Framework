@@ -10,7 +10,7 @@ using UnityEngine;
 namespace F8Framework.Tests
 {
 	[Serializable]
-	internal class LocalizedStringsItem
+	internal class DemoLocalizedStringsItem
 	{
 		[Preserve]
 		public System.Int32 id;
@@ -23,16 +23,16 @@ namespace F8Framework.Tests
 	}
 	
 	[Serializable]
-	internal class LocalizedStrings
+	internal class DemoLocalizedStrings
 	{
 		[Preserve]
 		public static void PreRegister()
 		{
-			TypeHandlerFactory.PreRegister<F8Framework.Tests.LocalizedStringsItem>(new F8Framework.Core.ObjectHandler<F8Framework.Tests.LocalizedStringsItem>());
-			TypeHandlerFactory.PreRegister<System.Collections.Generic.Dictionary<System.Int32, F8Framework.Tests.LocalizedStringsItem>>(new F8Framework.Core.DictionaryHandler<System.Int32, F8Framework.Tests.LocalizedStringsItem>());
-			TypeHandlerFactory.PreRegister<F8Framework.Tests.LocalizedStrings>(new F8Framework.Core.ObjectHandler<F8Framework.Tests.LocalizedStrings>());
+			TypeHandlerFactory.PreRegister<F8Framework.Tests.DemoLocalizedStringsItem>(new F8Framework.Core.ObjectHandler<F8Framework.Tests.DemoLocalizedStringsItem>());
+			TypeHandlerFactory.PreRegister<System.Collections.Generic.Dictionary<System.Int32, F8Framework.Tests.DemoLocalizedStringsItem>>(new F8Framework.Core.DictionaryHandler<System.Int32, F8Framework.Tests.DemoLocalizedStringsItem>());
+			TypeHandlerFactory.PreRegister<F8Framework.Tests.DemoLocalizedStrings>(new F8Framework.Core.ObjectHandler<F8Framework.Tests.DemoLocalizedStrings>());
 		}
 		[Preserve]
-		public Dictionary<System.Int32, F8Framework.Tests.LocalizedStringsItem> Dict = new Dictionary<System.Int32, F8Framework.Tests.LocalizedStringsItem>();
+		public Dictionary<System.Int32, F8Framework.Tests.DemoLocalizedStringsItem> Dict = new Dictionary<System.Int32, F8Framework.Tests.DemoLocalizedStringsItem>();
 	}
 }
