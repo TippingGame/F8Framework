@@ -124,7 +124,7 @@ namespace F8Framework.Core
             _tempActivityModules.AddRange(_activityModules.Values);
             foreach (var module in _tempActivityModules)
             {
-                module.OnEnterGame();
+                module.OnQuitGame();
             }
             _tempActivityModules.Clear();
         }

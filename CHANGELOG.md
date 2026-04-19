@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.0.285] - 2025-04-19
+1.修复活动模块ActivityModule的QuitGame调用错误  
+2.修复ABBuildTool，AB名加上MD5时错误清理.manifest的问题  
+
 ## [3.0.284] - 2025-04-16
 1.新增活动模块ActivityModule创建模板  
 2.新增组件绑定名字  
