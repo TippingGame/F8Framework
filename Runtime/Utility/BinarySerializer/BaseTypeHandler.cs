@@ -5,6 +5,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using LitJson;
 using UnityEngine;
 
 namespace F8Framework.Core
@@ -189,6 +190,22 @@ namespace F8Framework.Core
             {
                 ArrayPool<byte>.Shared.Return(rented);
             }
+        }
+    }
+
+    internal class JsonDataHandler : TypeHandler<JsonData>
+    {
+        private static readonly StringHandler _stringHandler = new StringHandler();
+
+        public override void Serialize(BinaryWriter writer, JsonData value)
+        {
+            _stringHandler.Serialize(writer, value?.ToJson());
+        }
+
+        public override JsonData Deserialize(BinaryReader reader)
+        {
+            string json = _stringHandler.Deserialize(reader);
+            return string.IsNullOrEmpty(json) ? null : Util.LitJson.ToObject(json);
         }
     }
 
@@ -786,6 +803,11 @@ namespace F8Framework.Core
             // 收集所有需要序列化的属性（可读写且未标记 BinaryIgnore）
             foreach (var prop in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {
+                if (prop.GetIndexParameters().Length > 0)
+                {
+                    continue;
+                }
+
                 if (prop.CanRead && prop.CanWrite && !prop.IsDefined(typeof(BinaryIgnore), true))
                 {
                     _members.Add(prop);

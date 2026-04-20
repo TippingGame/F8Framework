@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using Excel;
+using LitJson;
 using UnityEngine;
 using Assembly = System.Reflection.Assembly;
 
@@ -24,6 +25,7 @@ namespace F8Framework.Core
         public const string FLOAT = "float";
         public const string DOUBLE = "double";
         public const string DECIMAL = "decimal";
+        public const string JSON = "json";
         public const string STRING = "str";
         public const string STRINGFULL = "string";
         public const string OBJ = "obj";
@@ -698,6 +700,9 @@ namespace F8Framework.Core
 
                             o = DECIMAL_decimal;
                             break;
+                        case SupportType.JSON:
+                            o = Util.LitJson.ToObject(data);
+                            break;
                         case SupportType.STRING or SupportType.STRINGFULL:
                             if (data.StartsWith("\"") && data.EndsWith("\""))
                             {
@@ -762,10 +767,7 @@ namespace F8Framework.Core
                             break;
                         case SupportType.VECTOR2 or SupportType.VECTOR2FULL:
                             data = RemoveOuterBracketsIfPaired(data); // 移除最外层的 '[' 和 ']' '{' 和 '}'
-                            var vector2 = Regex.Matches(data, "(?:\"(?:[^\"]|\"\")*\"|[^,]+)") //逗号分隔
-                                .Cast<Match>()
-                                .Select(m => m.Value)
-                                .ToArray();
+                            var vector2 = ParseElements(data).ToArray();
                             var vector22 = new Vector2();
                             vector22.x = (float)ParseValue(SupportType.FLOAT, vector2.Length >= 1 ? vector2[0] : "0",
                                 classname);
@@ -775,10 +777,7 @@ namespace F8Framework.Core
                             break;
                         case SupportType.VECTOR3 or SupportType.VECTOR3FULL:
                             data = RemoveOuterBracketsIfPaired(data); // 移除最外层的 '[' 和 ']' '{' 和 '}'
-                            var vector3 = Regex.Matches(data, "(?:\"(?:[^\"]|\"\")*\"|[^,]+)") //逗号分隔
-                                .Cast<Match>()
-                                .Select(m => m.Value)
-                                .ToArray();
+                            var vector3 = ParseElements(data).ToArray();
                             var vector33 = new Vector3();
                             vector33.x = (float)ParseValue(SupportType.FLOAT, vector3.Length >= 1 ? vector3[0] : "0",
                                 classname);
@@ -790,10 +789,7 @@ namespace F8Framework.Core
                             break;
                         case SupportType.VECTOR4 or SupportType.VECTOR4FULL:
                             data = RemoveOuterBracketsIfPaired(data); // 移除最外层的 '[' 和 ']' '{' 和 '}'
-                            var vector4 = Regex.Matches(data, "(?:\"(?:[^\"]|\"\")*\"|[^,]+)") //逗号分隔
-                                .Cast<Match>()
-                                .Select(m => m.Value)
-                                .ToArray();
+                            var vector4 = ParseElements(data).ToArray();
                             var vector44 = new Vector4();
                             vector44.x = (float)ParseValue(SupportType.FLOAT, vector4.Length >= 1 ? vector4[0] : "0",
                                 classname);
@@ -807,10 +803,7 @@ namespace F8Framework.Core
                             break;
                         case SupportType.VECTOR2INT or SupportType.VECTOR2INTFULL:
                             data = RemoveOuterBracketsIfPaired(data); // 移除最外层的 '[' 和 ']' '{' 和 '}'
-                            var vector2int = Regex.Matches(data, "(?:\"(?:[^\"]|\"\")*\"|[^,]+)") //逗号分隔
-                                .Cast<Match>()
-                                .Select(m => m.Value)
-                                .ToArray();
+                            var vector2int = ParseElements(data).ToArray();
                             var vector22int = new Vector2Int();
                             vector22int.x = (int)ParseValue(SupportType.INT,
                                 vector2int.Length >= 1 ? vector2int[0] : "0", classname);
@@ -820,10 +813,7 @@ namespace F8Framework.Core
                             break;
                         case SupportType.VECTOR3INT or SupportType.VECTOR3INTFULL:
                             data = RemoveOuterBracketsIfPaired(data); // 移除最外层的 '[' 和 ']' '{' 和 '}'
-                            var vector3int = Regex.Matches(data, "(?:\"(?:[^\"]|\"\")*\"|[^,]+)") //逗号分隔
-                                .Cast<Match>()
-                                .Select(m => m.Value)
-                                .ToArray();
+                            var vector3int = ParseElements(data).ToArray();
                             var vector33int = new Vector3Int();
                             vector33int.x = (int)ParseValue(SupportType.INT,
                                 vector3int.Length >= 1 ? vector3int[0] : "0", classname);
@@ -835,10 +825,7 @@ namespace F8Framework.Core
                             break;
                         case SupportType.QUATERNION or SupportType.QUATERNIONFULL:
                             data = RemoveOuterBracketsIfPaired(data); // 移除最外层的 '[' 和 ']' '{' 和 '}'
-                            var quaternion = Regex.Matches(data, "(?:\"(?:[^\"]|\"\")*\"|[^,]+)") //逗号分隔
-                                .Cast<Match>()
-                                .Select(m => m.Value)
-                                .ToArray();
+                            var quaternion = ParseElements(data).ToArray();
                             var quaternion1 = new Quaternion();
                             quaternion1.x = (float)ParseValue(SupportType.FLOAT,
                                 quaternion.Length >= 1 ? quaternion[0] : "0", classname);
@@ -852,10 +839,7 @@ namespace F8Framework.Core
                             break;
                         case SupportType.COLOR:
                             data = RemoveOuterBracketsIfPaired(data); // 移除最外层的 '[' 和 ']' '{' 和 '}'
-                            var color = Regex.Matches(data, "(?:\"(?:[^\"]|\"\")*\"|[^,]+)") //逗号分隔
-                                .Cast<Match>()
-                                .Select(m => m.Value)
-                                .ToArray();
+                            var color = ParseElements(data).ToArray();
                             var color1 = new Color();
                             color1.r = (float)ParseValue(SupportType.FLOAT, color.Length >= 1 ? color[0] : "0",
                                 classname);
@@ -869,10 +853,7 @@ namespace F8Framework.Core
                             break;
                         case SupportType.COLOR32:
                             data = RemoveOuterBracketsIfPaired(data); // 移除最外层的 '[' 和 ']' '{' 和 '}'
-                            var color32 = Regex.Matches(data, "(?:\"(?:[^\"]|\"\")*\"|[^,]+)") //逗号分隔
-                                .Cast<Match>()
-                                .Select(m => m.Value)
-                                .ToArray();
+                            var color32 = ParseElements(data).ToArray();
                             var color2 = new Color32();
                             color2.r = (byte)ParseValue(SupportType.BYTE, color32.Length >= 1 ? color32[0] : "0",
                                 classname);
@@ -975,10 +956,7 @@ namespace F8Framework.Core
                             break;
                         case SupportType.MATRIX4X4:
                             data = RemoveOuterBracketsIfPaired(data); // 移除最外层的 '[' 和 ']' '{' 和 '}'
-                            var matrix4x4 = Regex.Matches(data, "(?:\"(?:[^\"]|\"\")*\"|[^,]+)") //逗号分隔
-                                .Cast<Match>()
-                                .Select(m => m.Value)
-                                .ToArray();
+                            var matrix4x4 = ParseElements(data).ToArray();
                             var matrix = new Matrix4x4();
                             matrix.m00 = (float)ParseValue(SupportType.FLOAT, matrix4x4.Length >= 1 ? matrix4x4[0] : "0", classname);
                             matrix.m10 = (float)ParseValue(SupportType.FLOAT, matrix4x4.Length >= 2 ? matrix4x4[1] : "0", classname);
@@ -1026,6 +1004,10 @@ namespace F8Framework.Core
             else if (type.StartsWith("System."))
             {
                 return Type.GetType(type + ",mscorlib");
+            }
+            else if (type.StartsWith("LitJson."))
+            {
+                return Type.GetType(type + ",LitJson");
             }
             else if (type.StartsWith(CODE_NAMESPACE))
             {
@@ -1211,6 +1193,9 @@ namespace F8Framework.Core
                 case SupportType.DECIMAL:
                     type = "System.Decimal";
                     break;
+                case SupportType.JSON:
+                    type = "LitJson.JsonData";
+                    break;
                 case SupportType.STRING or SupportType.STRINGFULL:
                     type = "System.String";
                     break;
@@ -1320,6 +1305,9 @@ namespace F8Framework.Core
             List<string> elements = new List<string>();
             string currentElement = "";
             int bracketDepth = 0;
+            int squareBracketDepth = 0;
+            int curlyBracketDepth = 0;
+            int angleBracketDepth = 0;
             bool inQuotes = false;
 
             foreach (char c in data)
@@ -1330,21 +1318,48 @@ namespace F8Framework.Core
                     inQuotes = !inQuotes;
                     currentElement += c;
                 }
-                else if (c == leftBracket)
+                else if (!inQuotes && c == leftBracket)
                 {
-                    // 遇到左括号，增加括号深度
                     bracketDepth++;
                     currentElement += c;
                 }
-                else if (c == rightBracket)
+                else if (!inQuotes && c == rightBracket)
                 {
-                    // 遇到右括号，减少括号深度
                     bracketDepth--;
                     currentElement += c;
                 }
-                else if (c == ',' && !inQuotes && bracketDepth == 0)
+                else if (!inQuotes && c == '[')
                 {
-                    // 如果不在引号内且括号深度为 0，遇到逗号则分割元素
+                    squareBracketDepth++;
+                    currentElement += c;
+                }
+                else if (!inQuotes && c == ']')
+                {
+                    squareBracketDepth--;
+                    currentElement += c;
+                }
+                else if (!inQuotes && c == '{')
+                {
+                    curlyBracketDepth++;
+                    currentElement += c;
+                }
+                else if (!inQuotes && c == '}')
+                {
+                    curlyBracketDepth--;
+                    currentElement += c;
+                }
+                else if (!inQuotes && c == '<')
+                {
+                    angleBracketDepth++;
+                    currentElement += c;
+                }
+                else if (!inQuotes && c == '>')
+                {
+                    angleBracketDepth--;
+                    currentElement += c;
+                }
+                else if (c == ',' && !inQuotes && bracketDepth == 0 && squareBracketDepth == 0 && curlyBracketDepth == 0 && angleBracketDepth == 0)
+                {
                     elements.Add(currentElement);
                     currentElement = "";
                 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using LitJson;
 using UnityEngine;
 
 namespace F8Framework.Core
@@ -27,6 +28,7 @@ namespace F8Framework.Core
             PreRegister<double>(new DoubleHandler());
             PreRegister<decimal>(new DecimalHandler());
             PreRegister<string>(new StringHandler());
+            PreRegister<JsonData>(new JsonDataHandler());
 
             // 时间类型
             PreRegister<DateTime>(new DateTimeHandler());

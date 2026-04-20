@@ -77,6 +77,7 @@ Sheet1.VariantName = "English";
 ### Basic types
 `char`, `bool`, `byte`, `short`, `int`, `long`, `float`, `double`, `decimal`, `str/string`, `obj/object`, `datetime`, `sbyte`, `ushort`, `uint`, `ulong`
 Unity types: `vec2/vector2`, `vec3/vector3`, `vec4/vector4`, `vec2int/vector2int`, `vec3int/vector3int`, `quat/quaternion`, `color`, `color32`, `matrix4x4`
+Standard JSON specification type: `json`
 
 ### Container types
 - Arrays: `int[]`, `string[][]`, `obj[][][]`

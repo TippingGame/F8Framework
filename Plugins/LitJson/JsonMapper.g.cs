@@ -341,17 +341,15 @@ namespace LitJson
             data.Properties = new Dictionary<string, PropertyMetadata> ();
 
             foreach (PropertyInfo p_info in type.GetProperties ()) {
-                if (p_info.Name == "Item") {
-                    ParameterInfo[] parameters = p_info.GetIndexParameters ();
-
-                    if (parameters.Length != 1)
-                        continue;
-
-                    if (parameters[0].ParameterType == typeof(string) || parameters[0].ParameterType == typeof(int) ||
-                        parameters[0].ParameterType == typeof(byte) || parameters[0].ParameterType == typeof(short) ||
-                        parameters[0].ParameterType == typeof(long) || parameters[0].ParameterType == typeof(float) ||
-                        parameters[0].ParameterType == typeof(double) || parameters[0].ParameterType == typeof(decimal))
-                        data.ElementType = p_info.PropertyType;
+                ParameterInfo[] parameters = p_info.GetIndexParameters ();
+                if (parameters.Length > 0) {
+                    if (p_info.Name == "Item" && parameters.Length == 1) {
+                        if (parameters[0].ParameterType == typeof(string) || parameters[0].ParameterType == typeof(int) ||
+                            parameters[0].ParameterType == typeof(byte) || parameters[0].ParameterType == typeof(short) ||
+                            parameters[0].ParameterType == typeof(long) || parameters[0].ParameterType == typeof(float) ||
+                            parameters[0].ParameterType == typeof(double) || parameters[0].ParameterType == typeof(decimal))
+                            data.ElementType = p_info.PropertyType;
+                    }
 
                     continue;
                 }
@@ -389,7 +387,7 @@ namespace LitJson
             IList<PropertyMetadata> props = new List<PropertyMetadata> ();
 
             foreach (PropertyInfo p_info in type.GetProperties ()) {
-                if (p_info.Name == "Item")
+                if (p_info.GetIndexParameters ().Length > 0)
                     continue;
 
                 PropertyMetadata p_data = new PropertyMetadata ();
@@ -678,10 +676,18 @@ namespace LitJson
                         }
                         
                         object value = ReadValue(valueType ?? t_data.ElementType, reader);
-                        
-                        var addMethod = instance.GetType().GetMethod("Add");
-                        if (addMethod != null) {
-                            addMethod.Invoke(instance, new object[] { key, value });
+
+                        if (instance is IDictionary dictionaryInstance) {
+                            dictionaryInstance.Add(key, value);
+                        } else {
+                            var addMethod = instance.GetType().GetMethod("Add");
+                            if (addMethod != null) {
+                                var parameters = addMethod.GetParameters();
+                                if (parameters.Length == 2)
+                                    addMethod.Invoke(instance, new object[] { key, value });
+                                else if (parameters.Length == 1)
+                                    addMethod.Invoke(instance, new object[] { value });
+                            }
                         }
                     }
 
@@ -955,7 +961,9 @@ namespace LitJson
             }
 
             if (obj is IJsonWrapper) {
-                if (writer_is_private)
+                if (obj is JsonData)
+                    ((IJsonWrapper) obj).ToJson (writer);
+                else if (writer_is_private)
                     writer.TextWriter.Write (((IJsonWrapper) obj).ToJson ());
                 else
                     ((IJsonWrapper) obj).ToJson (writer);

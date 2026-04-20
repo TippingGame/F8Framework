@@ -7,7 +7,7 @@ namespace F8Framework.Core.Editor
 	public class LocalizerEditorSettingsWindow : EditorWindow
 	{
 		public static int index = 0;
-		public string[] options = Language.BuiltinLanguages.Select(lang => lang.ToString()).ToArray();
+		readonly string[] languageOptions = Language.BuiltinLanguages.Select(lang => lang.ToString()).ToArray();
 		
 		[UnityEditor.MenuItem("开发工具/本地化工具 _F6", false, 100)]
 		static void Open()
@@ -19,6 +19,7 @@ namespace F8Framework.Core.Editor
 			else
 			{
 				LocalizationEditorSettings.LoadEditorSettings();
+				Localization.EditorInstance.LoadInEditor();
 
 				for (int i = 0; i < Language.BuiltinLanguages.Length; i++)
 				{
@@ -34,7 +35,9 @@ namespace F8Framework.Core.Editor
 
 		void OnGUI()
 		{
+			Localization.EditorInstance.LoadInEditor();
 			var prevSettings = LocalizationEditorSettings.current.Clone();
+			var displayOptions = GetDisplayOptions();
 			EditorGUILayout.LabelField("Settings", EditorStyles.boldLabel);
 			for (int i = 0; i < Language.BuiltinLanguages.Length; i++)
 			{
@@ -43,10 +46,10 @@ namespace F8Framework.Core.Editor
 					index = i;
 				}
 			}
-			index = EditorGUILayout.Popup(index, options);
-			if (options[index] != LocalizationSettings.LoadLanguageSettings())
+			index = EditorGUILayout.Popup(index, displayOptions);
+			if (languageOptions[index] != LocalizationSettings.LoadLanguageSettings())
 			{
-				Localization.EditorInstance.CurrentLanguageName = options[index];
+				Localization.EditorInstance.CurrentLanguageName = languageOptions[index];
 				LocalizationSettings.SaveLanguageSettings();
 				if (Application.isPlaying)
 				{
@@ -84,6 +87,14 @@ namespace F8Framework.Core.Editor
 			}
 
 			if (LocalizationEditorSettings.current != prevSettings) LocalizationEditorSettings.SaveEditorSettings();
+		}
+
+		string[] GetDisplayOptions()
+		{
+			var configuredLanguages = Localization.EditorInstance.LanguageList;
+			return languageOptions
+				.Select(language => configuredLanguages.Contains(language) ? $"{language}（已配置）" : language)
+				.ToArray();
 		}
 
 		static void DrawSettingsPanel(ref LocalizationEditorSettings.SettingsDefinition settings)

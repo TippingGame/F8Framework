@@ -234,7 +234,7 @@ namespace F8Framework.Core
 			
 			if (Contains(typeof(T)))
 			{
-				LogF8.LogModule($"游戏模块 {typeof(T)} 已存在");
+				LogF8.LogModule($"游戏模块 {typeof(T).Name} 已存在");
 				return GetModule<T>();
 			}
 			
