@@ -1,4 +1,4 @@
-namespace Mirror.SimpleWeb
+namespace JamesFrowen.SimpleWeb
 {
     public enum EventType
     {

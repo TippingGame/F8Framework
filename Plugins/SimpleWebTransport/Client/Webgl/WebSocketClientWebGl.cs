@@ -1,39 +1,17 @@
 using System;
 using System.Collections.Generic;
-using AOT;
+using System.Runtime.InteropServices;
 
-namespace Mirror.SimpleWeb
+namespace JamesFrowen.SimpleWeb
 {
-#if !UNITY_2021_3_OR_NEWER
-
-    // Unity 2019 doesn't have ArraySegment.ToArray() yet.
-    public static class Extensions
-    {
-        public static byte[] ToArray(this ArraySegment<byte> segment)
-        {
-            byte[] array = new byte[segment.Count];
-            Array.Copy(segment.Array, segment.Offset, array, 0, segment.Count);
-            return array;
-        }
-    }
-
-#endif
-
     public class WebSocketClientWebGl : SimpleWebClient
     {
         static readonly Dictionary<int, WebSocketClientWebGl> instances = new Dictionary<int, WebSocketClientWebGl>();
 
-        [MonoPInvokeCallback(typeof(Action<int>))]
-        static void OpenCallback(int index) => instances[index].onOpen();
-
-        [MonoPInvokeCallback(typeof(Action<int>))]
-        static void CloseCallBack(int index) => instances[index].onClose();
-
-        [MonoPInvokeCallback(typeof(Action<int, IntPtr, int>))]
-        static void MessageCallback(int index, IntPtr bufferPtr, int count) => instances[index].onMessage(bufferPtr, count);
-
-        [MonoPInvokeCallback(typeof(Action<int>))]
-        static void ErrorCallback(int index) => instances[index].onErr();
+        /// <summary>
+        /// buffer used by jslib to avoid allocations
+        /// </summary>
+        IntPtr incomingDataBuffer;
 
         /// <summary>
         /// key for instances sent between c# and js
@@ -49,8 +27,6 @@ namespace Mirror.SimpleWeb
         /// </summary>
         Queue<byte[]> ConnectingSendQueue;
 
-        public bool CheckJsConnected() => SimpleWebJSLib.IsConnected(index);
-
         internal WebSocketClientWebGl(int maxMessageSize, int maxMessagesPerTick) : base(maxMessageSize, maxMessagesPerTick)
         {
 #if !UNITY_WEBGL || UNITY_EDITOR
@@ -58,9 +34,12 @@ namespace Mirror.SimpleWeb
 #endif
         }
 
+        public bool CheckJsConnected() => SimpleWebJSLib.IsConnected(index);
+
         public override void Connect(Uri serverAddress)
         {
-            index = SimpleWebJSLib.Connect(serverAddress.ToString(), OpenCallback, CloseCallBack, MessageCallback, ErrorCallback);
+            incomingDataBuffer = Marshal.AllocHGlobal(maxMessageSize);
+            index = SimpleWebJSLib.Connect(serverAddress.ToString(), OpenCallback, CloseCallBack, MessageCallback, ErrorCallback, incomingDataBuffer, maxMessageSize);
             instances.Add(index, this);
             state = ClientState.Connecting;
         }
@@ -70,24 +49,35 @@ namespace Mirror.SimpleWeb
             state = ClientState.Disconnecting;
             // disconnect should cause closeCallback and OnDisconnect to be called
             SimpleWebJSLib.Disconnect(index);
+            SafeFreeDataBuffer();
         }
 
-        public override void Send(ArraySegment<byte> segment)
+        void SafeFreeDataBuffer()
         {
-            if (segment.Count > maxMessageSize)
+            if (incomingDataBuffer != IntPtr.Zero)
             {
-                Log.Error("[SWT-WebSocketClientWebGl]: Cant send message with length {0} because it is over the max size of {1}", segment.Count, maxMessageSize);
+                Marshal.FreeHGlobal(incomingDataBuffer);
+                incomingDataBuffer = IntPtr.Zero;
+            }
+        }
+
+        public override void Send(ReadOnlySpan<byte> span)
+        {
+            if (span.Length > maxMessageSize)
+            {
+                Log.Error($"Cant send message with length {span.Length} because it is over the max size of {maxMessageSize}");
                 return;
             }
 
             if (state == ClientState.Connected)
             {
-                SimpleWebJSLib.Send(index, segment.Array, segment.Offset, segment.Count);
+                SimpleWebJSLib.Send(index, span);
             }
-            else if (ConnectingSendQueue == null)
+            else
             {
-                ConnectingSendQueue = new Queue<byte[]>();
-                ConnectingSendQueue.Enqueue(segment.ToArray());
+                if (ConnectingSendQueue == null)
+                    ConnectingSendQueue = new Queue<byte[]>();
+                ConnectingSendQueue.Enqueue(span.ToArray());
             }
         }
 
@@ -101,9 +91,8 @@ namespace Mirror.SimpleWeb
                 while (ConnectingSendQueue.Count > 0)
                 {
                     byte[] next = ConnectingSendQueue.Dequeue();
-                    SimpleWebJSLib.Send(index, next, 0, next.Length);
+                    SimpleWebJSLib.Send(index, next.AsSpan());
                 }
-
                 ConnectingSendQueue = null;
             }
         }
@@ -115,6 +104,7 @@ namespace Mirror.SimpleWeb
             receiveQueue.Enqueue(new Message(EventType.Disconnected));
             state = ClientState.NotConnected;
             instances.Remove(index);
+            SafeFreeDataBuffer();
         }
 
         void onMessage(IntPtr bufferPtr, int count)
@@ -122,13 +112,17 @@ namespace Mirror.SimpleWeb
             try
             {
                 ArrayBuffer buffer = bufferPool.Take(count);
-                buffer.CopyFrom(bufferPtr, count);
+                unsafe
+                {
+                    ReadOnlySpan<byte> sourceSpan = new ReadOnlySpan<byte>(bufferPtr.ToPointer(), count);
+                    buffer.CopyFrom(sourceSpan);
+                }
 
                 receiveQueue.Enqueue(new Message(buffer));
             }
             catch (Exception e)
             {
-                Log.Error("[SWT-WebSocketClientWebGl]: onMessage {0}: {1}\n{2}", e.GetType(), e.Message, e.StackTrace);
+                Log.Error($"onData {e.GetType()}: {e.Message}\n{e.StackTrace}");
                 receiveQueue.Enqueue(new Message(e));
             }
         }
@@ -138,5 +132,26 @@ namespace Mirror.SimpleWeb
             receiveQueue.Enqueue(new Message(new Exception("Javascript Websocket error")));
             Disconnect();
         }
+
+
+#if UNITY_WEBGL
+        [AOT.MonoPInvokeCallback(typeof(Action<int>))]
+#endif
+        static void OpenCallback(int index) => instances[index].onOpen();
+
+#if UNITY_WEBGL
+        [AOT.MonoPInvokeCallback(typeof(Action<int>))]
+#endif
+        static void CloseCallBack(int index) => instances[index].onClose();
+
+#if UNITY_WEBGL
+        [AOT.MonoPInvokeCallback(typeof(Action<int, IntPtr, int>))]
+#endif
+        static void MessageCallback(int index, IntPtr bufferPtr, int count) => instances[index].onMessage(bufferPtr, count);
+
+#if UNITY_WEBGL
+        [AOT.MonoPInvokeCallback(typeof(Action<int>))]
+#endif
+        static void ErrorCallback(int index) => instances[index].onErr();
     }
 }

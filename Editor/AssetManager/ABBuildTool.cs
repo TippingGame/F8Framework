@@ -69,7 +69,6 @@ namespace F8Framework.Core.Editor
             options |= BuildAssetBundleOptions.DisableLoadAssetByFileNameWithExtension;
             options |= BuildAssetBundleOptions.ChunkBasedCompression;
             options |= BuildAssetBundleOptions.StrictMode;
-            options |= BuildAssetBundleOptions.DeterministicAssetBundle;
             if (F8GamePrefs.GetBool(nameof(F8GameConfig.AppendHashToAssetBundleName)))
             {
                 options |= BuildAssetBundleOptions.AppendHashToAssetBundleName;

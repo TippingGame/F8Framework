@@ -55,7 +55,7 @@ Unity 2021、2022、2023、6000
 * [ICSharpCode.SharpZipLib](https://github.com/icsharpcode/SharpZipLib)：压缩/解压缩
 * [Mirror(内置):KCP](https://github.com/MirrorNetworking/kcp2k)：Reliable UDP
 * [Mirror(内置):Telepathy](https://github.com/MirrorNetworking/Telepathy)：TCP
-* [Mirror(内置):Websockets](https://github.com/MirrorNetworking/SimpleWebTransport)：Websockets
+* [Websockets](https://github.com/James-Frowen/SimpleWebTransport)：Websockets
 * [LitJson](https://github.com/LitJSON/litjson)：序列化/反序列化 JSON（已修改字典Key支持所有基础和枚举类型，增加C#类型：HashSet，增加Unity常用类型：Type，Vector2，Vector3，Vector4，Quaternion，GameObject，Transform，Color，Color32，Bounds，Rect，RectOffset，LayerMask，Vector2Int，Vector3Int，RangeInt，BoundsInt，Matrix4x4，修复DateTime精度丢失的问题，修复long报错的问题）
 
 ## 使用步骤
@@ -153,7 +153,7 @@ Build targets: Win / Android / iOS / Mac / Linux / WebGL / WeChat Mini Games / T
 * [ICSharpCode.SharpZipLib](https://github.com/icsharpcode/SharpZipLib)：Compression/Decompression
 * [Mirror(built in):KCP](https://github.com/MirrorNetworking/kcp2k)：Reliable UDP
 * [Mirror(built in):Telepathy](https://github.com/MirrorNetworking/Telepathy)：TCP
-* [Mirror(built in):Websockets](https://github.com/MirrorNetworking/SimpleWebTransport)：Websockets
+* [Websockets](https://github.com/James-Frowen/SimpleWebTransport)：Websockets
 * [LitJson](https://github.com/LitJSON/litjson)：JSON serialization/deserialization (The dictionary key has been modified to support all basic and enumeration types; Add C # type: HashSet; added support for commonly used Unity types: Type, Vector2, Vector3, Vector4, Quaternion, GameObject, Transform, Color, Color32, Bounds, Rect, RectOffset, LayerMask, Vector2Int, Vector3Int, RangeInt, BoundsInt, Matrix4x4; fixed the DateTime precision loss issue; Fix the issue of long error)
 
 ## Setup

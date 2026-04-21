@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace Mirror.SimpleWeb
+namespace JamesFrowen.SimpleWeb
 {
     /// <summary>
     /// Constant values that should never change
@@ -8,7 +8,7 @@ namespace Mirror.SimpleWeb
     /// Some values are from https://tools.ietf.org/html/rfc6455
     /// </para>
     /// </summary>
-    internal static class Constants
+    static class Constants
     {
         /// <summary>
         /// Header is at most 4 bytes
@@ -58,6 +58,7 @@ namespace Mirror.SimpleWeb
         /// if payload length is 127 when next 8 bytes will be the length
         /// </summary>
         public const int UlongPayloadLength = 127;
+
 
         /// <summary>
         /// Guid used for WebSocket Protocol

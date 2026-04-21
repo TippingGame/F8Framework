@@ -6,14 +6,36 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
-namespace Mirror.SimpleWeb
+namespace JamesFrowen.SimpleWeb
 {
-    internal sealed class Connection : IDisposable
+    /// <summary>
+    /// Represents a handle to a remote connection.
+    /// </summary>
+    public interface IConnection
     {
+        /// <summary>
+        /// An opaque application-defined context associated with this connection.
+        /// <para>Use this to store references to high-level objects like a Player or Session.</para>
+        /// <remarks>This value is typically cleared by the transport when the connection is disconnected.</remarks>
+        /// </summary>
+        object Context { get; set; }
+
+        /// <summary>
+        /// The unique underlying identifier for this connection.
+        /// </summary>
+        int Id { get; }
+    }
+
+    sealed class Connection : IDisposable, IConnection
+    {
+        public const int IdNotSet = -1;
         readonly object disposedLock = new object();
 
-        public const int IdNotSet = -1;
+        public object Context { get; set; }
+        public int Id => connId;
+
         public TcpClient client;
+
         public int connId = IdNotSet;
 
         /// <summary>
@@ -26,21 +48,72 @@ namespace Mirror.SimpleWeb
         /// <para>Only valid on server</para>
         /// </summary>
         public string remoteAddress;
+        public int remotePort;
 
         public Stream stream;
         public Thread receiveThread;
         public Thread sendThread;
 
-        public ManualResetEventSlim sendPending = new ManualResetEventSlim(false);
-        public ConcurrentQueue<ArrayBuffer> sendQueue = new ConcurrentQueue<ArrayBuffer>();
+        ManualResetEventSlim sendPending = new ManualResetEventSlim(false);
+        ConcurrentQueue<ArrayBuffer> sendQueue = new ConcurrentQueue<ArrayBuffer>();
+        Action<Connection> onSendQueueFull;
+        readonly int maxSendQueueSize;
+        public bool needsPong;
 
-        public Action<Connection> onDispose;
+        Action<Connection> onDispose;
         volatile bool hasDisposed;
 
-        public Connection(TcpClient client, Action<Connection> onDispose)
+        public Connection(TcpClient client, Action<Connection> onDispose, Action<Connection> onSendQueueFull, int maxSendQueueSize)
         {
             this.client = client ?? throw new ArgumentNullException(nameof(client));
             this.onDispose = onDispose;
+            this.onSendQueueFull = onSendQueueFull;
+            this.maxSendQueueSize = maxSendQueueSize;
+        }
+
+        public void SetNeedsPong()
+        {
+            // Set flag to send pong response
+            needsPong = true;
+            sendPending.Set();
+        }
+
+        public void QueueSend(ArrayBuffer buffer)
+        {
+            // note: need to check disposedLock, so we done Enqueue while Dispose is running
+            //       Dispose will empty and release buffers in sendQueue
+            //       we want to make sure we do no queue after that
+            bool queueFull = false;
+            lock (disposedLock)
+            {
+                if (hasDisposed)
+                {
+                    Log.Warn($"Message sent to id={connId} after it was been disposed");
+                    buffer.Release();
+                }
+                else if (sendQueue.Count >= maxSendQueueSize)
+                {
+                    queueFull = true;
+                    buffer.Release();
+                }
+                else
+                {
+                    sendQueue.Enqueue(buffer);
+                    sendPending.Set();
+                }
+            }
+
+            if (queueFull)
+            {
+                Log.Warn($"Send queue was over {maxSendQueueSize} for {ToString()}, kicking connection.");
+                onSendQueueFull?.Invoke(this);
+                Dispose();
+            }
+        }
+
+        public (ManualResetEventSlim sendPending, ConcurrentQueue<ArrayBuffer> sendQueue) GetSendQueue()
+        {
+            return (sendPending, sendQueue);
         }
 
         /// <summary>
@@ -48,12 +121,12 @@ namespace Mirror.SimpleWeb
         /// </summary>
         public void Dispose()
         {
-            Log.Verbose("[SWT-Connection]: Dispose {0}", ToString());
+            Log.Verbose($"Dispose {ToString()}");
 
             // check hasDisposed first to stop ThreadInterruptedException on lock
             if (hasDisposed) return;
 
-            Log.Verbose("[SWT-Connection]: Connection Close: {0}", ToString());
+            Log.Info($"Connection Close: {ToString()}");
 
             lock (disposedLock)
             {
@@ -91,15 +164,12 @@ namespace Mirror.SimpleWeb
 
         public override string ToString()
         {
-            // remoteAddress isn't set until after handshake
             if (hasDisposed)
                 return $"[Conn:{connId}, Disposed]";
-            else if (!string.IsNullOrWhiteSpace(remoteAddress))
-                return $"[Conn:{connId}, endPoint:{remoteAddress}]";
             else
                 try
                 {
-                    EndPoint endpoint = client?.Client?.RemoteEndPoint;
+                    System.Net.EndPoint endpoint = client?.Client?.RemoteEndPoint;
                     return $"[Conn:{connId}, endPoint:{endpoint}]";
                 }
                 catch (SocketException)
@@ -112,13 +182,14 @@ namespace Mirror.SimpleWeb
         /// Gets the address based on the <see cref="request"/> and RemoteEndPoint
         /// <para>Called after ServerHandShake is accepted</para>
         /// </summary>
-        internal string CalculateAddress()
+        internal void CalculateEndPoint(out string address, out int port)
         {
             if (request.Headers.TryGetValue("X-Forwarded-For", out string forwardFor))
             {
                 string actualClientIP = forwardFor.ToString().Split(',').First();
                 // Remove the port number from the address
-                return actualClientIP.Split(':').First();
+                address = actualClientIP.Split(':').First();
+                port = 0;
             }
             else
             {
@@ -127,7 +198,8 @@ namespace Mirror.SimpleWeb
                 if (ipAddress.IsIPv4MappedToIPv6)
                     ipAddress = ipAddress.MapToIPv4();
 
-                return ipAddress.ToString();
+                address = ipAddress.ToString();
+                port = ipEndPoint.Port;
             }
         }
     }

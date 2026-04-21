@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Security.Authentication;
 using F8Framework.Core;
-using Mirror.SimpleWeb;
+using JamesFrowen.SimpleWeb;
 using UnityEngine;
 
 namespace F8Framework.Tests
@@ -13,6 +13,7 @@ namespace F8Framework.Tests
         [SerializeField] private int _port = 7778;
         [SerializeField] private int _maxMessageSize = 32000;
         [SerializeField] private int _maxHandShakeSize = 5000;
+        [SerializeField] private int _maxSendQueueSize = 1000;
 
         [SerializeField] private bool _noDelay = true;
         [SerializeField] private int _sendTimeout = 5000;
@@ -36,12 +37,12 @@ namespace F8Framework.Tests
             TcpConfig tcpConfig = new TcpConfig(_noDelay, _sendTimeout, _receiveTimeout);
 
             SslConfig sslConfig = SslConfigLoader.Load(sslEnabled, sslCertJson, sslProtocols);
-            server = new SimpleWebServer(_maxMessagePerTick, tcpConfig, _maxMessageSize, _maxHandShakeSize, sslConfig);
+            server = new SimpleWebServer(_maxMessagePerTick, tcpConfig, _maxMessageSize, _maxHandShakeSize, sslConfig, _maxSendQueueSize);
 
-            server.onConnect += (id, ip) => { connection = true; LogF8.LogNet($"New Client connected, id:{id}, ip:{ip}"); };
-            server.onDisconnect += (id) => LogF8.LogNet($"Client disconnected, id:{id}");
+            server.onConnect += (id) => { connection = true; LogF8.LogNet($"New Client connected, id:{id.Id}"); };
+            server.onDisconnect += (id) => LogF8.LogNet($"Client disconnected, id:{id.Id}");
             server.onData += OnData;
-            server.onError += (id, exception) => LogF8.LogNet($"Error because of Client, id:{id}, Error:{exception}");
+            server.onError += (id, exception) => LogF8.LogNet($"Error because of Client, id:{id.Id}, Error:{exception}");
 
             // add events then start
             server.Start(checked((ushort)_port));
@@ -62,9 +63,9 @@ namespace F8Framework.Tests
             server?.Stop();
         }
 
-        private void OnData(int id, ArraySegment<byte> data)
+        private void OnData(IConnection id, ArraySegment<byte> data)
         {
-            LogF8.LogNet($"Data from Client, id:{id}, length:{data.Count}");
+            LogF8.LogNet($"Data from Client, id:{id.Id}, length:{data.Count}");
 
             byte[] received = data.Array;
             int length = data.Count;

@@ -1,13 +1,15 @@
 using System;
 
-namespace Mirror.SimpleWeb
+namespace JamesFrowen.SimpleWeb
 {
     public struct Message
     {
-        public readonly int connId;
+        public readonly IConnection conn;
         public readonly EventType type;
         public readonly ArrayBuffer data;
         public readonly Exception exception;
+
+        public int connId => conn?.Id ?? -1;
 
         public Message(EventType type) : this()
         {
@@ -26,22 +28,22 @@ namespace Mirror.SimpleWeb
             this.exception = exception;
         }
 
-        public Message(int connId, EventType type) : this()
+        public Message(IConnection conn, EventType type) : this()
         {
-            this.connId = connId;
+            this.conn = conn;
             this.type = type;
         }
 
-        public Message(int connId, ArrayBuffer data) : this()
+        public Message(IConnection conn, ArrayBuffer data) : this()
         {
-            this.connId = connId;
+            this.conn = conn;
             type = EventType.Data;
             this.data = data;
         }
 
-        public Message(int connId, Exception exception) : this()
+        public Message(IConnection conn, Exception exception) : this()
         {
-            this.connId = connId;
+            this.conn = conn;
             type = EventType.Error;
             this.exception = exception;
         }

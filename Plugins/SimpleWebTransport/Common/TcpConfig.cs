@@ -1,12 +1,15 @@
 using System.Net.Sockets;
+using UnityEngine;
 
-namespace Mirror.SimpleWeb
+namespace JamesFrowen.SimpleWeb
 {
     [System.Serializable]
     public struct TcpConfig
     {
         public readonly bool noDelay;
+        [Tooltip("in milliseconds, (0 means no timeout)")]
         public readonly int sendTimeout;
+        [Tooltip("in milliseconds, (0 means no timeout)")]
         public readonly int receiveTimeout;
 
         public TcpConfig(bool noDelay, int sendTimeout, int receiveTimeout)

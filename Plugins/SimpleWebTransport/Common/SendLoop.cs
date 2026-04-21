@@ -1,19 +1,22 @@
 using System;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Threading;
 using UnityEngine.Profiling;
 
-namespace Mirror.SimpleWeb
+namespace JamesFrowen.SimpleWeb
 {
     public static class SendLoopConfig
     {
         public static volatile bool batchSend = false;
         public static volatile bool sleepBeforeSend = false;
     }
-    internal static class SendLoop
+    static class SendLoop
     {
+        static readonly byte[] PongResponse = new byte[] { 0b1000_0000 | 10, 0 }; // FIN bit + PONG opcode, Length 0
+
         public struct Config
         {
             public readonly Connection conn;
@@ -48,6 +51,7 @@ namespace Mirror.SimpleWeb
             {
                 TcpClient client = conn.client;
                 Stream stream = conn.stream;
+                (ManualResetEventSlim sendPending, ConcurrentQueue<ArrayBuffer> sendQueue) = conn.GetSendQueue();
 
                 // null check in case disconnect while send thread is starting
                 if (client == null)
@@ -56,23 +60,28 @@ namespace Mirror.SimpleWeb
                 while (client.Connected)
                 {
                     // wait for message
-                    conn.sendPending.Wait();
+                    sendPending.Wait();
+
+                    if (conn.needsPong)
+                        SendPongResponse(conn);
+
                     // wait for 1ms for mirror to send other messages
                     if (SendLoopConfig.sleepBeforeSend)
+                    {
                         Thread.Sleep(1);
-
-                    conn.sendPending.Reset();
+                    }
+                    sendPending.Reset();
 
                     if (SendLoopConfig.batchSend)
                     {
                         int offset = 0;
-                        while (conn.sendQueue.TryDequeue(out ArrayBuffer msg))
+                        while (sendQueue.TryDequeue(out ArrayBuffer msg))
                         {
+                            using ArrayBuffer _ = msg; // auto release
                             // check if connected before sending message
                             if (!client.Connected)
                             {
-                                Log.Verbose("[SWT-SendLoop]: SendLoop {0} not connected", conn);
-                                msg.Release();
+                                Log.Info($"SendLoop {conn} not connected");
                                 return;
                             }
 
@@ -86,7 +95,6 @@ namespace Mirror.SimpleWeb
                             }
 
                             offset = SendMessage(writeBuffer, offset, msg, setMask, maskHelper);
-                            msg.Release();
                         }
 
                         // after no message in queue, send remaining messages
@@ -96,34 +104,43 @@ namespace Mirror.SimpleWeb
                     }
                     else
                     {
-                        while (conn.sendQueue.TryDequeue(out ArrayBuffer msg))
+                        while (sendQueue.TryDequeue(out ArrayBuffer msg))
                         {
+                            using ArrayBuffer _ = msg;
                             // check if connected before sending message
                             if (!client.Connected)
                             {
-                                Log.Verbose("[SWT-SendLoop]: SendLoop {0} not connected", conn);
-                                msg.Release();
+                                Log.Info($"SendLoop {conn} not connected");
                                 return;
                             }
 
                             int length = SendMessage(writeBuffer, 0, msg, setMask, maskHelper);
                             stream.Write(writeBuffer, 0, length);
-                            msg.Release();
                         }
                     }
                 }
 
-                Log.Verbose("[SWT-SendLoop]: {0} Not Connected", conn);
+                Log.Info($"{conn} Not Connected");
             }
             catch (ThreadInterruptedException e) { Log.InfoException(e); }
-            catch (ThreadAbortException) { Log.Error("[SWT-SendLoop]: Thread Abort Exception"); }
-            catch (Exception e) { Log.Exception(e); }
+            catch (ThreadAbortException e) { Log.InfoException(e); }
+            catch (Exception e)
+            {
+                Log.Exception(e);
+            }
             finally
             {
                 Profiler.EndThreadProfiling();
                 conn.Dispose();
                 maskHelper?.Dispose();
             }
+        }
+
+
+        static void SendPongResponse(Connection conn)
+        {
+            conn.stream.Write(PongResponse, 0, PongResponse.Length);
+            conn.needsPong = false;
         }
 
         /// <returns>new offset in buffer</returns>
@@ -137,11 +154,11 @@ namespace Mirror.SimpleWeb
                 offset = maskHelper.WriteMask(buffer, offset);
             }
 
-            msg.CopyTo(buffer, offset);
+            msg.CopyTo(buffer.AsSpan(offset));
             offset += msgLength;
 
             // dump before mask on
-            Log.DumpBuffer("[SWT-SendLoop]: Send", buffer, startOffset, offset);
+            Log.DumpBuffer("Send", buffer, startOffset, offset);
 
             if (setMask)
             {
@@ -190,7 +207,9 @@ namespace Mirror.SimpleWeb
             }
 
             if (setMask)
+            {
                 buffer[startOffset + 1] |= 0b1000_0000;
+            }
 
             return sendLength + startOffset;
         }

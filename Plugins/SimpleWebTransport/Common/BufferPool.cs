@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 using System.Threading;
 
-namespace Mirror.SimpleWeb
+namespace JamesFrowen.SimpleWeb
 {
     public interface IBufferOwner
     {
@@ -60,48 +59,49 @@ namespace Mirror.SimpleWeb
             Release();
         }
 
-        public void CopyTo(byte[] target, int offset)
-        {
-            if (count > (target.Length + offset))
-                throw new ArgumentException($"{nameof(count)} was greater than {nameof(target)}.length", nameof(target));
 
-            Buffer.BlockCopy(array, 0, target, offset, count);
+        /// <summary>Copies this buffer's valid data into a target span</summary>
+        public void CopyTo(Span<byte> target)
+        {
+            if (count > target.Length)
+                throw new ArgumentException($"Buffer count {count} is greater than target length {target.Length}");
+
+            // Use AsSpan() helper to get the slice of valid data
+            new ReadOnlySpan<byte>(array, 0, count).CopyTo(target);
         }
 
-        public void CopyFrom(ArraySegment<byte> segment)
+        /// <summary>Copies data from a source span into this buffer and updates count</summary>
+        public void CopyFrom(ReadOnlySpan<byte> source)
         {
-            CopyFrom(segment.Array, segment.Offset, segment.Count);
+            if (source.Length > array.Length)
+                throw new ArgumentException($"Source length {source.Length} is greater than buffer array length {array.Length}");
+
+            count = source.Length;
+            source.CopyTo(array);
         }
 
-        public void CopyFrom(byte[] source, int offset, int length)
-        {
-            if (length > array.Length)
-                throw new ArgumentException($"{nameof(length)} was greater than {nameof(array)}.length", nameof(length));
 
-            count = length;
-            Buffer.BlockCopy(source, offset, array, 0, length);
+        public Span<byte> ToSpan()
+        {
+            return new Span<byte>(array, 0, count);
         }
 
-        public void CopyFrom(IntPtr bufferPtr, int length)
+        public ArraySegment<byte> ToSegment()
         {
-            if (length > array.Length)
-                throw new ArgumentException($"{nameof(length)} was greater than {nameof(array)}.length", nameof(length));
-
-            count = length;
-            Marshal.Copy(bufferPtr, array, 0, length);
+            return new ArraySegment<byte>(array, 0, count);
         }
-
-        public ArraySegment<byte> ToSegment() => new ArraySegment<byte>(array, 0, count);
 
         [Conditional("UNITY_ASSERTIONS")]
         internal void Validate(int arraySize)
         {
             if (array.Length != arraySize)
-                Log.Error("[SWT-ArrayBuffer]: Buffer that was returned had an array of the wrong size");
+            {
+                Log.Error("Buffer that was returned had an array of the wrong size");
+            }
         }
     }
 
-    internal class BufferBucket : IBufferOwner
+    class BufferBucket : IBufferOwner
     {
         public readonly int arraySize;
         readonly ConcurrentQueue<ArrayBuffer> buffers;
@@ -121,10 +121,12 @@ namespace Mirror.SimpleWeb
         {
             IncrementCreated();
             if (buffers.TryDequeue(out ArrayBuffer buffer))
+            {
                 return buffer;
+            }
             else
             {
-                Log.Flood($"[SWT-BufferBucket]: BufferBucket({arraySize}) create new");
+                Log.Verbose($"BufferBucket({arraySize}) create new");
                 return new ArrayBuffer(this, arraySize);
             }
         }
@@ -140,14 +142,13 @@ namespace Mirror.SimpleWeb
         void IncrementCreated()
         {
             int next = Interlocked.Increment(ref _current);
-            Log.Flood($"[SWT-BufferBucket]: BufferBucket({arraySize}) count:{next}");
+            Log.Verbose($"BufferBucket({arraySize}) count:{next}");
         }
-
         [Conditional("DEBUG")]
         void DecrementCreated()
         {
             int next = Interlocked.Decrement(ref _current);
-            Log.Flood($"[SWT-BufferBucket]: BufferBucket({arraySize}) count:{next}");
+            Log.Verbose($"BufferBucket({arraySize}) count:{next}");
         }
     }
 
@@ -182,13 +183,17 @@ namespace Mirror.SimpleWeb
             if (smallest < 1) throw new ArgumentException("Smallest must be at least 1");
             if (largest < smallest) throw new ArgumentException("Largest must be greater than smallest");
 
+
             this.bucketCount = bucketCount;
             this.smallest = smallest;
             this.largest = largest;
 
+
             // split range over log scale (more buckets for smaller sizes)
+
             double minLog = Math.Log(this.smallest);
             double maxLog = Math.Log(this.largest);
+
             double range = maxLog - minLog;
             double each = range / (bucketCount - 1);
 
@@ -200,15 +205,16 @@ namespace Mirror.SimpleWeb
                 buckets[i] = new BufferBucket((int)Math.Ceiling(size));
             }
 
+
             Validate();
 
             // Example
-            // 5         count
+            // 5         count  
             // 20        smallest
             // 16400     largest
 
             // 3.0       log 20
-            // 9.7       log 16400
+            // 9.7       log 16400 
 
             // 6.7       range 9.7 - 3
             // 1.675     each  6.7 / (5-1)
@@ -226,24 +232,31 @@ namespace Mirror.SimpleWeb
         void Validate()
         {
             if (buckets[0].arraySize != smallest)
-                Log.Error("[SWT-BufferPool]: BufferPool Failed to create bucket for smallest. bucket:{0} smallest:{1}", buckets[0].arraySize, smallest);
+            {
+                Log.Error($"BufferPool Failed to create bucket for smallest. bucket:{buckets[0].arraySize} smallest{smallest}");
+            }
 
             int largestBucket = buckets[bucketCount - 1].arraySize;
             // rounded using Ceiling, so allowed to be 1 more that largest
             if (largestBucket != largest && largestBucket != largest + 1)
-                Log.Error("[SWT-BufferPool]: BufferPool Failed to create bucket for largest. bucket:{0} smallest:{1}", largestBucket, largest);
+            {
+                Log.Error($"BufferPool Failed to create bucket for largest. bucket:{largestBucket} smallest{largest}");
+            }
         }
 
         public ArrayBuffer Take(int size)
         {
-            if (size > largest)
-                throw new ArgumentException($"Size ({size}) is greater than largest ({largest})");
+            if (size > largest) { throw new ArgumentException($"Size ({size}) is greatest that largest ({largest})"); }
 
             for (int i = 0; i < bucketCount; i++)
+            {
                 if (size <= buckets[i].arraySize)
+                {
                     return buckets[i].Take();
+                }
+            }
 
-            throw new ArgumentException($"Size ({size}) is greater than largest ({largest})");
+            throw new ArgumentException($"Size ({size}) is greatest that largest ({largest})");
         }
     }
 }
