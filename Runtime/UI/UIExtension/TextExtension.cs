@@ -241,13 +241,14 @@ namespace F8Framework.Core
 
             if (_enableSoftOutline)
             {
+                Vector2 compensatedSoftOutlineDistance = _softOutlineDistance;
                 AppendSoftEffectCopies(
                     SharedVertices,
                     SharedBaseVertices,
                     0,
                     baseVertexCount,
                     Vector2.zero,
-                    _softOutlineDistance * bestFitScale,
+                    compensatedSoftOutlineDistance * bestFitScale,
                     _softOutlineColor,
                     _softOutlineSamples);
             }
@@ -255,10 +256,10 @@ namespace F8Framework.Core
             if (_enableOutline)
             {
                 Vector2 scaledOutlineDistance = _outlineDistance * bestFitScale;
-                AppendEffectCopies(SharedVertices, SharedBaseVertices, 0, baseVertexCount, new Vector2(scaledOutlineDistance.x, 0f), _outlineColor);
-                AppendEffectCopies(SharedVertices, SharedBaseVertices, 0, baseVertexCount, new Vector2(-scaledOutlineDistance.x, 0f), _outlineColor);
-                AppendEffectCopies(SharedVertices, SharedBaseVertices, 0, baseVertexCount, new Vector2(0f, scaledOutlineDistance.y), _outlineColor);
-                AppendEffectCopies(SharedVertices, SharedBaseVertices, 0, baseVertexCount, new Vector2(0f, -scaledOutlineDistance.y), _outlineColor);
+                AppendEffectCopies(SharedVertices, SharedBaseVertices, 0, baseVertexCount, new Vector2(scaledOutlineDistance.x, scaledOutlineDistance.y), _outlineColor);
+                AppendEffectCopies(SharedVertices, SharedBaseVertices, 0, baseVertexCount, new Vector2(scaledOutlineDistance.x, -scaledOutlineDistance.y), _outlineColor);
+                AppendEffectCopies(SharedVertices, SharedBaseVertices, 0, baseVertexCount, new Vector2(-scaledOutlineDistance.x, scaledOutlineDistance.y), _outlineColor);
+                AppendEffectCopies(SharedVertices, SharedBaseVertices, 0, baseVertexCount, new Vector2(-scaledOutlineDistance.x, -scaledOutlineDistance.y), _outlineColor);
             }
 
             SharedVertices.AddRange(SharedBaseVertices);
@@ -787,14 +788,12 @@ namespace F8Framework.Core
             int sampleCount)
         {
             int clampedSamples = Mathf.Max(1, sampleCount);
-            Color sampleColor = color;
-            sampleColor.a = Mathf.Clamp01(color.a / Mathf.Sqrt(clampedSamples));
 
             for (int sampleIndex = 0; sampleIndex < clampedSamples; sampleIndex++)
             {
                 float angle = Mathf.PI * 2f * sampleIndex / clampedSamples;
                 Vector2 radialOffset = new Vector2(Mathf.Cos(angle) * blurDistance.x, Mathf.Sin(angle) * blurDistance.y);
-                AppendEffectCopies(target, source, start, end, centerOffset + radialOffset, sampleColor);
+                AppendEffectCopies(target, source, start, end, centerOffset + radialOffset, color);
             }
         }
 
