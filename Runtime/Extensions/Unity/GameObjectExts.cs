@@ -16,11 +16,7 @@ namespace F8Framework.Core
         }
         public static void DestroyAllChilds(this GameObject @this)
         {
-            var childCount = @this.transform.childCount;
-            for (int i = 0; i < childCount; i++)
-            {
-                GameObject.Destroy(@this.transform.GetChild(i).gameObject);
-            }
+            @this.transform.ClearChild();
         }
         public static GameObject Active(this GameObject @this)
         {
@@ -55,202 +51,70 @@ namespace F8Framework.Core
         }
         public static T GetOrAddComponent<T>(this GameObject @this) where T : Component
         {
-            T component = @this.GetComponent<T>();
-            if (component == null)
-            {
-                component = @this.AddComponent<T>();
-            }
-            return component;
+            return @this.transform.GetOrAddComponent<T>();
         }
         public static Component GetOrAddComponent(this GameObject @this, Type type)
         {
-            Component component = @this.GetComponent(type);
-            if (component == null)
-            {
-                component = @this.AddComponent(type);
-            }
-            return component;
+            return @this.transform.GetOrAddComponent(type);
         }
         public static T GetComponentInParent<T>(this GameObject @this, string name)
 where T : Component
         {
-            var parent = @this.GetComponentsInParent<Transform>();
-            var length = parent.Length;
-            Transform parentTrans = null;
-            for (int i = 0; i < length; i++)
-            {
-                if (parent[i].name == name)
-                {
-                    parentTrans = parent[i];
-                    break;
-                }
-            }
-            if (parentTrans == null)
-                return null;
-            var comp = parentTrans.GetComponent<T>();
-            return comp;
+            return @this.transform.GetComponentInParent<T>(name);
         }
         public static T GetOrAddComponentInParent<T>(this GameObject @this, string name)
 where T : Component
         {
-            var parent = @this.GetComponentsInParent<Transform>();
-            var length = parent.Length;
-            Transform parentTrans = null;
-            for (int i = 0; i < length; i++)
-            {
-                if (parent[i].name == name)
-                {
-                    parentTrans = parent[i];
-                    break;
-                }
-            }
-            if (parentTrans == null)
-                return null;
-            var comp = parentTrans.GetComponent<T>();
-            if (comp == null)
-            {
-                comp = @this.gameObject.AddComponent<T>();
-            }
-            return comp;
+            return @this.transform.GetOrAddComponentInParent<T>(name);
         }
         public static T GetComponentInChildren<T>(this GameObject @this, string name)
             where T : Component
         {
-            var childs = @this.GetComponentsInChildren<Transform>();
-            var length = childs.Length;
-            Transform childTrans = null;
-            for (int i = 0; i < length; i++)
-            {
-                if (childs[i].name == name)
-                {
-                    childTrans = childs[i];
-                    break;
-                }
-            }
-            if (childTrans == null)
-                return null;
-            var comp = childTrans.GetComponent<T>();
-            return comp;
+            return @this.transform.GetComponentInChildren<T>(name);
         }
         public static T GetOrAddComponentInChildren<T>(this GameObject @this, string name)
     where T : Component
         {
-            var childs = @this.GetComponentsInChildren<Transform>();
-            var length = childs.Length;
-            Transform childTrans = null;
-            for (int i = 0; i < length; i++)
-            {
-                if (childs[i].name == name)
-                {
-                    childTrans = childs[i];
-                    break;
-                }
-            }
-            if (childTrans == null)
-                return null;
-            var comp = childTrans.GetComponent<T>();
-            if (comp == null)
-                comp = childTrans.gameObject.AddComponent<T>();
-            return comp;
+            return @this.transform.GetOrAddComponentInChildren<T>(name);
         }
         public static T GetComponentInPeer<T>(this GameObject @this, string name)
 where T : Component
         {
-            Transform tran = @this.transform.parent.Find(name);
-            if (tran != null)
-            {
-                return tran.GetComponent<T>();
-            }
-            return null;
+            return @this.transform.GetComponentInPeer<T>(name);
         }
         public static T GetOrAddComponentInPeer<T>(this GameObject @this, string name)
 where T : Component
         {
-            Transform tran = @this.transform.parent.Find(name);
-            if (tran != null)
-            {
-                var comp = tran.GetComponent<T>();
-                if (comp == null)
-                    @this.gameObject.AddComponent<T>();
-                return comp;
-            }
-            return null;
+            return @this.transform.GetOrAddComponentInPeer<T>(name);
         }
         public static T[] GetComponentsInPeer<T>(this GameObject @this, bool includeSrc = false)
 where T : Component
         {
-            Transform parentTrans = @this.transform.parent;
-            var childTrans = parentTrans.GetComponentsInChildren<Transform>();
-            var length = childTrans.Length;
-            Transform[] trans;
-            if (!includeSrc)
-                trans = Util.Algorithm.FindAll(childTrans, t => t.parent == parentTrans);
-            else
-                trans = Util.Algorithm.FindAll(childTrans, t => t.parent == parentTrans && t != @this);
-            var transLength = trans.Length;
-            T[] src = new T[transLength];
-            int idx = 0;
-            for (int i = 0; i < transLength; i++)
-            {
-                var comp = trans[i].GetComponent<T>();
-                if (comp != null)
-                {
-                    src[idx] = comp;
-                    idx++;
-                }
-            }
-            T[] dst = new T[idx];
-            Array.Copy(src, 0, dst, 0, idx);
-            return dst;
+            return @this.transform.GetComponentsInPeer<T>(includeSrc);
         }
         public static GameObject TryRemoveComponent<T>(this GameObject @this) where T : Component
         {
-            var t = @this.GetComponent<T>();
-
-            if (t != null)
-            {
-                Object.Destroy(t);
-            }
+            @this.transform.TryRemoveComponent<T>();
             return @this;
         }
         public static GameObject TryRemoveComponent(this GameObject @this, Type type)
         {
-            var t = @this.GetComponent(type);
-
-            if (t != null)
-            {
-                Object.Destroy(t);
-            }
+            @this.transform.TryRemoveComponent(type);
             return @this;
         }
         public static GameObject TryRemoveComponent(this GameObject @this, string type)
         {
-            var t = @this.GetComponent(type);
-
-            if (t != null)
-            {
-                Object.Destroy(t);
-            }
+            @this.transform.TryRemoveComponent(type);
             return @this;
         }
         public static GameObject TryRemoveComponents<T>(this GameObject @this) where T : Component
         {
-            var t = @this.GetComponents<T>();
-
-            for (var i = 0; i < t.Length; i++)
-            {
-                Object.Destroy(t[i]);
-            }
+            @this.transform.TryRemoveComponents<T>();
             return @this;
         }
         public static GameObject TryRemoveComponents<T>(this GameObject @this, Type type)
         {
-            var t = @this.GetComponents(type);
-
-            for (var i = 0; i < t.Length; i++)
-            {
-                Object.Destroy(t[i]);
-            }
+            @this.transform.TryRemoveComponents<T>(type);
             return @this;
         }
         public static GameObject SetLayer(this GameObject @this, int layer)

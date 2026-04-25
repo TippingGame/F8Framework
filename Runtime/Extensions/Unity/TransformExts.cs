@@ -142,13 +142,7 @@ namespace F8Framework.Core
         }
         public static void DeleteChildrens(this Transform @this)
         {
-            var childCount = @this.childCount;
-            if (childCount == 0)
-                return;
-            for (int i = 0; i < childCount; i++)
-            {
-                GameObject.Destroy(@this.GetChild(i).gameObject);
-            }
+            ClearChild(@this);
         }
         /// <summary>
         /// 查找所有符合名称的子节点
@@ -193,8 +187,9 @@ namespace F8Framework.Core
         public static Transform[] FindPeers(this Transform @this, bool includeSrc = false)
         {
             Transform parentTrans = @this.parent;
+            if (parentTrans == null)
+                return includeSrc ? new[] { @this } : Array.Empty<Transform>();
             var childTrans = parentTrans.GetComponentsInChildren<Transform>();
-            var length = childTrans.Length;
             if (!includeSrc)
                 return Util.Algorithm.FindAll(childTrans, t => t.parent == parentTrans && t != @this);
             else
@@ -202,10 +197,10 @@ namespace F8Framework.Core
         }
         public static Transform FindPeer(this Transform @this, string name)
         {
-            Transform tran = @this.parent.Find(name);
-            if (tran == null)
+            Transform parent = @this.parent;
+            if (parent == null)
                 return null;
-            return tran;
+            return parent.Find(name);
         }
         public static Transform FindParent(this Transform @this, string name)
         {
@@ -244,14 +239,7 @@ namespace F8Framework.Core
         /// <returns>同级别对象数组</returns>
         public static T[] PeerComponets<T>(this Transform @this, bool includeSrc = false) where T : Component
         {
-            Transform parentTrans = @this.parent;
-            var childTrans = parentTrans.GetComponentsInChildren<Transform>();
-            var length = childTrans.Length;
-            Transform[] trans;
-            if (!includeSrc)
-                trans = Util.Algorithm.FindAll(childTrans, t => t.parent == parentTrans);
-            else
-                trans = Util.Algorithm.FindAll(childTrans, t => t.parent == parentTrans && t != @this);
+            Transform[] trans = FindPeers(@this, includeSrc);
             var transLength = trans.Length;
             T[] src = new T[transLength];
             int idx = 0;
@@ -270,11 +258,7 @@ namespace F8Framework.Core
         }
         public static void DestroyAllChilds(this Transform @this)
         {
-            var childCount = @this.childCount;
-            for (int i = 0; i < childCount; i++)
-            {
-                GameObject.Destroy(@this.GetChild(i).gameObject);
-            }
+            ClearChild(@this);
         }
         public static void ResetWorldTransform(this Transform @this)
         {

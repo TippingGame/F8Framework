@@ -784,30 +784,32 @@ namespace F8Framework.Core.Editor
             GUILayout.Space(10);
             
             bool enableFullPathAssetLoading = F8EditorPrefs.GetBool(EnableFullPathAssetLoadingKey, false);
-            _enableFullPathAssetLoading = EditorGUILayout.Toggle("启用完整资源路径加载", enableFullPathAssetLoading);
+            GUILayout.BeginHorizontal();
+            _enableFullPathAssetLoading = EditorGUILayout.Toggle("启用完整资源路径加载", enableFullPathAssetLoading, GUILayout.Width(180));
+            if (_enableFullPathAssetLoading)
+            {
+                EditorGUILayout.LabelField("※ 如：AssetBundles/UI/UIPanel，Resources/UI/UIPanel", EditorStyles.miniLabel);
+            }
+            GUILayout.EndHorizontal();
             if (enableFullPathAssetLoading != _enableFullPathAssetLoading)
             {
                 F8EditorPrefs.SetBool(EnableFullPathAssetLoadingKey, _enableFullPathAssetLoading);
-            }
-
-            if (enableFullPathAssetLoading)
-            {
-                EditorGUILayout.LabelField("※ 如：AssetBundles/UI/UIPanel，Resources/UI/UIPanel，勾选后将增加AssetBundleMap.json和ResourceMap.json文件体积", EditorStyles.miniLabel);
             }
             
             GUILayout.Space(10);
             
             bool enableFullPathExtensionAssetLoading = F8EditorPrefs.GetBool(EnableFullPathExtensionAssetLoadingKey, false);
-            _enableFullPathExtensionAssetLoading = EditorGUILayout.Toggle("启用完整资源路径带扩展名", enableFullPathExtensionAssetLoading);
+            GUILayout.BeginHorizontal();
+            _enableFullPathExtensionAssetLoading = EditorGUILayout.Toggle("启用完整资源路径带扩展名", enableFullPathExtensionAssetLoading, GUILayout.Width(180));
+            if (_enableFullPathExtensionAssetLoading)
+            {
+                EditorGUILayout.LabelField("※ 如：AssetBundles/UI/UIPanel.prefab，Resources/UI/UIPanel.prefab", EditorStyles.miniLabel);
+            }
+            GUILayout.EndHorizontal();
 
             if (enableFullPathExtensionAssetLoading != _enableFullPathExtensionAssetLoading)
             {
                 F8EditorPrefs.SetBool(EnableFullPathExtensionAssetLoadingKey, _enableFullPathExtensionAssetLoading);
-            }
-
-            if (enableFullPathExtensionAssetLoading)
-            {
-                EditorGUILayout.LabelField("※ 如：AssetBundles/UI/UIPanel.prefab，Resources/UI/UIPanel.prefab，勾选后将增加AssetBundleMap.json和ResourceMap.json文件体积", EditorStyles.miniLabel);
             }
             
             GUILayout.Space(10);

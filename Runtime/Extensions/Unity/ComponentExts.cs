@@ -27,78 +27,36 @@ namespace F8Framework.Core
         public static T GetComponentInParent<T>(this Component @this, string name)
 where T : Component
         {
-            var parent = @this.GetComponentsInParent<Transform>();
-            var length = parent.Length;
-            Transform parentTrans = null;
-            for (int i = 0; i < length; i++)
-            {
-                if (parent[i].name == name)
-                {
-                    parentTrans = parent[i];
-                    break;
-                }
-            }
+            Transform parentTrans = @this.transform.FindParent(name);
             if (parentTrans == null)
                 return null;
-            var comp = parentTrans.GetComponent<T>();
-            return comp;
+            return parentTrans.GetComponent<T>();
         }
         public static T GetOrAddComponentInParent<T>(this Component @this, string name)
 where T : Component
         {
-            var parent = @this.GetComponentsInParent<Transform>();
-            var length = parent.Length;
-            Transform parentTrans = null;
-            for (int i = 0; i < length; i++)
-            {
-                if (parent[i].name == name)
-                {
-                    parentTrans = parent[i];
-                    break;
-                }
-            }
+            Transform parentTrans = @this.transform.FindParent(name);
             if (parentTrans == null)
                 return null;
             var comp = parentTrans.GetComponent<T>();
             if (comp == null)
             {
-                comp = @this.gameObject.AddComponent<T>();
+                comp = parentTrans.gameObject.AddComponent<T>();
             }
             return comp;
         }
         public static T GetComponentInChildren<T>(this Component @this, string name)
             where T : Component
         {
-            var childs = @this.GetComponentsInChildren<Transform>();
-            var length = childs.Length;
-            Transform childTrans = null;
-            for (int i = 0; i < length; i++)
-            {
-                if (childs[i].name == name)
-                {
-                    childTrans = childs[i];
-                    break;
-                }
-            }
+            Transform childTrans = @this.transform.FindChildren(name);
             if (childTrans == null)
                 return null;
-            var comp = childTrans.GetComponent<T>();
-            return comp;
+            return childTrans.GetComponent<T>();
         }
         public static T GetOrAddComponentInChildren<T>(this Component @this, string name)
     where T : Component
         {
-            var childs = @this.GetComponentsInChildren<Transform>();
-            var length = childs.Length;
-            Transform childTrans = null;
-            for (int i = 0; i < length; i++)
-            {
-                if (childs[i].name == name)
-                {
-                    childTrans = childs[i];
-                    break;
-                }
-            }
+            Transform childTrans = @this.transform.FindChildren(name);
             if (childTrans == null)
                 return null;
             var comp = childTrans.GetComponent<T>();
@@ -109,37 +67,24 @@ where T : Component
         public static T GetComponentInPeer<T>(this Component @this, string name)
 where T : Component
         {
-            Transform tran = @this.transform.parent.Find(name);
-            if (tran != null)
-            {
-                return tran.GetComponent<T>();
-            }
-            return null;
+            Transform tran = @this.transform.FindPeer(name);
+            return tran == null ? null : tran.GetComponent<T>();
         }
         public static T GetOrAddComponentInPeer<T>(this Component @this, string name)
 where T : Component
         {
-            Transform tran = @this.transform.parent.Find(name);
-            if (tran != null)
-            {
-                var comp = tran.GetComponent<T>();
-                if (comp == null)
-                    @this.gameObject.AddComponent<T>();
-                return comp;
-            }
-            return null;
+            Transform tran = @this.transform.FindPeer(name);
+            if (tran == null)
+                return null;
+            var comp = tran.GetComponent<T>();
+            if (comp == null)
+                comp = tran.gameObject.AddComponent<T>();
+            return comp;
         }
         public static T[] GetComponentsInPeer<T>(this Component @this, bool includeSrc = false)
 where T : Component
         {
-            Transform parentTrans = @this.transform.parent;
-            var childTrans = parentTrans.GetComponentsInChildren<Transform>();
-            var length = childTrans.Length;
-            Transform[] trans;
-            if (!includeSrc)
-                trans = Util.Algorithm.FindAll(childTrans, t => t.parent == parentTrans);
-            else
-                trans = Util.Algorithm.FindAll(childTrans, t => t.parent == parentTrans && t != @this);
+            Transform[] trans = @this.transform.FindPeers(includeSrc);
             var transLength = trans.Length;
             T[] src = new T[transLength];
             int idx = 0;

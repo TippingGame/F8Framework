@@ -30,42 +30,9 @@ namespace F8Framework.Core
         /// </summary>
         public static Texture2D ScaleTextureBilinear(this Texture2D @this, float scaleFactor)
         {
-            Texture2D newTexture = new Texture2D(Mathf.CeilToInt(@this.width * scaleFactor), Mathf.CeilToInt(@this.height * scaleFactor));
-            float scale = 1.0f / scaleFactor;
-            int maxX = @this.width - 1;
-            int maxY = @this.height - 1;
-            for (int y = 0; y < newTexture.height; y++)
-            {
-                for (int x = 0; x < newTexture.width; x++)
-                {
-                    float targetX = x * scale;
-                    float targetY = y * scale;
-                    int x1 = Mathf.Min(maxX, Mathf.FloorToInt(targetX));
-                    int y1 = Mathf.Min(maxY, Mathf.FloorToInt(targetY));
-                    int x2 = Mathf.Min(maxX, x1 + 1);
-                    int y2 = Mathf.Min(maxY, y1 + 1);
-
-                    float u = targetX - x1;
-                    float v = targetY - y1;
-                    float w1 = (1 - u) * (1 - v);
-                    float w2 = u * (1 - v);
-                    float w3 = (1 - u) * v;
-                    float w4 = u * v;
-                    Color color1 = @this.GetPixel(x1, y1);
-                    Color color2 = @this.GetPixel(x2, y1);
-                    Color color3 = @this.GetPixel(x1, y2);
-                    Color color4 = @this.GetPixel(x2, y2);
-                    Color color = new Color(Mathf.Clamp01(color1.r * w1 + color2.r * w2 + color3.r * w3 + color4.r * w4),
-                        Mathf.Clamp01(color1.g * w1 + color2.g * w2 + color3.g * w3 + color4.g * w4),
-                        Mathf.Clamp01(color1.b * w1 + color2.b * w2 + color3.b * w3 + color4.b * w4),
-                        Mathf.Clamp01(color1.a * w1 + color2.a * w2 + color3.a * w3 + color4.a * w4)
-                    );
-                    newTexture.SetPixel(x, y, color);
-
-                }
-            }
-            newTexture.Apply();
-            return newTexture;
+            return ResizeTextureBilinear(@this,
+                Mathf.CeilToInt(@this.width * scaleFactor),
+                Mathf.CeilToInt(@this.height * scaleFactor));
         }
 
         /// <summary> 
@@ -73,11 +40,15 @@ namespace F8Framework.Core
         /// </summary>
         public static Texture2D SizeTextureBilinear(this Texture2D @this, Vector2 size)
         {
-            Texture2D newTexture = new Texture2D(Mathf.CeilToInt(size.x), Mathf.CeilToInt(size.y));
-            float scaleX = @this.width / size.x;
-            float scaleY = @this.height / size.y;
-            int maxX = @this.width - 1;
-            int maxY = @this.height - 1;
+            return ResizeTextureBilinear(@this, Mathf.CeilToInt(size.x), Mathf.CeilToInt(size.y));
+        }
+        static Texture2D ResizeTextureBilinear(Texture2D texture, int targetWidth, int targetHeight)
+        {
+            Texture2D newTexture = new Texture2D(targetWidth, targetHeight);
+            float scaleX = texture.width / (float)targetWidth;
+            float scaleY = texture.height / (float)targetHeight;
+            int maxX = texture.width - 1;
+            int maxY = texture.height - 1;
             for (int y = 0; y < newTexture.height; y++)
             {
                 for (int x = 0; x < newTexture.width; x++)
@@ -95,17 +66,17 @@ namespace F8Framework.Core
                     float w2 = u * (1 - v);
                     float w3 = (1 - u) * v;
                     float w4 = u * v;
-                    Color color1 = @this.GetPixel(x1, y1);
-                    Color color2 = @this.GetPixel(x2, y1);
-                    Color color3 = @this.GetPixel(x1, y2);
-                    Color color4 = @this.GetPixel(x2, y2);
-                    Color color = new Color(Mathf.Clamp01(color1.r * w1 + color2.r * w2 + color3.r * w3 + color4.r * w4),
+                    Color color1 = texture.GetPixel(x1, y1);
+                    Color color2 = texture.GetPixel(x2, y1);
+                    Color color3 = texture.GetPixel(x1, y2);
+                    Color color4 = texture.GetPixel(x2, y2);
+                    Color color = new Color(
+                        Mathf.Clamp01(color1.r * w1 + color2.r * w2 + color3.r * w3 + color4.r * w4),
                         Mathf.Clamp01(color1.g * w1 + color2.g * w2 + color3.g * w3 + color4.g * w4),
                         Mathf.Clamp01(color1.b * w1 + color2.b * w2 + color3.b * w3 + color4.b * w4),
                         Mathf.Clamp01(color1.a * w1 + color2.a * w2 + color3.a * w3 + color4.a * w4)
                     );
                     newTexture.SetPixel(x, y, color);
-
                 }
             }
             newTexture.Apply();

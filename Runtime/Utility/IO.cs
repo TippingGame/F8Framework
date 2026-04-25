@@ -32,7 +32,7 @@ namespace F8Framework.Core
             /// <returns>文件地址</returns>
             public static string[] GetAllFiles(string path)
             {
-                return Directory.GetFiles(path, ".", SearchOption.AllDirectories);
+                return Directory.GetFiles(path, "*", SearchOption.AllDirectories);
             }
 
             /// <summary>
@@ -252,7 +252,7 @@ namespace F8Framework.Core
             {
                 if (File.Exists(sourceFileName))
                 {
-                    var fileName = Path.GetDirectoryName(sourceFileName);
+                    var fileName = Path.GetFileName(sourceFileName);
                     if (!Directory.Exists(folderPath))
                     {
                         Directory.CreateDirectory(folderPath);
@@ -794,7 +794,7 @@ namespace F8Framework.Core
             /// </summary>
             /// <param name="path">路径</param>
             /// <returns>文件夹大小</returns>
-            public static long GetDirectorySize(string path, string searchPattern = ".")
+            public static long GetDirectorySize(string path, string searchPattern = "*")
             {
                 if (!Directory.Exists(path))
                     return 0;

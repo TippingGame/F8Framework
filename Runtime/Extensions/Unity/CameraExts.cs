@@ -41,21 +41,15 @@ namespace F8Framework.Core
         /// <returns>相机抓取的屏幕Texture2D</returns>
         public static Sprite CameraScreenshotAsSpriteRGBA(this Camera @this)
         {
-            var texture2D = CameraScreenshotAsTextureRGBA(@this);
-            var sprite = Sprite.Create(texture2D, new Rect(0, 0, texture2D.width, texture2D.height), Vector2.zero);
-            return sprite;
+            return CameraScreenshotAsTextureRGBA(@this).ConvertToSprite();
         }
         public static Sprite CameraScreenshotAsSpriteRGB(this Camera @this)
         {
-            var texture2D = CameraScreenshotAsTextureRGB(@this);
-            var sprite = Sprite.Create(texture2D, new Rect(0, 0, texture2D.width, texture2D.height), Vector2.zero);
-            return sprite;
+            return CameraScreenshotAsTextureRGB(@this).ConvertToSprite();
         }
         public static Sprite CameraScreenshotAsSprite(this Camera @this, TextureFormat textureFormat)
         {
-            var texture2D = CameraScreenshotAsTexture(@this, textureFormat);
-            var sprite = Sprite.Create(texture2D, new Rect(0, 0, texture2D.width, texture2D.height), Vector2.zero);
-            return sprite;
+            return CameraScreenshotAsTexture(@this, textureFormat).ConvertToSprite();
         }
     }
 }
