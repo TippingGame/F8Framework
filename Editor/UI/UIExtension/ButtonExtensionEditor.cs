@@ -1,8 +1,6 @@
-using F8Framework.Core;
 using UnityEditor;
-using UnityEngine;
 
-namespace F8Framework.Editor
+namespace F8Framework.Core.Editor
 {
     [CustomEditor(typeof(ButtonExtension))]
     public sealed class ButtonExtensionEditor : UnityEditor.Editor
