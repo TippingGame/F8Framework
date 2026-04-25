@@ -2,6 +2,7 @@
 
 namespace F8Framework.Core
 {
+	[AddComponentMenu("F8Framework/Local/AudioLocalizer")]
 	public class AudioLocalizer : LocalizerBase
 	{
 		public string localizedTextID = "";

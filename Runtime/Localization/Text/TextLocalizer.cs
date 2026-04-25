@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 namespace F8Framework.Core
 {
+	[AddComponentMenu("F8Framework/Local/TextLocalizer")]
 	public class TextLocalizer : LocalizerBase
 	{
 		public string textId;

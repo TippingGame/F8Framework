@@ -86,6 +86,39 @@ namespace F8Framework.Core.Editor
 
         public static string BuildPath => URLSetting.AddRootPath(F8EditorPrefs.GetString(_prefBuildPathKey, null)) ?? _buildPath;
         public static string ToVersion => F8EditorPrefs.GetString(_toVersionKey, null) ?? _toVersion;
+
+        private static string ChangeVersionLastNumber(string version, int delta, int minValue)
+        {
+            if (string.IsNullOrEmpty(version))
+            {
+                return version;
+            }
+
+            string[] versionParts = version.Split('.');
+            if (versionParts.Length == 0)
+            {
+                return version;
+            }
+
+            string lastPart = versionParts[versionParts.Length - 1];
+            if (!int.TryParse(lastPart, out int lastNumber))
+            {
+                return version;
+            }
+
+            versionParts[versionParts.Length - 1] = Mathf.Max(minValue, lastNumber + delta).ToString();
+            return string.Join(".", versionParts);
+        }
+
+        private static string ChangeBuildCount(string buildCount, int delta, int minValue)
+        {
+            if (!int.TryParse(buildCount, out int count))
+            {
+                return buildCount;
+            }
+
+            return Mathf.Max(minValue, count + delta).ToString();
+        }
         
         // Jenkins打包专用
         public static void JenkinsBuild()
@@ -647,25 +680,31 @@ namespace F8Framework.Core.Editor
             GUI.SetNextControlName(_toVersionKey);
             _toVersion = EditorGUILayout.TextField(toVersionValue);
             F8EditorPrefs.SetString(_toVersionKey, _toVersion);
-            
+
+            if (GUILayout.Button("-1", GUILayout.Width(40)))
+            {
+                string newVersion = ChangeVersionLastNumber(_toVersion, -1, 0);
+                if (newVersion != _toVersion)
+                {
+                    _toVersion = newVersion;
+                    F8EditorPrefs.SetString(_toVersionKey, _toVersion);
+                    if (focusedControlName == _toVersionKey)
+                    {
+                        GUI.FocusControl(null);
+                    }
+                }
+            }
+
             if (GUILayout.Button("+1", GUILayout.Width(40)))
             {
-                if (!string.IsNullOrEmpty(_toVersion))
+                string newVersion = ChangeVersionLastNumber(_toVersion, 1, 0);
+                if (newVersion != _toVersion)
                 {
-                    string[] versionParts = _toVersion.Split('.');
-                    if (versionParts.Length > 0)
+                    _toVersion = newVersion;
+                    F8EditorPrefs.SetString(_toVersionKey, _toVersion);
+                    if (focusedControlName == _toVersionKey)
                     {
-                        string lastPart = versionParts[versionParts.Length - 1];
-                        if (int.TryParse(lastPart, out int lastNumber))
-                        {
-                            versionParts[versionParts.Length - 1] = (lastNumber + 1).ToString();
-                            _toVersion = string.Join(".", versionParts);
-                            F8EditorPrefs.SetString(_toVersionKey, _toVersion);
-                            if (focusedControlName == _toVersionKey)
-                            {
-                                GUI.FocusControl(null);
-                            }
-                        }
+                        GUI.FocusControl(null);
                     }
                 }
             }
@@ -685,11 +724,26 @@ namespace F8Framework.Core.Editor
             _codeVersion = EditorGUILayout.TextField(codeVersionValue);
             F8EditorPrefs.SetString(_codeVersionKey, _codeVersion);
 
+            if (GUILayout.Button("-1", GUILayout.Width(40)))
+            {
+                string newCodeVersion = ChangeBuildCount(_codeVersion, -1, 1);
+                if (newCodeVersion != _codeVersion)
+                {
+                    _codeVersion = newCodeVersion;
+                    F8EditorPrefs.SetString(_codeVersionKey, _codeVersion);
+                    if (focusedControlName == _codeVersionKey)
+                    {
+                        GUI.FocusControl(null);
+                    }
+                }
+            }
+
             if (GUILayout.Button("+1", GUILayout.Width(40)))
             {
-                if (int.TryParse(_codeVersion, out int codeVersion))
+                string newCodeVersion = ChangeBuildCount(_codeVersion, 1, 1);
+                if (newCodeVersion != _codeVersion)
                 {
-                    _codeVersion = (codeVersion + 1).ToString();
+                    _codeVersion = newCodeVersion;
                     F8EditorPrefs.SetString(_codeVersionKey, _codeVersion);
                     if (focusedControlName == _codeVersionKey)
                     {
@@ -840,15 +894,13 @@ namespace F8Framework.Core.Editor
             
             GUILayout.Space(10);
             GUILayout.BeginHorizontal();
-            GUILayout.Label("AssetBundle 偏移加密（Offset）  [1-254]", GUILayout.Width(360));
-            GUILayout.EndHorizontal();
-            GUILayout.BeginHorizontal();
+            GUILayout.Label("AssetBundle 偏移加密（Offset）[1-254]：", GUILayout.Width(240));
             int assetBundleOffset = F8GamePrefs.GetInt(nameof(F8GameConfig.AssetBundleOffset), 0);
             if (assetBundleOffset == 0)
             {
                 assetBundleOffset = _assetBundleOffset;
             }
-            string inputOffset = EditorGUILayout.TextField(assetBundleOffset.ToString());
+            string inputOffset = EditorGUILayout.TextField(assetBundleOffset.ToString(), GUILayout.MinWidth(120));
             if (int.TryParse(inputOffset, out int parsedValueOffset))
             {
                 _assetBundleOffset = Mathf.Clamp(parsedValueOffset, 0, 254);
@@ -862,15 +914,13 @@ namespace F8Framework.Core.Editor
             GUILayout.Space(5);
             
             GUILayout.BeginHorizontal();
-            GUILayout.Label("AssetBundle 异或加密（XOR）    [1-254]", GUILayout.Width(360));
-            GUILayout.EndHorizontal();
-            GUILayout.BeginHorizontal();
+            GUILayout.Label("AssetBundle 异或加密（XOR）   [1-254]：", GUILayout.Width(240));
             int assetBundleXorKey = F8GamePrefs.GetInt(nameof(F8GameConfig.AssetBundleXorKey), 0);
             if (assetBundleXorKey == 0)
             {
                 assetBundleXorKey = _assetBundleXorKey;
             }
-            string inputXorKey = EditorGUILayout.TextField(assetBundleXorKey.ToString());
+            string inputXorKey = EditorGUILayout.TextField(assetBundleXorKey.ToString(), GUILayout.MinWidth(120));
             if (int.TryParse(inputXorKey, out int parsedValueXorKey))
             {
                 _assetBundleXorKey = Mathf.Clamp(parsedValueXorKey, 0, 254);
@@ -895,7 +945,9 @@ namespace F8Framework.Core.Editor
             GUILayout.Space(10);
             
             GUILayout.BeginHorizontal();
-            GUILayout.Label("资产远程地址/游戏远程版本 例：http://127.0.0.1:6789/", GUILayout.Width(360));
+            GUILayout.Label("资产远程地址/游戏远程版本，如：", GUILayout.Width(190));
+            EditorGUILayout.SelectableLabel("http://127.0.0.1:6789/", EditorStyles.textField,
+                GUILayout.Height(EditorGUIUtility.singleLineHeight), GUILayout.MinWidth(180));
             GUILayout.EndHorizontal();
             
             GUILayout.BeginHorizontal();

@@ -3,6 +3,7 @@ using UnityEngine.UI;
 
 namespace F8Framework.Core
 {
+	[AddComponentMenu("F8Framework/Local/ImageLocalizer")]
 	public class ImageLocalizer : LocalizerBase
 	{
 		public string localizedTextID = "";

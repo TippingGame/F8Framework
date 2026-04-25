@@ -6,6 +6,7 @@ using TMPro;
 
 namespace F8Framework.Core
 {
+	[AddComponentMenu("F8Framework/Local/FontLocalizer")]
 	public class FontLocalizer : LocalizerBase
 	{
 		public string localizedTextID = "";
