@@ -215,4 +215,10 @@ public class UIMain : BaseView
 * Tab标签页  
 ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_20240302173507.png)
 ----------------------------------
-
+4. UI组件拓展：
+* 文本拓展：TextExtension  
+![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_1777171392870.png)
+----------------------------------
+* 按钮拓展：ButtonExtension  
+![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_1777171368722.png)
+----------------------------------

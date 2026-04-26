@@ -59,6 +59,8 @@ namespace F8Framework.Core.Editor
         private SerializedProperty _enableSubmitLongPress;
         private SerializedProperty _enableSubmitDoubleClick;
 
+        private SerializedProperty _onHoverEnter;
+        private SerializedProperty _onHoverExit;
         private SerializedProperty _onSelect;
         private SerializedProperty _onDeselect;
 
@@ -118,6 +120,8 @@ namespace F8Framework.Core.Editor
             _enableSubmitLongPress = serializedObject.FindProperty("_enableSubmitLongPress");
             _enableSubmitDoubleClick = serializedObject.FindProperty("_enableSubmitDoubleClick");
 
+            _onHoverEnter = serializedObject.FindProperty("_onHoverEnter");
+            _onHoverExit = serializedObject.FindProperty("_onHoverExit");
             _onSelect = serializedObject.FindProperty("_onSelect");
             _onDeselect = serializedObject.FindProperty("_onDeselect");
         }
@@ -137,6 +141,7 @@ namespace F8Framework.Core.Editor
             DrawSection("Double Click（双击）", DrawDoubleClick);
             DrawSection("Long Press（长按）", DrawLongPress);
             DrawSection("Submit Input（键盘手柄输入）", DrawSubmitInput);
+            DrawSection("Hover Events（悬停事件）", DrawHoverEvents);
             DrawSection("Selection Events（选中事件）", DrawSelectionEvents);
 
             serializedObject.ApplyModifiedProperties();
@@ -281,6 +286,12 @@ namespace F8Framework.Core.Editor
             {
                 EditorGUILayout.PropertyField(_enableSubmitDoubleClick);
             }
+        }
+
+        private void DrawHoverEvents()
+        {
+            EditorGUILayout.PropertyField(_onHoverEnter);
+            EditorGUILayout.PropertyField(_onHoverExit);
         }
 
         private void DrawSelectionEvents()

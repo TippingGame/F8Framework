@@ -233,4 +233,10 @@ public class UIMain : BaseView
 * Tab System  
   ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_20240302173507.png)
 ----------------------------------
-
+4. UI Component Expansion:
+* TextExtension:  
+  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_1777171392870.png)
+----------------------------------
+* ButtonExtension:  
+  ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/UI/ui_1777171368722.png)
+----------------------------------

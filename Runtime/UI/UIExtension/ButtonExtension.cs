@@ -72,6 +72,8 @@ namespace F8Framework.Core
         [SerializeField] private bool _enableSubmitLongPress = true;
         [SerializeField] private bool _enableSubmitDoubleClick = true;
         
+        [SerializeField] private ButtonEvent _onHoverEnter = new ButtonEvent();
+        [SerializeField] private ButtonEvent _onHoverExit = new ButtonEvent();
         [SerializeField] private ButtonEvent _onSelect = new ButtonEvent();
         [SerializeField] private ButtonEvent _onDeselect = new ButtonEvent();
 
@@ -95,6 +97,8 @@ namespace F8Framework.Core
 
         public ButtonEvent OnDoubleClick => _onDoubleClick;
         public ButtonEvent OnLongPress => _onLongPress;
+        public ButtonEvent OnHoverEnterEvent => _onHoverEnter;
+        public ButtonEvent OnHoverExitEvent => _onHoverExit;
         public ButtonEvent OnSelectEvent => _onSelect;
         public ButtonEvent OnDeselectEvent => _onDeselect;
 
@@ -227,6 +231,7 @@ namespace F8Framework.Core
             }
 
             _isHovering = true;
+            _onHoverEnter.Invoke();
             PlayHoverFeedback();
         }
 
@@ -267,6 +272,7 @@ namespace F8Framework.Core
 
             if (wasHovering)
             {
+                _onHoverExit.Invoke();
                 PlayHoverExitFeedback();
             }
         }
