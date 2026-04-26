@@ -10,7 +10,7 @@ namespace F8Framework.Core
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Button))]
     public sealed class ButtonExtension : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler,
-        IPointerExitHandler, ISelectHandler, IDeselectHandler, ISubmitHandler, IUpdateSelectedHandler,
+        IPointerEnterHandler, IPointerExitHandler, ISelectHandler, IDeselectHandler, ISubmitHandler, IUpdateSelectedHandler,
         IInitializePotentialDragHandler, IBeginDragHandler, IDragHandler, IEndDragHandler, IScrollHandler
     {
         [Serializable]
@@ -40,11 +40,21 @@ namespace F8Framework.Core
         [SerializeField] private Vector3 _selectedScaleMultiplier = new Vector3(1.05f, 1.05f, 1f);
         [SerializeField, Min(0f)] private float _selectAnimationDuration = 0.15f;
         [SerializeField] private Ease _selectEase = Ease.EaseOutBack;
+        [SerializeField] private bool _loopSelectAnimation;
         [SerializeField, Min(0f)] private float _deselectAnimationDuration = 0.12f;
         [SerializeField] private Ease _deselectEase = Ease.EaseOutQuad;
+
+        [SerializeField] private bool _enableHoverAnimation;
+        [SerializeField] private Vector3 _hoverScaleMultiplier = new Vector3(1.05f, 1.05f, 1f);
+        [SerializeField, Min(0f)] private float _hoverEnterDuration = 0.12f;
+        [SerializeField] private Ease _hoverEnterEase = Ease.EaseOutQuad;
+        [SerializeField, Min(0f)] private float _hoverExitDuration = 0.1f;
+        [SerializeField] private Ease _hoverExitEase = Ease.EaseOutQuad;
         
         [SerializeField] private bool _playClickSound = true;
         [SerializeField] private string _clickSoundAssetName;
+        [SerializeField] private bool _playHoverSound;
+        [SerializeField] private string _hoverSoundAssetName;
         [SerializeField] private bool _playSelectSound;
         [SerializeField] private string _selectSoundAssetName;
         
@@ -69,6 +79,7 @@ namespace F8Framework.Core
         private Vector3 _defaultScale = Vector3.one;
         private bool _hasCachedDefaultScale;
         private bool _isSelected;
+        private bool _isHovering;
         private bool _isPointerDown;
         private bool _isLongPressTriggered;
         private bool _ignoreNextClickFeedback;
@@ -91,7 +102,10 @@ namespace F8Framework.Core
         {
             _enableClickAnimation = true;
             _playClickSound = true;
+            _enableHoverAnimation = false;
+            _playHoverSound = false;
             _enableSelectAnimation = false;
+            _loopSelectAnimation = false;
             _playSelectSound = false;
             _enableDoubleClick = false;
             _enableLongPress = false;
@@ -114,7 +128,8 @@ namespace F8Framework.Core
             }
 
             _isSelected = EventSystem.current != null && EventSystem.current.currentSelectedGameObject == gameObject;
-            ApplyScaleImmediate(GetRestScale());
+            _isHovering = false;
+            ApplyScaleImmediate(GetVisualStateScale());
         }
 
         private void Update()
@@ -194,13 +209,25 @@ namespace F8Framework.Core
             _ignoreNextClickFeedback = false;
             _isSubmitPressed = false;
             _isSubmitLongPressTriggered = false;
+            _isHovering = false;
             StopTween();
-            ApplyScaleImmediate(GetRestScale());
+            ApplyScaleImmediate(GetVisualStateScale());
         }
 
         private void OnDestroy()
         {
             StopTween();
+        }
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            if (!CanInteract())
+            {
+                return;
+            }
+
+            _isHovering = true;
+            PlayHoverFeedback();
         }
 
         public void OnPointerDown(PointerEventData eventData)
@@ -230,9 +257,17 @@ namespace F8Framework.Core
 
         public void OnPointerExit(PointerEventData eventData)
         {
+            bool wasHovering = _isHovering;
+            _isHovering = false;
+
             if (_cancelLongPressWhenPointerExit)
             {
                 ResetPressState();
+            }
+
+            if (wasHovering)
+            {
+                PlayHoverExitFeedback();
             }
         }
 
@@ -334,13 +369,13 @@ namespace F8Framework.Core
                 return;
             }
 
-            Vector3 restScale = GetRestScale();
+            Vector3 restScale = GetVisualStateScale();
             Vector3 pressedScale = Vector3.Scale(restScale, Vector3.one * _clickScaleMultiplier);
 
-            PlayScaleTween(pressedScale, _clickPressDuration, _clickPressEase, () =>
+            PlayTransientScaleTween(pressedScale, _clickPressDuration, _clickPressEase, () =>
             {
-                PlayScaleTween(restScale, _clickReleaseDuration, _clickReleaseEase);
-            });
+                PlayTransientScaleTween(restScale, _clickReleaseDuration, _clickReleaseEase);
+            }, false);
         }
 
         public void PlaySelectFeedback()
@@ -352,17 +387,48 @@ namespace F8Framework.Core
                 return;
             }
 
-            PlayScaleTween(GetRestScale(), _selectAnimationDuration, _selectEase);
+            if (_loopSelectAnimation)
+            {
+                PlaySelectLoopAnimation();
+                return;
+            }
+
+            PlayTransientScaleTween(GetVisualStateScale(), _selectAnimationDuration, _selectEase);
         }
 
         public void PlayDeselectFeedback()
         {
+            StopTween();
+
             if (!_enableSelectAnimation)
             {
                 return;
             }
 
-            PlayScaleTween(GetRestScale(), _deselectAnimationDuration, _deselectEase);
+            PlayTransientScaleTween(GetVisualStateScale(), _deselectAnimationDuration, _deselectEase);
+        }
+
+        public void PlayHoverFeedback()
+        {
+            PlayHoverSound();
+
+            if (!_enableHoverAnimation)
+            {
+                return;
+            }
+
+            PlayTransientScaleTween(GetVisualStateScale(), _hoverEnterDuration, _hoverEnterEase);
+        }
+
+        public void PlayHoverExitFeedback()
+        {
+            if (!_enableHoverAnimation)
+            {
+                ResumeSelectAnimationIfNeeded();
+                return;
+            }
+
+            PlayTransientScaleTween(GetVisualStateScale(), _hoverExitDuration, _hoverExitEase);
         }
 
         private void CacheReferences()
@@ -435,6 +501,16 @@ namespace F8Framework.Core
             }
 
             AudioManager.Instance?.PlayUISound(_clickSoundAssetName);
+        }
+
+        private void PlayHoverSound()
+        {
+            if (!_playHoverSound || string.IsNullOrEmpty(_hoverSoundAssetName))
+            {
+                return;
+            }
+
+            AudioManager.Instance?.PlayUISound(_hoverSoundAssetName);
         }
 
         private void PlaySelectSound()
@@ -572,14 +648,31 @@ namespace F8Framework.Core
                    InputManager.Instance != null;
         }
 
-        private Vector3 GetRestScale()
+        private Vector3 GetVisualStateScale()
         {
-            if (!_isSelected || !_enableSelectAnimation)
+            Vector3 scale = GetBaseScaleWithoutSelection();
+
+            if (_enableSelectAnimation && _isSelected)
             {
-                return _defaultScale;
+                scale = Vector3.Scale(scale, _selectedScaleMultiplier);
             }
 
-            return Vector3.Scale(_defaultScale, _selectedScaleMultiplier);
+            if (_enableHoverAnimation && _isHovering)
+            {
+                scale = Vector3.Scale(scale, _hoverScaleMultiplier);
+            }
+
+            return scale;
+        }
+
+        private Vector3 GetBaseScaleWithoutSelection()
+        {
+            if (_enableHoverAnimation && _isHovering)
+            {
+                return Vector3.Scale(_defaultScale, _hoverScaleMultiplier);
+            }
+
+            return _defaultScale;
         }
 
         private void ApplyScaleImmediate(Vector3 scale)
@@ -592,7 +685,7 @@ namespace F8Framework.Core
             _animationTarget.localScale = scale;
         }
 
-        private void PlayScaleTween(Vector3 targetScale, float duration, Ease ease, Action onComplete = null)
+        private void PlayTransientScaleTween(Vector3 targetScale, float duration, Ease ease, Action onComplete = null, bool resumeSelectAfterComplete = true)
         {
             if (_animationTarget == null)
             {
@@ -605,13 +698,60 @@ namespace F8Framework.Core
             {
                 ApplyScaleImmediate(targetScale);
                 onComplete?.Invoke();
+                if (resumeSelectAfterComplete)
+                {
+                    ResumeSelectAnimationIfNeeded();
+                }
                 return;
             }
 
             Tween.Instance.ScaleTween(_animationTarget, targetScale, duration)
                 .SetCustomId(_tweenKey)
                 .SetEase(ease)
-                .SetOnComplete(onComplete);
+                .SetOnComplete(() =>
+                {
+                    onComplete?.Invoke();
+                    if (resumeSelectAfterComplete)
+                    {
+                        ResumeSelectAnimationIfNeeded();
+                    }
+                });
+        }
+
+        private void PlaySelectLoopAnimation()
+        {
+            if (_animationTarget == null)
+            {
+                return;
+            }
+
+            StopTween();
+
+            Vector3 fromScale = GetBaseScaleWithoutSelection();
+            Vector3 toScale = GetVisualStateScale();
+
+            ApplyScaleImmediate(fromScale);
+
+            if (_selectAnimationDuration <= 0f || Tween.Instance == null)
+            {
+                ApplyScaleImmediate(toScale);
+                return;
+            }
+
+            Tween.Instance.ScaleTween(_animationTarget, toScale, _selectAnimationDuration)
+                .SetCustomId(_tweenKey)
+                .SetEase(_selectEase)
+                .SetLoopType(LoopType.Yoyo, -1);
+        }
+
+        private void ResumeSelectAnimationIfNeeded()
+        {
+            if (!_enableSelectAnimation || !_loopSelectAnimation || !_isSelected || _isHovering || _animationTarget == null)
+            {
+                return;
+            }
+
+            PlaySelectLoopAnimation();
         }
 
         private void StopTween()

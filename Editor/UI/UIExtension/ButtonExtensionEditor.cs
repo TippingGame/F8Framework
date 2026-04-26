@@ -27,11 +27,21 @@ namespace F8Framework.Core.Editor
         private SerializedProperty _selectedScaleMultiplier;
         private SerializedProperty _selectAnimationDuration;
         private SerializedProperty _selectEase;
+        private SerializedProperty _loopSelectAnimation;
         private SerializedProperty _deselectAnimationDuration;
         private SerializedProperty _deselectEase;
 
+        private SerializedProperty _enableHoverAnimation;
+        private SerializedProperty _hoverScaleMultiplier;
+        private SerializedProperty _hoverEnterDuration;
+        private SerializedProperty _hoverEnterEase;
+        private SerializedProperty _hoverExitDuration;
+        private SerializedProperty _hoverExitEase;
+
         private SerializedProperty _playClickSound;
         private SerializedProperty _clickSoundAssetName;
+        private SerializedProperty _playHoverSound;
+        private SerializedProperty _hoverSoundAssetName;
         private SerializedProperty _playSelectSound;
         private SerializedProperty _selectSoundAssetName;
 
@@ -76,11 +86,21 @@ namespace F8Framework.Core.Editor
             _selectedScaleMultiplier = serializedObject.FindProperty("_selectedScaleMultiplier");
             _selectAnimationDuration = serializedObject.FindProperty("_selectAnimationDuration");
             _selectEase = serializedObject.FindProperty("_selectEase");
+            _loopSelectAnimation = serializedObject.FindProperty("_loopSelectAnimation");
             _deselectAnimationDuration = serializedObject.FindProperty("_deselectAnimationDuration");
             _deselectEase = serializedObject.FindProperty("_deselectEase");
 
+            _enableHoverAnimation = serializedObject.FindProperty("_enableHoverAnimation");
+            _hoverScaleMultiplier = serializedObject.FindProperty("_hoverScaleMultiplier");
+            _hoverEnterDuration = serializedObject.FindProperty("_hoverEnterDuration");
+            _hoverEnterEase = serializedObject.FindProperty("_hoverEnterEase");
+            _hoverExitDuration = serializedObject.FindProperty("_hoverExitDuration");
+            _hoverExitEase = serializedObject.FindProperty("_hoverExitEase");
+
             _playClickSound = serializedObject.FindProperty("_playClickSound");
             _clickSoundAssetName = serializedObject.FindProperty("_clickSoundAssetName");
+            _playHoverSound = serializedObject.FindProperty("_playHoverSound");
+            _hoverSoundAssetName = serializedObject.FindProperty("_hoverSoundAssetName");
             _playSelectSound = serializedObject.FindProperty("_playSelectSound");
             _selectSoundAssetName = serializedObject.FindProperty("_selectSoundAssetName");
 
@@ -111,6 +131,7 @@ namespace F8Framework.Core.Editor
             DrawSection("References（引用）", DrawReferences);
             DrawSection("ScrollRect Compatibility（滚动穿透）", DrawScrollRectCompatibility);
             DrawSection("Click Animation（点击动画）", DrawClickAnimation);
+            DrawSection("Hover Animation（悬停动画）", DrawHoverAnimation);
             DrawSection("Select Animation（选中动画）", DrawSelectAnimation);
             DrawSection("Sound（声音）", DrawSound);
             DrawSection("Double Click（双击）", DrawDoubleClick);
@@ -175,8 +196,24 @@ namespace F8Framework.Core.Editor
             EditorGUILayout.PropertyField(_selectedScaleMultiplier);
             EditorGUILayout.PropertyField(_selectAnimationDuration);
             EditorGUILayout.PropertyField(_selectEase);
+            EditorGUILayout.PropertyField(_loopSelectAnimation);
             EditorGUILayout.PropertyField(_deselectAnimationDuration);
             EditorGUILayout.PropertyField(_deselectEase);
+        }
+
+        private void DrawHoverAnimation()
+        {
+            EditorGUILayout.PropertyField(_enableHoverAnimation);
+            if (!_enableHoverAnimation.boolValue)
+            {
+                return;
+            }
+
+            EditorGUILayout.PropertyField(_hoverScaleMultiplier);
+            EditorGUILayout.PropertyField(_hoverEnterDuration);
+            EditorGUILayout.PropertyField(_hoverEnterEase);
+            EditorGUILayout.PropertyField(_hoverExitDuration);
+            EditorGUILayout.PropertyField(_hoverExitEase);
         }
 
         private void DrawSound()
@@ -185,6 +222,12 @@ namespace F8Framework.Core.Editor
             if (_playClickSound.boolValue)
             {
                 EditorGUILayout.PropertyField(_clickSoundAssetName);
+            }
+
+            EditorGUILayout.PropertyField(_playHoverSound);
+            if (_playHoverSound.boolValue)
+            {
+                EditorGUILayout.PropertyField(_hoverSoundAssetName);
             }
 
             EditorGUILayout.PropertyField(_playSelectSound);
