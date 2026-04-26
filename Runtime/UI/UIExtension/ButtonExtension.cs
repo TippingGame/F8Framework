@@ -52,7 +52,6 @@ namespace F8Framework.Core
         
         [SerializeField] private bool _forwardDragToParentScrollRect = true;
         [SerializeField] private bool _forwardScrollWheelToParentScrollRect = true;
-        [SerializeField] private bool _autoFindParentScrollRect = true;
         [SerializeField] private DragPassthroughMode _dragPassthroughMode = DragPassthroughMode.AutoDetect;
         [SerializeField] private ScrollRectDragStrategy _scrollRectDragStrategy = ScrollRectDragStrategy.Always;
         [SerializeField, Min(0f)] private float _dragStartThreshold = 12f;
@@ -476,7 +475,7 @@ namespace F8Framework.Core
         {
             _button ??= GetComponent<Button>();
             _animationTarget ??= transform;
-            if (_autoFindParentScrollRect && _parentScrollRect == null)
+            if (_parentScrollRect == null)
             {
                 _parentScrollRect = GetComponentInParent<ScrollRect>();
             }

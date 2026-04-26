@@ -14,7 +14,6 @@ namespace F8Framework.Core.Editor
         private SerializedProperty _dragPassthroughMode;
         private SerializedProperty _forwardDragToParentScrollRect;
         private SerializedProperty _forwardScrollWheelToParentScrollRect;
-        private SerializedProperty _autoFindParentScrollRect;
         private SerializedProperty _scrollRectDragStrategy;
         private SerializedProperty _dragStartThreshold;
         private SerializedProperty _cancelClickWhenDragging;
@@ -79,7 +78,6 @@ namespace F8Framework.Core.Editor
             _dragPassthroughMode = serializedObject.FindProperty("_dragPassthroughMode");
             _forwardDragToParentScrollRect = serializedObject.FindProperty("_forwardDragToParentScrollRect");
             _forwardScrollWheelToParentScrollRect = serializedObject.FindProperty("_forwardScrollWheelToParentScrollRect");
-            _autoFindParentScrollRect = serializedObject.FindProperty("_autoFindParentScrollRect");
             _scrollRectDragStrategy = serializedObject.FindProperty("_scrollRectDragStrategy");
             _dragStartThreshold = serializedObject.FindProperty("_dragStartThreshold");
             _cancelClickWhenDragging = serializedObject.FindProperty("_cancelClickWhenDragging");
@@ -168,7 +166,6 @@ namespace F8Framework.Core.Editor
         private void DrawInteractionRouting()
         {
             EditorGUILayout.PropertyField(_dragPassthroughMode);
-            EditorGUILayout.PropertyField(_autoFindParentScrollRect);
             EditorGUILayout.PropertyField(_forwardDragToParentScrollRect);
             EditorGUILayout.PropertyField(_forwardScrollWheelToParentScrollRect);
 
