@@ -1,5 +1,8 @@
 # Changelog
 
+## [3.1.294] - 2025-04-26
+1.优化ButtonExtension组件交互路由和取消点击行为  
+
 ## [3.1.293] - 2025-04-26
 1.优化ButtonExtension组件支持InputSystem  
 

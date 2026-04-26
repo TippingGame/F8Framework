@@ -20,17 +20,44 @@ namespace F8Framework.Core
         public sealed class ButtonEvent : UnityEvent
         {
         }
+
+        private enum DragPassthroughMode
+        {
+            Disabled = 0,
+            AutoDetect = 1,
+            ScrollRectOnly = 2
+        }
+
+        private enum ScrollRectDragStrategy
+        {
+            Always = 0,
+            MatchScrollRectAxis = 1,
+            HorizontalOnly = 2,
+            VerticalOnly = 3
+        }
+
+        private enum DragReceiver
+        {
+            None = 0,
+            Slider = 1,
+            Scrollbar = 2,
+            ScrollRect = 3
+        }
         
         [SerializeField] private Button _button;
         [SerializeField] private Transform _animationTarget;
         [SerializeField] private ScrollRect _parentScrollRect;
+        [SerializeField] private Slider _parentSlider;
+        [SerializeField] private Scrollbar _parentScrollbar;
         
         [SerializeField] private bool _forwardDragToParentScrollRect = true;
         [SerializeField] private bool _forwardScrollWheelToParentScrollRect = true;
         [SerializeField] private bool _autoFindParentScrollRect = true;
+        [SerializeField] private DragPassthroughMode _dragPassthroughMode = DragPassthroughMode.AutoDetect;
+        [SerializeField] private ScrollRectDragStrategy _scrollRectDragStrategy = ScrollRectDragStrategy.Always;
         [SerializeField, Min(0f)] private float _dragStartThreshold = 12f;
-        [SerializeField] private bool _cancelClickWhenDragging = true;
-        [SerializeField] private bool _cancelLongPressWhenBeginDrag = true;
+        [SerializeField] private bool _cancelClickWhenDragging = false;
+        [SerializeField] private bool _cancelLongPressWhenBeginDrag = false;
         
         [SerializeField] private bool _enableClickAnimation = true;
         [SerializeField, Min(0.01f)] private float _clickScaleMultiplier = 0.92f;
@@ -67,7 +94,7 @@ namespace F8Framework.Core
         
         [SerializeField] private bool _enableLongPress;
         [SerializeField, Min(0.01f)] private float _longPressDuration = 0.5f;
-        [SerializeField] private bool _cancelLongPressWhenPointerExit = true;
+        [SerializeField] private bool _cancelLongPressWhenPointerExit = false;
         [SerializeField] private ButtonEvent _onLongPress = new ButtonEvent();
         
         [SerializeField] private bool _enableSubmitInputEnhancement;
@@ -91,6 +118,9 @@ namespace F8Framework.Core
         private bool _isDragging;
         private bool _isSubmitPressed;
         private bool _isSubmitLongPressTriggered;
+        private bool _isSliderHandle;
+        private bool _isScrollbarHandle;
+        private DragReceiver _activeDragReceiver;
         private float _pointerDownTime = -1f;
         private float _lastClickTime = -10f;
         private float _submitPressTime = -1f;
@@ -117,6 +147,8 @@ namespace F8Framework.Core
             _enableDoubleClick = false;
             _enableLongPress = false;
             _enableSubmitInputEnhancement = false;
+            _dragPassthroughMode = DragPassthroughMode.AutoDetect;
+            _scrollRectDragStrategy = ScrollRectDragStrategy.Always;
             CacheReferences();
         }
 
@@ -448,6 +480,19 @@ namespace F8Framework.Core
             {
                 _parentScrollRect = GetComponentInParent<ScrollRect>();
             }
+
+            if (_parentSlider == null)
+            {
+                _parentSlider = GetComponentInParent<Slider>();
+            }
+
+            if (_parentScrollbar == null)
+            {
+                _parentScrollbar = GetComponentInParent<Scrollbar>();
+            }
+
+            _isSliderHandle = IsSliderHandle();
+            _isScrollbarHandle = IsScrollbarHandle();
         }
 
         private void CacheDefaultScale()
@@ -509,7 +554,7 @@ namespace F8Framework.Core
                 return;
             }
 
-            AudioManager.Instance?.PlayUISound(_clickSoundAssetName);
+            AudioManager.Instance?.PlayBtnClick(_clickSoundAssetName);
         }
 
         private void PlayHoverSound()
@@ -519,7 +564,7 @@ namespace F8Framework.Core
                 return;
             }
 
-            AudioManager.Instance?.PlayUISound(_hoverSoundAssetName);
+            AudioManager.Instance?.PlayBtnClick(_hoverSoundAssetName);
         }
 
         private void PlaySelectSound()
@@ -529,7 +574,7 @@ namespace F8Framework.Core
                 return;
             }
 
-            AudioManager.Instance?.PlayUISound(_selectSoundAssetName);
+            AudioManager.Instance?.PlayBtnClick(_selectSoundAssetName);
         }
 
         private void ResetPressState()
@@ -538,28 +583,46 @@ namespace F8Framework.Core
             _pointerDownTime = -1f;
             _isLongPressTriggered = false;
             _isDragging = false;
+            _activeDragReceiver = DragReceiver.None;
             _pointerId = int.MinValue;
         }
 
         public void OnInitializePotentialDrag(PointerEventData eventData)
         {
             _isDragging = false;
-            if (!_forwardDragToParentScrollRect || _parentScrollRect == null)
+            _activeDragReceiver = DragReceiver.None;
+
+            if (_dragPassthroughMode == DragPassthroughMode.Disabled)
             {
                 return;
             }
 
-            _parentScrollRect.OnInitializePotentialDrag(eventData);
+            if (ShouldRouteToSlider())
+            {
+                _parentSlider.OnInitializePotentialDrag(eventData);
+                return;
+            }
+
+            if (ShouldRouteToScrollbar())
+            {
+                _parentScrollbar.OnInitializePotentialDrag(eventData);
+                return;
+            }
+
+            if (CanRouteToScrollRect(eventData))
+            {
+                _parentScrollRect.OnInitializePotentialDrag(eventData);
+            }
         }
 
         public void OnBeginDrag(PointerEventData eventData)
         {
-            if (!_forwardDragToParentScrollRect || _parentScrollRect == null)
+            _isDragging = true;
+            if (_cancelClickWhenDragging)
             {
-                return;
+                CancelButtonClick(eventData);
             }
 
-            _isDragging = true;
             if (_cancelLongPressWhenBeginDrag)
             {
                 ResetPressState();
@@ -567,27 +630,55 @@ namespace F8Framework.Core
                 _ignoreNextClickFeedback = false;
             }
 
-            _parentScrollRect.OnBeginDrag(eventData);
+            _activeDragReceiver = ResolveDragReceiver(eventData);
+            switch (_activeDragReceiver)
+            {
+                case DragReceiver.Slider:
+                    _parentSlider.OnDrag(eventData);
+                    return;
+                case DragReceiver.Scrollbar:
+                    _parentScrollbar.OnBeginDrag(eventData);
+                    _parentScrollbar.OnDrag(eventData);
+                    return;
+                case DragReceiver.ScrollRect:
+                    _parentScrollRect.OnBeginDrag(eventData);
+                    return;
+                default:
+                    return;
+            }
         }
 
         public void OnDrag(PointerEventData eventData)
         {
-            if (!_forwardDragToParentScrollRect || _parentScrollRect == null)
-            {
-                return;
-            }
-
             _isDragging = true;
-            _parentScrollRect.OnDrag(eventData);
+            DragReceiver receiver = _activeDragReceiver != DragReceiver.None ? _activeDragReceiver : ResolveDragReceiver(eventData);
+            switch (receiver)
+            {
+                case DragReceiver.Slider:
+                    _parentSlider.OnDrag(eventData);
+                    return;
+                case DragReceiver.Scrollbar:
+                    _parentScrollbar.OnDrag(eventData);
+                    return;
+                case DragReceiver.ScrollRect:
+                    _parentScrollRect.OnDrag(eventData);
+                    return;
+            }
         }
 
         public void OnEndDrag(PointerEventData eventData)
         {
-            if (_forwardDragToParentScrollRect && _parentScrollRect != null)
+            switch (_activeDragReceiver)
             {
-                _parentScrollRect.OnEndDrag(eventData);
+                case DragReceiver.Scrollbar:
+                    _parentScrollbar.OnPointerUp(eventData);
+                    break;
+                case DragReceiver.ScrollRect:
+                    _parentScrollRect.OnEndDrag(eventData);
+                    break;
             }
 
+            _activeDragReceiver = DragReceiver.None;
             _isDragging = false;
             _isPointerDown = false;
         }
@@ -610,6 +701,16 @@ namespace F8Framework.Core
             }
 
             return (eventData.position - _pointerDownPosition).sqrMagnitude >= _dragStartThreshold * _dragStartThreshold;
+        }
+
+        private void CancelButtonClick(PointerEventData eventData)
+        {
+            if (eventData == null)
+            {
+                return;
+            }
+
+            eventData.eligibleForClick = false;
         }
 
         private bool TryGetCurrentPointerPosition(out Vector2 position)
@@ -716,6 +817,124 @@ namespace F8Framework.Core
 #endif
         }
 
+        private DragReceiver ResolveDragReceiver(PointerEventData eventData)
+        {
+            if (_dragPassthroughMode == DragPassthroughMode.Disabled)
+            {
+                return DragReceiver.None;
+            }
+
+            if (_dragPassthroughMode != DragPassthroughMode.ScrollRectOnly)
+            {
+                if (ShouldRouteToSlider())
+                {
+                    return DragReceiver.Slider;
+                }
+
+                if (ShouldRouteToScrollbar())
+                {
+                    return DragReceiver.Scrollbar;
+                }
+            }
+
+            return CanRouteToScrollRect(eventData) ? DragReceiver.ScrollRect : DragReceiver.None;
+        }
+
+        private bool ShouldRouteToSlider()
+        {
+            return _parentSlider != null && _isSliderHandle;
+        }
+
+        private bool ShouldRouteToScrollbar()
+        {
+            return _parentScrollbar != null && _isScrollbarHandle;
+        }
+
+        private bool CanRouteToScrollRect(PointerEventData eventData)
+        {
+            if (!_forwardDragToParentScrollRect || _parentScrollRect == null)
+            {
+                return false;
+            }
+
+            switch (_scrollRectDragStrategy)
+            {
+                case ScrollRectDragStrategy.Always:
+                    return true;
+                case ScrollRectDragStrategy.MatchScrollRectAxis:
+                    return MatchesScrollRectAxis(GetDragDelta(eventData));
+                case ScrollRectDragStrategy.HorizontalOnly:
+                    return Mathf.Abs(GetDragDelta(eventData).x) >= Mathf.Abs(GetDragDelta(eventData).y);
+                case ScrollRectDragStrategy.VerticalOnly:
+                    return Mathf.Abs(GetDragDelta(eventData).y) >= Mathf.Abs(GetDragDelta(eventData).x);
+                default:
+                    return true;
+            }
+        }
+
+        private Vector2 GetDragDelta(PointerEventData eventData)
+        {
+            Vector2 delta = eventData.delta;
+            if (delta.sqrMagnitude > 0f)
+            {
+                return delta;
+            }
+
+            return eventData.position - _pointerDownPosition;
+        }
+
+        private bool MatchesScrollRectAxis(Vector2 delta)
+        {
+            bool horizontalDominant = Mathf.Abs(delta.x) >= Mathf.Abs(delta.y);
+            bool verticalDominant = Mathf.Abs(delta.y) >= Mathf.Abs(delta.x);
+
+            if (_parentScrollRect.horizontal && !_parentScrollRect.vertical)
+            {
+                return horizontalDominant;
+            }
+
+            if (_parentScrollRect.vertical && !_parentScrollRect.horizontal)
+            {
+                return verticalDominant;
+            }
+
+            return _parentScrollRect.horizontal || _parentScrollRect.vertical;
+        }
+
+        private bool IsSliderHandle()
+        {
+            if (_parentSlider == null)
+            {
+                return false;
+            }
+
+            RectTransform rectTransform = transform as RectTransform;
+            if (rectTransform == null)
+            {
+                return false;
+            }
+
+            RectTransform handleRect = _parentSlider.handleRect;
+            return handleRect != null && (handleRect == rectTransform || rectTransform.IsChildOf(handleRect));
+        }
+
+        private bool IsScrollbarHandle()
+        {
+            if (_parentScrollbar == null)
+            {
+                return false;
+            }
+
+            RectTransform rectTransform = transform as RectTransform;
+            if (rectTransform == null)
+            {
+                return false;
+            }
+
+            RectTransform handleRect = _parentScrollbar.handleRect;
+            return handleRect != null && (handleRect == rectTransform || rectTransform.IsChildOf(handleRect));
+        }
+
         private Vector3 GetVisualStateScale()
         {
             Vector3 scale = GetBaseScaleWithoutSelection();
@@ -735,11 +954,6 @@ namespace F8Framework.Core
 
         private Vector3 GetBaseScaleWithoutSelection()
         {
-            if (_enableHoverAnimation && _isHovering)
-            {
-                return Vector3.Scale(_defaultScale, _hoverScaleMultiplier);
-            }
-
             return _defaultScale;
         }
 

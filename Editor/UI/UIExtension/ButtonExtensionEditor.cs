@@ -8,10 +8,14 @@ namespace F8Framework.Core.Editor
         private SerializedProperty _button;
         private SerializedProperty _animationTarget;
         private SerializedProperty _parentScrollRect;
+        private SerializedProperty _parentSlider;
+        private SerializedProperty _parentScrollbar;
 
+        private SerializedProperty _dragPassthroughMode;
         private SerializedProperty _forwardDragToParentScrollRect;
         private SerializedProperty _forwardScrollWheelToParentScrollRect;
         private SerializedProperty _autoFindParentScrollRect;
+        private SerializedProperty _scrollRectDragStrategy;
         private SerializedProperty _dragStartThreshold;
         private SerializedProperty _cancelClickWhenDragging;
         private SerializedProperty _cancelLongPressWhenBeginDrag;
@@ -69,10 +73,14 @@ namespace F8Framework.Core.Editor
             _button = serializedObject.FindProperty("_button");
             _animationTarget = serializedObject.FindProperty("_animationTarget");
             _parentScrollRect = serializedObject.FindProperty("_parentScrollRect");
+            _parentSlider = serializedObject.FindProperty("_parentSlider");
+            _parentScrollbar = serializedObject.FindProperty("_parentScrollbar");
 
+            _dragPassthroughMode = serializedObject.FindProperty("_dragPassthroughMode");
             _forwardDragToParentScrollRect = serializedObject.FindProperty("_forwardDragToParentScrollRect");
             _forwardScrollWheelToParentScrollRect = serializedObject.FindProperty("_forwardScrollWheelToParentScrollRect");
             _autoFindParentScrollRect = serializedObject.FindProperty("_autoFindParentScrollRect");
+            _scrollRectDragStrategy = serializedObject.FindProperty("_scrollRectDragStrategy");
             _dragStartThreshold = serializedObject.FindProperty("_dragStartThreshold");
             _cancelClickWhenDragging = serializedObject.FindProperty("_cancelClickWhenDragging");
             _cancelLongPressWhenBeginDrag = serializedObject.FindProperty("_cancelLongPressWhenBeginDrag");
@@ -133,14 +141,15 @@ namespace F8Framework.Core.Editor
             DrawScriptField();
 
             DrawSection("References（引用）", DrawReferences);
-            DrawSection("ScrollRect Compatibility（滚动穿透）", DrawScrollRectCompatibility);
-            DrawSection("Click Animation（点击动画）", DrawClickAnimation);
-            DrawSection("Hover Animation（悬停动画）", DrawHoverAnimation);
-            DrawSection("Select Animation（选中动画）", DrawSelectAnimation);
-            DrawSection("Sound（声音）", DrawSound);
+            DrawSection("Interaction Routing（交互路由）", DrawInteractionRouting);
+            DrawSection("Pointer Behavior（指针行为）", DrawPointerBehavior);
+            DrawSection("Click Feedback（点击动画）", DrawClickAnimation);
+            DrawSection("Hover Feedback（悬停动画）", DrawHoverAnimation);
+            DrawSection("Select Feedback（选中动画）", DrawSelectAnimation);
+            DrawSection("Audio Feedback（音效）", DrawSound);
             DrawSection("Double Click（双击）", DrawDoubleClick);
             DrawSection("Long Press（长按）", DrawLongPress);
-            DrawSection("Submit Input（键盘手柄输入）", DrawSubmitInput);
+            DrawSection("Enhanced Input（键盘手柄输入）", DrawEnhancedInput);
             DrawSection("Hover Events（悬停事件）", DrawHoverEvents);
             DrawSection("Selection Events（选中事件）", DrawSelectionEvents);
 
@@ -151,28 +160,33 @@ namespace F8Framework.Core.Editor
         {
             EditorGUILayout.PropertyField(_button);
             EditorGUILayout.PropertyField(_animationTarget);
+            EditorGUILayout.PropertyField(_parentSlider);
+            EditorGUILayout.PropertyField(_parentScrollbar);
+            EditorGUILayout.PropertyField(_parentScrollRect);
         }
 
-        private void DrawScrollRectCompatibility()
+        private void DrawInteractionRouting()
         {
+            EditorGUILayout.PropertyField(_dragPassthroughMode);
+            EditorGUILayout.PropertyField(_autoFindParentScrollRect);
             EditorGUILayout.PropertyField(_forwardDragToParentScrollRect);
             EditorGUILayout.PropertyField(_forwardScrollWheelToParentScrollRect);
-            EditorGUILayout.PropertyField(_autoFindParentScrollRect);
-
-            bool needsScrollRect = _forwardDragToParentScrollRect.boolValue ||
-                                   _forwardScrollWheelToParentScrollRect.boolValue ||
-                                   _autoFindParentScrollRect.boolValue;
-            if (needsScrollRect)
-            {
-                EditorGUILayout.PropertyField(_parentScrollRect);
-            }
 
             if (_forwardDragToParentScrollRect.boolValue)
             {
-                EditorGUILayout.PropertyField(_dragStartThreshold);
-                EditorGUILayout.PropertyField(_cancelClickWhenDragging);
-                EditorGUILayout.PropertyField(_cancelLongPressWhenBeginDrag);
+                EditorGUILayout.PropertyField(_scrollRectDragStrategy);
             }
+        }
+
+        private void DrawPointerBehavior()
+        {
+            EditorGUILayout.PropertyField(_dragStartThreshold);
+            EditorGUILayout.PropertyField(_cancelClickWhenDragging);
+        }
+
+        private void DrawEnhancedInput()
+        {
+            DrawSubmitInput();
         }
 
         private void DrawClickAnimation()
@@ -201,9 +215,9 @@ namespace F8Framework.Core.Editor
             EditorGUILayout.PropertyField(_selectedScaleMultiplier);
             EditorGUILayout.PropertyField(_selectAnimationDuration);
             EditorGUILayout.PropertyField(_selectEase);
-            EditorGUILayout.PropertyField(_loopSelectAnimation);
             EditorGUILayout.PropertyField(_deselectAnimationDuration);
             EditorGUILayout.PropertyField(_deselectEase);
+            EditorGUILayout.PropertyField(_loopSelectAnimation);
         }
 
         private void DrawHoverAnimation()
@@ -263,6 +277,7 @@ namespace F8Framework.Core.Editor
             }
 
             EditorGUILayout.PropertyField(_longPressDuration);
+            EditorGUILayout.PropertyField(_cancelLongPressWhenBeginDrag);
             EditorGUILayout.PropertyField(_cancelLongPressWhenPointerExit);
             EditorGUILayout.PropertyField(_onLongPress);
         }
