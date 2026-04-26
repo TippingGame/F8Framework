@@ -3,6 +3,9 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 
 namespace F8Framework.Core
 {
@@ -180,7 +183,7 @@ namespace F8Framework.Core
 
             if (!_isSubmitPressed)
             {
-                if (InputManager.Instance != null && InputManager.Instance.GetButtonDown(_submitActionName))
+                if (IsSubmitActionPressedThisFrame())
                 {
                     _isSubmitPressed = true;
                     _isSubmitLongPressTriggered = false;
@@ -190,7 +193,7 @@ namespace F8Framework.Core
                 return;
             }
 
-            if (InputManager.Instance != null && InputManager.Instance.GetButtonUp(_submitActionName))
+            if (IsSubmitActionReleasedThisFrame())
             {
                 _isSubmitPressed = false;
                 _submitPressTime = -1f;
@@ -335,7 +338,7 @@ namespace F8Framework.Core
                 return;
             }
 
-            if (!InputManager.Instance.GetButtonUp(_submitActionName))
+            if (!IsSubmitActionReleasedThisFrame())
             {
                 return;
             }
@@ -618,6 +621,38 @@ namespace F8Framework.Core
                 return false;
             }
 
+#if ENABLE_INPUT_SYSTEM
+            if (_pointerId < 0)
+            {
+                Mouse mouse = Mouse.current;
+                if (mouse == null || !mouse.leftButton.isPressed)
+                {
+                    return false;
+                }
+
+                position = mouse.position.ReadValue();
+                return true;
+            }
+
+            Touchscreen touchscreen = Touchscreen.current;
+            if (touchscreen == null)
+            {
+                return false;
+            }
+
+            foreach (var touch in touchscreen.touches)
+            {
+                if (!touch.press.isPressed || touch.touchId.ReadValue() != _pointerId)
+                {
+                    continue;
+                }
+
+                position = touch.position.ReadValue();
+                return true;
+            }
+
+            return false;
+#elif ENABLE_LEGACY_INPUT_MANAGER
             if (_pointerId < 0)
             {
                 if (!Input.GetMouseButton(0))
@@ -642,6 +677,9 @@ namespace F8Framework.Core
             }
 
             return false;
+#else
+            return false;
+#endif
         }
 
         private bool ShouldDeferSubmitFeedback()
@@ -652,6 +690,30 @@ namespace F8Framework.Core
                    _isSelected &&
                    !string.IsNullOrEmpty(_submitActionName) &&
                    InputManager.Instance != null;
+        }
+
+        private bool IsSubmitActionPressedThisFrame()
+        {
+#if ENABLE_INPUT_SYSTEM
+            InputAction submitAction = InputManager.Instance?.FindAction(_submitActionName);
+            return submitAction != null && submitAction.WasPressedThisFrame();
+#elif ENABLE_LEGACY_INPUT_MANAGER
+            return InputManager.Instance != null && InputManager.Instance.GetButtonDown(_submitActionName);
+#else
+            return false;
+#endif
+        }
+
+        private bool IsSubmitActionReleasedThisFrame()
+        {
+#if ENABLE_INPUT_SYSTEM
+            InputAction submitAction = InputManager.Instance?.FindAction(_submitActionName);
+            return submitAction != null && submitAction.WasReleasedThisFrame();
+#elif ENABLE_LEGACY_INPUT_MANAGER
+            return InputManager.Instance != null && InputManager.Instance.GetButtonUp(_submitActionName);
+#else
+            return false;
+#endif
         }
 
         private Vector3 GetVisualStateScale()

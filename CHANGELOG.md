@@ -1,5 +1,8 @@
 # Changelog
 
+## [3.1.293] - 2025-04-26
+1.优化ButtonExtension组件支持InputSystem  
+
 ## [3.1.292] - 2025-04-26
 1.新增ButtonExtension组件悬停事件  
 2.完善文档  
