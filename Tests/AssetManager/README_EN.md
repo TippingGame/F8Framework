@@ -219,8 +219,8 @@ Project Settings → Editor → Build Pipeline → Enable "Multi-Process AssetBu
 * 3. Set custom AB names (supports multi-select)
 * 4. Global missing reference detector
      ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_1761979410848.png)
-
-![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_20240216212631_2.png)  
+* 5. Batch Rename Tool (Can be used for scene objects or asset files)  
+     ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_1777309729762.png)
 
 #### Quick Access: Hover over files/folders and press Spacebar to open in system explorer
 ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_20241112212631.png)  

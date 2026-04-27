@@ -209,6 +209,8 @@ Project Settings -> Editor -> Build Pipeline -> Multi-Process AssetBundle Buildi
 * 3. 设置选中的所有资产为相同Ab名（可选择多个文件，也可以选中文件夹）  
 * 4. 全局空引用查找（打开窗口，显示引用丢失的资产）  
      ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_1761979410848.png)
+* 5. 批量重命名（可对场景物体或资产文件使用）  
+     ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_1777309729762.png)
 
 #### 你可以在资源栏 **鼠标指着** 文件/文件夹并按下 **键盘空格键** ，跳转到系统资源管理器：如windows文件夹
 ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/AssetManager/ui_20241112212631.png)  
