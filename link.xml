@@ -11,7 +11,6 @@
   <assembly fullname="ICSharpCode.SharpZipLib" preserve="all" />
   <assembly fullname="Excel" preserve="all" />
   <assembly fullname="LitJson" preserve="all" />
-  <assembly fullname="MessagePack" preserve="all" />
   <assembly fullname="kcp2k" preserve="all" />
   <assembly fullname="SimpleWebTransport" preserve="all" />
   <assembly fullname="Telepathy" preserve="all" />
