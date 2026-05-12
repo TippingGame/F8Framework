@@ -6,10 +6,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.IO;
 using F8Framework.Core;
 using UnityEngine.Scripting;
 
@@ -17,12 +15,15 @@ namespace F8Framework.F8ExcelDataClass
 {
 	public class F8DataManager : ModuleSingleton<F8DataManager>, IModule
 	{
+		public string VariantName;
 		private Sheet1 p_Sheet1;
 		private Sheet2 p_Sheet2;
+		private item p_item;
 		private LocalizedStrings p_LocalizedStrings;
+		private role p_role;
 
 		[Preserve]
-		public Sheet1Item GetSheet1ByID(int id)
+		public Sheet1Item GetSheet1ByID(System.Int32 id)
 		{
 			Sheet1Item t = null;
 			p_Sheet1.Dict.TryGetValue(id, out t);
@@ -31,13 +32,15 @@ namespace F8Framework.F8ExcelDataClass
 		}
 
 		[Preserve]
-		public Dictionary<int, Sheet1Item> GetSheet1()
+		public Dictionary<System.Int32, Sheet1Item> GetSheet1()
 		{
-			return p_Sheet1.Dict;
+			if (p_Sheet1 != null) return p_Sheet1.Dict;
+			LogF8.LogError("未加载配置表： Sheet1");
+			return null;
 		}
 
 		[Preserve]
-		public Sheet2Item GetSheet2ByID(int id)
+		public Sheet2Item GetSheet2ByID(System.Int32 id)
 		{
 			Sheet2Item t = null;
 			p_Sheet2.Dict.TryGetValue(id, out t);
@@ -46,13 +49,32 @@ namespace F8Framework.F8ExcelDataClass
 		}
 
 		[Preserve]
-		public Dictionary<int, Sheet2Item> GetSheet2()
+		public Dictionary<System.Int32, Sheet2Item> GetSheet2()
 		{
-			return p_Sheet2.Dict;
+			if (p_Sheet2 != null) return p_Sheet2.Dict;
+			LogF8.LogError("未加载配置表： Sheet2");
+			return null;
 		}
 
 		[Preserve]
-		public LocalizedStringsItem GetLocalizedStringsByID(int id)
+		public itemItem GetitemByID(System.Int32 id)
+		{
+			itemItem t = null;
+			p_item.Dict.TryGetValue(id, out t);
+			if (t == null) LogF8.LogError("找不到id： " + id + " ，配置表： item");
+			return t;
+		}
+
+		[Preserve]
+		public Dictionary<System.Int32, itemItem> Getitem()
+		{
+			if (p_item != null) return p_item.Dict;
+			LogF8.LogError("未加载配置表： item");
+			return null;
+		}
+
+		[Preserve]
+		public LocalizedStringsItem GetLocalizedStringsByID(System.Int32 id)
 		{
 			LocalizedStringsItem t = null;
 			p_LocalizedStrings.Dict.TryGetValue(id, out t);
@@ -61,9 +83,28 @@ namespace F8Framework.F8ExcelDataClass
 		}
 
 		[Preserve]
-		public Dictionary<int, LocalizedStringsItem> GetLocalizedStrings()
+		public Dictionary<System.Int32, LocalizedStringsItem> GetLocalizedStrings()
 		{
-			return p_LocalizedStrings.Dict;
+			if (p_LocalizedStrings != null) return p_LocalizedStrings.Dict;
+			LogF8.LogError("未加载配置表： LocalizedStrings");
+			return null;
+		}
+
+		[Preserve]
+		public roleItem GetroleByID(System.Int32 id)
+		{
+			roleItem t = null;
+			p_role.Dict.TryGetValue(id, out t);
+			if (t == null) LogF8.LogError("找不到id： " + id + " ，配置表： role");
+			return t;
+		}
+
+		[Preserve]
+		public Dictionary<System.Int32, roleItem> Getrole()
+		{
+			if (p_role != null) return p_role.Dict;
+			LogF8.LogError("未加载配置表： role");
+			return null;
 		}
 
 		[Preserve]
@@ -90,15 +131,24 @@ namespace F8Framework.F8ExcelDataClass
 		{
 			p_Sheet1 = Load<Sheet1>("Sheet1") as Sheet1;
 			p_Sheet2 = Load<Sheet2>("Sheet2") as Sheet2;
+			p_item = Load<item>("item") as item;
 			p_LocalizedStrings = Load<LocalizedStrings>("LocalizedStrings") as LocalizedStrings;
+			p_role = Load<role>("role") as role;
 		}
 
 		[Preserve]
-		public void RuntimeLoadAll(Dictionary<String, System.Object> objs)
+		public void RuntimeLoadAll(Dictionary<String, System.Object> objs = null)
 		{
+			if (objs == null)
+			{
+				objs = new Dictionary<string, object>();
+				ReadExcel.Instance.LoadAllExcelData(objs);
+			}
 			p_Sheet1 = objs["Sheet1"] as Sheet1;
 			p_Sheet2 = objs["Sheet2"] as Sheet2;
+			p_item = objs["item"] as item;
 			p_LocalizedStrings = objs["LocalizedStrings"] as LocalizedStrings;
+			p_role = objs["role"] as role;
 		}
 
 		[Preserve]
@@ -106,65 +156,94 @@ namespace F8Framework.F8ExcelDataClass
 		{
 			yield return LoadAsync<Sheet1>("Sheet1", result => p_Sheet1 = result as Sheet1);
 			yield return LoadAsync<Sheet2>("Sheet2", result => p_Sheet2 = result as Sheet2);
+			yield return LoadAsync<item>("item", result => p_item = result as item);
 			yield return LoadAsync<LocalizedStrings>("LocalizedStrings", result => p_LocalizedStrings = result as LocalizedStrings);
+			yield return LoadAsync<role>("role", result => p_role = result as role);
+#if UNITY_EDITOR
+			if (AssetManager.Instance.IsEditorMode)
+			{
+				RuntimeLoadAll();
+			}
+#endif
 		}
 
 		[Preserve]
-		public void LoadAllAsyncCallback(Action onLoadComplete)
+		public async Task LoadAllAsyncTask()
+		{
+			await LoadAsyncTask<Sheet1>("Sheet1", result => p_Sheet1 = result as Sheet1);
+			await LoadAsyncTask<Sheet2>("Sheet2", result => p_Sheet2 = result as Sheet2);
+			await LoadAsyncTask<item>("item", result => p_item = result as item);
+			await LoadAsyncTask<LocalizedStrings>("LocalizedStrings", result => p_LocalizedStrings = result as LocalizedStrings);
+			await LoadAsyncTask<role>("role", result => p_role = result as role);
+#if UNITY_EDITOR
+			if (AssetManager.Instance.IsEditorMode)
+			{
+				RuntimeLoadAll();
+			}
+#endif
+		}
+
+		[Preserve]
+		public void LoadAllAsyncCallback(Action onLoadComplete = null)
 		{
 			Util.Unity.StartCoroutine(LoadAllAsyncIEnumerator(onLoadComplete));
 		}
 
 		[Preserve]
-		public IEnumerator LoadAllAsyncIEnumerator(Action onLoadComplete)
+		public IEnumerator LoadAllAsyncIEnumerator(Action onLoadComplete = null)
 		{
 			yield return LoadAsync<Sheet1>("Sheet1", result => p_Sheet1 = result as Sheet1);
 			yield return LoadAsync<Sheet2>("Sheet2", result => p_Sheet2 = result as Sheet2);
+			yield return LoadAsync<item>("item", result => p_item = result as item);
 			yield return LoadAsync<LocalizedStrings>("LocalizedStrings", result => p_LocalizedStrings = result as LocalizedStrings);
+			yield return LoadAsync<role>("role", result => p_role = result as role);
+#if UNITY_EDITOR
+			if (AssetManager.Instance.IsEditorMode)
+			{
+				RuntimeLoadAll();
+			}
+#endif
 			onLoadComplete?.Invoke();
 		}
 
 		[Preserve]
 		public T Load<T>(string name)
 		{
-			IFormatter f = new BinaryFormatter();
 			TextAsset textAsset = AssetManager.Instance.Load<TextAsset>(name);
 			if (textAsset == null)
 			{
 				return default(T);
 			}
 			AssetManager.Instance.Unload(name, false);
-#if UNITY_WEBGL
-			T obj = Util.LitJson.ToObject<T>(textAsset.text);
+			T obj = Util.BinarySerializer.Deserialize<T>(textAsset.bytes);
 			return obj;
-#else
-			using (MemoryStream memoryStream = new MemoryStream(textAsset.bytes))
-			{
-				return (T)f.Deserialize(memoryStream);
-			}
-#endif
 		}
 
 		[Preserve]
 		public IEnumerator LoadAsync<T>(string name, Action<T> callback)
 		{
-			IFormatter f = new BinaryFormatter();
-			var load = AssetManager.Instance.LoadAsyncCoroutine<TextAsset>(name);
+			var load = AssetManager.Instance.LoadAsync<TextAsset>(name);
 			yield return load;
 			TextAsset textAsset = AssetManager.Instance.GetAssetObject<TextAsset>(name);
 			if (textAsset != null)
 			{
 				AssetManager.Instance.Unload(name, false);
-#if UNITY_WEBGL
-				T obj = Util.LitJson.ToObject<T>(textAsset.text);
+				T obj = Util.BinarySerializer.Deserialize<T>(textAsset.bytes);
 				callback(obj);
-#else
-				using (Stream s = new MemoryStream(textAsset.bytes))
-				{
-					T obj = (T)f.Deserialize(s);
-					callback(obj);
-				}
-#endif
+			}
+		}
+
+		[Preserve]
+		public async Task LoadAsyncTask<T>(string name, Action<T> callback)
+		{
+			BaseLoader load = AssetManager.Instance.LoadAsync<TextAsset>(name);
+			await load;
+			TextAsset textAsset = AssetManager.Instance.GetAssetObject<TextAsset>(name);
+			if (textAsset != null)
+			{
+				AssetManager.Instance.Unload(name, false);
+				T obj = Util.BinarySerializer.Deserialize<T>(textAsset.bytes);
+				callback(obj);
 			}
 		}
 
@@ -190,6 +269,12 @@ namespace F8Framework.F8ExcelDataClass
 
 		public void OnTermination()
 		{
+			p_Sheet1 = null;
+			p_Sheet2 = null;
+			p_item = null;
+			p_LocalizedStrings = null;
+			p_role = null;
+			VariantName = null;
 			base.Destroy();
 		}
 	}

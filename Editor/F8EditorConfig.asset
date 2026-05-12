@@ -1,0 +1,195 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d20185f55aa8f0d47a4bf03c387dc15a, type: 3}
+  m_Name: F8EditorConfig
+  m_EditorClassIdentifier: 
+  entries:
+  - key: playmodeplus-lastScene
+    stringValue: Assets/Scenes/Launcher.unity
+    intValue: 0
+    floatValue: 0
+    boolValue: 0
+    valueType: 1
+  - key: LocalizationSettings
+    stringValue: '{"DefaultLanguage":"ChineseSimplified","maxSuggestion":50,"enableTMP":false}'
+    intValue: 0
+    floatValue: 0
+    boolValue: 0
+    valueType: 1
+  - key: compilationFinished
+    stringValue: 
+    intValue: 0
+    floatValue: 0
+    boolValue: 0
+    valueType: 4
+  - key: ExcelPath
+    stringValue: G:/Work/unity2021315f1pj/F8FrameworkDemo/Assets/StreamingAssets/config
+    intValue: 0
+    floatValue: 0
+    boolValue: 0
+    valueType: 1
+  - key: ConvertExcelToOtherFormatsKey
+    stringValue: binary
+    intValue: 0
+    floatValue: 0
+    boolValue: 0
+    valueType: 1
+  - key: compilationFinishedHotUpdateDll
+    stringValue: 
+    intValue: 0
+    floatValue: 0
+    boolValue: 0
+    valueType: 4
+  - key: compilationFinishedBuildAB
+    stringValue: 
+    intValue: 0
+    floatValue: 0
+    boolValue: 0
+    valueType: 4
+  - key: FullPathAssetLoadingKey
+    stringValue: 
+    intValue: 0
+    floatValue: 0
+    boolValue: 0
+    valueType: 0
+  - key: FullPathExtensionAssetLoadingKey
+    stringValue: 
+    intValue: 0
+    floatValue: 0
+    boolValue: 0
+    valueType: 0
+  - key: ToVersionKey
+    stringValue: 1.0.0
+    intValue: 0
+    floatValue: 0
+    boolValue: 0
+    valueType: 1
+  - key: compilationFinishedBuildPkg
+    stringValue: 
+    intValue: 0
+    floatValue: 0
+    boolValue: 0
+    valueType: 4
+  - key: compilationFinishedBuildRun
+    stringValue: 
+    intValue: 0
+    floatValue: 0
+    boolValue: 0
+    valueType: 4
+  - key: compilationFinishedBuildUpdate
+    stringValue: 
+    intValue: 0
+    floatValue: 0
+    boolValue: 0
+    valueType: 4
+  - key: ForceRebuildAssetBundleKey
+    stringValue: 
+    intValue: 0
+    floatValue: 0
+    boolValue: 0
+    valueType: 0
+  - key: IsEditorMode
+    stringValue: 
+    intValue: 0
+    floatValue: 0
+    boolValue: 0
+    valueType: 0
+  - key: CurrentLanguage
+    stringValue: ChineseSimplified
+    intValue: 0
+    floatValue: 0
+    boolValue: 0
+    valueType: 1
+  - key: CustomToolbar.ToolbarFpsSlider.Value
+    stringValue: 
+    intValue: 0
+    floatValue: 0
+    boolValue: 0
+    valueType: 0
+  - key: CustomToolbar.ToolbarTimeSlider.Value
+    stringValue: 
+    intValue: 0
+    floatValue: 1
+    boolValue: 0
+    valueType: 3
+  - key: PrefBuildPathKey
+    stringValue: 
+    intValue: 0
+    floatValue: 0
+    boolValue: 0
+    valueType: 0
+  - key: ExportCurrentPlatformKey
+    stringValue: 
+    intValue: 0
+    floatValue: 0
+    boolValue: 0
+    valueType: 0
+  - key: CodeVersionKey
+    stringValue: 1
+    intValue: 0
+    floatValue: 0
+    boolValue: 0
+    valueType: 1
+  - key: ExcelBinDataFolderKey
+    stringValue: Assets/AssetBundles/Config/BinConfigData
+    intValue: 0
+    floatValue: 0
+    boolValue: 0
+    valueType: 1
+  - key: AssetRemoteAddressKey
+    stringValue: 
+    intValue: 0
+    floatValue: 0
+    boolValue: 0
+    valueType: 1
+  - key: EnableHotUpdateKey
+    stringValue: 
+    intValue: 0
+    floatValue: 0
+    boolValue: 0
+    valueType: 0
+  - key: EnablePackageKey
+    stringValue: 
+    intValue: 0
+    floatValue: 0
+    boolValue: 0
+    valueType: 0
+  - key: EnableFullPackageKey
+    stringValue: 
+    intValue: 0
+    floatValue: 0
+    boolValue: 0
+    valueType: 0
+  - key: EnableOptionalPackageKey
+    stringValue: 
+    intValue: 0
+    floatValue: 0
+    boolValue: 0
+    valueType: 0
+  - key: EnableNullPackageKey
+    stringValue: 
+    intValue: 0
+    floatValue: 0
+    boolValue: 0
+    valueType: 0
+  - key: OptionalPackageKey
+    stringValue: 0_1_2_3
+    intValue: 0
+    floatValue: 0
+    boolValue: 0
+    valueType: 1
+  - key: CleanBuildCacheKey
+    stringValue: 
+    intValue: 0
+    floatValue: 0
+    boolValue: 0
+    valueType: 0
