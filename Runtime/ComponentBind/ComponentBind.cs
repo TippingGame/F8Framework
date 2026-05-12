@@ -258,10 +258,13 @@ namespace F8Framework.Core
             {
                 // 替换注释之间的内容，包含头尾的注释
                 scriptContent = scriptContent.Remove(match.Groups[0].Index, match.Groups[0].Length);
+                string generatedFieldsCode = generatedCode.Length > 0
+                    ? $"\n\t[Header(\"===== 自动生成，组件绑定 =====\")]" + $"\n{generatedCode}"
+                    : string.Empty;
+
                 scriptContent = scriptContent.Insert(match.Groups[0].Index,
                     $"// 自动获取组件（自动生成，不能删除）" +
-                    $"\n\t[Header(\"===== 自动生成，组件绑定 =====\")]" +
-                    $"\n{generatedCode}" +
+                    $"{generatedFieldsCode}" +
                     $"\n{listenerCode}" +
                     $"\n#if UNITY_EDITOR" +
                     $"\n\t// 自动生成" +

@@ -1,5 +1,8 @@
 # Changelog
 
+## [3.1.297] - 2025-05-13
+1.修复ComponentBind在没组件时生成Header的问题  
+
 ## [3.1.296] - 2025-05-03
 1.优化UIRedDot红点系统  
 
