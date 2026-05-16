@@ -88,6 +88,7 @@ namespace F8Framework.Core
             
             _volumeAudioEffect = PlayerPrefs.GetFloat(_volumeAudioEffectKey, 1f);
             _switchAudioEffect = PlayerPrefs.GetInt(_switchAudioEffectKey, 1) == 1;
+            ResetAudioEffect();
         }
 
         /// <summary>
@@ -300,6 +301,7 @@ namespace F8Framework.Core
                 AudioMusicBtnClick.MusicSource.volume = value;
                 AudioMusicUISound.MusicSource.volume = value;
                 AudioMusicAudioEffect.MusicSource.volume = value;
+                _audioMusicAudioEffect3D?.SetVolume(value);
             }
         }
 
@@ -322,6 +324,7 @@ namespace F8Framework.Core
                     AudioMusicBtnClick.MusicSource.Stop();
                     AudioMusicUISound.MusicSource.Stop();
                     AudioMusicAudioEffect.MusicSource.Stop();
+                    _audioMusicAudioEffect3D?.Stop();
                 }
             }
         }
@@ -392,7 +395,19 @@ namespace F8Framework.Core
             AudioMusicAudioEffect.Load(assetName, callback, loop, priority, fadeDuration);
         }
         
-        /*----------一次性3D音效特效----------*/
+        /*----------一次性音效特效----------*/
+        /// <summary>
+        /// 播放一次性2D音效特效。
+        /// </summary>
+        /// <param name="assetName">资产名。</param>
+        /// <param name="volume">音量。</param>
+        /// <param name="maxNum">最大同时播放个数。</param>
+        /// <param name="callback">播放完成回调。</param>
+        public void PlayAudioEffect2D(string assetName, float volume = 1f, int maxNum = 5, Action callback = null)
+        {
+            PlayOneShotAudioEffect(assetName, _transform.position, volume, 0f, maxNum, callback, false);
+        }
+        
         /// <summary>
         /// 播放一次性3D音效特效。
         /// </summary>
@@ -406,13 +421,17 @@ namespace F8Framework.Core
         public void PlayAudioEffect3D(string assetName, bool isRandom = false, Vector3? audioPosition = null, float volume = 1f, float spatialBlend = 1f,
             int maxNum = 5, Action callback = null)
         {
+            PlayOneShotAudioEffect(assetName, audioPosition.GetValueOrDefault(_transform.position), volume, spatialBlend, maxNum, callback, isRandom);
+        }
+        
+        private void PlayOneShotAudioEffect(string assetName, Vector3 audioPosition, float volume, float spatialBlend,
+            int maxNum, Action callback, bool isRandom)
+        {
             if (!_switchAudioEffect)
             {
                 return ;
             }
-            Vector3 actualPosition = audioPosition.GetValueOrDefault(_transform.position);
-            float actualVolume = volume * _volumeAudioEffect;
-            _audioMusicAudioEffect3D.Load(assetName, actualPosition, actualVolume, spatialBlend, maxNum, callback, _audioEffectMixerGroup, isRandom);
+            _audioMusicAudioEffect3D.Load(assetName, audioPosition, volume, spatialBlend, maxNum, callback, _audioEffectMixerGroup, isRandom);
         }
         
         /*----------全局控制----------*/
@@ -423,6 +442,7 @@ namespace F8Framework.Core
             AudioMusicBtnClick.Resume();
             AudioMusicUISound.Resume();
             AudioMusicAudioEffect.Resume();
+            _audioMusicAudioEffect3D?.Resume();
         }
         
         public void PauseAll() {
@@ -431,6 +451,7 @@ namespace F8Framework.Core
             AudioMusicBtnClick.Pause();
             AudioMusicUISound.Pause();
             AudioMusicAudioEffect.Pause();
+            _audioMusicAudioEffect3D?.Pause();
         }
         
         public void StopAll()
@@ -440,6 +461,7 @@ namespace F8Framework.Core
             AudioMusicBtnClick.Stop();
             AudioMusicUISound.Stop();
             AudioMusicAudioEffect.Stop();
+            _audioMusicAudioEffect3D?.Stop();
         }
         
         public void UnloadAll(bool unloadAllLoadedObjects = true)

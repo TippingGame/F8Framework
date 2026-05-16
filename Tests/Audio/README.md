@@ -53,6 +53,13 @@ void Start()
     FF8.Audio.SetBtnClickComplete(CallBack); // 设置完成回调
     FF8.Audio.SetAudioEffectComplete(CallBack); // 设置完成回调
     
+    /*----------一次性2D音效----------*/
+    // assetName资产名
+    // volume音量
+    // maxNum最大同时播放个数
+    // callback播放完成回调
+    FF8.Audio.PlayAudioEffect2D("assetName", volume: 1f, maxNum: 5, CallBack);
+    
     /*----------一次性3D音效----------*/
     // assetName资产名
     // isRandom是否随机音量音高
@@ -71,9 +78,9 @@ void Start()
     FF8.Audio.SetAudioMixer(FF8.Asset.Load<AudioMixer>("F8AudioMixer"));
 
     /*----------全局控制----------*/
-    FF8.Audio.PauseAll(); // 暂停所有，不包括AudioEffect
-    FF8.Audio.ResumeAll(); // 恢复所有，不包括AudioEffect
-    FF8.Audio.StopAll(); // 停止所有，不包括AudioEffect
+    FF8.Audio.PauseAll(); // 暂停所有
+    FF8.Audio.ResumeAll(); // 恢复所有
+    FF8.Audio.StopAll(); // 停止所有
 
     FF8.Audio.UnloadAll(true); // 卸载所有音频和音效。（true:完全卸载，包括正在使用的）
 

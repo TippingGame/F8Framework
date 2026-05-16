@@ -68,6 +68,11 @@ FF8.Audio.SetBtnClickComplete(callback);
 FF8.Audio.SetAudioEffectComplete(callback);
 ```
 
+### One-shot 2D audio effects
+```csharp
+FF8.Audio.PlayAudioEffect2D("assetName", volume: 1f, maxNum: 5, callback);
+```
+
 ### 3D audio effects
 ```csharp
 FF8.Audio.PlayAudioEffect3D("assetName",
@@ -81,9 +86,9 @@ FF8.Audio.PlayAudioEffect3D("assetName",
 
 ### Global control
 ```csharp
-FF8.Audio.PauseAll();     // Pause all (except AudioEffect)
-FF8.Audio.ResumeAll();    // Resume all (except AudioEffect)
-FF8.Audio.StopAll();      // Stop all (except AudioEffect)
+FF8.Audio.PauseAll();     // Pause all, including one-shot AudioEffect instances
+FF8.Audio.ResumeAll();    // Resume all, including one-shot AudioEffect instances
+FF8.Audio.StopAll();      // Stop all, including one-shot AudioEffect instances
 FF8.Audio.UnloadAll(true); // Unload all audio (true = force including in-use)
 ```
 
@@ -103,7 +108,7 @@ FF8.Audio.AudioMusicUISound.UnloadAll();
 ## Workflow
 
 1. Load audio clips via AssetManager (place in AssetBundles or Resources).
-2. Choose category: Music (BGM), Voice, or AudioEffect (SFX/UI).
+2. Choose category: Music (BGM), Voice, AudioEffect (SFX/UI), or one-shot 2D/3D AudioEffect.
 3. Use priority parameter for Music/Voice to handle overlapping tracks.
 4. Volume and switch settings auto-persist to PlayerPrefs.
 5. Use fadeDuration for smooth transitions between tracks.
@@ -117,7 +122,7 @@ FF8.Audio.AudioMusicUISound.UnloadAll();
 | Audio clip not found | Asset not in loadable directory | Ensure clip is under AssetBundles or Resources, press F8 |
 | No sound on mobile | Volume or switch set to off | Check `SwitchMusic`/`SwitchAudioEffect` values |
 | Memory leak from audio | Not unloading unused clips | Call `UnloadAll()` when transitioning scenes |
-| PauseAll doesn't affect SFX | By design, AudioEffect excluded | Control AudioEffect separately via channel |
+| One-shot SFX stops too early | Timer using scaled time or clip load failed | Use current `AudioEffect` implementation; it tracks one-shot instances with unscaled clip duration |
 
 ## Cross-module dependencies
 
@@ -126,7 +131,7 @@ FF8.Audio.AudioMusicUISound.UnloadAll();
 
 ## Output checklist
 
-- Audio category selected (Music/Voice/AudioEffect).
+- Audio category selected (Music/Voice/AudioEffect/one-shot AudioEffect).
 - Volume persistence configured.
 - Files changed and why.
 - Validation status and remaining risks.

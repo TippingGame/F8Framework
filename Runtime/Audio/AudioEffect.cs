@@ -12,12 +12,27 @@ namespace F8Framework.Core
     {
         private Dictionary<string, AudioClip> _effects = new Dictionary<string, AudioClip>();
         private Dictionary<string, int> _effectsNum = new Dictionary<string, int>();
+        private readonly List<PlayingAudioEffect> _playingAudioEffects = new List<PlayingAudioEffect>();
         // 定义音量和音高的范围
         private float minVolume = 0.6f;
         private float maxVolume = 1.0f;
         private float minPitch = 0.8f;
         private float maxPitch = 1.2f;
         private GameObject OneShotAudio;
+        private int _playVersion;
+        private float _volumeScale = 1f;
+        
+        private class PlayingAudioEffect
+        {
+            public string Url;
+            public GameObject GameObject;
+            public AudioSource AudioSource;
+            public int TimerId;
+            public float BaseVolume;
+            public Action Callback;
+            public bool IsPausedByManager;
+            public bool IsFromPool;
+        }
         
         public AudioEffect(Transform transform)
         {
@@ -37,6 +52,7 @@ namespace F8Framework.Core
                 return;
             }
             _effectsNum[url] = count + 1;
+            int playVersion = _playVersion;
             
             if (_effects != null && _effects.TryGetValue(url, out AudioClip audioClip) && audioClip)
             {
@@ -46,8 +62,20 @@ namespace F8Framework.Core
             {
                 AssetManager.Instance.LoadAsync<AudioClip>(url, (asset) =>
                 {
-                    _effects[url] = asset;
+                    if (playVersion != _playVersion)
+                    {
+                        DecreaseEffectCount(url);
+                        return;
+                    }
                     
+                    if (asset == null || asset.Equals(null))
+                    {
+                        DecreaseEffectCount(url);
+                        return;
+                    }
+
+                    _effects[url] = asset;
+
                     PlayClipAtPoint(url, _effects[url], position, volume, spatialBlend, callback, audioEffectMixerGroup, isRandom);
                 });
             }
@@ -67,39 +95,204 @@ namespace F8Framework.Core
         public void PlayClipAtPoint(string url, AudioClip clip, Vector3 position, [DefaultValue("1.0F")] float volume, [DefaultValue("1.0F")] float spatialBlend,
             Action callback = null, AudioMixerGroup audioEffectMixerGroup = null, bool isRandom = false)
         {
+            if (clip == null || clip.Equals(null))
+            {
+                DecreaseEffectCount(url);
+                return;
+            }
+
+            bool isFromPool = GameObjectPool.Instance != null;
             GameObject gameObject = GameObjectPool.Instance?.Spawn(OneShotAudio);
+            if (gameObject == null || gameObject.Equals(null))
+            {
+                isFromPool = false;
+                gameObject = Object.Instantiate(OneShotAudio);
+            }
+
+            if (gameObject == null || gameObject.Equals(null))
+            {
+                DecreaseEffectCount(url);
+                return;
+            }
+
             gameObject.transform.position = position;
             AudioSource audioSource = gameObject.GetComponent<AudioSource>();
+            if (audioSource == null || audioSource.Equals(null))
+            {
+                ReleaseGameObject(gameObject, isFromPool);
+                DecreaseEffectCount(url);
+                return;
+            }
+
             audioSource.clip = clip;
             audioSource.spatialBlend = spatialBlend;
-            audioSource.volume = isRandom ? Random.Range(minVolume, maxVolume) : volume;
+            float baseVolume = isRandom ? Random.Range(minVolume, maxVolume) : volume;
+            audioSource.volume = baseVolume * _volumeScale;
             audioSource.pitch = isRandom ? Random.Range(minPitch, maxPitch) : 1f;
             audioSource.rolloffMode = AudioRolloffMode.Linear;
             if (audioEffectMixerGroup)
                 audioSource.outputAudioMixerGroup = audioEffectMixerGroup;
             audioSource.Play();
-            
-            float time = clip.length * ((double)Time.timeScale < 0.009999999776482582 ? 0.01f : Time.timeScale);
-            TimerManager.Instance?.AddTimer(this, 1f, time, 1, null, () =>
+            PlayingAudioEffect playingAudioEffect = new PlayingAudioEffect
             {
-                GameObjectPool.Instance?.Despawn(gameObject);
-                if (_effectsNum.TryGetValue(url, out int num))
+                Url = url,
+                GameObject = gameObject,
+                AudioSource = audioSource,
+                BaseVolume = baseVolume,
+                Callback = callback,
+                IsFromPool = isFromPool
+            };
+            _playingAudioEffects.Add(playingAudioEffect);
+            
+            float time = clip.length / Mathf.Max(Mathf.Abs(audioSource.pitch), 0.01f);
+            playingAudioEffect.TimerId = TimerManager.Instance?.AddTimer(this, 1f, time, 1, null, () =>
+            {
+                FinishPlayingAudioEffect(playingAudioEffect, true);
+            }, true) ?? 0;
+        }
+        
+        public void SetVolume(float volume)
+        {
+            _volumeScale = volume;
+            for (int i = _playingAudioEffects.Count - 1; i >= 0; i--)
+            {
+                PlayingAudioEffect playingAudioEffect = _playingAudioEffects[i];
+                if (playingAudioEffect.AudioSource == null || playingAudioEffect.AudioSource.Equals(null))
                 {
-                    _effectsNum[url] = num - 1;
+                    RemoveInvalidPlayingAudioEffect(i);
+                    continue;
                 }
-                callback?.Invoke();
-            });
+                
+                playingAudioEffect.AudioSource.volume = playingAudioEffect.BaseVolume * _volumeScale;
+            }
+        }
+        
+        public void Pause()
+        {
+            for (int i = _playingAudioEffects.Count - 1; i >= 0; i--)
+            {
+                PlayingAudioEffect playingAudioEffect = _playingAudioEffects[i];
+                if (playingAudioEffect.AudioSource == null || playingAudioEffect.AudioSource.Equals(null))
+                {
+                    RemoveInvalidPlayingAudioEffect(i);
+                    continue;
+                }
+                
+                if (playingAudioEffect.AudioSource.isPlaying)
+                {
+                    playingAudioEffect.AudioSource.Pause();
+                    playingAudioEffect.IsPausedByManager = true;
+                    TimerManager.Instance?.Pause(playingAudioEffect.TimerId);
+                }
+            }
+        }
+        
+        public void Resume()
+        {
+            for (int i = _playingAudioEffects.Count - 1; i >= 0; i--)
+            {
+                PlayingAudioEffect playingAudioEffect = _playingAudioEffects[i];
+                if (playingAudioEffect.AudioSource == null || playingAudioEffect.AudioSource.Equals(null))
+                {
+                    RemoveInvalidPlayingAudioEffect(i);
+                    continue;
+                }
+                
+                if (playingAudioEffect.IsPausedByManager && !playingAudioEffect.AudioSource.isPlaying && playingAudioEffect.AudioSource.clip != null)
+                {
+                    playingAudioEffect.AudioSource.Play();
+                    playingAudioEffect.IsPausedByManager = false;
+                    TimerManager.Instance?.Resume(playingAudioEffect.TimerId);
+                }
+            }
+        }
+        
+        public void Stop()
+        {
+            _playVersion++;
+            for (int i = _playingAudioEffects.Count - 1; i >= 0; i--)
+            {
+                FinishPlayingAudioEffect(_playingAudioEffects[i], false);
+            }
         }
         
         // 释放所有音效资源
         public void UnloadAll(bool unloadAllLoadedObjects = true)
         {
+            Stop();
             foreach (var item in _effects)
             {
                 AssetManager.Instance?.Unload(item.Key, unloadAllLoadedObjects);
             }
             _effects.Clear();
             _effectsNum.Clear();
+        }
+        
+        private void FinishPlayingAudioEffect(PlayingAudioEffect playingAudioEffect, bool invokeCallback)
+        {
+            if (playingAudioEffect == null)
+            {
+                return;
+            }
+            
+            TimerManager.Instance?.RemoveTimer(playingAudioEffect.TimerId);
+            if (playingAudioEffect.AudioSource != null && !playingAudioEffect.AudioSource.Equals(null))
+            {
+                playingAudioEffect.AudioSource.Stop();
+            }
+            if (playingAudioEffect.GameObject != null && !playingAudioEffect.GameObject.Equals(null))
+            {
+                ReleaseGameObject(playingAudioEffect.GameObject, playingAudioEffect.IsFromPool);
+            }
+            
+            DecreaseEffectCount(playingAudioEffect.Url);
+            _playingAudioEffects.Remove(playingAudioEffect);
+            
+            if (invokeCallback)
+            {
+                playingAudioEffect.Callback?.Invoke();
+            }
+        }
+
+        private void RemoveInvalidPlayingAudioEffect(int index)
+        {
+            PlayingAudioEffect playingAudioEffect = _playingAudioEffects[index];
+            TimerManager.Instance?.RemoveTimer(playingAudioEffect.TimerId);
+            DecreaseEffectCount(playingAudioEffect.Url);
+            _playingAudioEffects.RemoveAt(index);
+        }
+
+        private void ReleaseGameObject(GameObject gameObject, bool isFromPool)
+        {
+            if (gameObject == null || gameObject.Equals(null))
+            {
+                return;
+            }
+
+            if (isFromPool && GameObjectPool.Instance != null)
+            {
+                GameObjectPool.Instance.Despawn(gameObject);
+            }
+            else
+            {
+                Object.Destroy(gameObject);
+            }
+        }
+        
+        private void DecreaseEffectCount(string url)
+        {
+            if (_effectsNum.TryGetValue(url, out int num))
+            {
+                num--;
+                if (num <= 0)
+                {
+                    _effectsNum.Remove(url);
+                }
+                else
+                {
+                    _effectsNum[url] = num;
+                }
+            }
         }
     }
 }

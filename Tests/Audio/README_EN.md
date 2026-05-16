@@ -52,6 +52,13 @@ void Start()
     FF8.Audio.SetBtnClickComplete(CallBack); // Set completion callback
     FF8.Audio.SetAudioEffectComplete(CallBack); // Set completion callback
     
+    /*----------One-shot 2D Sound Effects----------*/
+    // assetName: Asset name
+    // volume: Base volume (0-1)
+    // maxNum: Maximum concurrent instances
+    // callback: Playback completion callback
+    FF8.Audio.PlayAudioEffect2D("assetName", volume: 1f, maxNum: 5, CallBack);
+    
     /*----------One-shot 3D Sound Effects----------*/
     // assetName: Asset name
     // isRandom: Randomize pitch/volume
@@ -70,9 +77,9 @@ void Start()
     FF8.Audio.SetAudioMixer(FF8.Asset.Load<AudioMixer>("F8AudioMixer"));
 
     /*----------Global Controls----------*/
-    FF8.Audio.PauseAll(); // Pause all (excluding AudioEffect)
-    FF8.Audio.ResumeAll(); // Resume all (excluding AudioEffect)
-    FF8.Audio.StopAll(); // Stop all (excluding AudioEffect)
+    FF8.Audio.PauseAll(); // Pause all
+    FF8.Audio.ResumeAll(); // Resume all
+    FF8.Audio.StopAll(); // Stop all
 
     FF8.Audio.UnloadAll(true); // Unload all audio (true: force unload including in-use)
 
