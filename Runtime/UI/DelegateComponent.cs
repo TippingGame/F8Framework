@@ -68,7 +68,7 @@ namespace F8Framework.Core
                 viewParams.Callbacks.OnRemoved(viewParams.Params, viewParams.UIid);
             }
             
-            ViewParams?.BaseView?.Removed();
+            ViewParams?.BaseView?.Removed(isDestroy);
             
             if (isDestroy)
             {

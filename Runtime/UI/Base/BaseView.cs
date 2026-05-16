@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using Object = UnityEngine.Object;
 
 namespace F8Framework.Core
 {
@@ -13,20 +15,17 @@ namespace F8Framework.Core
         private Sequence _viewOpenSequence;
         private Sequence _viewCloseSequence;
         
-        // 消息事件
-        private EventDispatcher _eventDispatcher = null;
-                
-        public EventDispatcher EventDispatcher {
-            get
-            {
-                if (_eventDispatcher == null)
-                {
-                    _eventDispatcher = new EventDispatcher();
-                }
+        // 消息事件追踪，自动卸载
+        private EventDispatcher _eventDispatcher;
+        public EventDispatcher EventDispatcher => _eventDispatcher ??= new EventDispatcher();
         
-                return _eventDispatcher;
-            }
-        }
+        // 资源加载追踪，自动卸载
+        private AssetLoadTracker _assetLoadTracker;
+        public AssetLoadTracker AssetLoadTracker => _assetLoadTracker ??= new AssetLoadTracker();
+        
+        // 计时器追踪，自动卸载
+        private TimerTracker _timerTracker;
+        public TimerTracker TimerTracker => _timerTracker ??= new TimerTracker();
 
         private void Awake()
         {
@@ -119,6 +118,11 @@ namespace F8Framework.Core
                 _eventDispatcher.Clear();
                 _eventDispatcher = null;
             }
+            if (_timerTracker != null)
+            {
+                _timerTracker.Clear();
+                _timerTracker = null;
+            }
             OnBeforeRemove();
         }
 
@@ -126,11 +130,12 @@ namespace F8Framework.Core
         {
         }
 
-        public void Removed()
+        public void Removed(bool isDestroy)
         {
             CancelViewOpenSequence();
             CancelViewCloseSequence();
             OnRemoved();
+            ClearAssetLoadTracker(isDestroy);
         }
 
         internal bool TryPlayCloseTween(Action onComplete)
@@ -539,6 +544,185 @@ namespace F8Framework.Core
         public void RemoveEventListener(int eventId)
         {
             EventDispatcher.RemoveEventListener(eventId);
+        }
+        
+        public T LoadAsset<T>(string assetName, string subAssetName = null,
+            AssetManager.AssetAccessMode mode = AssetManager.AssetAccessMode.UNKNOWN)
+            where T : Object
+        {
+            return AssetLoadTracker.Load<T>(assetName, subAssetName, mode);
+        }
+        
+        public Object LoadAsset(string assetName, string subAssetName = null,
+            AssetManager.AssetAccessMode mode = AssetManager.AssetAccessMode.UNKNOWN)
+        {
+            return AssetLoadTracker.Load(assetName, subAssetName, mode);
+        }
+        
+        public Object LoadAsset(string assetName, Type assetType, string subAssetName = null,
+            AssetManager.AssetAccessMode mode = AssetManager.AssetAccessMode.UNKNOWN)
+        {
+            return AssetLoadTracker.Load(assetName, assetType, subAssetName, mode);
+        }
+        
+        public BaseLoader LoadAssetAsync<T>(string assetName, OnAssetObject<T> callback = null,
+            string subAssetName = null,
+            AssetManager.AssetAccessMode mode = AssetManager.AssetAccessMode.UNKNOWN)
+            where T : Object
+        {
+            return AssetLoadTracker.LoadAsync(assetName, callback, subAssetName, mode);
+        }
+        
+        public BaseLoader LoadAssetAsync(string assetName, OnAssetObject<Object> callback = null,
+            string subAssetName = null,
+            AssetManager.AssetAccessMode mode = AssetManager.AssetAccessMode.UNKNOWN)
+        {
+            return AssetLoadTracker.LoadAsync(assetName, callback, subAssetName, mode);
+        }
+        
+        public BaseLoader LoadAssetAsync(string assetName, Type assetType, OnAssetObject<Object> callback = null,
+            string subAssetName = null,
+            AssetManager.AssetAccessMode mode = AssetManager.AssetAccessMode.UNKNOWN)
+        {
+            return AssetLoadTracker.LoadAsync(assetName, assetType, callback, subAssetName, mode);
+        }
+        
+        public Dictionary<string, TObject> LoadAllAsset<TObject>(string assetName,
+            AssetManager.AssetAccessMode mode = AssetManager.AssetAccessMode.UNKNOWN)
+            where TObject : Object
+        {
+            return AssetLoadTracker.LoadAll<TObject>(assetName, mode);
+        }
+        
+        public Dictionary<string, Object> LoadAllAsset(string assetName,
+            AssetManager.AssetAccessMode mode = AssetManager.AssetAccessMode.UNKNOWN)
+        {
+            return AssetLoadTracker.LoadAll(assetName, mode);
+        }
+        
+        public BaseLoader LoadAllAssetAsync<TObject>(string assetName, OnAllAssetObject<TObject> callback = null,
+            AssetManager.AssetAccessMode mode = AssetManager.AssetAccessMode.UNKNOWN)
+            where TObject : Object
+        {
+            return AssetLoadTracker.LoadAllAsync(assetName, callback, mode);
+        }
+        
+        public BaseLoader LoadAllAssetAsync(string assetName, OnAllAssetObject<Object> callback = null,
+            AssetManager.AssetAccessMode mode = AssetManager.AssetAccessMode.UNKNOWN)
+        {
+            return AssetLoadTracker.LoadAllAsync(assetName, callback, mode);
+        }
+        
+        public Dictionary<string, TObject> LoadSubAsset<TObject>(string assetName, string subAssetName = null,
+            AssetManager.AssetAccessMode mode = AssetManager.AssetAccessMode.UNKNOWN)
+            where TObject : Object
+        {
+            return AssetLoadTracker.LoadSub<TObject>(assetName, subAssetName, mode);
+        }
+        
+        public Dictionary<string, Object> LoadSubAsset(string assetName, string subAssetName = null,
+            AssetManager.AssetAccessMode mode = AssetManager.AssetAccessMode.UNKNOWN)
+        {
+            return AssetLoadTracker.LoadSub(assetName, subAssetName, mode);
+        }
+        
+        public BaseLoader LoadSubAssetAsync<TObject>(string assetName, string subAssetName = null,
+            OnAllAssetObject<TObject> callback = null,
+            AssetManager.AssetAccessMode mode = AssetManager.AssetAccessMode.UNKNOWN)
+            where TObject : Object
+        {
+            return AssetLoadTracker.LoadSubAsync(assetName, subAssetName, callback, mode);
+        }
+        
+        public BaseLoader LoadSubAssetAsync(string assetName, string subAssetName = null,
+            OnAllAssetObject<Object> callback = null,
+            AssetManager.AssetAccessMode mode = AssetManager.AssetAccessMode.UNKNOWN)
+        {
+            return AssetLoadTracker.LoadSubAsync(assetName, subAssetName, callback, mode);
+        }
+        
+        public BaseDirLoader LoadDirAsset(string assetName,
+            AssetManager.AssetAccessMode mode = AssetManager.AssetAccessMode.UNKNOWN)
+        {
+            return AssetLoadTracker.LoadDir(assetName, mode);
+        }
+        
+        public BaseDirLoader LoadDirAssetAsync(string assetName, Action callback = null,
+            AssetManager.AssetAccessMode mode = AssetManager.AssetAccessMode.UNKNOWN)
+        {
+            return AssetLoadTracker.LoadDirAsync(assetName, callback, mode);
+        }
+        
+        public void UnloadAsset(string assetName, bool unloadAllLoadedObjects = false)
+        {
+            _assetLoadTracker?.Release(assetName, unloadAllLoadedObjects);
+        }
+        
+        public void ClearAssetLoadTracker(bool unloadAllLoadedObjects = false)
+        {
+            if (_assetLoadTracker == null)
+                return;
+            
+            _assetLoadTracker.ReleaseAll(unloadAllLoadedObjects);
+            _assetLoadTracker = null;
+        }
+        
+        public int AddTimer(float duration, Action onComplete, bool ignoreTimeScale = false)
+        {
+            return TimerTracker.AddTimer(this, duration, onComplete, ignoreTimeScale);
+        }
+        
+        public int AddTimer(float duration, bool isLoop, Action onComplete = null, bool ignoreTimeScale = false)
+        {
+            return TimerTracker.AddTimer(this, duration, isLoop, onComplete, ignoreTimeScale);
+        }
+        
+        public int AddTimer(float step = 1f, int field = 0, Action onSecond = null,
+            Action onComplete = null, bool ignoreTimeScale = false)
+        {
+            return TimerTracker.AddTimer(this, step, field, onSecond, onComplete, ignoreTimeScale);
+        }
+        
+        public int AddTimer(float step, float delay, int field = 0, Action onSecond = null,
+            Action onComplete = null, bool ignoreTimeScale = false)
+        {
+            return TimerTracker.AddTimer(this, step, delay, field, onSecond, onComplete, ignoreTimeScale);
+        }
+        
+        public int AddTimerFrame(float duration, Action onComplete, bool ignoreTimeScale = false)
+        {
+            return TimerTracker.AddTimerFrame(this, duration, onComplete, ignoreTimeScale);
+        }
+        
+        public int AddTimerFrame(float duration, bool isLoop, Action onComplete, bool ignoreTimeScale = false)
+        {
+            return TimerTracker.AddTimerFrame(this, duration, isLoop, onComplete, ignoreTimeScale);
+        }
+        
+        public int AddTimerFrame(float step = 1f, int field = 0, Action onFrame = null,
+            Action onComplete = null, bool ignoreTimeScale = false)
+        {
+            return TimerTracker.AddTimerFrame(this, step, field, onFrame, onComplete, ignoreTimeScale);
+        }
+        
+        public int AddTimerFrame(float stepFrame, float delayFrame, int field = 0, Action onFrame = null,
+            Action onComplete = null, bool ignoreTimeScale = false)
+        {
+            return TimerTracker.AddTimerFrame(this, stepFrame, delayFrame, field, onFrame, onComplete, ignoreTimeScale);
+        }
+        
+        public void RemoveTimer(int id)
+        {
+            _timerTracker?.RemoveTimer(id);
+        }
+        
+        public void ClearTimerTracker()
+        {
+            if (_timerTracker == null)
+                return;
+            
+            _timerTracker.Clear();
+            _timerTracker = null;
         }
     }
 }

@@ -64,8 +64,10 @@ public class #SCRIPTNAME# : BaseItem
     // OnDisable
     private void OnDisable()
     {
-        // 在合适的时候清除事件
+        // 在合适的时候清除
         base.ClearEventDispatcher();
+        base.ClearTimerTracker();
+        base.ClearAssetLoadTracker(false);
     }
     
     // 自动获取组件（自动生成，不能删除）

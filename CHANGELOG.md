@@ -1,5 +1,8 @@
 # Changelog
 
+## [3.1.298] - 2025-05-17
+1.新增AssetLoadTracker，TimerTracker追踪器给BaseView，BaseItem添加自动释放资源和计时器  
+
 ## [3.1.297] - 2025-05-13
 1.修复ComponentBind在没组件时生成Header的问题  
 
