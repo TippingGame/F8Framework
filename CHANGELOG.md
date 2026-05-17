@@ -1,5 +1,8 @@
 # Changelog
 
+## [3.1.300] - 2025-05-17
+1.优化Localization收集的中文  
+
 ## [3.1.299] - 2025-05-17
 1.新增Audio模块PlayAudioEffect2D方法，VolumeAudioEffect / ResumeAll / PauseAll / StopAll 现在会一起控制一次性音效  
 
