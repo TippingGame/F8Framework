@@ -8,6 +8,12 @@ namespace F8Framework.Core
         [Header("Layout", order = 3)]
         public ScrollLayout layout = new ScrollLayout();
 
+        [Header("Event", order = 4)]
+        public ChangeValueEvent onChangeValue = new ChangeValueEvent();
+        public ItemActiveEvent onChangeActiveItem = new ItemActiveEvent();
+        public StateChangeEvent onStartLine = new StateChangeEvent();
+        public StateChangeEvent onEndLine = new StateChangeEvent();
+
         public class LineLayout
         {
             public LineLayout(int index)

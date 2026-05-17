@@ -14,12 +14,6 @@ namespace F8Framework.Core
 
         private bool                            changeValue             = false;
 
-        [Header("Event", order = 4)]
-        public ChangeValueEvent                 onChangeValue           = new ChangeValueEvent();
-        public ItemActiveEvent                  onChangeActiveItem      = new ItemActiveEvent();
-        public StateChangeEvent                 onStartLine             = new StateChangeEvent();
-        public StateChangeEvent                 onEndLine               = new StateChangeEvent();
-
         private Predicate<InfiniteScrollData>   onFilter                = null;
 
         private void Awake()
