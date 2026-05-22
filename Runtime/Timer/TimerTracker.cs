@@ -90,16 +90,45 @@ namespace F8Framework.Core
             if (!_timerIds.Remove(id))
                 return;
 
-            TimerManager.Instance.RemoveTimer(id);
+            if (ModuleCenter.Contains<TimerManager>())
+            {
+                TimerManager.Instance.RemoveTimer(id);
+            }
+        }
+
+        public void Pause(int id)
+        {
+            if (!_timerIds.Contains(id))
+                return;
+
+            if (ModuleCenter.Contains<TimerManager>())
+            {
+                TimerManager.Instance.Pause(id);
+            }
+        }
+
+        public void Resume(int id)
+        {
+            if (!_timerIds.Contains(id))
+                return;
+
+            if (ModuleCenter.Contains<TimerManager>())
+            {
+                TimerManager.Instance.Resume(id);
+            }
         }
 
         public void Clear()
         {
             _released = true;
 
-            foreach (int timerId in _timerIds)
+            if (ModuleCenter.Contains<TimerManager>())
             {
-                TimerManager.Instance.RemoveTimer(timerId);
+                var timerManager = TimerManager.Instance;
+                foreach (int timerId in _timerIds)
+                {
+                    timerManager.RemoveTimer(timerId);
+                }
             }
 
             _timerIds.Clear();
@@ -112,7 +141,10 @@ namespace F8Framework.Core
 
             if (_released)
             {
-                TimerManager.Instance.RemoveTimer(id);
+                if (ModuleCenter.Contains<TimerManager>())
+                {
+                    TimerManager.Instance.RemoveTimer(id);
+                }
                 return id;
             }
 

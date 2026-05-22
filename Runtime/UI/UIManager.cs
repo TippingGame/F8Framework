@@ -39,6 +39,8 @@ namespace F8Framework.Core
 
         private Dictionary<int, UIConfig> _configs = new Dictionary<int, UIConfig>();
         internal readonly List<ViewParams> CurrentUIs = new List<ViewParams>();
+        private AssetLoadTracker _assetLoadTracker;
+        internal AssetLoadTracker AssetLoadTracker => _assetLoadTracker ??= new AssetLoadTracker();
         
         // 将所有的层放入一个字典中
         private Dictionary<LayerType, LayerUI> _layers;
@@ -219,6 +221,7 @@ namespace F8Framework.Core
         {
             Clear(true);
             CurrentUIs.Clear();
+            ClearAssetLoadTracker(true);
             _layers?.Clear();
             _layerGame = null;
             _layerUI = null;
@@ -228,6 +231,30 @@ namespace F8Framework.Core
             _layerGuide = null;
             _layers = null;
             Destroy(gameObject);
+        }
+
+        internal GameObject LoadUIPrefab(string assetName)
+        {
+            return AssetLoadTracker.Load<GameObject>(assetName);
+        }
+
+        internal BaseLoader LoadUIPrefabAsync(string assetName, OnAssetObject<GameObject> callback = null)
+        {
+            return AssetLoadTracker.LoadAsync(assetName, callback);
+        }
+
+        internal void UnloadUIPrefab(string assetName, bool unloadAllLoadedObjects = false)
+        {
+            _assetLoadTracker?.Release(assetName, unloadAllLoadedObjects);
+        }
+
+        internal void ClearAssetLoadTracker(bool unloadAllLoadedObjects = false)
+        {
+            if (_assetLoadTracker == null)
+                return;
+            
+            _assetLoadTracker.ReleaseAll(unloadAllLoadedObjects);
+            _assetLoadTracker = null;
         }
         
         // 同步加载，使用枚举作为参数

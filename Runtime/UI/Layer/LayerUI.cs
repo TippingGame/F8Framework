@@ -83,6 +83,8 @@ namespace F8Framework.Core
             viewParams.Params = parameters;
             viewParams.Callbacks = callbacks;
             viewParams.Valid = true;
+            viewParams.LoadCanceled = false;
+            viewParams.UnloadAllLoadedObjectsOnCancel = false;
 
             Load(viewParams);
 
@@ -104,6 +106,8 @@ namespace F8Framework.Core
             viewParams.Params = parameters;
             viewParams.Callbacks = callbacks;
             viewParams.Valid = true;
+            viewParams.LoadCanceled = false;
+            viewParams.UnloadAllLoadedObjectsOnCancel = false;
 
             return LoadAsync(viewParams);
         }
@@ -122,7 +126,11 @@ namespace F8Framework.Core
         {
             if (!uiViews.TryGetValue(prefabPath, out var viewParams))
             {
-                if (!uiCache.TryGetValue(prefabPath, out viewParams))
+                if (uiCache.TryGetValue(prefabPath, out viewParams))
+                {
+                    uiCache.Remove(prefabPath);
+                }
+                else
                 {
                     viewParams = new ViewParams();
                     viewParams.Guid = guid ?? Guid.NewGuid().ToString();
@@ -141,7 +149,7 @@ namespace F8Framework.Core
             }
             else
             {
-                GameObject res = AssetManager.Instance.Load<GameObject>(viewParams.PrefabPath);
+                GameObject res = UIManager.Instance.LoadUIPrefab(viewParams.PrefabPath);
                 GameObject childNode = Instantiate(res, gameObject.transform, false);
                 childNode.name = viewParams.PrefabPath;
                 viewParams.Go = childNode;
@@ -168,8 +176,23 @@ namespace F8Framework.Core
             {
                 viewParams.UILoader = new UILoader();
                 viewParams.UILoader.Guid = viewParams.Guid;
-                AssetManager.Instance.LoadAsync<GameObject>(viewParams.PrefabPath, (res) =>
+                UIManager.Instance.LoadUIPrefabAsync(viewParams.PrefabPath, (res) =>
                 {
+                    if (viewParams.LoadCanceled || !viewParams.Valid || this == null)
+                    {
+                        UIManager.Instance.UnloadUIPrefab(viewParams.PrefabPath, viewParams.UnloadAllLoadedObjectsOnCancel);
+                        viewParams.UILoader.UILoadSuccess();
+                        return;
+                    }
+
+                    if (res == null)
+                    {
+                        uiViews.Remove(viewParams.PrefabPath);
+                        viewParams.Valid = false;
+                        viewParams.UILoader.UILoadSuccess();
+                        return;
+                    }
+
                     GameObject childNode = Instantiate(res, gameObject.transform, false);
                     childNode.name = viewParams.PrefabPath;
                     viewParams.Go = childNode;
@@ -210,22 +233,29 @@ namespace F8Framework.Core
             {
                 RemoveCache(prefabPath);
             }
-            
-            var children = GetChildrens();
-            foreach (var comp in children)
+
+            if (!uiViews.TryGetValue(prefabPath, out var viewParams))
             {
-                var viewParams = comp.ViewParams;
-                if (viewParams.PrefabPath == prefabPath)
-                {
-                    uiViews.Remove(viewParams.PrefabPath);
-                    if (!isDestroy)
-                    {
-                        uiCache[viewParams.PrefabPath] = viewParams;
-                    }
-                    comp.Remove(isDestroy);
-                    viewParams.Valid = false;
-                }
+                return;
             }
+
+            uiViews.Remove(viewParams.PrefabPath);
+            if (CancelPendingLoad(viewParams, isDestroy))
+            {
+                return;
+            }
+
+            if (!isDestroy)
+            {
+                uiCache[viewParams.PrefabPath] = viewParams;
+            }
+
+            var comp = viewParams.DelegateComponent;
+            if (comp != null)
+            {
+                comp.Remove(isDestroy);
+            }
+            viewParams.Valid = false;
         }
 
         protected void RemoveCache(string prefabPath)
@@ -234,9 +264,37 @@ namespace F8Framework.Core
             {
                 uiViews.Remove(viewParams.PrefabPath);
                 uiCache.Remove(prefabPath);
-                var childNode = viewParams.Go;
+                DestroyCachedView(viewParams);
+            }
+        }
+
+        protected void DestroyCachedView(ViewParams viewParams)
+        {
+            if (viewParams == null)
+            {
+                return;
+            }
+
+            var childNode = viewParams.Go;
+            if (childNode != null)
+            {
                 Destroy(childNode);
             }
+
+            UIManager.Instance.UnloadUIPrefab(viewParams.PrefabPath, true);
+        }
+
+        protected bool CancelPendingLoad(ViewParams viewParams, bool unloadAllLoadedObjects)
+        {
+            if (viewParams == null || viewParams.Go != null || viewParams.DelegateComponent != null)
+            {
+                return false;
+            }
+
+            viewParams.LoadCanceled = true;
+            viewParams.UnloadAllLoadedObjectsOnCancel = unloadAllLoadedObjects;
+            viewParams.Valid = false;
+            return true;
         }
 
         public GameObject GetByGuid(string guid)
@@ -306,17 +364,18 @@ namespace F8Framework.Core
             {
                 foreach (var value in uiCache.Values)
                 {
-                    var childNode = value.Go;
-                    if (childNode != null)
-                    {
-                        Destroy(childNode);
-                    }
+                    DestroyCachedView(value);
                 }
                 uiCache.Clear();
             }
             
             foreach (var value in uiViews.Values)
             {
+                if (CancelPendingLoad(value, isDestroy))
+                {
+                    continue;
+                }
+
                 if (!isDestroy)
                 {
                     uiCache[value.PrefabPath] = value;

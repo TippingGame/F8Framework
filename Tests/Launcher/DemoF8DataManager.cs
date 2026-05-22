@@ -16,6 +16,8 @@ namespace F8Framework.Tests
 	internal class DemoF8DataManager : ModuleSingleton<DemoF8DataManager>, IModule
 	{
 		public string VariantName { get; set; }
+		private AssetLoadTracker _assetLoadTracker;
+		private AssetLoadTracker AssetLoadTracker => _assetLoadTracker ??= new AssetLoadTracker();
 		private DemoSheet1 p_Sheet1;
 		private DemoSheet2 p_Sheet2;
 		private DemoLocalizedStrings p_LocalizedStrings;
@@ -157,12 +159,12 @@ namespace F8Framework.Tests
 		[Preserve]
 		public T Load<T>(string name)
 		{
-			TextAsset textAsset = AssetManager.Instance.Load<TextAsset>(name);
+			TextAsset textAsset = AssetLoadTracker.Load<TextAsset>(name);
 			if (textAsset == null)
 			{
 				return default(T);
 			}
-			AssetManager.Instance.Unload(name, false);
+			UnloadAsset(name, false);
 			T obj = Util.BinarySerializer.Deserialize<T>(textAsset.bytes);
 			return obj;
 		}
@@ -170,29 +172,42 @@ namespace F8Framework.Tests
 		[Preserve]
 		public IEnumerator LoadAsync<T>(string name, Action<T> callback)
 		{
-			var load = AssetManager.Instance.LoadAsync<TextAsset>(name);
-			yield return load;
-			TextAsset textAsset = AssetManager.Instance.GetAssetObject<TextAsset>(name);
+			TextAsset textAsset = null;
+			yield return AssetLoadTracker.LoadAsync<TextAsset>(name, result => textAsset = result);
 			if (textAsset != null)
 			{
-				AssetManager.Instance.Unload(name, false);
+				UnloadAsset(name, false);
 				T obj = Util.BinarySerializer.Deserialize<T>(textAsset.bytes);
-				callback(obj);
+				callback?.Invoke(obj);
 			}
 		}
 
 		[Preserve]
 		public async Task LoadAsyncTask<T>(string name, Action<T> callback)
 		{
-			BaseLoader load = AssetManager.Instance.LoadAsync<TextAsset>(name);
+			TextAsset textAsset = null;
+			BaseLoader load = AssetLoadTracker.LoadAsync<TextAsset>(name, result => textAsset = result);
 			await load;
-			TextAsset textAsset = AssetManager.Instance.GetAssetObject<TextAsset>(name);
 			if (textAsset != null)
 			{
-				AssetManager.Instance.Unload(name, false);
+				UnloadAsset(name, false);
 				T obj = Util.BinarySerializer.Deserialize<T>(textAsset.bytes);
-				callback(obj);
+				callback?.Invoke(obj);
 			}
+		}
+
+		public void UnloadAsset(string name, bool unloadAllLoadedObjects = false)
+		{
+			_assetLoadTracker?.Release(name, unloadAllLoadedObjects);
+		}
+
+		public void ClearAssetLoadTracker(bool unloadAllLoadedObjects = false)
+		{
+			if (_assetLoadTracker == null)
+				return;
+
+			_assetLoadTracker.ReleaseAll(unloadAllLoadedObjects);
+			_assetLoadTracker = null;
 		}
 
 		public void OnInit(object createParam)
@@ -217,6 +232,11 @@ namespace F8Framework.Tests
 
 		public void OnTermination()
 		{
+			ClearAssetLoadTracker(true);
+			p_Sheet1 = null;
+			p_Sheet2 = null;
+			p_LocalizedStrings = null;
+			VariantName = null;
 			base.Destroy();
 		}
 	}

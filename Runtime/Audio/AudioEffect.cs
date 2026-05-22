@@ -21,6 +21,10 @@ namespace F8Framework.Core
         private GameObject OneShotAudio;
         private int _playVersion;
         private float _volumeScale = 1f;
+        private AssetLoadTracker _assetLoadTracker;
+        private AssetLoadTracker AssetLoadTracker => _assetLoadTracker ??= new AssetLoadTracker();
+        private TimerTracker _timerTracker;
+        private TimerTracker TimerTracker => _timerTracker ??= new TimerTracker();
         
         private class PlayingAudioEffect
         {
@@ -60,7 +64,7 @@ namespace F8Framework.Core
             }
             else
             {
-                AssetManager.Instance.LoadAsync<AudioClip>(url, (asset) =>
+                AssetLoadTracker.LoadAsync<AudioClip>(url, (asset) =>
                 {
                     if (playVersion != _playVersion)
                     {
@@ -145,10 +149,10 @@ namespace F8Framework.Core
             _playingAudioEffects.Add(playingAudioEffect);
             
             float time = clip.length / Mathf.Max(Mathf.Abs(audioSource.pitch), 0.01f);
-            playingAudioEffect.TimerId = TimerManager.Instance?.AddTimer(this, 1f, time, 1, null, () =>
+            playingAudioEffect.TimerId = TimerTracker.AddTimer(this, 1f, time, 1, null, () =>
             {
                 FinishPlayingAudioEffect(playingAudioEffect, true);
-            }, true) ?? 0;
+            }, true);
         }
         
         public void SetVolume(float volume)
@@ -182,7 +186,7 @@ namespace F8Framework.Core
                 {
                     playingAudioEffect.AudioSource.Pause();
                     playingAudioEffect.IsPausedByManager = true;
-                    TimerManager.Instance?.Pause(playingAudioEffect.TimerId);
+                    _timerTracker?.Pause(playingAudioEffect.TimerId);
                 }
             }
         }
@@ -202,7 +206,7 @@ namespace F8Framework.Core
                 {
                     playingAudioEffect.AudioSource.Play();
                     playingAudioEffect.IsPausedByManager = false;
-                    TimerManager.Instance?.Resume(playingAudioEffect.TimerId);
+                    _timerTracker?.Resume(playingAudioEffect.TimerId);
                 }
             }
         }
@@ -214,16 +218,14 @@ namespace F8Framework.Core
             {
                 FinishPlayingAudioEffect(_playingAudioEffects[i], false);
             }
+            ClearTimerTracker();
         }
         
         // 释放所有音效资源
         public void UnloadAll(bool unloadAllLoadedObjects = true)
         {
             Stop();
-            foreach (var item in _effects)
-            {
-                AssetManager.Instance?.Unload(item.Key, unloadAllLoadedObjects);
-            }
+            ClearAssetLoadTracker(unloadAllLoadedObjects);
             _effects.Clear();
             _effectsNum.Clear();
         }
@@ -235,7 +237,7 @@ namespace F8Framework.Core
                 return;
             }
             
-            TimerManager.Instance?.RemoveTimer(playingAudioEffect.TimerId);
+            RemoveTimer(playingAudioEffect.TimerId);
             if (playingAudioEffect.AudioSource != null && !playingAudioEffect.AudioSource.Equals(null))
             {
                 playingAudioEffect.AudioSource.Stop();
@@ -257,7 +259,7 @@ namespace F8Framework.Core
         private void RemoveInvalidPlayingAudioEffect(int index)
         {
             PlayingAudioEffect playingAudioEffect = _playingAudioEffects[index];
-            TimerManager.Instance?.RemoveTimer(playingAudioEffect.TimerId);
+            RemoveTimer(playingAudioEffect.TimerId);
             DecreaseEffectCount(playingAudioEffect.Url);
             _playingAudioEffects.RemoveAt(index);
         }
@@ -293,6 +295,29 @@ namespace F8Framework.Core
                     _effectsNum[url] = num;
                 }
             }
+        }
+
+        private void RemoveTimer(int timerId)
+        {
+            _timerTracker?.RemoveTimer(timerId);
+        }
+
+        private void ClearTimerTracker()
+        {
+            if (_timerTracker == null)
+                return;
+            
+            _timerTracker.Clear();
+            _timerTracker = null;
+        }
+
+        private void ClearAssetLoadTracker(bool unloadAllLoadedObjects = false)
+        {
+            if (_assetLoadTracker == null)
+                return;
+            
+            _assetLoadTracker.ReleaseAll(unloadAllLoadedObjects);
+            _assetLoadTracker = null;
         }
     }
 }

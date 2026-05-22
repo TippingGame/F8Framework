@@ -1520,11 +1520,6 @@ namespace F8Framework.Core
             CleanupTerminationState();
         }
 
-        private void OnDestroy()
-        {
-            CleanupTerminationState();
-        }
-
         private void InitializeHelper(IInputHelper helper, bool loadDefaultDevice)
         {
             var previousHelper = _helper;

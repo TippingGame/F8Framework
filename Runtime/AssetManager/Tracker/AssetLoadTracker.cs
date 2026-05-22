@@ -9,6 +9,7 @@ namespace F8Framework.Core
     {
         private readonly Dictionary<string, int> _refs = new();
         private bool _released;
+        private bool _releasedUnloadAllLoadedObjects;
 
         public T Load<T>(string assetName, string subAssetName = null,
             AssetManager.AssetAccessMode mode = AssetManager.AssetAccessMode.UNKNOWN)
@@ -169,7 +170,7 @@ namespace F8Framework.Core
             {
                 if (_released)
                 {
-                    ReleaseDirectory(assetName, mode, false);
+                    ReleaseDirectory(assetName, mode, _releasedUnloadAllLoadedObjects);
                     return;
                 }
 
@@ -183,7 +184,10 @@ namespace F8Framework.Core
             if (string.IsNullOrEmpty(assetName) || !_refs.TryGetValue(assetName, out int count) || count <= 0)
                 return;
 
-            AssetManager.Instance.Unload(assetName, unloadAllLoadedObjects);
+            if (ModuleCenter.Contains<AssetManager>())
+            {
+                AssetManager.Instance.Unload(assetName, unloadAllLoadedObjects);
+            }
 
             if (count <= 1)
             {
@@ -198,11 +202,16 @@ namespace F8Framework.Core
         public void ReleaseAll(bool unloadAllLoadedObjects = false)
         {
             _released = true;
+            _releasedUnloadAllLoadedObjects = unloadAllLoadedObjects;
 
-            foreach (var pair in _refs)
+            if (ModuleCenter.Contains<AssetManager>())
             {
-                for (int i = 0; i < pair.Value; i++)
-                    AssetManager.Instance.Unload(pair.Key, unloadAllLoadedObjects);
+                var assetManager = AssetManager.Instance;
+                foreach (var pair in _refs)
+                {
+                    for (int i = 0; i < pair.Value; i++)
+                        assetManager.Unload(pair.Key, unloadAllLoadedObjects);
+                }
             }
 
             _refs.Clear();
@@ -214,13 +223,21 @@ namespace F8Framework.Core
                 return;
 
             _released = false;
+            _releasedUnloadAllLoadedObjects = false;
             _refs[assetName] = _refs.TryGetValue(assetName, out int count) ? count + 1 : 1;
         }
 
         private void RetainDirectory(string assetName, AssetManager.AssetAccessMode mode)
         {
-            AssetManager.AssetInfo info = AssetManager.Instance.GetAssetInfo(assetName + AssetManager.DirSuffix, mode);
-            if (!AssetManager.Instance.IsLegal(ref info) || info.AssetPath == null)
+            if (!ModuleCenter.Contains<AssetManager>())
+                return;
+
+            var assetManager = AssetManager.Instance;
+            if (assetManager == null)
+                return;
+
+            AssetManager.AssetInfo info = assetManager.GetAssetInfo(assetName + AssetManager.DirSuffix, mode);
+            if (!assetManager.IsLegal(ref info) || info.AssetPath == null)
                 return;
 
             foreach (string subAssetName in info.AssetPath)
@@ -233,14 +250,21 @@ namespace F8Framework.Core
         private void ReleaseDirectory(string assetName, AssetManager.AssetAccessMode mode,
             bool unloadAllLoadedObjects)
         {
-            AssetManager.AssetInfo info = AssetManager.Instance.GetAssetInfo(assetName + AssetManager.DirSuffix, mode);
-            if (!AssetManager.Instance.IsLegal(ref info) || info.AssetPath == null)
+            if (!ModuleCenter.Contains<AssetManager>())
+                return;
+
+            var assetManager = AssetManager.Instance;
+            if (assetManager == null)
+                return;
+
+            AssetManager.AssetInfo info = assetManager.GetAssetInfo(assetName + AssetManager.DirSuffix, mode);
+            if (!assetManager.IsLegal(ref info) || info.AssetPath == null)
                 return;
 
             foreach (string subAssetName in info.AssetPath)
             {
                 if (!string.IsNullOrEmpty(subAssetName))
-                    AssetManager.Instance.Unload(subAssetName, unloadAllLoadedObjects);
+                    assetManager.Unload(subAssetName, unloadAllLoadedObjects);
             }
         }
 
@@ -254,7 +278,10 @@ namespace F8Framework.Core
 
             if (_released)
             {
-                AssetManager.Instance.Unload(assetName, false);
+                if (ModuleCenter.Contains<AssetManager>())
+                {
+                    AssetManager.Instance.Unload(assetName, _releasedUnloadAllLoadedObjects);
+                }
                 return;
             }
 
@@ -273,7 +300,10 @@ namespace F8Framework.Core
 
             if (_released)
             {
-                AssetManager.Instance.Unload(assetName, false);
+                if (ModuleCenter.Contains<AssetManager>())
+                {
+                    AssetManager.Instance.Unload(assetName, _releasedUnloadAllLoadedObjects);
+                }
                 return;
             }
 

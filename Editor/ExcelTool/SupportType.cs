@@ -392,6 +392,8 @@ namespace F8Framework.Core.Editor
             source.Append("\t{\n");
 
             source.Append("\t\tpublic string VariantName;\n");
+            source.Append("\t\tprivate AssetLoadTracker _assetLoadTracker;\n");
+            source.Append("\t\tprivate AssetLoadTracker AssetLoadTracker => _assetLoadTracker ??= new AssetLoadTracker();\n");
             //定义变量
             foreach (string t in types)
             {
@@ -541,12 +543,12 @@ namespace F8Framework.Core.Editor
             source.Append("\t\t[Preserve]\n");
             source.Append("\t\tpublic T Load<T>(string name)\n");
             source.Append("\t\t{\n");
-            source.Append("\t\t\tTextAsset textAsset = AssetManager.Instance.Load<TextAsset>(name);\n");
+            source.Append("\t\t\tTextAsset textAsset = AssetLoadTracker.Load<TextAsset>(name);\n");
             source.Append("\t\t\tif (textAsset == null)\n");
             source.Append("\t\t\t{\n");
             source.Append("\t\t\t\treturn default(T);\n");
             source.Append("\t\t\t}\n");
-            source.Append("\t\t\tAssetManager.Instance.Unload(name, false);\n");
+            source.Append("\t\t\tUnloadAsset(name, false);\n");
             
             string exportFormat = F8EditorPrefs.GetString(BuildPkgTool.ConvertExcelToOtherFormatsKey, BuildPkgTool.ExcelToOtherFormats[1]);
             if (exportFormat == BuildPkgTool.ExcelToOtherFormats[1])
@@ -562,12 +564,11 @@ namespace F8Framework.Core.Editor
             source.Append("\t\t[Preserve]\n");
             source.Append("\t\tpublic IEnumerator LoadAsync<T>(string name, Action<T> callback)\n");
             source.Append("\t\t{\n");
-            source.Append("\t\t\tvar load = AssetManager.Instance.LoadAsync<TextAsset>(name);\n");
-            source.Append("\t\t\tyield return load;\n");
-            source.Append("\t\t\tTextAsset textAsset = AssetManager.Instance.GetAssetObject<TextAsset>(name);\n");
+            source.Append("\t\t\tTextAsset textAsset = null;\n");
+            source.Append("\t\t\tyield return AssetLoadTracker.LoadAsync<TextAsset>(name, result => textAsset = result);\n");
             source.Append("\t\t\tif (textAsset != null)\n");
             source.Append("\t\t\t{\n");
-            source.Append("\t\t\t\tAssetManager.Instance.Unload(name, false);\n");
+            source.Append("\t\t\t\tUnloadAsset(name, false);\n");
             if (exportFormat == BuildPkgTool.ExcelToOtherFormats[1])
             {
                 source.Append("\t\t\t\tT obj = Util.BinarySerializer.Deserialize<T>(textAsset.bytes);\n");
@@ -575,19 +576,19 @@ namespace F8Framework.Core.Editor
             {
                 source.Append("\t\t\t\tT obj = Util.LitJson.ToObject<T>(textAsset.text);\n");
             }
-            source.Append("\t\t\t\tcallback(obj);\n");
+            source.Append("\t\t\t\tcallback?.Invoke(obj);\n");
             source.Append("\t\t\t}\n");
             source.Append("\t\t}\n\n");
             
             source.Append("\t\t[Preserve]\n");
             source.Append("\t\tpublic async Task LoadAsyncTask<T>(string name, Action<T> callback)\n");
             source.Append("\t\t{\n");
-            source.Append("\t\t\tBaseLoader load = AssetManager.Instance.LoadAsync<TextAsset>(name);\n");
+            source.Append("\t\t\tTextAsset textAsset = null;\n");
+            source.Append("\t\t\tBaseLoader load = AssetLoadTracker.LoadAsync<TextAsset>(name, result => textAsset = result);\n");
             source.Append("\t\t\tawait load;\n");
-            source.Append("\t\t\tTextAsset textAsset = AssetManager.Instance.GetAssetObject<TextAsset>(name);\n");
             source.Append("\t\t\tif (textAsset != null)\n");
             source.Append("\t\t\t{\n");
-            source.Append("\t\t\t\tAssetManager.Instance.Unload(name, false);\n");
+            source.Append("\t\t\t\tUnloadAsset(name, false);\n");
             if (exportFormat == BuildPkgTool.ExcelToOtherFormats[1])
             {
                 source.Append("\t\t\t\tT obj = Util.BinarySerializer.Deserialize<T>(textAsset.bytes);\n");
@@ -595,8 +596,21 @@ namespace F8Framework.Core.Editor
             {
                 source.Append("\t\t\t\tT obj = Util.LitJson.ToObject<T>(textAsset.text);\n");
             }
-            source.Append("\t\t\t\tcallback(obj);\n");
+            source.Append("\t\t\t\tcallback?.Invoke(obj);\n");
             source.Append("\t\t\t}\n");
+            source.Append("\t\t}\n\n");
+            
+            source.Append("\t\tpublic void UnloadAsset(string name, bool unloadAllLoadedObjects = false)\n");
+            source.Append("\t\t{\n");
+            source.Append("\t\t\t_assetLoadTracker?.Release(name, unloadAllLoadedObjects);\n");
+            source.Append("\t\t}\n\n");
+            
+            source.Append("\t\tpublic void ClearAssetLoadTracker(bool unloadAllLoadedObjects = false)\n");
+            source.Append("\t\t{\n");
+            source.Append("\t\t\tif (_assetLoadTracker == null)\n");
+            source.Append("\t\t\t\treturn;\n\n");
+            source.Append("\t\t\t_assetLoadTracker.ReleaseAll(unloadAllLoadedObjects);\n");
+            source.Append("\t\t\t_assetLoadTracker = null;\n");
             source.Append("\t\t}\n\n");
             
             source.Append("\t\tpublic void OnInit(object createParam)\n");
@@ -617,6 +631,7 @@ namespace F8Framework.Core.Editor
             source.Append("\t\t}\n\n");
             source.Append("\t\tpublic void OnTermination()\n");
             source.Append("\t\t{\n");
+            source.Append("\t\t\tClearAssetLoadTracker(true);\n");
             foreach (string t in types)
             {
                 source.Append("\t\t\tp_" + t + " = null;\n");
@@ -672,7 +687,7 @@ namespace F8Framework.Core.Editor
 		            private System.Object Load(string name)
 		            {
 		            	IFormatter f = new BinaryFormatter();
-		            	TextAsset text = AssetManager.Instance.Load<TextAsset>(name);
+		            	TextAsset text = AssetLoadTracker.Load<TextAsset>(name);
 		            	using (MemoryStream memoryStream = new MemoryStream(text.bytes))
 		            	{
 		            		return f.Deserialize(memoryStream);

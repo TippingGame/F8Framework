@@ -76,6 +76,8 @@ namespace F8Framework.Core
 
             viewParams.UIid = uiId;
             viewParams.Valid = true;
+            viewParams.LoadCanceled = false;
+            viewParams.UnloadAllLoadedObjectsOnCancel = false;
 
             viewParams.Callbacks = firstElement.callbacks ?? new UICallbacks();
             UICallbacks.OnAddedEventDelegate onRemoveSource = viewParams.Callbacks.OnRemoved;
@@ -99,6 +101,8 @@ namespace F8Framework.Core
 
             viewParams.UIid = uiId;
             viewParams.Valid = true;
+            viewParams.LoadCanceled = false;
+            viewParams.UnloadAllLoadedObjectsOnCancel = false;
 
             viewParams.Callbacks = firstElement.callbacks ?? new UICallbacks();
             UICallbacks.OnAddedEventDelegate onRemoveSource = viewParams.Callbacks.OnRemoved;

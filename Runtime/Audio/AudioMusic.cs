@@ -13,6 +13,10 @@ namespace F8Framework.Core
         public AudioSource MusicSource;
         public int AudioTween;
         private int _timerId = 0;
+        private AssetLoadTracker _assetLoadTracker;
+        private AssetLoadTracker AssetLoadTracker => _assetLoadTracker ??= new AssetLoadTracker();
+        private TimerTracker _timerTracker;
+        private TimerTracker TimerTracker => _timerTracker ??= new TimerTracker();
 
         // 获取音乐播放进度
         public float Progress
@@ -48,7 +52,7 @@ namespace F8Framework.Core
             }
             else
             {
-                AssetManager.Instance.LoadAsync<AudioClip>(url, (asset) =>
+                AssetLoadTracker.LoadAsync<AudioClip>(url, (asset) =>
                 {
                     _audios[url] = asset;
                     
@@ -63,6 +67,11 @@ namespace F8Framework.Core
             {
                 StopCurrentPlayback();
             }
+            else
+            {
+                RemoveTimer(_timerId);
+                _timerId = 0;
+            }
 
             MusicSource.clip = audioClip;
 
@@ -71,13 +80,20 @@ namespace F8Framework.Core
             if (audioClip != null)
             {
                 MusicSource.Play();
-                
-                _timerId = TimerManager.Instance.AddTimer(this, 1f, audioClip.length, 1, null,
+
+                int timerId = 0;
+                timerId = TimerTracker.AddTimer(this, 1f, audioClip.length, 1, null,
                     () =>
                     {
+                        RemoveTimer(timerId);
+                        if (_timerId == timerId)
+                        {
+                            _timerId = 0;
+                        }
                         OnComplete?.Invoke();
                     }
                 );
+                _timerId = timerId;
             }
             
             if (fadeDuration > 0f)
@@ -91,7 +107,8 @@ namespace F8Framework.Core
         
         private void StopCurrentPlayback()
         {
-            TimerManager.Instance?.RemoveTimer(_timerId);
+            RemoveTimer(_timerId);
+            _timerId = 0;
             Tween.Instance?.CancelTween(AudioTween);
             MusicSource.Stop();
             OnComplete?.Invoke();
@@ -102,7 +119,7 @@ namespace F8Framework.Core
             if (MusicSource.isPlaying)
             {
                 MusicSource.Pause();
-                TimerManager.Instance?.Pause(_timerId);
+                _timerTracker?.Pause(_timerId);
                 Tween.Instance?.SetIsPause(AudioTween, true);
             }
         }
@@ -112,14 +129,14 @@ namespace F8Framework.Core
             if (!MusicSource.isPlaying && MusicSource.clip != null)
             {
                 MusicSource.Play();
-                TimerManager.Instance?.Resume(_timerId);
+                _timerTracker?.Resume(_timerId);
                 Tween.Instance?.SetIsPause(AudioTween, false);
             }
         }
         
         public void Stop()
         {
-            if (MusicSource.isPlaying)
+            if (MusicSource.isPlaying || _timerId != 0)
             {
                 StopCurrentPlayback();
             }
@@ -129,11 +146,32 @@ namespace F8Framework.Core
         public void UnloadAll(bool unloadAllLoadedObjects = true)
         {
             StopCurrentPlayback();
-            foreach (var item in _audios)
-            {
-                AssetManager.Instance?.Unload(item.Key, unloadAllLoadedObjects);
-            }
+            ClearTimerTracker();
+            ClearAssetLoadTracker(unloadAllLoadedObjects);
             _audios.Clear();
+        }
+
+        private void RemoveTimer(int timerId)
+        {
+            _timerTracker?.RemoveTimer(timerId);
+        }
+
+        private void ClearTimerTracker()
+        {
+            if (_timerTracker == null)
+                return;
+            
+            _timerTracker.Clear();
+            _timerTracker = null;
+        }
+
+        private void ClearAssetLoadTracker(bool unloadAllLoadedObjects = false)
+        {
+            if (_assetLoadTracker == null)
+                return;
+            
+            _assetLoadTracker.ReleaseAll(unloadAllLoadedObjects);
+            _assetLoadTracker = null;
         }
     }
 }

@@ -33,6 +33,8 @@ namespace F8Framework.Core
         public object[] Params;
         public UICallbacks Callbacks;
         public bool Valid;
+        public bool LoadCanceled;
+        public bool UnloadAllLoadedObjectsOnCancel;
         public GameObject Go;
         public DelegateComponent DelegateComponent;
         public BaseView BaseView;

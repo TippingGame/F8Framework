@@ -72,6 +72,7 @@ namespace F8Framework.Core
             
             if (isDestroy)
             {
+                UIManager.Instance.UnloadUIPrefab(viewParams.PrefabPath, true);
                 Destroy(gameObject);
             }
             else

@@ -15,6 +15,8 @@ namespace F8Framework.Core
             viewParams.Params = parameters;
             viewParams.Callbacks = callbacks;
             viewParams.Valid = true;
+            viewParams.LoadCanceled = false;
+            viewParams.UnloadAllLoadedObjectsOnCancel = false;
             
             Load(viewParams);
             return guid;
@@ -30,6 +32,8 @@ namespace F8Framework.Core
             viewParams.Params = parameters;
             viewParams.Callbacks = callbacks;
             viewParams.Valid = true;
+            viewParams.LoadCanceled = false;
+            viewParams.UnloadAllLoadedObjectsOnCancel = false;
             
             return LoadAsync(viewParams);
         }
@@ -60,6 +64,7 @@ namespace F8Framework.Core
                     viewParams.Guid = guid;
                 }
                 uiCache.Remove(lastKey);
+                viewParams.Guid = guid;
                 viewParams.PrefabPath = prefabPath;
                 uiViews.Add(viewParams.Guid, viewParams);
             }
@@ -80,6 +85,12 @@ namespace F8Framework.Core
         {
             if (uiViews.TryGetValue(guid, out var viewParams))
             {
+                uiViews.Remove(guid);
+                if (CancelPendingLoad(viewParams, isDestroy))
+                {
+                    return viewParams.UIid;
+                }
+
                 if (isDestroy)
                 {
                     RemoveCache(viewParams.Guid);
@@ -88,11 +99,21 @@ namespace F8Framework.Core
                 {
                     uiCache[viewParams.Guid] = viewParams;
                 }
-                uiViews.Remove(guid);
+
                 var comp = viewParams.DelegateComponent;
-                comp.Remove(isDestroy);
+                if (comp != null)
+                {
+                    comp.Remove(isDestroy);
+                }
                 viewParams.Valid = false;
                 return viewParams.UIid;
+            }
+
+            if (isDestroy && uiCache.TryGetValue(guid, out var cachedViewParams))
+            {
+                int uiId = cachedViewParams.UIid;
+                RemoveCache(guid);
+                return uiId;
             }
 
             return 0;
@@ -104,13 +125,17 @@ namespace F8Framework.Core
             {
                 uiViews.Remove(guid);
                 uiCache.Remove(guid);
-                var childNode = viewParams.Go;
-                Destroy(childNode);
+                DestroyCachedView(viewParams);
             }
         }
         
         public new void Close(string prefabPath, bool isDestroy)
         {
+            if (isDestroy)
+            {
+                RemoveCachesByPrefab(prefabPath);
+            }
+
             var values = new List<ViewParams>();
             foreach (var viewParams in uiViews.Values)
             {
@@ -122,6 +147,12 @@ namespace F8Framework.Core
 
             foreach (var viewParams in values)
             {
+                uiViews.Remove(viewParams.Guid);
+                if (CancelPendingLoad(viewParams, isDestroy))
+                {
+                    continue;
+                }
+
                 if (isDestroy)
                 {
                     RemoveCache(viewParams.Guid);
@@ -130,10 +161,30 @@ namespace F8Framework.Core
                 {
                     uiCache[viewParams.Guid] = viewParams;
                 }
-                uiViews.Remove(viewParams.Guid);
+
                 var comp = viewParams.DelegateComponent;
-                comp.Remove(isDestroy);
+                if (comp != null)
+                {
+                    comp.Remove(isDestroy);
+                }
                 viewParams.Valid = false;
+            }
+        }
+
+        private void RemoveCachesByPrefab(string prefabPath)
+        {
+            var keys = new List<string>();
+            foreach (var pair in uiCache)
+            {
+                if (pair.Value.PrefabPath == prefabPath)
+                {
+                    keys.Add(pair.Key);
+                }
+            }
+
+            foreach (var key in keys)
+            {
+                RemoveCache(key);
             }
         }
         
@@ -143,17 +194,18 @@ namespace F8Framework.Core
             {
                 foreach (var value in uiCache.Values)
                 {
-                    var childNode = value.Go;
-                    if (childNode != null)
-                    {
-                        Destroy(childNode);
-                    }
+                    DestroyCachedView(value);
                 }
                 uiCache.Clear();
             }
             
             foreach (var value in uiViews.Values)
             {
+                if (CancelPendingLoad(value, isDestroy))
+                {
+                    continue;
+                }
+
                 if (!isDestroy)
                 {
                     uiCache[value.Guid] = value;

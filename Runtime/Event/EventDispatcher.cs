@@ -58,7 +58,19 @@ namespace F8Framework.Core
             {
                 return;
             }
-            eventData.RemoveFrom(MessageManager.Instance);
+
+            if (!ModuleCenter.Contains<MessageManager>())
+            {
+                return;
+            }
+
+            var messageManager = ModuleCenter.GetModule<MessageManager>();
+            if (messageManager == null)
+            {
+                return;
+            }
+
+            eventData.RemoveFrom(messageManager);
         }
 
         public void AddEventListener<T>(T eventName, Action listener, object handle = null) where T : Enum, IConvertible
@@ -239,7 +251,10 @@ namespace F8Framework.Core
             if (events.ContainsKey(eventId) && events[eventId].Count > 0)
             {
                 events.Remove(eventId);
-                MessageManager.Instance.RemoveEventListener(eventId);
+                if (ModuleCenter.Contains<MessageManager>())
+                {
+                    MessageManager.Instance.RemoveEventListener(eventId);
+                }
             }
         }
 
