@@ -82,8 +82,8 @@ namespace F8Framework.Core
             viewParams.UIid = uiId;
             viewParams.Params = parameters;
             viewParams.Callbacks = callbacks;
-            viewParams.Valid = true;
-            viewParams.LoadCanceled = false;
+            viewParams.State = ViewState.None;
+            viewParams.DestroyOnClose = false;
             viewParams.UnloadAllLoadedObjectsOnCancel = false;
 
             Load(viewParams);
@@ -105,8 +105,8 @@ namespace F8Framework.Core
             viewParams.UIid = uiId;
             viewParams.Params = parameters;
             viewParams.Callbacks = callbacks;
-            viewParams.Valid = true;
-            viewParams.LoadCanceled = false;
+            viewParams.State = viewParams.Go == null && viewParams.DelegateComponent == null ? ViewState.Loading : ViewState.None;
+            viewParams.DestroyOnClose = false;
             viewParams.UnloadAllLoadedObjectsOnCancel = false;
 
             return LoadAsync(viewParams);
@@ -114,7 +114,7 @@ namespace F8Framework.Core
 
         protected bool IsDuplicateLoad(string prefabPath, out ViewParams viewParams)
         {
-            if (uiViews.TryGetValue(prefabPath, out viewParams) && viewParams.Valid)
+            if (uiViews.TryGetValue(prefabPath, out viewParams) && viewParams.State != ViewState.None)
             {
                 LogF8.LogView($"UI重复加载：{prefabPath}");
                 return true;
@@ -143,9 +143,13 @@ namespace F8Framework.Core
 
         protected void Load(ViewParams viewParams)
         {
+            viewParams.State = ViewState.None;
+            PrepareUILoader(viewParams);
+
             if (viewParams != null && viewParams.Go != null)
             {
                 CreateNode(viewParams);
+                viewParams.UILoader.UILoadSuccess();
             }
             else
             {
@@ -159,8 +163,6 @@ namespace F8Framework.Core
                 viewParams.BaseView = childNode.GetComponent<BaseView>();
                 comp.ViewParams = viewParams;
                 
-                viewParams.UILoader = new UILoader();
-                viewParams.UILoader.Guid = viewParams.Guid;
                 CreateNode(viewParams);
                 viewParams.UILoader.UILoadSuccess();
             }
@@ -168,31 +170,42 @@ namespace F8Framework.Core
 
         protected UILoader LoadAsync(ViewParams viewParams)
         {
+            PrepareUILoader(viewParams);
+
             if (viewParams != null && viewParams.Go != null)
             {
-                return CreateNode(viewParams);
+                viewParams.State = ViewState.None;
+                CreateNode(viewParams);
+                viewParams.UILoader.UILoadSuccess();
+                return viewParams.UILoader;
             }
             else
             {
-                viewParams.UILoader = new UILoader();
-                viewParams.UILoader.Guid = viewParams.Guid;
+                viewParams.State = ViewState.Loading;
+                int loadVersion = ++viewParams.LoadVersion;
+                UILoader uiLoader = viewParams.UILoader;
                 UIManager.Instance.LoadUIPrefabAsync(viewParams.PrefabPath, (res) =>
                 {
-                    if (viewParams.LoadCanceled || !viewParams.Valid || this == null)
+                    if (!viewParams.Loading || loadVersion != viewParams.LoadVersion || this == null)
                     {
+                        if (loadVersion == viewParams.LoadVersion)
+                        {
+                            viewParams.State = ViewState.None;
+                        }
                         UIManager.Instance.UnloadUIPrefab(viewParams.PrefabPath, viewParams.UnloadAllLoadedObjectsOnCancel);
-                        viewParams.UILoader.UILoadSuccess();
+                        uiLoader.UILoadSuccess();
                         return;
                     }
 
                     if (res == null)
                     {
                         uiViews.Remove(viewParams.PrefabPath);
-                        viewParams.Valid = false;
-                        viewParams.UILoader.UILoadSuccess();
+                        viewParams.State = ViewState.None;
+                        uiLoader.UILoadSuccess();
                         return;
                     }
 
+                    viewParams.State = ViewState.None;
                     GameObject childNode = Instantiate(res, gameObject.transform, false);
                     childNode.name = viewParams.PrefabPath;
                     viewParams.Go = childNode;
@@ -202,18 +215,29 @@ namespace F8Framework.Core
                     viewParams.BaseView = childNode.GetComponent<BaseView>();
                     comp.ViewParams = viewParams;
                     CreateNode(viewParams);
-                    viewParams.UILoader.UILoadSuccess();
+                    uiLoader.UILoadSuccess();
                 });
                 
                 return viewParams.UILoader;
             }
         }
+
+        protected void PrepareUILoader(ViewParams viewParams)
+        {
+            if (viewParams.UILoader == null || viewParams.UILoader.LoaderSuccess)
+            {
+                viewParams.UILoader = new UILoader();
+            }
+
+            viewParams.UILoader.Guid = viewParams.Guid;
+        }
         
         public UILoader CreateNode(ViewParams viewParams)
         {
+            UIManager.Instance.CurrentUIs.RemoveAll(value => value == viewParams);
             UIManager.Instance.CurrentUIs.Add(viewParams);
             
-            viewParams.Valid = true;
+            viewParams.State = ViewState.Active;
 
             var comp = viewParams.DelegateComponent;
             viewParams.Go.transform.SetParent(gameObject.transform, false);
@@ -239,23 +263,26 @@ namespace F8Framework.Core
                 return;
             }
 
-            uiViews.Remove(viewParams.PrefabPath);
-            if (CancelPendingLoad(viewParams, isDestroy))
+            if (IsPendingLoad(viewParams))
             {
                 return;
             }
 
-            if (!isDestroy)
+            if (CancelPendingLoad(viewParams, isDestroy))
             {
-                uiCache[viewParams.PrefabPath] = viewParams;
+                uiViews.Remove(viewParams.PrefabPath);
+                return;
             }
 
             var comp = viewParams.DelegateComponent;
             if (comp != null)
             {
-                comp.Remove(isDestroy);
+                RemoveView(viewParams, comp, isDestroy);
             }
-            viewParams.Valid = false;
+            else
+            {
+                viewParams.State = ViewState.None;
+            }
         }
 
         protected void RemoveCache(string prefabPath)
@@ -275,6 +302,8 @@ namespace F8Framework.Core
                 return;
             }
 
+            viewParams.State = ViewState.None;
+
             var childNode = viewParams.Go;
             if (childNode != null)
             {
@@ -286,15 +315,57 @@ namespace F8Framework.Core
 
         protected bool CancelPendingLoad(ViewParams viewParams, bool unloadAllLoadedObjects)
         {
-            if (viewParams == null || viewParams.Go != null || viewParams.DelegateComponent != null)
+            if (!IsPendingLoad(viewParams))
             {
                 return false;
             }
 
-            viewParams.LoadCanceled = true;
+            viewParams.State = ViewState.None;
+            viewParams.LoadVersion++;
             viewParams.UnloadAllLoadedObjectsOnCancel = unloadAllLoadedObjects;
-            viewParams.Valid = false;
             return true;
+        }
+
+        protected bool IsPendingLoad(ViewParams viewParams)
+        {
+            return viewParams != null && viewParams.Loading && viewParams.Go == null && viewParams.DelegateComponent == null;
+        }
+
+        protected void RemoveView(ViewParams viewParams, DelegateComponent comp, bool isDestroy)
+        {
+            if (comp.Remove(isDestroy, OnViewRemoved))
+            {
+                return;
+            }
+
+            viewParams.State = ViewState.None;
+        }
+
+        protected virtual void OnViewRemoved(ViewParams viewParams)
+        {
+            if (viewParams == null)
+            {
+                return;
+            }
+
+            RemoveViewRecord(viewParams);
+
+            if (viewParams.DestroyOnClose)
+            {
+                return;
+            }
+
+            CacheView(viewParams);
+        }
+
+        protected virtual void RemoveViewRecord(ViewParams viewParams)
+        {
+            uiViews.Remove(viewParams.PrefabPath);
+        }
+
+        protected virtual void CacheView(ViewParams viewParams)
+        {
+            uiCache[viewParams.PrefabPath] = viewParams;
         }
 
         public GameObject GetByGuid(string guid)
@@ -369,27 +440,27 @@ namespace F8Framework.Core
                 uiCache.Clear();
             }
             
-            foreach (var value in uiViews.Values)
+            var values = new List<ViewParams>(uiViews.Values);
+            uiViews.Clear();
+
+            foreach (var value in values)
             {
                 if (CancelPendingLoad(value, isDestroy))
                 {
+                    uiViews.Remove(value.PrefabPath);
                     continue;
                 }
 
-                if (!isDestroy)
-                {
-                    uiCache[value.PrefabPath] = value;
-                }
-        
                 var comp = value.DelegateComponent;
                 if (comp != null)
                 {
-                    comp.Remove(isDestroy);
+                    RemoveView(value, comp, isDestroy);
                 }
-                value.Valid = false;
+                else
+                {
+                    value.State = ViewState.None;
+                }
             }
-    
-            uiViews.Clear();
         }
     }
 }

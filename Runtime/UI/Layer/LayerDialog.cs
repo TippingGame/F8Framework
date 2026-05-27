@@ -11,7 +11,7 @@ namespace F8Framework.Core
             public UIConfig config;
             public object[] parameters;
             public UICallbacks callbacks;
-            public string guid;
+            public string requestId;
             public UILoader uiLoader;
         }
 
@@ -24,21 +24,22 @@ namespace F8Framework.Core
                 dialogQueue = new Queue<DialogParam>();
                 dialogParams[uiId] = dialogQueue;
             }
-            dialogQueue.Enqueue(new DialogParam
+            var dialogParam = new DialogParam
             {
                 config = config,
                 parameters = parameters,
                 callbacks = callbacks,
-                guid = null,
+                requestId = Guid.NewGuid().ToString(),
                 uiLoader = null,
-            });
+            };
+            dialogQueue.Enqueue(dialogParam);
             if (dialogQueue.Count > 1)
             {
-                return dialogQueue.Peek().guid;
+                return GetCurrentOrCachedGuid(config.AssetName);
             }
             else
             {
-                return Show(uiId, dialogQueue.Peek());
+                return Show(uiId, dialogParam);
             }
         }
 
@@ -49,43 +50,43 @@ namespace F8Framework.Core
                 dialogQueue = new Queue<DialogParam>();
                 dialogParams[uiId] = dialogQueue;
             }
-            dialogQueue.Enqueue(new DialogParam
+            var dialogParam = new DialogParam
             {
                 config = config,
                 parameters = parameters,
                 callbacks = callbacks,
-                guid = null,
-                uiLoader = null,
-            });
+                requestId = Guid.NewGuid().ToString(),
+                uiLoader = new UILoader(),
+            };
+            dialogParam.uiLoader.Guid = GetCurrentOrCachedGuid(config.AssetName);
+            dialogQueue.Enqueue(dialogParam);
             if (dialogQueue.Count > 1)
             {
-                return dialogQueue.Peek().uiLoader;
+                return dialogParam.uiLoader;
             }
             else
             {
-                var dia = dialogQueue.Peek();
-                dia.uiLoader = ShowAsync(uiId, dialogQueue.Peek());
-                return dia.uiLoader;
+                return ShowAsync(uiId, dialogParam);
             }
         }
         
         private string Show(int uiId, DialogParam firstElement)
         {
             string prefabPath = firstElement.config.AssetName;
-            ViewParams viewParams = GetOrCreateViewParams(prefabPath, firstElement.guid);
+            ViewParams viewParams = GetOrCreateViewParams(prefabPath);
 
             viewParams.UIid = uiId;
-            viewParams.Valid = true;
-            viewParams.LoadCanceled = false;
+            viewParams.State = ViewState.None;
+            viewParams.DestroyOnClose = false;
             viewParams.UnloadAllLoadedObjectsOnCancel = false;
 
-            viewParams.Callbacks = firstElement.callbacks ?? new UICallbacks();
+            viewParams.Callbacks = CloneCallbacks(firstElement.callbacks);
             UICallbacks.OnAddedEventDelegate onRemoveSource = viewParams.Callbacks.OnRemoved;
             
             viewParams.Callbacks.OnRemoved = (param, id) =>
             {
                 onRemoveSource?.Invoke(param, id);
-                StartCoroutine(DelayedNext(id));
+                StartCoroutine(DelayedNext(id, firstElement.requestId));
             };
             
             viewParams.Params = firstElement.parameters;
@@ -93,56 +94,120 @@ namespace F8Framework.Core
             firstElement.uiLoader = viewParams.UILoader;
             return viewParams.Guid;
         }
+
+        protected new ViewParams GetOrCreateViewParams(string prefabPath, string guid = null)
+        {
+            if (!uiViews.TryGetValue(prefabPath, out var viewParams))
+            {
+                if (uiCache.TryGetValue(prefabPath, out viewParams))
+                {
+                    uiCache.Remove(prefabPath);
+                }
+                else
+                {
+                    viewParams = new ViewParams();
+                }
+
+                viewParams.Guid ??= guid ?? Guid.NewGuid().ToString();
+                viewParams.PrefabPath = prefabPath;
+                uiViews.Add(viewParams.PrefabPath, viewParams);
+            }
+            return viewParams;
+        }
         
         private UILoader ShowAsync(int uiId, DialogParam firstElement)
         {
             string prefabPath = firstElement.config.AssetName;
-            ViewParams viewParams = GetOrCreateViewParams(prefabPath, firstElement.guid);
+            ViewParams viewParams = GetOrCreateViewParams(prefabPath);
 
             viewParams.UIid = uiId;
-            viewParams.Valid = true;
-            viewParams.LoadCanceled = false;
+            viewParams.State = viewParams.Go == null && viewParams.DelegateComponent == null ? ViewState.Loading : ViewState.None;
+            viewParams.DestroyOnClose = false;
             viewParams.UnloadAllLoadedObjectsOnCancel = false;
 
-            viewParams.Callbacks = firstElement.callbacks ?? new UICallbacks();
+            viewParams.Callbacks = CloneCallbacks(firstElement.callbacks);
             UICallbacks.OnAddedEventDelegate onRemoveSource = viewParams.Callbacks.OnRemoved;
             
             viewParams.Callbacks.OnRemoved = (param, id) =>
             {
                 onRemoveSource?.Invoke(param, id);
-                StartCoroutine(DelayedNext(id));
+                StartCoroutine(DelayedNext(id, firstElement.requestId));
             };
             
             viewParams.Params = firstElement.parameters;
-            
+            viewParams.UILoader = firstElement.uiLoader;
+            PrepareUILoader(viewParams);
+            firstElement.uiLoader = viewParams.UILoader;
             return LoadAsync(viewParams);
         }
+
+        private string GetCurrentOrCachedGuid(string prefabPath)
+        {
+            if (uiViews.TryGetValue(prefabPath, out var viewParams))
+            {
+                return viewParams.Guid;
+            }
+
+            if (uiCache.TryGetValue(prefabPath, out viewParams))
+            {
+                return viewParams.Guid;
+            }
+
+            return null;
+        }
+
+        private UICallbacks CloneCallbacks(UICallbacks callbacks)
+        {
+            if (callbacks == null)
+            {
+                return new UICallbacks();
+            }
+
+            return new UICallbacks(callbacks.OnAdded, callbacks.OnRemoved, callbacks.OnBeforeRemove);
+        }
         
-        private IEnumerator DelayedNext(int id)
+        private IEnumerator DelayedNext(int id, string requestId)
         {
             // 延迟一帧
             yield return null;
-            Next(id);
+            Next(id, requestId);
         }
         
-        private void Next(int id)
+        private void Next(int id, string requestId)
         {
-            if (dialogParams[id] != null && dialogParams[id].Count > 0)
+            if (dialogParams.TryGetValue(id, out var dialogQueue) && dialogQueue.Count > 0)
             {
-                dialogParams[id].Dequeue();
-                if (dialogParams[id].Count > 0)
+                if (dialogQueue.Peek().requestId != requestId)
                 {
-                    DialogParam nextParam = dialogParams[id].Peek();
-                    Show(id, nextParam);
+                    return;
+                }
+
+                dialogQueue.Dequeue();
+                if (dialogQueue.Count > 0)
+                {
+                    DialogParam nextParam = dialogQueue.Peek();
+                    if (nextParam.uiLoader == null)
+                    {
+                        Show(id, nextParam);
+                    }
+                    else
+                    {
+                        ShowAsync(id, nextParam);
+                    }
                 }
             }
         }
         
         public new void Clear(bool isDestroy)
         {
-            foreach (var key in dialogParams.Keys)
+            foreach (var dialogQueue in dialogParams.Values)
             {
-                dialogParams[key].Clear();
+                foreach (var dialogParam in dialogQueue)
+                {
+                    dialogParam.uiLoader?.UILoadSuccess();
+                }
+
+                dialogQueue.Clear();
             }
             
             base.Clear(isDestroy);

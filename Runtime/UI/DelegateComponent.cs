@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace F8Framework.Core
@@ -6,11 +7,14 @@ namespace F8Framework.Core
     {
         public ViewParams ViewParams;
         private bool _isRemoving;
+        private int _removeVersion;
 
         // 窗口添加
         public void Add()
         {
+            _removeVersion++;
             _isRemoving = false;
+            ViewParams.State = ViewState.Active;
             // 触发窗口组件上添加到父节点后的事件
             ViewParams.BaseView?.Added(ViewParams.UIid, ViewParams.Guid, ViewParams.Params);
             
@@ -21,53 +25,83 @@ namespace F8Framework.Core
         }
 
         // 删除节点，该方法只能调用一次，将会触发OnBeforeRemoved回调
-        public void Remove(bool isDestroy)
+        public bool Remove(bool isDestroy, Action<ViewParams> onComplete = null)
         {
-            if (ViewParams != null && ViewParams.Valid && !_isRemoving)
+            if (ViewParams == null || !ViewParams.Valid)
             {
-                _isRemoving = true;
-                if (ViewParams.BaseView != null && ViewParams.BaseView.TryPlayCloseTween(() => ContinueRemove(isDestroy)))
-                {
-                    return;
-                }
-
-                ContinueRemove(isDestroy);
+                return false;
             }
+
+            ViewParams.DestroyOnClose |= isDestroy;
+            ViewParams.State = ViewState.Closing;
+
+            if (_isRemoving)
+            {
+                return true;
+            }
+
+            _isRemoving = true;
+            int removeVersion = ++_removeVersion;
+            if (ViewParams.BaseView != null && ViewParams.BaseView.TryPlayCloseTween(() => ContinueRemove(removeVersion, onComplete)))
+            {
+                return true;
+            }
+
+            ContinueRemove(removeVersion, onComplete);
+            return true;
         }
 
-        private void ContinueRemove(bool isDestroy)
+        private void ContinueRemove(int removeVersion, Action<ViewParams> onComplete)
         {
             if (ViewParams == null)
+            {
+                _isRemoving = false;
+                return;
+            }
+
+            if (!_isRemoving || removeVersion != _removeVersion)
             {
                 return;
             }
 
+            var viewParams = ViewParams;
             // 触发窗口组件上移除之前的事件
-            ViewParams.BaseView?.BeforeRemove();
+            viewParams.BaseView?.BeforeRemove();
 
             // 通知外部对象窗口组件上移除之前的事件（关闭窗口前的关闭动画处理）
-            if (ViewParams.Callbacks != null && ViewParams.Callbacks.OnBeforeRemove != null)
+            if (viewParams.Callbacks != null && viewParams.Callbacks.OnBeforeRemove != null)
             {
-                ViewParams.Callbacks.OnBeforeRemove();
-                Removed(ViewParams, isDestroy);
+                viewParams.Callbacks.OnBeforeRemove();
+                Removed(viewParams, removeVersion, onComplete);
             }
             else
             {
-                Removed(ViewParams, isDestroy);
+                Removed(viewParams, removeVersion, onComplete);
             }
         }
 
         // 窗口组件中触发移除事件与释放窗口对象
-        private void Removed(ViewParams viewParams, bool isDestroy)
+        private void Removed(ViewParams viewParams, int removeVersion, Action<ViewParams> onComplete)
         {
+            if (ViewParams != viewParams || !_isRemoving || removeVersion != _removeVersion)
+            {
+                return;
+            }
+
             _isRemoving = false;
-            viewParams.Valid = false;
+            viewParams.State = ViewState.None;
             
             if (viewParams.Callbacks != null && viewParams.Callbacks.OnRemoved != null)
             {
                 viewParams.Callbacks.OnRemoved(viewParams.Params, viewParams.UIid);
             }
+
+            if (ViewParams != viewParams || removeVersion != _removeVersion)
+            {
+                return;
+            }
             
+            bool isDestroy = viewParams.DestroyOnClose;
             ViewParams?.BaseView?.Removed(isDestroy);
             
             if (isDestroy)
@@ -85,10 +119,12 @@ namespace F8Framework.Core
             }
             
             UIManager.Instance.CurrentUIs.Remove(viewParams);
+            onComplete?.Invoke(viewParams);
         }
 
         private void OnDestroy()
         {
+            _isRemoving = false;
             ViewParams = null;
         }
     }
