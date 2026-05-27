@@ -18,6 +18,8 @@ namespace F8Framework.Core
         
         // 分包压缩密码
         public const string OptionalPackagePassword = "";
+        // 资源清单加密密钥，留空不加密
+        public const string AssetManifestEncryptKey = "";
         
         [System.Serializable]
         public class ConfigEntry

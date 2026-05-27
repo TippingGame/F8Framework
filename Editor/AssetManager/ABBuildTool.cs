@@ -20,12 +20,13 @@ namespace F8Framework.Core.Editor
         {
             SessionState.SetBool("compilationFinishedBuildAB", false);
             string[] args = Environment.GetCommandLineArgs();
-            bool enableFullPathAssetLoading = BuildPkgTool.GetArgValue(args, "EnableFullPathAssetLoading-").Equals("true", StringComparison.OrdinalIgnoreCase);
-            bool enableFullPathExtensionAssetLoading = BuildPkgTool.GetArgValue(args, "EnableFullPathExtensionAssetLoading-").Equals("true", StringComparison.OrdinalIgnoreCase);
-            bool forceRebuildAssetBundle = BuildPkgTool.GetArgValue(args, "ForceRebuildAssetBundle-").Equals("true", StringComparison.OrdinalIgnoreCase);
-            bool appendHashToAssetBundleName = BuildPkgTool.GetArgValue(args, "AppendHashToAssetBundleName-").Equals("true", StringComparison.OrdinalIgnoreCase);
-            bool forceRemoteAssetBundle = BuildPkgTool.GetArgValue(args, "ForceRemoteAssetBundle-").Equals("true", StringComparison.OrdinalIgnoreCase);
-            bool disableUnityCacheOnWebGL = BuildPkgTool.GetArgValue(args, "DisableUnityCacheOnWebGL-").Equals("true", StringComparison.OrdinalIgnoreCase);
+            bool enableFullPathAssetLoading = string.Equals(BuildPkgTool.GetArgValue(args, "EnableFullPathAssetLoading-"), "true", StringComparison.OrdinalIgnoreCase);
+            bool enableFullPathExtensionAssetLoading = string.Equals(BuildPkgTool.GetArgValue(args, "EnableFullPathExtensionAssetLoading-"), "true", StringComparison.OrdinalIgnoreCase);
+            bool forceRebuildAssetBundle = string.Equals(BuildPkgTool.GetArgValue(args, "ForceRebuildAssetBundle-"), "true", StringComparison.OrdinalIgnoreCase);
+            bool appendHashToAssetBundleName = string.Equals(BuildPkgTool.GetArgValue(args, "AppendHashToAssetBundleName-"), "true", StringComparison.OrdinalIgnoreCase);
+            bool forceRemoteAssetBundle = string.Equals(BuildPkgTool.GetArgValue(args, "ForceRemoteAssetBundle-"), "true", StringComparison.OrdinalIgnoreCase);
+            bool disableUnityCacheOnWebGL = string.Equals(BuildPkgTool.GetArgValue(args, "DisableUnityCacheOnWebGL-"), "true", StringComparison.OrdinalIgnoreCase);
+            string assetManifestEncryptKey = BuildPkgTool.GetArgValue(args, "AssetManifestEncryptKey-") ?? "";
             int assetBundleOffset = 0;
             if (int.TryParse(BuildPkgTool.GetArgValue(args, "AssetBundleOffset-"), out int intValue))
             {
@@ -44,6 +45,7 @@ namespace F8Framework.Core.Editor
             F8GamePrefs.SetBool(nameof(F8GameConfig.DisableUnityCacheOnWebGL), disableUnityCacheOnWebGL);
             F8GamePrefs.SetInt(nameof(F8GameConfig.AssetBundleOffset), assetBundleOffset);
             F8GamePrefs.SetInt(nameof(F8GameConfig.AssetBundleXorKey), assetBundleXorKey);
+            F8GamePrefs.SetString(nameof(F8GameConfig.AssetManifestEncryptKey), assetManifestEncryptKey);
             BuildAllAB();
         }
 
@@ -529,7 +531,7 @@ namespace F8Framework.Core.Editor
                 
             string AssetBundleMapPath = Application.dataPath + "/F8Framework/AssetMap/Resources/" + nameof(AssetBundleMap) + ".json";
             FileTools.CheckFileAndCreateDirWhenNeeded(AssetBundleMapPath);
-            FileTools.SafeWriteAllText(AssetBundleMapPath, Util.LitJson.ToJson(assetMapping));
+            F8JsonEncryption.WriteJsonToFile(AssetBundleMapPath, Util.LitJson.ToJson(assetMapping));
             AssetDatabase.Refresh();
             
             LogF8.LogAsset("写入AssetBundles资产数据 生成：" + AssetBundleMapPath);
@@ -646,7 +648,7 @@ namespace F8Framework.Core.Editor
             
             string ResourceMapPath = Application.dataPath + "/F8Framework/AssetMap/Resources/" + nameof(ResourceMap) + ".json";
             FileTools.CheckFileAndCreateDirWhenNeeded(ResourceMapPath);
-            FileTools.SafeWriteAllText(ResourceMapPath, Util.LitJson.ToJson(resourceMapping));
+            F8JsonEncryption.WriteJsonToFile(ResourceMapPath, Util.LitJson.ToJson(resourceMapping));
             AssetDatabase.Refresh();
             
             LogF8.LogAsset("写入Resources资产数据 生成：" + ResourceMapPath);

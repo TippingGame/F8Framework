@@ -45,7 +45,7 @@ namespace F8Framework.Core
         
         public void OnInit(object createParam)
         {
-            GameVersion gameVersion = Util.LitJson.ToObject<GameVersion>(Resources.Load<TextAsset>(nameof(GameVersion)).ToString());
+            GameVersion gameVersion = Util.LitJson.ToObject<GameVersion>(F8JsonEncryption.ReadJsonFromTextAsset(Resources.Load<TextAsset>(nameof(GameVersion))));
             GameConfig.LocalGameVersion = gameVersion;
         }
         
@@ -55,12 +55,12 @@ namespace F8Framework.Core
             if (File.Exists(Application.persistentDataPath + "/" + nameof(GameVersion) + ".json"))
             {
                 string json =
-                    FileTools.SafeReadAllText(Application.persistentDataPath + "/" + nameof(GameVersion) + ".json");
+                    F8JsonEncryption.ReadJsonFromFile(Application.persistentDataPath + "/" + nameof(GameVersion) + ".json");
                 GameConfig.LocalGameVersion = Util.LitJson.ToObject<GameVersion>(json);
             }
             else
             {
-                FileTools.SafeWriteAllText(Application.persistentDataPath + "/" + nameof(GameVersion) + ".json",
+                F8JsonEncryption.WriteJsonToFile(Application.persistentDataPath + "/" + nameof(GameVersion) + ".json",
                     Util.LitJson.ToJson(GameConfig.LocalGameVersion));
             }
 
@@ -86,7 +86,7 @@ namespace F8Framework.Core
             }
             else
             {
-                string text = webRequest.downloadHandler.text;
+                string text = F8JsonEncryption.DecryptJsonIfNeeded(webRequest.downloadHandler.text);
                 GameVersion gameVersion = Util.LitJson.ToObject<GameVersion>(text);
                 GameConfig.RemoteGameVersion = gameVersion;
                 LogF8.Log($"初始化远程版本成功：Version={GameConfig.RemoteGameVersion.Version}，Address={GameConfig.RemoteGameVersion.AssetRemoteAddress}");
@@ -114,7 +114,7 @@ namespace F8Framework.Core
             }
             else
             {
-                string text = webRequest.downloadHandler.text;
+                string text = F8JsonEncryption.DecryptJsonIfNeeded(webRequest.downloadHandler.text);
                 Dictionary<string, AssetBundleMap.AssetMapping> assetBundleMap = Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(text) ?? new Dictionary<string, AssetBundleMap.AssetMapping>();
                 GameConfig.RemoteAssetBundleMap = assetBundleMap;
                 LogF8.Log($"初始化资源版本成功：Count={GameConfig.RemoteAssetBundleMap.Count}");
@@ -124,7 +124,7 @@ namespace F8Framework.Core
             
             if (File.Exists(Application.persistentDataPath + "/" + nameof(AssetBundleMap) + ".json"))
             {
-                string json = FileTools.SafeReadAllText(Application.persistentDataPath + "/" + nameof(AssetBundleMap) + ".json");
+                string json = F8JsonEncryption.ReadJsonFromFile(Application.persistentDataPath + "/" + nameof(AssetBundleMap) + ".json");
                 AssetBundleMap.Mappings = Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(json);
             }
         }
@@ -332,14 +332,14 @@ namespace F8Framework.Core
                 {
                     GameConfig.LocalGameVersion.Version = GameConfig.RemoteGameVersion.Version;
                     GameConfig.LocalGameVersion.HotUpdateVersion = new List<string>();
-                    FileTools.SafeWriteAllText(Application.persistentDataPath + "/" + nameof(GameVersion) + ".json",
+                    F8JsonEncryption.WriteJsonToFile(Application.persistentDataPath + "/" + nameof(GameVersion) + ".json",
                         Util.LitJson.ToJson(GameConfig.LocalGameVersion));
                 }
                 
                 if (GameConfig.RemoteAssetBundleMap.Count > 0)
                 {
                     AssetBundleMap.Mappings = MergeAssetBundleMappings(AssetBundleMap.Mappings, GameConfig.RemoteAssetBundleMap);
-                    FileTools.SafeWriteAllText(Application.persistentDataPath + "/" + nameof(AssetBundleMap) + ".json",
+                    F8JsonEncryption.WriteJsonToFile(Application.persistentDataPath + "/" + nameof(AssetBundleMap) + ".json",
                         Util.LitJson.ToJson(AssetBundleMap.Mappings));
                 }
             }
@@ -661,7 +661,7 @@ namespace F8Framework.Core
                         GameConfig.LocalGameVersion.SubPackage.RemoveAt(i);
                     }
                 }
-                FileTools.SafeWriteAllText(Application.persistentDataPath + "/" + nameof(GameVersion) + ".json",
+                F8JsonEncryption.WriteJsonToFile(Application.persistentDataPath + "/" + nameof(GameVersion) + ".json",
                     Util.LitJson.ToJson(GameConfig.LocalGameVersion));
             }
             
@@ -688,7 +688,7 @@ namespace F8Framework.Core
                 }
             }
             
-            FileTools.SafeWriteAllText(Application.persistentDataPath + "/" + nameof(GameVersion) + ".json",
+            F8JsonEncryption.WriteJsonToFile(Application.persistentDataPath + "/" + nameof(GameVersion) + ".json",
                 Util.LitJson.ToJson(GameConfig.LocalGameVersion));
 
             completed?.Invoke();

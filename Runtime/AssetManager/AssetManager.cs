@@ -2211,8 +2211,8 @@ namespace F8Framework.Core
         
             public void OnInit(object createParam)
             {
-                AssetBundleMap.Mappings = Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(Resources.Load<TextAsset>(nameof(AssetBundleMap)).ToString());
-                ResourceMap.Mappings = Util.LitJson.ToObject<Dictionary<string, string[]>>(Resources.Load<TextAsset>(nameof(ResourceMap)).ToString());
+                AssetBundleMap.Mappings = Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(F8JsonEncryption.ReadJsonFromTextAsset(Resources.Load<TextAsset>(nameof(AssetBundleMap))));
+                ResourceMap.Mappings = Util.LitJson.ToObject<Dictionary<string, string[]>>(F8JsonEncryption.ReadJsonFromTextAsset(Resources.Load<TextAsset>(nameof(ResourceMap))));
                 _assetBundleManager = ModuleCenter.CreateModule<AssetBundleManager>();
                 _resourcesManager = ModuleCenter.CreateModule<ResourcesManager>();
             }

@@ -66,6 +66,7 @@ namespace F8Framework.Core.Editor
         private static int _assetBundleOffset = 0;
         private static int _assetBundleXorKey = 0;
         private static string _excelBinDataFolder = "";
+        private static string _assetManifestEncryptKey = "";
         
         private static BuildTarget _buildTarget = BuildTarget.NoTarget;
 
@@ -119,6 +120,11 @@ namespace F8Framework.Core.Editor
 
             return Mathf.Max(minValue, count + delta).ToString();
         }
+
+        private static bool GetBoolArg(string[] args, string argName)
+        {
+            return string.Equals(GetArgValue(args, argName), "true", StringComparison.OrdinalIgnoreCase);
+        }
         
         // Jenkins打包专用
         public static void JenkinsBuild()
@@ -135,20 +141,21 @@ namespace F8Framework.Core.Editor
             string version = GetArgValue(args, "Version-");
             string codeVersion = GetArgValue(args, "CodeVersion-");
             string assetRemoteAddress = GetArgValue(args, "AssetRemoteAddress-");
-            bool enableHotUpdate = GetArgValue(args, "EnableHotUpdate-").Equals("true", StringComparison.OrdinalIgnoreCase);
-            bool enablePackage = GetArgValue(args, "EnablePackage-").Equals("true", StringComparison.OrdinalIgnoreCase);
-            bool enableFullPackage = GetArgValue(args, "EnableFullPackage-").Equals("true", StringComparison.OrdinalIgnoreCase);
-            bool enableOptionalPackage = GetArgValue(args, "EnableOptionalPackage-").Equals("true", StringComparison.OrdinalIgnoreCase);
+            bool enableHotUpdate = GetBoolArg(args, "EnableHotUpdate-");
+            bool enablePackage = GetBoolArg(args, "EnablePackage-");
+            bool enableFullPackage = GetBoolArg(args, "EnableFullPackage-");
+            bool enableOptionalPackage = GetBoolArg(args, "EnableOptionalPackage-");
             string optionalPackage = GetArgValue(args, "OptionalPackage-");
-            bool enableNullPackage = GetArgValue(args, "EnableNullPackage-").Equals("true", StringComparison.OrdinalIgnoreCase);
-            bool androidBuildAppBundle = GetArgValue(args, "AndroidBuildAppBundle-").Equals("true", StringComparison.OrdinalIgnoreCase);
-            bool androidUseKeystore = GetArgValue(args, "AndroidUseKeystore-").Equals("true", StringComparison.OrdinalIgnoreCase);
+            bool enableNullPackage = GetBoolArg(args, "EnableNullPackage-");
+            bool androidBuildAppBundle = GetBoolArg(args, "AndroidBuildAppBundle-");
+            bool androidUseKeystore = GetBoolArg(args, "AndroidUseKeystore-");
             string androidKeystoreName = GetArgValue(args, "AndroidKeystoreName-");
             string androidKeystorePass = GetArgValue(args, "AndroidKeystorePass-");
             string androidKeyAliasName = GetArgValue(args, "AndroidKeyAliasName-");
             string androidKeyAliasPass = GetArgValue(args, "AndroidKeyAliasPass-");
-            bool cleanBuildCache = GetArgValue(args, "CleanBuildCache-").Equals("true", StringComparison.OrdinalIgnoreCase);
-            string optionalPackagePassword = GetArgValue(args, "OptionalPackagePassword-");
+            bool cleanBuildCache = GetBoolArg(args, "CleanBuildCache-");
+            string optionalPackagePassword = GetArgValue(args, "OptionalPackagePassword-") ?? "";
+            string assetManifestEncryptKey = GetArgValue(args, "AssetManifestEncryptKey-") ?? "";
 
             F8EditorPrefs.SetBool(_exportCurrentPlatformKey, false);
             F8EditorPrefs.SetString(_exportPlatformKey, platformStr);
@@ -189,6 +196,8 @@ namespace F8Framework.Core.Editor
             F8EditorPrefs.SetBool(CleanBuildCacheKey, cleanBuildCache);
             F8GamePrefs.SetString(nameof(F8GameConfig.OptionalPackagePassword), optionalPackagePassword);
             _optionalPackagePassword = optionalPackagePassword;
+            F8GamePrefs.SetString(nameof(F8GameConfig.AssetManifestEncryptKey), assetManifestEncryptKey);
+            _assetManifestEncryptKey = assetManifestEncryptKey;
             
             WriteGameVersion();
             Build();
@@ -225,7 +234,8 @@ namespace F8Framework.Core.Editor
                 return;
             }
 
-            GameVersion remoteGameVersion = Util.LitJson.ToObject<GameVersion>(FileTools.SafeReadAllText(gameVersionPath));
+            string assetManifestEncryptKey = F8GamePrefs.GetString(nameof(F8GameConfig.AssetManifestEncryptKey), "");
+            GameVersion remoteGameVersion = Util.LitJson.ToObject<GameVersion>(F8JsonEncryption.ReadJsonFromFile(gameVersionPath, assetManifestEncryptKey));
             int result = GameConfig.CompareVersions(toVersion, remoteGameVersion.Version);
             if (result <= 0)
             {
@@ -234,13 +244,13 @@ namespace F8Framework.Core.Editor
                 return;
             }
             
-            var resAssetBundleMappings = Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(Resources.Load<TextAsset>(nameof(AssetBundleMap)).ToString());
+            var resAssetBundleMappings = Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(F8JsonEncryption.ReadJsonFromTextAsset(Resources.Load<TextAsset>(nameof(AssetBundleMap))));
 
-            var assetBundleMappings = Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(FileTools.SafeReadAllText(assetBundleMapPath));
+            var assetBundleMappings = Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(F8JsonEncryption.ReadJsonFromFile(assetBundleMapPath, assetManifestEncryptKey));
             Dictionary<string, AssetBundleMap.AssetMapping> hotUpdateAssetBundleMappings = new Dictionary<string, AssetBundleMap.AssetMapping>();
             if (File.Exists(hotUpdateMapPath))
             {
-                hotUpdateAssetBundleMappings = Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(FileTools.SafeReadAllText(hotUpdateMapPath)) ?? new Dictionary<string, AssetBundleMap.AssetMapping>();
+                hotUpdateAssetBundleMappings = Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(F8JsonEncryption.ReadJsonFromFile(hotUpdateMapPath, assetManifestEncryptKey)) ?? new Dictionary<string, AssetBundleMap.AssetMapping>();
             }
 
             Dictionary<string, AssetBundleMap.AssetMapping> generateAssetBundleMappings = new Dictionary<string, AssetBundleMap.AssetMapping>();
@@ -270,15 +280,15 @@ namespace F8Framework.Core.Editor
             remoteGameVersion.Version = toVersion;
             if (!remoteGameVersion.HotUpdateVersion.Contains(toVersion))
                 remoteGameVersion.HotUpdateVersion.Add(toVersion);
-            FileTools.SafeWriteAllText(gameVersionPath, Util.LitJson.ToJson(remoteGameVersion));
+            F8JsonEncryption.WriteJsonToFile(gameVersionPath, Util.LitJson.ToJson(remoteGameVersion), assetManifestEncryptKey);
             
             foreach (var assetMapping in generateAssetBundleMappings)
             {
                 hotUpdateAssetBundleMappings[assetMapping.Key] = assetMapping.Value;
             }
 
-            FileTools.SafeWriteAllText(assetBundleMapPath, Util.LitJson.ToJson(assetBundleMappings));
-            FileTools.SafeWriteAllText(hotUpdateMapPath, Util.LitJson.ToJson(hotUpdateAssetBundleMappings));
+            F8JsonEncryption.WriteJsonToFile(assetBundleMapPath, Util.LitJson.ToJson(assetBundleMappings), assetManifestEncryptKey);
+            F8JsonEncryption.WriteJsonToFile(hotUpdateMapPath, Util.LitJson.ToJson(hotUpdateAssetBundleMappings), assetManifestEncryptKey);
             
             LogF8.LogVersion("构建热更新包版本成功！版本：" + toVersion);
             
@@ -381,7 +391,7 @@ namespace F8Framework.Core.Editor
                 string toPath = FileTools.TruncatePath(Application.dataPath, 1) + "/Library/F8BuildOptionalPackage";
                 FileTools.SafeDeleteDir(toPath);
                 Dictionary<string, AssetBundleMap.AssetMapping> mappings = 
-                    Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(Resources.Load<TextAsset>(nameof(AssetBundleMap)).ToString());
+                    Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(F8JsonEncryption.ReadJsonFromTextAsset(Resources.Load<TextAsset>(nameof(AssetBundleMap))));
                 string packagePath = buildPath + HotUpdateManager.RemoteDirName + HotUpdateManager.PackageDirName;
                 FileTools.SafeDeleteDir(packagePath);
                 // 分别打包Package
@@ -433,14 +443,14 @@ namespace F8Framework.Core.Editor
             // 空包
             if (enableNullPackage)
             {
-                var resAssetBundleMappings = Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(Resources.Load<TextAsset>(nameof(AssetBundleMap)).ToString());
+                var resAssetBundleMappings = Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(F8JsonEncryption.ReadJsonFromTextAsset(Resources.Load<TextAsset>(nameof(AssetBundleMap))));
                 foreach (var resAssetMapping in resAssetBundleMappings.Values)
                 {
                     resAssetMapping.MD5 = ""; // 空包原始MD5清空
                 }
                 string assetBundleMapPath = Application.dataPath + "/F8Framework/AssetMap/Resources/" + nameof(AssetBundleMap) + ".json";
                 FileTools.CheckFileAndCreateDirWhenNeeded(assetBundleMapPath);
-                FileTools.SafeWriteAllText(assetBundleMapPath, Util.LitJson.ToJson(resAssetBundleMappings));
+                F8JsonEncryption.WriteJsonToFile(assetBundleMapPath, Util.LitJson.ToJson(resAssetBundleMappings));
                 
                 string toPath = FileTools.TruncatePath(Application.dataPath, 1) + "/Library/F8BuildNullPackage";
                 FileTools.SafeDeleteDir(toPath);
@@ -711,7 +721,7 @@ namespace F8Framework.Core.Editor
 
             GUILayout.EndHorizontal();
 
-            GUILayout.Space(10);
+            GUILayout.Space(5);
             GUILayout.BeginHorizontal();
             GUILayout.Label("构建次数（某些平台需要递增）：", GUILayout.Width(185));
             string codeVersionValue = F8EditorPrefs.GetString(_codeVersionKey, "");
@@ -933,6 +943,20 @@ namespace F8Framework.Core.Editor
             GUILayout.EndHorizontal();
             
             GUILayout.Space(5);
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("资源清单加密（AES）：", GUILayout.Width(240));
+            string assetManifestEncryptKeyValue = F8GamePrefs.GetString(nameof(F8GameConfig.AssetManifestEncryptKey), "");
+            assetManifestEncryptKeyValue ??= "";
+            if (string.IsNullOrEmpty(assetManifestEncryptKeyValue))
+            {
+                assetManifestEncryptKeyValue = _assetManifestEncryptKey;
+            }
+            _assetManifestEncryptKey ??= "";
+            _assetManifestEncryptKey = EditorGUILayout.TextField(assetManifestEncryptKeyValue);
+            F8GamePrefs.SetString(nameof(F8GameConfig.AssetManifestEncryptKey), _assetManifestEncryptKey);
+            GUILayout.EndHorizontal();
+            
+            GUILayout.Space(5);
             GUILayout.Box("", GUILayout.Height(2), GUILayout.ExpandWidth(true));
             GUILayout.Space(5);
         }
@@ -994,7 +1018,7 @@ namespace F8Framework.Core.Editor
             _optionalPackagePassword = EditorGUILayout.TextField(optionalPackagePasswordValue);
             F8GamePrefs.SetString(nameof(F8GameConfig.OptionalPackagePassword), _optionalPackagePassword);
             GUILayout.EndHorizontal();
-            
+
             GUILayout.Space(5);
             GUILayout.Box("", GUILayout.Height(2), GUILayout.ExpandWidth(true));
             GUILayout.Space(5);
@@ -1284,7 +1308,7 @@ namespace F8Framework.Core.Editor
             
             string hotUpdateMapPath = buildPath + HotUpdateManager.RemoteDirName + HotUpdateManager.HotUpdateDirName + HotUpdateManager.Separator + nameof(AssetBundleMap) + ".json";
             FileTools.CheckFileAndCreateDirWhenNeeded(hotUpdateMapPath);
-            FileTools.SafeWriteAllText(hotUpdateMapPath, Util.LitJson.ToJson(new Dictionary<string, AssetBundleMap.AssetMapping>()));
+            F8JsonEncryption.WriteJsonToFile(hotUpdateMapPath, Util.LitJson.ToJson(new Dictionary<string, AssetBundleMap.AssetMapping>()));
             UnityEditor.AssetDatabase.Refresh();
         }
 
@@ -1350,7 +1374,7 @@ namespace F8Framework.Core.Editor
             FileTools.SafeDeleteFile(gameVersionResourcesPath + ".meta");
             UnityEditor.AssetDatabase.Refresh();
             FileTools.CheckFileAndCreateDirWhenNeeded(gameVersionResourcesPath);
-            FileTools.SafeWriteAllText(gameVersionResourcesPath, json);
+            F8JsonEncryption.WriteJsonToFile(gameVersionResourcesPath, json);
             // 复制到导出目录
             FileTools.CheckDirAndCreateWhenNeeded(buildPath + HotUpdateManager.RemoteDirName);
             FileTools.SafeCopyFile(gameVersionResourcesPath, buildPath + HotUpdateManager.RemoteDirName + "/" + nameof(GameVersion) + ".json");
