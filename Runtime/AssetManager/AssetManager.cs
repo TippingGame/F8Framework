@@ -2211,7 +2211,9 @@ namespace F8Framework.Core
         
             public void OnInit(object createParam)
             {
+                LogF8.Log($"读取默认AssetBundle资产配置，来源：Resources/{nameof(AssetBundleMap)}");
                 AssetBundleMap.Mappings = Util.LitJson.ToObject<Dictionary<string, AssetBundleMap.AssetMapping>>(F8JsonEncryption.ReadJsonFromTextAsset(Resources.Load<TextAsset>(nameof(AssetBundleMap))));
+                LogF8.Log($"读取默认Resources资产配置，来源：Resources/{nameof(ResourceMap)}");
                 ResourceMap.Mappings = Util.LitJson.ToObject<Dictionary<string, string[]>>(F8JsonEncryption.ReadJsonFromTextAsset(Resources.Load<TextAsset>(nameof(ResourceMap))));
                 _assetBundleManager = ModuleCenter.CreateModule<AssetBundleManager>();
                 _resourcesManager = ModuleCenter.CreateModule<ResourcesManager>();
