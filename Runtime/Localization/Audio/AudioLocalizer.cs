@@ -32,7 +32,12 @@ namespace F8Framework.Core
 				return;
 			}
 			var index = Localization.Instance?.CurrentLanguageIndex ?? 0;
-			injector.Inject(clips?[index], this);
+			injector.Inject(GetClip(index), this);
+		}
+
+		private AudioClip GetClip(int index)
+		{
+			return clips != null && index >= 0 && index < clips.Length ? clips[index] : null;
 		}
 		
 		public bool ChangeID(string textId)

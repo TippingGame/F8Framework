@@ -6,7 +6,7 @@ using TMPro;
 
 namespace F8Framework.Core
 {
-	public class FontInjector : IInjector
+	public class FontInjector : AssetInjectorBase
 	{
 		readonly Text text;
 		readonly TextMesh textMesh;
@@ -31,22 +31,36 @@ namespace F8Framework.Core
 		}
 #endif
 
-		public void Inject<T1, T2>(T1 localizedData, T2 localizer) where T2 : LocalizerBase
+		public override void Inject<T1, T2>(T1 localizedData, T2 localizer)
 		{
+			if (!HasTarget())
+			{
+				Unload();
+				return;
+			}
+
+			if (localizedData is null)
+			{
+				Unload();
+				return;
+			}
+
 			if (localizedData is Font font)
 			{
+				UseDirectAsset();
 				if (text)
 				{
 					text.font = font;
 				}
 				else if (textMesh)
 				{
-					text.font = font;
+					textMesh.font = font;
 				}
 			}
 #if LOCALIZER_TMP
 			else if (localizedData is TMP_FontAsset TMP_fonts)
 			{
+				UseDirectAsset();
 				if (TMP_text)
 				{
 					TMP_text.font = TMP_fonts;
@@ -55,19 +69,20 @@ namespace F8Framework.Core
 #endif
 			else if (localizedData is string textIDValue)
 			{
-				AssetManager.Instance.LoadAsync(textIDValue, (asset) =>
+				LoadLocalizedAsset(textIDValue, (asset) =>
 				{
 					if (asset is Font loadFont)
 					{
 						if (text)
 						{
 							text.font = loadFont;
+							return;
 						}
 						else if (textMesh)
 						{
-							text.font = loadFont;
+							textMesh.font = loadFont;
+							return;
 						}
-						return;
 					}
 #if LOCALIZER_TMP
 					if (asset is TMP_FontAsset loadTMP_fontAsset)
@@ -75,11 +90,46 @@ namespace F8Framework.Core
 						if (TMP_text)
 						{
 							TMP_text.font = loadTMP_fontAsset;
+							return;
 						}
 					}
 #endif
+					Unload();
 				});
 			}
+		}
+
+		private bool HasTarget()
+		{
+			if (text || textMesh)
+			{
+				return true;
+			}
+#if LOCALIZER_TMP
+			if (TMP_text)
+			{
+				return true;
+			}
+#endif
+			return false;
+		}
+
+		protected override void ClearTarget()
+		{
+			if (text)
+			{
+				text.font = null;
+			}
+			else if (textMesh)
+			{
+				textMesh.font = null;
+			}
+#if LOCALIZER_TMP
+			else if (TMP_text)
+			{
+				TMP_text.font = null;
+			}
+#endif
 		}
 	}
 }

@@ -2,7 +2,7 @@
 
 namespace F8Framework.Core
 {
-	public class TextureInjector : IInjector
+	public class TextureInjector : AssetInjectorBase
 	{
 		readonly Renderer renderer;
 		readonly string propertyName;
@@ -15,18 +15,50 @@ namespace F8Framework.Core
 			this.texture2Ds = texture2Ds;
 		}
 
-		public void Inject<T1, T2>(T1 localizedData, T2 localizer) where T2 : LocalizerBase
+		public override void Inject<T1, T2>(T1 localizedData, T2 localizer)
 		{
+			if (!renderer)
+			{
+				Unload();
+				return;
+			}
+
+			if (localizedData is null)
+			{
+				Unload();
+				return;
+			}
+
 			if (localizedData is int index)
 			{
-				renderer.material.SetTexture(propertyName, texture2Ds?[index]);
+				UseDirectAsset();
+				renderer.material.SetTexture(propertyName, GetTexture(index));
 			}
 			else if (localizedData is string textIDValue)
 			{
-				AssetManager.Instance.LoadAsync<Texture2D>(textIDValue, (asset) =>
+				LoadLocalizedAsset<Texture2D>(textIDValue, (asset) =>
 				{
-					renderer.material.SetTexture(propertyName, asset);
+					if (renderer)
+					{
+						renderer.material.SetTexture(propertyName, asset);
+						return;
+					}
+
+					Unload();
 				});
+			}
+		}
+
+		private Texture2D GetTexture(int index)
+		{
+			return texture2Ds != null && index >= 0 && index < texture2Ds.Length ? texture2Ds[index] : null;
+		}
+
+		protected override void ClearTarget()
+		{
+			if (renderer)
+			{
+				renderer.material.SetTexture(propertyName, null);
 			}
 		}
 	}

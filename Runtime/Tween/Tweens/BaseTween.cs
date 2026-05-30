@@ -48,6 +48,7 @@ namespace F8Framework.Core
         protected int loopCount = 0;
         protected int tempLoopCount = 0;
         protected bool ignoreTimeScale = false;
+        protected bool useSmoothDeltaTime = false;
         #endregion
         
         #region EVENTS
@@ -95,6 +96,7 @@ namespace F8Framework.Core
         public GameObject Owner => owner;
         public UpdateMode UpdateMode => updateMode;
         public bool IgnoreTimeScale => ignoreTimeScale;
+        public bool UseSmoothDeltaTime => useSmoothDeltaTime;
         public bool IsAutoKill => CanRecycle;
 
         public BaseTween()
@@ -174,6 +176,12 @@ namespace F8Framework.Core
         public BaseTween SetIgnoreTimeScale(bool value)
         {
             ignoreTimeScale = value;
+            return this;
+        }
+
+        public BaseTween SetUseSmoothDeltaTime(bool value)
+        {
+            useSmoothDeltaTime = value;
             return this;
         }
         
@@ -374,6 +382,7 @@ namespace F8Framework.Core
             isPause = false;
             CanRecycle = true;
             ignoreTimeScale = false;
+            useSmoothDeltaTime = false;
 
             onUpdateString = null;
             onUpdate = null;

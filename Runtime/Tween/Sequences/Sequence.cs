@@ -228,6 +228,7 @@ namespace F8Framework.Core
 			timer = 0.0f;
 			loops = 0;
 			ignoreCommands = false;
+			ignoreTimeScale = false;
 			commandQueue.Clear();
 			head = null;
 			Recycle = null;

@@ -81,6 +81,7 @@ BaseTween tween = gameObject.Move(Vector3.one, 10f)
     .SetUpdateMode(UpdateMode.Update)
     .SetOwner(gameObject)
     .SetIgnoreTimeScale(true)
+    .SetUseSmoothDeltaTime(true) // Smooth visual motion; ignored when SetIgnoreTimeScale(true)
     .SetCustomId("myTween")
     .SetAutoKill(false);
 ```
@@ -93,6 +94,8 @@ FF8.Tween.SetProgress(id, 0.5f);
 FF8.Tween.Complete(id);
 FF8.Tween.ReplayReset(id);
 FF8.Tween.SetIsPause(id, true);
+FF8.Tween.SetIgnoreTimeScale(id, true);
+FF8.Tween.SetUseSmoothDeltaTime(id, true);
 FF8.Tween.CancelTween(id);
 gameObject.CancelAllTweens();
 ```
@@ -140,8 +143,9 @@ await sequence;
 2. Chain configuration methods for easing, delay, loop.
 3. Use sequences for complex multi-step animations.
 4. For UI, use `MoveUI()` with canvas-relative coordinates.
-5. Use `SetAutoKill(false)` if you need to replay or hold references.
-6. Cancel/complete tweens when game state changes.
+5. Use `SetUseSmoothDeltaTime(true)` only for visual tweens that should smooth frame-time spikes.
+6. Use `SetAutoKill(false)` if you need to replay or hold references.
+7. Cancel/complete tweens when game state changes.
 
 ## Common error handling
 
@@ -150,6 +154,7 @@ await sequence;
 | Tween reference is stale | Auto-killed and recycled | Use `SetAutoKill(false)` |
 | UI animation jumps | Wrong coordinate space | Use MoveUI for viewport-relative |
 | Tween not playing during pause | TimeScale is 0 | Use `SetIgnoreTimeScale(true)` |
+| Visual tween jumps after frame spike | Raw `deltaTime` catches up immediately | Use `SetUseSmoothDeltaTime(true)` on that tween |
 
 ## Cross-module dependencies
 

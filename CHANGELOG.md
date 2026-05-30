@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.1.306] - 2025-05-31
+1.优化Asset模块AB名可不填斜杠  
+2.优化Local模块组件资源自动释放  
+3.新增Tween模块SetUseSmoothDeltaTime方法  
+
 ## [3.1.305] - 2025-05-29
 1.优化HotUpdate模块日志打印描述  
 

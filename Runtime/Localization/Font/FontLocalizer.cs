@@ -56,15 +56,27 @@ namespace F8Framework.Core
 			var index = Localization.Instance?.CurrentLanguageIndex ?? 0;
 			if (!hasTMP_Text)
 			{
-				injector.Inject(fonts?[index], this);
+				injector.Inject(GetFont(index), this);
 			}
 #if LOCALIZER_TMP
 			else
 			{
-				injector.Inject(TMP_fontAsset?[index], this);
+				injector.Inject(GetTMPFont(index), this);
 			}
 #endif
 		}
+
+		private Font GetFont(int index)
+		{
+			return fonts != null && index >= 0 && index < fonts.Length ? fonts[index] : null;
+		}
+
+#if LOCALIZER_TMP
+		private TMP_FontAsset GetTMPFont(int index)
+		{
+			return TMP_fontAsset != null && index >= 0 && index < TMP_fontAsset.Length ? TMP_fontAsset[index] : null;
+		}
+#endif
 		
 		public bool ChangeID(string textId)
 		{

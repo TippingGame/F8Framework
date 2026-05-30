@@ -29,6 +29,11 @@ namespace F8Framework.Core
 
 		protected virtual void OnDestroy()
 		{
+			if (injector is IUnloadableInjector unloadableInjector)
+			{
+				unloadableInjector.Unload();
+			}
+
 			Localization.Instance?.RemoveLocalizer(this);
 		}
 	}

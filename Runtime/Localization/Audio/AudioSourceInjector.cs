@@ -2,7 +2,7 @@
 
 namespace F8Framework.Core
 {
-	public class AudioSourceInjector : IInjector
+	public class AudioSourceInjector : AssetInjectorBase
 	{
 		readonly AudioSource audio;
 
@@ -11,8 +11,20 @@ namespace F8Framework.Core
 			this.audio = audio;
 		}
 
-		public void Inject<T1, T2>(T1 localizedData, T2 localizer) where T2 : LocalizerBase
+		public override void Inject<T1, T2>(T1 localizedData, T2 localizer)
 		{
+			if (!audio)
+			{
+				Unload();
+				return;
+			}
+
+			if (localizedData is null)
+			{
+				Unload();
+				return;
+			}
+
 			var isPlaying = audio.isPlaying;
 #if !UNITY_WEBGL
             var time = audio.time;
@@ -22,15 +34,22 @@ namespace F8Framework.Core
 
 			if (localizedData is AudioClip audioClip)
 			{
+				UseDirectAsset();
 				Play(audioClip);
 			}
 			else if (localizedData is string textIDValue)
 			{
-				AssetManager.Instance.LoadAsync<AudioClip>(textIDValue, Play);
+				LoadLocalizedAsset<AudioClip>(textIDValue, Play);
 			}
 			
 			void Play(AudioClip clip)
 			{
+				if (!audio || !clip)
+				{
+					Unload();
+					return;
+				}
+
 				audio.clip = clip;
 				if (isPlaying)
 				{
@@ -47,6 +66,17 @@ namespace F8Framework.Core
 #endif
 				}
 			}
+		}
+
+		protected override void ClearTarget()
+		{
+			if (!audio)
+			{
+				return;
+			}
+
+			audio.Stop();
+			audio.clip = null;
 		}
 	}
 }

@@ -97,7 +97,7 @@ namespace F8Framework.Core
                 }
                 
                 if (tweens[i].UpdateMode == UpdateMode.Update)
-                    tweens[i].Update(tweens[i].IgnoreTimeScale ? Time.unscaledDeltaTime : Time.deltaTime);
+                    tweens[i].Update(GetDeltaTime(tweens[i]));
             }
         }
 
@@ -116,7 +116,7 @@ namespace F8Framework.Core
                     i--;
                     continue;
                 }
-                tweens[i].Update(tweens[i].IgnoreTimeScale ? Time.unscaledDeltaTime : Time.deltaTime);
+                tweens[i].Update(GetDeltaTime(tweens[i]));
             }
         }
 
@@ -137,6 +137,16 @@ namespace F8Framework.Core
                 }
                 tweens[i].Update(tweens[i].IgnoreTimeScale ? Time.fixedUnscaledDeltaTime : Time.fixedDeltaTime);
             }
+        }
+
+        private float GetDeltaTime(BaseTween tween)
+        {
+            if (tween.IgnoreTimeScale)
+            {
+                return Time.unscaledDeltaTime;
+            }
+
+            return tween.UseSmoothDeltaTime ? Time.smoothDeltaTime : Time.deltaTime;
         }
 
         public void OnTermination()
@@ -364,6 +374,43 @@ namespace F8Framework.Core
                 if (tweens[n].ID == id)
                 {
                     tweens[n].SetIgnoreTimeScale(ignoreTimeScale);
+                    break;
+                }
+            }
+        }
+
+        public void SetUseSmoothDeltaTime(GameObject owner, bool useSmoothDeltaTime)
+        {
+            if (tweenConnections.TryGetValue(owner, out var idList))
+            {
+                if (idList == null)
+                    return;
+
+                for (int n = 0; n < idList.Count; n++)
+                {
+                    SetUseSmoothDeltaTime(idList[n], useSmoothDeltaTime);
+                }
+            }
+        }
+        
+        public void SetUseSmoothDeltaTime(object customId, bool useSmoothDeltaTime)
+        {
+            for (int n = 0; n < tweens.Count; n++)
+            {
+                if (tweens[n].CustomId == customId)
+                {
+                    tweens[n].SetUseSmoothDeltaTime(useSmoothDeltaTime);
+                }
+            }
+        }
+        
+        public void SetUseSmoothDeltaTime(int id, bool useSmoothDeltaTime)
+        {
+            for (int n = 0; n < tweens.Count; n++)
+            {
+                if (tweens[n].ID == id)
+                {
+                    tweens[n].SetUseSmoothDeltaTime(useSmoothDeltaTime);
                     break;
                 }
             }

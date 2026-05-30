@@ -304,8 +304,8 @@ namespace F8Framework.Core.Editor
         //得到上级路径
         private static string AssetGetParentPath(string path)
         {
-            string parentPath = path.Substring(0, path.LastIndexOf('/'));
-            return parentPath;
+            int index = path.LastIndexOf('/');
+            return index >= 0 ? path.Substring(0, index) : "";
         }
         
         private static bool AssetPathsContainsDiscrepantAssetBundle(ICollection<string> assetPaths, string ab)

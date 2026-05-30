@@ -67,6 +67,7 @@ void Start()
         .SetOwner(gameObject) // Set animation owner
         .SetIsPause(false) // Set pause state
         .SetIgnoreTimeScale(true) // Set whether to ignore time scale
+        .SetUseSmoothDeltaTime(true) // Set whether to use smoothDeltaTime (effective when time scale is not ignored)
         .SetCustomId("customId") // Set custom ID
         .SetCurrentTime(5f) // Set current time
         .SetProgress(0.5f) // Set current progress
@@ -100,6 +101,9 @@ void Start()
     
     // Set ignore time scale (same as above)
     FF8.Tween.SetIgnoreTimeScale(id, true);
+    
+    // Set whether to use smoothDeltaTime (same as above, effective when time scale is not ignored)
+    FF8.Tween.SetUseSmoothDeltaTime(id, true);
     
     // Cancel animation (same as above)
     int id2 = baseTween.ID;

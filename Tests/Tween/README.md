@@ -68,6 +68,7 @@ void Start()
         .SetOwner(gameObject) // 设置动画拥有者
         .SetIsPause(false) // 设置是否暂停
         .SetIgnoreTimeScale(true) // 设置是否忽略时间缩放
+        .SetUseSmoothDeltaTime(true) // 设置是否使用平滑DeltaTime（不忽略时间缩放时生效）
         .SetCustomId("customId") // 设置自定义ID
         .SetCurrentTime(5f) // 设置当前时间
         .SetProgress(0.5f) // 设置当前进度
@@ -101,6 +102,9 @@ void Start()
     
     // 设置是否忽略时间缩放（同上）
     FF8.Tween.SetIgnoreTimeScale(id, true);
+    
+    // 设置是否使用平滑DeltaTime（同上，不忽略时间缩放时生效）
+    FF8.Tween.SetUseSmoothDeltaTime(id, true);
     
     // 取消动画（同上）
     int id2 = baseTween.ID;

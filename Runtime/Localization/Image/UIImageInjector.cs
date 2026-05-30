@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace F8Framework.Core
 {
-	public class UIImageInjector : IInjector
+	public class UIImageInjector : AssetInjectorBase
 	{
 		readonly Image image;
 		readonly Sprite[] sprites;
@@ -14,18 +14,50 @@ namespace F8Framework.Core
 			this.sprites = sprites;
 		}
 
-		public void Inject<T1, T2>(T1 localizedData, T2 localizer) where T2 : LocalizerBase
+		public override void Inject<T1, T2>(T1 localizedData, T2 localizer)
 		{
+			if (!image)
+			{
+				Unload();
+				return;
+			}
+
+			if (localizedData is null)
+			{
+				Unload();
+				return;
+			}
+
 			if (localizedData is int index)
 			{
-				image.sprite = sprites?[index];
+				UseDirectAsset();
+				image.sprite = GetSprite(index);
 			}
 			else if (localizedData is string textIDValue)
 			{
-				AssetManager.Instance.LoadAsync<Sprite>(textIDValue, (asset) =>
+				LoadLocalizedAsset<Sprite>(textIDValue, (asset) =>
 				{
-					image.sprite = asset;
+					if (image)
+					{
+						image.sprite = asset;
+						return;
+					}
+
+					Unload();
 				});
+			}
+		}
+
+		private Sprite GetSprite(int index)
+		{
+			return sprites != null && index >= 0 && index < sprites.Length ? sprites[index] : null;
+		}
+
+		protected override void ClearTarget()
+		{
+			if (image)
+			{
+				image.sprite = null;
 			}
 		}
 	}

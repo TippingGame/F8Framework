@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace F8Framework.Core
 {
-    public class SpriteRendererInjector : IInjector
+    public class SpriteRendererInjector : AssetInjectorBase
     {
         readonly SpriteRenderer spriteRenderer;
         readonly Sprite[] sprites;
@@ -13,18 +13,50 @@ namespace F8Framework.Core
             this.sprites = sprites;
         }
 
-        public void Inject<T1, T2>(T1 localizedData, T2 localizer) where T2 : LocalizerBase
+        public override void Inject<T1, T2>(T1 localizedData, T2 localizer)
         {
+            if (!spriteRenderer)
+            {
+                Unload();
+                return;
+            }
+
+            if (localizedData is null)
+            {
+                Unload();
+                return;
+            }
+
             if (localizedData is int index)
             {
-                spriteRenderer.sprite = sprites?[index];
+                UseDirectAsset();
+                spriteRenderer.sprite = GetSprite(index);
             }
             else if (localizedData is string textIDValue)
             {
-                AssetManager.Instance.LoadAsync<Sprite>(textIDValue, (asset) =>
+                LoadLocalizedAsset<Sprite>(textIDValue, (asset) =>
                 {
-                    spriteRenderer.sprite = asset;
+                    if (spriteRenderer)
+                    {
+                        spriteRenderer.sprite = asset;
+                        return;
+                    }
+
+                    Unload();
                 });
+            }
+        }
+
+        private Sprite GetSprite(int index)
+        {
+            return sprites != null && index >= 0 && index < sprites.Length ? sprites[index] : null;
+        }
+
+        protected override void ClearTarget()
+        {
+            if (spriteRenderer)
+            {
+                spriteRenderer.sprite = null;
             }
         }
     }
