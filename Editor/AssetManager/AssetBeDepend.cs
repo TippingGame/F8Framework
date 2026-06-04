@@ -9,64 +9,115 @@ namespace F8Framework.Core.Editor
         // 存储所有依赖关系
         private static Dictionary<string, List<string>> referenceCacheDic = new Dictionary<string, List<string>>();
         
-        private static List<string> referenceCacheList = new List<string>();
+        private static List<AssetReferenceInfo> referenceCacheList = new List<AssetReferenceInfo>();
+        private static HashSet<string> referenceCacheSet = new HashSet<string>();
         
         [MenuItem("Assets/（F8资产功能）/（寻找资源是否被引用）", false , 1010)]
         public static void FindReferences()
         {
             referenceCacheList.Clear();
+            referenceCacheSet.Clear();
             referenceCacheDic.Clear();
             CollectDepend();
             
-            // 获取所有选中 文件、文件夹的 GUID
-            string[] guids = Selection.assetGUIDs;
-            foreach (var guid in guids)
+            List<string> selectedAssetPaths = GetSelectedAssetPaths();
+            foreach (var assetPath in selectedAssetPaths)
             {
-                // 将 GUID 转换为 路径
-                string assetPath = AssetDatabase.GUIDToAssetPath(guid);
                 IsBeDepend(assetPath);
             }
         
-            LogF8.LogAsset("引用搜索完成");
+            LogF8.LogAsset($"引用搜索完成，共搜索 {selectedAssetPaths.Count} 个资源，找到 {referenceCacheList.Count} 条引用");
             
             // 打开引用结果窗口
             AssetReferenceResultWindow.ShowWindow(referenceCacheList, referenceCacheDic, "初始搜索结果");
+        }
+
+        private static List<string> GetSelectedAssetPaths()
+        {
+            HashSet<string> selectedAssetPathSet = new HashSet<string>();
+            string[] guids = Selection.assetGUIDs;
+            foreach (var guid in guids)
+            {
+                string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+                if (string.IsNullOrEmpty(assetPath))
+                {
+                    continue;
+                }
+
+                if (AssetDatabase.IsValidFolder(assetPath))
+                {
+                    string[] childGuids = AssetDatabase.FindAssets("", new[] { assetPath });
+                    foreach (var childGuid in childGuids)
+                    {
+                        string childAssetPath = AssetDatabase.GUIDToAssetPath(childGuid);
+                        if (!string.IsNullOrEmpty(childAssetPath) && !AssetDatabase.IsValidFolder(childAssetPath))
+                        {
+                            selectedAssetPathSet.Add(childAssetPath);
+                        }
+                    }
+                }
+                else
+                {
+                    selectedAssetPathSet.Add(assetPath);
+                }
+            }
+
+            return new List<string>(selectedAssetPathSet);
         }
         
         // 收集项目中所有依赖关系
         private static void CollectDepend()
         {
             int count = 0;
-            // 获取 AssetBundles 文件夹下所有资源
-            string[] uiDirs = { System.IO.Path.Combine("Assets") };
-            string[] guids = AssetDatabase.FindAssets("", uiDirs);
-            foreach (string guid in guids)
+            string[] guids = AssetDatabase.FindAssets("", new[] { "Assets" });
+            try
             {
-                // 将 GUID 转换为路径
-                string assetPath = AssetDatabase.GUIDToAssetPath(guid);
-                // 获取文件所有直接依赖的资源
-                string[] dependencies = AssetDatabase.GetDependencies(assetPath, false);
-        
-                foreach (var filePath in dependencies)
+                foreach (string guid in guids)
                 {
-                    // dependency 被 assetPath 依赖了
-                    // 将所有依赖关系存储到字典中
-                    List<string> list = null;
-                    if (!referenceCacheDic.TryGetValue(filePath, out list))
+                    string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+                    if (string.IsNullOrEmpty(assetPath) || AssetDatabase.IsValidFolder(assetPath))
                     {
-                        list = new List<string>();
-                        referenceCacheDic[filePath] = list;
+                        count++;
+                        EditorUtility.DisplayProgressBar("引用查找", "引用查找中",
+                            (float)(count * 1.0f / guids.Length));
+                        continue;
                     }
-        
-                    list.Add(assetPath);
+
+                    string[] dependencies = AssetDatabase.GetDependencies(assetPath, true);
+                    foreach (var filePath in dependencies)
+                    {
+                        if (string.IsNullOrEmpty(filePath) || filePath == assetPath)
+                        {
+                            continue;
+                        }
+
+                        AddReference(filePath, assetPath);
+                    }
+
+                    count++;
+                    EditorUtility.DisplayProgressBar("引用查找", "引用查找中",
+                        (float)(count * 1.0f / guids.Length));
                 }
-        
-                count++;
-                EditorUtility.DisplayProgressBar("引用查找", "引用查找中",
-                    (float)(count * 1.0f / guids.Length));
             }
-        
-            EditorUtility.ClearProgressBar();
+            finally
+            {
+                EditorUtility.ClearProgressBar();
+            }
+        }
+
+        private static void AddReference(string targetAssetPath, string referenceAssetPath)
+        {
+            List<string> list = null;
+            if (!referenceCacheDic.TryGetValue(targetAssetPath, out list))
+            {
+                list = new List<string>();
+                referenceCacheDic[targetAssetPath] = list;
+            }
+
+            if (!list.Contains(referenceAssetPath))
+            {
+                list.Add(referenceAssetPath);
+            }
         }
         
         // 判断文件是否被依赖
@@ -81,21 +132,34 @@ namespace F8Framework.Core.Editor
             // 将依赖关系打印出来
             foreach (var file in list)
             {
-                if (!referenceCacheList.Contains(file))
+                string cacheKey = filePath + "\n" + file;
+                if (referenceCacheSet.Add(cacheKey))
                 {
-                    referenceCacheList.Add(file);
+                    referenceCacheList.Add(new AssetReferenceInfo(filePath, file));
                     LogF8.LogAsset(filePath + "---->被：<color=#FFFF00>" + file + "</color> 引用");
                 }
             }
-        
+
             return true;
+        }
+    }
+
+    public class AssetReferenceInfo
+    {
+        public string TargetAssetPath { get; private set; }
+        public string ReferenceAssetPath { get; private set; }
+
+        public AssetReferenceInfo(string targetAssetPath, string referenceAssetPath)
+        {
+            TargetAssetPath = targetAssetPath;
+            ReferenceAssetPath = referenceAssetPath;
         }
     }
 
     // 引用结果显示窗口
     public class AssetReferenceResultWindow : EditorWindow
     {
-        private List<string> referenceList;
+        private List<AssetReferenceInfo> referenceList;
         private Dictionary<string, List<string>> referenceCacheDic;
         private Vector2 scrollPosition;
         
@@ -106,19 +170,19 @@ namespace F8Framework.Core.Editor
         // 历史状态类
         private class HistoryState
         {
-            public List<string> references;
+            public List<AssetReferenceInfo> references;
             public string title;
             public string targetAssetPath; // 当前查看的资源路径
             
-            public HistoryState(List<string> refs, string t, string target = "")
+            public HistoryState(List<AssetReferenceInfo> refs, string t, string target = "")
             {
-                references = new List<string>(refs);
+                references = new List<AssetReferenceInfo>(refs);
                 title = t;
                 targetAssetPath = target;
             }
         }
         
-        public static void ShowWindow(List<string> references, Dictionary<string, List<string>> cacheDic, string title = "资源引用结果", string targetAssetPath = "")
+        public static void ShowWindow(List<AssetReferenceInfo> references, Dictionary<string, List<string>> cacheDic, string title = "资源引用结果", string targetAssetPath = "")
         {
             AssetReferenceResultWindow window = GetWindow<AssetReferenceResultWindow>("资源引用结果");
             window.referenceCacheDic = cacheDic;
@@ -127,7 +191,7 @@ namespace F8Framework.Core.Editor
             window.Show();
         }
         
-        private void SetCurrentState(List<string> references, string title, string targetAssetPath = "")
+        private void SetCurrentState(List<AssetReferenceInfo> references, string title, string targetAssetPath = "")
         {
             // 将当前状态保存到历史记录
             if (currentState != null)
@@ -162,7 +226,7 @@ namespace F8Framework.Core.Editor
             
             // 显示标题和统计信息
             EditorGUILayout.BeginHorizontal();
-            GUILayout.Label($"{currentState.title} - 找到 {referenceList.Count} 个引用文件", EditorStyles.boldLabel);
+            GUILayout.Label($"{currentState.title} - 找到 {referenceList.Count} 条引用", EditorStyles.boldLabel);
             EditorGUILayout.EndHorizontal();
             
             EditorGUILayout.EndVertical();
@@ -224,8 +288,11 @@ namespace F8Framework.Core.Editor
             EditorGUILayout.EndHorizontal();
         }
         
-        private void DrawReferenceItem(string assetPath, int index)
+        private void DrawReferenceItem(AssetReferenceInfo referenceInfo, int index)
         {
+            string assetPath = referenceInfo.ReferenceAssetPath;
+            string targetAssetPath = referenceInfo.TargetAssetPath;
+            
             EditorGUILayout.BeginVertical(GUI.skin.box);
             
             EditorGUILayout.BeginHorizontal();
@@ -275,14 +342,24 @@ namespace F8Framework.Core.Editor
             pathStyle.normal.textColor = Color.gray;
             GUILayout.Label(assetPath, pathStyle);
             EditorGUILayout.EndHorizontal();
+
+            if (!string.IsNullOrEmpty(targetAssetPath))
+            {
+                EditorGUILayout.BeginHorizontal();
+                GUILayout.Space(35);
+                GUIStyle targetPathStyle = new GUIStyle(EditorStyles.miniLabel);
+                targetPathStyle.normal.textColor = new Color(0.1f, 0.5f, 0.9f);
+                GUILayout.Label("引用目标: " + targetAssetPath, targetPathStyle);
+                EditorGUILayout.EndHorizontal();
+            }
             
             // 显示引用数量信息
             EditorGUILayout.BeginHorizontal();
             GUILayout.Space(35);
-            int referenceCount = GetReferenceCount(assetPath);
+            int referenceCount = GetReferenceCount(targetAssetPath);
             GUIStyle countStyle = new GUIStyle(EditorStyles.miniLabel);
             countStyle.normal.textColor = referenceCount > 0 ? new Color(0.2f, 0.8f, 0.2f) : Color.gray;
-            GUILayout.Label($"被 {referenceCount} 个文件引用", countStyle);
+            GUILayout.Label($"目标共被 {referenceCount} 个文件引用", countStyle);
             EditorGUILayout.EndHorizontal();
             
             EditorGUILayout.EndVertical();
@@ -312,11 +389,14 @@ namespace F8Framework.Core.Editor
         private void FindReferencesForThisAsset(string assetPath)
         {
             // 查找该资源的引用
-            List<string> referencesForThisAsset = new List<string>();
+            List<AssetReferenceInfo> referencesForThisAsset = new List<AssetReferenceInfo>();
             
             if (referenceCacheDic.TryGetValue(assetPath, out var refList))
             {
-                referencesForThisAsset.AddRange(refList);
+                foreach (var refAssetPath in refList)
+                {
+                    referencesForThisAsset.Add(new AssetReferenceInfo(assetPath, refAssetPath));
+                }
             }
             
             // 打开新的结果窗口显示该资源的引用

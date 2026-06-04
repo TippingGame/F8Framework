@@ -181,10 +181,8 @@ namespace F8Framework.Core.Editor
             
             AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
             // 等待脚本编译完成
-            CompilationPipeline.compilationFinished += (object s) =>
-            {
-                SessionState.SetBool("compilationFinished", true);
-            };
+            CompilationPipeline.compilationFinished -= OnCompilationFinished;
+            CompilationPipeline.compilationFinished += OnCompilationFinished;
         }
 
         // Jenkins导表专用
@@ -199,6 +197,12 @@ namespace F8Framework.Core.Editor
             F8EditorPrefs.SetString(BuildPkgTool.ExcelBinDataFolderKey, URLSetting.RemoveRootPath(ExcelBinDataFolder));
             SessionState.SetBool("compilationFinished", true);
             AllScriptsReloaded();
+        }
+
+        private static void OnCompilationFinished(object obj)
+        {
+            CompilationPipeline.compilationFinished -= OnCompilationFinished;
+            SessionState.SetBool("compilationFinished", true);
         }
 
         // 等待脚本编译完成
@@ -397,10 +401,13 @@ namespace F8Framework.Core.Editor
                         throw new Exception("空的类名（excel页签名）, 路径:  " + inputPath);
                     }
 
-                    if (names != null && types != null && configDataList.Count > 0)
+                    if (names != null && types != null)
                     {
+                        List<ReadExcel.ConfigData> scriptConfigDataList = configDataList.Count > 0
+                            ? configDataList
+                            : CreateConfigDataList(types, names);
                         //根据刚才的数据来生成C#脚本
-                        ScriptGenerator generator = new ScriptGenerator(inputPath, className, configDataList);
+                        ScriptGenerator generator = new ScriptGenerator(inputPath, className, scriptConfigDataList);
                         //所有生成的类的代码最终保存在这
                         if (codeList.ContainsKey(className))
                         {
@@ -432,6 +439,27 @@ namespace F8Framework.Core.Editor
                 excelReader?.Dispose();
                 stream?.Dispose();
             }
+        }
+
+        private static List<ReadExcel.ConfigData> CreateConfigDataList(string[] types, string[] names)
+        {
+            List<ReadExcel.ConfigData> configDataList = new List<ReadExcel.ConfigData>();
+            int count = Math.Min(types.Length, names.Length);
+            for (int i = 0; i < count; i++)
+            {
+                if (string.IsNullOrEmpty(types[i]))
+                    continue;
+
+                configDataList.Add(new ReadExcel.ConfigData
+                {
+                    Type = types[i],
+                    Name = names[i],
+                    Data = string.Empty
+                });
+            }
+
+            ReadExcel.VariantInfoDict(ref configDataList);
+            return configDataList;
         }
 
         //编译代码

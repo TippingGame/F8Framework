@@ -17,7 +17,15 @@ namespace F8Framework.Core.Editor
         private List<ReadExcel.ConfigData> ConfigDatas;
         private string ClassName;
         private string InputPath;
-        private StringBuilder enumSource = new StringBuilder();
+        private readonly Dictionary<string, EnumDefinition> enumDefinitions = new Dictionary<string, EnumDefinition>();
+        private readonly List<string> enumDefinitionOrder = new List<string>();
+
+        private class EnumDefinition
+        {
+            public string Source;
+            public bool HasFullDefinition;
+            public string Signature;
+        }
 
         public ScriptGenerator(string inputPath, string className, List<ReadExcel.ConfigData> configDatas)
         {
@@ -83,7 +91,8 @@ namespace F8Framework.Core.Editor
             classSource.Append("\t[Serializable]\n");
             classSource.Append("\tpublic class " + ClassName + "Item\n"); //表里每一条数据的类型名为表类型名加Item
             classSource.Append("\t{\n");
-            enumSource.Clear();
+            enumDefinitions.Clear();
+            enumDefinitionOrder.Clear();
 
             string exportFormat = F8EditorPrefs.GetString(BuildPkgTool.ConvertExcelToOtherFormatsKey, BuildPkgTool.ExcelToOtherFormats[1]);
             Dictionary<string, string> binaryRegisters = exportFormat == BuildPkgTool.ExcelToOtherFormats[1] ? new Dictionary<string, string>() : null;
@@ -112,9 +121,9 @@ namespace F8Framework.Core.Editor
                 }
                 
                 // 枚举定义
-                if (!string.IsNullOrEmpty(types[i]) && !string.IsNullOrEmpty(fields[i]))
+                if (!string.IsNullOrEmpty(types[i]))
                 {
-                    enumSource.Append(PropertyEnum(types[i], ClassName, InputPath, true, binaryRegisters));
+                    PropertyEnum(types[i], ClassName, InputPath, true, binaryRegisters);
                 }
             }
             
@@ -125,10 +134,10 @@ namespace F8Framework.Core.Editor
             classSource.Append("\t[Serializable]\n");
             classSource.Append("\tpublic class " + ClassName + "\n");
             classSource.Append("\t{\n");
-            string idType = "";
+            string idType = "int";
             for (int i = 0; i < fields.Length; i++)
             {
-                if (fields[i].Equals("id", StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(fields[i], "id", StringComparison.OrdinalIgnoreCase))
                 {
                     idType = ReadExcel.GetTrueType(types[i], ClassName, InputPath);
                     break;
@@ -213,9 +222,9 @@ namespace F8Framework.Core.Editor
             classSource.Append("\t\t[Preserve]\n");
             classSource.Append("\t\tpublic " + "Dictionary<" + idType + ", " + ExcelDataTool.CODE_NAMESPACE + "." + ClassName + "Item" + "> " + "Dict" +
                                " = new Dictionary<" + idType + ", " + ExcelDataTool.CODE_NAMESPACE + "." + ClassName + "Item" + ">();\n");
-            if (enumSource.Length > 0)
+            foreach (string enumName in enumDefinitionOrder)
             {
-                classSource.Append(enumSource.ToString());
+                classSource.Append(enumDefinitions[enumName].Source);
             }
             classSource.Append("\t}\n");
             classSource.Append("}\n");
@@ -264,10 +273,10 @@ namespace F8Framework.Core.Editor
             }
         }
 
-        private string PropertyEnum(string type, string className = "", string inputPath = "", bool writtenForm = true, Dictionary<string, string> binaryRegisters = null)
+        private void PropertyEnum(string type, string className = "", string inputPath = "", bool writtenForm = true, Dictionary<string, string> binaryRegisters = null)
         {
             if (!type.StartsWith(SupportType.ENUM) || (!type.EndsWith(">") && !type.EndsWith("}")))
-                return "";
+                return;
 
             // 1. 检查是否有大括号（完整定义）或只有尖括号（简化定义）
             bool hasBraces = type.Contains('{') && type.Contains('}');
@@ -311,15 +320,16 @@ namespace F8Framework.Core.Editor
             }
 
             string enumName = enumParams[0].Trim();
+            string enumSourceName = enumName;
 
             // 3. 检查类名前缀（如果包含点）
             if (enumName.Contains('.'))
             {
                 string[] parts = enumName.Split('.');
                 if (parts[0] != className)
-                {
-                    return "";
-                }
+                    return;
+
+                enumSourceName = parts[parts.Length - 1].Trim();
             }
 
             // 4. 设置默认值
@@ -337,7 +347,7 @@ namespace F8Framework.Core.Editor
 
             sb.Append("\t\t[Preserve]\n");
             sb.Append("\t\t[Serializable]\n");
-            sb.Append("\t\tpublic enum ").Append(enumName).Append(" : ").Append(ReadExcel.GetTrueType(underlyingType, className, inputPath, writtenForm)).Append("\n");
+            sb.Append("\t\tpublic enum ").Append(enumSourceName).Append(" : ").Append(ReadExcel.GetTrueType(underlyingType, className, inputPath, writtenForm)).Append("\n");
             sb.Append("\t\t{\n");
 
             // 6. 处理枚举值（如果有）
@@ -361,8 +371,43 @@ namespace F8Framework.Core.Editor
 
             sb.Append("\t\t}\n");
 
-            binaryRegisters?.TryAdd($"{ExcelDataTool.CODE_NAMESPACE}.{className}.{enumName}", SupportType.ENUM);
-            return sb.ToString();
+            RegisterEnumDefinition(enumSourceName, sb.ToString(), hasBraces, enumDefinition, underlyingType, isFlags, enumValues);
+            binaryRegisters?.TryAdd($"{ExcelDataTool.CODE_NAMESPACE}.{className}.{enumSourceName}", SupportType.ENUM);
+        }
+
+        private void RegisterEnumDefinition(string enumName, string source, bool hasFullDefinition, string enumDefinition, string underlyingType, bool isFlags, string enumValues)
+        {
+            if (string.IsNullOrEmpty(enumName) || string.IsNullOrEmpty(source))
+            {
+                return;
+            }
+
+            string signature = $"{enumDefinition}|{underlyingType}|{isFlags}|{enumValues}";
+
+            if (enumDefinitions.TryGetValue(enumName, out EnumDefinition existing))
+            {
+                if (!string.Equals(existing.Signature, signature, StringComparison.Ordinal))
+                {
+                    throw new Exception($"表[{ClassName}]中枚举[{enumName}]定义不一致，请统一写法后再导表。");
+                }
+
+                if (!existing.HasFullDefinition && hasFullDefinition)
+                {
+                    existing.Source = source;
+                    existing.HasFullDefinition = true;
+                    existing.Signature = signature;
+                }
+
+                return;
+            }
+
+            enumDefinitions[enumName] = new EnumDefinition
+            {
+                Source = source,
+                HasFullDefinition = hasFullDefinition,
+                Signature = signature
+            };
+            enumDefinitionOrder.Add(enumName);
         }
         
         //创建数据管理器脚本
