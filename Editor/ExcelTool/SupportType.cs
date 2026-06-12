@@ -24,7 +24,6 @@ namespace F8Framework.Core.Editor
         {
             public string Source;
             public bool HasFullDefinition;
-            public string Signature;
         }
 
         public ScriptGenerator(string inputPath, string className, List<ReadExcel.ConfigData> configDatas)
@@ -382,20 +381,12 @@ namespace F8Framework.Core.Editor
                 return;
             }
 
-            string signature = $"{enumDefinition}|{underlyingType}|{isFlags}|{enumValues}";
-
             if (enumDefinitions.TryGetValue(enumName, out EnumDefinition existing))
             {
-                if (!string.Equals(existing.Signature, signature, StringComparison.Ordinal))
-                {
-                    throw new Exception($"表[{ClassName}]中枚举[{enumName}]定义不一致，请统一写法后再导表。");
-                }
-
                 if (!existing.HasFullDefinition && hasFullDefinition)
                 {
                     existing.Source = source;
                     existing.HasFullDefinition = true;
-                    existing.Signature = signature;
                 }
 
                 return;
@@ -404,8 +395,7 @@ namespace F8Framework.Core.Editor
             enumDefinitions[enumName] = new EnumDefinition
             {
                 Source = source,
-                HasFullDefinition = hasFullDefinition,
-                Signature = signature
+                HasFullDefinition = hasFullDefinition
             };
             enumDefinitionOrder.Add(enumName);
         }
