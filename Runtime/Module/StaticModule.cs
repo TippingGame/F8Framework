@@ -33,7 +33,7 @@ namespace F8Framework.Core
             _tempStaticModules.AddRange(_staticModules.Values);
             foreach (var module in _tempStaticModules)
             {
-                module.OnEnterGame();
+                module.OnQuitGame();
             }
             _tempStaticModules.Clear();
         }
