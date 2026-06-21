@@ -291,6 +291,8 @@ namespace F8Framework.Core.Editor
             F8JsonEncryption.WriteJsonToFile(hotUpdateMapPath, Util.LitJson.ToJson(hotUpdateAssetBundleMappings), assetManifestEncryptKey);
             
             LogF8.LogVersion("构建热更新包版本成功！版本：" + toVersion);
+
+            SyncForceRemoteAssetBundles(buildPath);
             
             AssetDatabase.Refresh();
         }
@@ -490,6 +492,8 @@ namespace F8Framework.Core.Editor
                 FileTools.SafeDeleteDir(toPath);
                 LogF8.LogVersion("游戏空包打包成功! " + locationPathName);
             }
+            
+            SyncForceRemoteAssetBundles(buildPath);
             
             AssetDatabase.Refresh();
         }
@@ -1237,6 +1241,34 @@ namespace F8Framework.Core.Editor
                 }
             }
             AssetDatabase.Refresh();
+        }
+
+        private static void SyncForceRemoteAssetBundles(string buildPath)
+        {
+            if (!F8GamePrefs.GetBool(nameof(F8GameConfig.ForceRemoteAssetBundle)))
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(buildPath))
+            {
+                LogF8.LogError("强制远程资产加载模式下，同步AssetBundles到CDN目录失败：打包输出目录为空。");
+                return;
+            }
+
+            string assetBundlesPath = FileTools.FormatToUnityPath(Application.streamingAssetsPath + "/" + URLSetting.AssetBundlesName);
+            if (!Directory.Exists(assetBundlesPath))
+            {
+                LogF8.LogError("强制远程资产加载模式下，同步AssetBundles到CDN目录失败，源目录不存在：" + assetBundlesPath);
+                return;
+            }
+
+            string remoteAssetBundlesPath = FileTools.FormatToUnityPath(buildPath + HotUpdateManager.RemoteDirName + "/" + URLSetting.AssetBundlesName);
+            FileTools.SafeClearDir(remoteAssetBundlesPath);
+            if (FileTools.SafeCopyDirectory(assetBundlesPath, remoteAssetBundlesPath, true, new[] { ".meta", ".DS_Store" }))
+            {
+                LogF8.LogVersion("强制远程资产加载模式：已同步全量AssetBundles到CDN目录：" + remoteAssetBundlesPath);
+            }
         }
         
         // 复制并删除不需要打进包里的AB
