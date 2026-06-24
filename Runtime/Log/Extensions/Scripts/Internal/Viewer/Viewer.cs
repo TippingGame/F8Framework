@@ -107,18 +107,16 @@ namespace F8Framework.Core
         
         private void Update()
         {
-            if (pannel.activeSelf == false && gestureEnable == true)
-            {
-                CheckGesture(true);
-                CheckKey(true);
-            }
-            else
+            bool show = pannel.activeSelf == false;
+
+            if (show == false)
             {
                 UpdateOrientation();
                 UpdateResolution();
-                CheckKey(false);
-                CheckGesture(false);
             }
+
+            CheckKey(show);
+            CheckGesture(show);
         }
 
         private void UpdateResolution()
@@ -165,6 +163,13 @@ namespace F8Framework.Core
 
         private void CheckGesture(bool show)
         {
+            if (gestureEnable == false)
+            {
+                isTouchBegin = false;
+                touchTime = 0;
+                return;
+            }
+
 #if ENABLE_INPUT_SYSTEM
             int pressedTouchCount = 0;
 
@@ -227,15 +232,19 @@ namespace F8Framework.Core
 
         private void CheckKey(bool show)
         {
+            if (keyCodeEnable == false)
+            {
+                return;
+            }
+
 #if ENABLE_INPUT_SYSTEM
             if (UnityEngine.InputSystem.Keyboard.current != null &&
-                UnityEngine.InputSystem.Keyboard.current.backquoteKey.wasPressedThisFrame &&
-                keyCodeEnable)
+                UnityEngine.InputSystem.Keyboard.current.backquoteKey.wasPressedThisFrame)
             {
                 Show(show);
             }
 #elif ENABLE_LEGACY_INPUT_MANAGER
-            if (Input.GetKeyDown(KeyCode.BackQuote) == true && keyCodeEnable)
+            if (Input.GetKeyDown(KeyCode.BackQuote) == true)
             {
                 Show(show);
             }
