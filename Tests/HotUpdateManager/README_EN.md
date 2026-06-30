@@ -35,6 +35,10 @@ Method 2: Unity → Menu Bar → Window → Package Manager → "+" → Add Pack
 --------------------------
 * For Local Hot Update Testing: Clear temporary files in the sandbox directory before testing.
 --------------------------
+* Remote asset URLs can use the default value written by the build tool, or be resolved from code at runtime:
+  * `GameConfig.SetAssetRemoteBaseAddressGetter(...)`: pass the CDN base URL; the framework appends `Remote/platform`
+  * `GameConfig.SetAssetRemoteFinalAddressGetter(...)`: pass the final remote asset root; no suffix is appended
+--------------------------
 ### If Build Fails: Try running Unity's native Build once before retrying.
 
 --------------------------
@@ -43,6 +47,15 @@ Method 2: Unity → Menu Bar → Window → Package Manager → "+" → Add Pack
 --------------------------
 ### Code Examples
 ```C#
+private static string GetHotfixUrl()
+{
+#if TEST_VERSION
+    return "https://cdn-test.xxx.com/hotfix/";
+#else
+    return "https://cdn-prod.xxx.com/hotfix/";
+#endif
+}
+
 IEnumerator Start()
 {
     // Required modules for startup, hot update version management -->used asset module -->used download module
@@ -53,6 +66,9 @@ IEnumerator Start()
     
     // Initialize local version
     FF8.HotUpdate.InitLocalVersion();
+
+    // Optional: resolve the CDN base URL from code; the framework appends Remote/platform
+    GameConfig.SetAssetRemoteBaseAddressGetter(GetHotfixUrl);
 
     // Initialize remote version 
     yield return FF8.HotUpdate.InitRemoteVersion();

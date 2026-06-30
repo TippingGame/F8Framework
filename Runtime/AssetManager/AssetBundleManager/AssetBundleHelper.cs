@@ -19,15 +19,10 @@ namespace F8Framework.Core
             return _streamingAssetsPath;
         }
         
-        private static string _remoteAddress;
-        
         private static string GetRemoteAddress()
         {
-            if (_remoteAddress == null)
-            {
-                _remoteAddress = GameConfig.LocalGameVersion.AssetRemoteAddress + "/" + URLSetting.AssetBundlesName + "/" + URLSetting.GetPlatformName() + "/";
-            }
-            return _remoteAddress;
+            string remoteAddress = GameConfig.CombineAssetRemoteUrl(URLSetting.AssetBundlesName, URLSetting.GetPlatformName());
+            return string.IsNullOrEmpty(remoteAddress) ? null : remoteAddress + "/";
         }
 
         private static string _hotUpdatePath;
@@ -84,7 +79,7 @@ namespace F8Framework.Core
                     assetBundlePath = GetPackagePath();
                     break;
                 case SourceType.REMOTE_ADDRESS:
-                    if (string.IsNullOrEmpty(GameConfig.LocalGameVersion.AssetRemoteAddress))
+                    if (string.IsNullOrEmpty(GameConfig.GetAssetRemoteAddress()))
                     {
                         LogF8.LogError("加载远程包需要配置远程地址：AssetRemoteAddress");
                     }

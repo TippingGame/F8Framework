@@ -79,7 +79,12 @@ namespace F8Framework.Core
                 yield break;
             }
             
-            string path = GameConfig.LocalGameVersion.AssetRemoteAddress + "/" + nameof(GameVersion) + ".json";
+            string path = GameConfig.CombineAssetRemoteUrl(nameof(GameVersion) + ".json");
+            if (path.IsNullOrEmpty())
+            {
+                LogF8.LogError("获取游戏远程版本失败：未配置远程地址 AssetRemoteAddress");
+                yield break;
+            }
             LogF8.Log($"请求远程版本配置，来源：{path}");
             
             UnityWebRequest webRequest = UnityWebRequest.Get(path);
@@ -107,7 +112,12 @@ namespace F8Framework.Core
                 yield break;
             }
 
-            string path = GameConfig.LocalGameVersion.AssetRemoteAddress + HotUpdateDirName + Separator + nameof(AssetBundleMap) + ".json";
+            string path = GameConfig.CombineAssetRemoteUrl(HotUpdateDirName + Separator + nameof(AssetBundleMap) + ".json");
+            if (path.IsNullOrEmpty())
+            {
+                LogF8.LogError("请求热更资产配置失败：未配置远程地址 AssetRemoteAddress");
+                yield break;
+            }
             LogF8.Log($"请求热更资产配置，来源：{path}");
             
             UnityWebRequest webRequest = UnityWebRequest.Get(path);
@@ -204,7 +214,13 @@ namespace F8Framework.Core
                 {
                     string abPath = resAssetMapping.Value.Version + "/" + URLSetting.AssetBundlesName + "/" +
                                     URLSetting.GetPlatformName() + "/" + resAssetMapping.Value.AbName;
-                    string remoteUrl = GameConfig.LocalGameVersion.AssetRemoteAddress + HotUpdateDirName + Separator + abPath;
+                    string remoteUrl = GameConfig.CombineAssetRemoteUrl(HotUpdateDirName + Separator + abPath);
+                    if (remoteUrl.IsNullOrEmpty())
+                    {
+                        LogF8.LogError("检查热更资源失败：未配置远程地址 AssetRemoteAddress");
+                        return (downloadInfos, allSize);
+                    }
+
                     int index = abPath.IndexOf('/');
                     string relativePath = abPath.Substring(index + 1);
                     string localPath = Application.persistentDataPath + HotUpdateDirName + "/" + relativePath;
@@ -376,7 +392,12 @@ namespace F8Framework.Core
                 }
 
                 string persistentPackagePath = Application.persistentDataPath + "/" + PackageSplit + package + ".zip";
-                string remotePackageUrl = GameConfig.LocalGameVersion.AssetRemoteAddress + "/" + PackageSplit + package + ".zip";
+                string remotePackageUrl = GameConfig.CombineAssetRemoteUrl(PackageSplit + package + ".zip");
+                if (remotePackageUrl.IsNullOrEmpty())
+                {
+                    LogF8.LogError("检查分包资源失败：未配置远程地址 AssetRemoteAddress");
+                    return (downloadInfos, allSize);
+                }
 
                 string expectedMd5 = null;
                 long expectedSize = 0;

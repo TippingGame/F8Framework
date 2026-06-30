@@ -999,7 +999,7 @@ namespace F8Framework.Core
         
         public static string GetRemoteAssetBundleCompletePath()
         {
-            if (!string.IsNullOrEmpty(GameConfig.LocalGameVersion.AssetRemoteAddress))
+            if (!string.IsNullOrEmpty(GameConfig.GetAssetRemoteAddress()))
             {
                 string remoteABFullPath
                     = AssetBundleHelper.GetAssetBundleFullName(null, AssetBundleHelper.SourceType.REMOTE_ADDRESS);

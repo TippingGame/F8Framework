@@ -35,6 +35,10 @@
 --------------------------
 * 如需本地测试热更新，注意清理沙盒目录中的临时文件
 --------------------------
+* 远程资产地址既可以使用打包工具写入的默认值，也可以在运行时用代码动态获取：
+  * `GameConfig.SetAssetRemoteBaseAddressGetter(...)`：传入 CDN 基础地址，框架自动追加 `Remote/平台`
+  * `GameConfig.SetAssetRemoteFinalAddressGetter(...)`：传入最终远程资产根地址，框架不再追加后缀
+--------------------------
 ### 如构建失败：请尝试使用Unity自带的Build一次后再尝试
 
 --------------------------
@@ -43,6 +47,15 @@
 --------------------------
 ### 代码使用方法
 ```C#
+private static string GetHotfixUrl()
+{
+#if TEST_VERSION
+    return "https://cdn-test.xxx.com/hotfix/";
+#else
+    return "https://cdn-prod.xxx.com/hotfix/";
+#endif
+}
+
 IEnumerator Start()
 {
     // 启动必须要的模块，热更新版本管理-->使用了资产模块-->使用了下载模块
@@ -53,6 +66,9 @@ IEnumerator Start()
     
     // 初始化本地版本
     FF8.HotUpdate.InitLocalVersion();
+
+    // 可选：用代码动态获取远程资产基础地址，框架会自动追加 Remote/平台
+    GameConfig.SetAssetRemoteBaseAddressGetter(GetHotfixUrl);
 
     // 初始化远程版本
     yield return FF8.HotUpdate.InitRemoteVersion();

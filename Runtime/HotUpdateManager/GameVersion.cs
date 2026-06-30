@@ -41,6 +41,121 @@ namespace F8Framework.Core
 
         public static Dictionary<string, AssetBundleMap.AssetMapping> RemoteAssetBundleMap =
             new Dictionary<string, AssetBundleMap.AssetMapping>();
+
+        private static Func<string> _assetRemoteAddressGetter;
+
+        /// <summary>
+        /// 设置最终远程资产根地址，返回值会直接作为热更根地址使用，如：https://cdn-test.xxx.com/hotfix/Remote/Android
+        /// </summary>
+        public static void SetAssetRemoteFinalAddressGetter(Func<string> getter)
+        {
+            _assetRemoteAddressGetter = getter;
+        }
+
+        /// <summary>
+        /// 设置 CDN 基础地址，框架会自动追加 Remote/平台，如：https://cdn-test.xxx.com/hotfix -> https://cdn-test.xxx.com/hotfix/Remote/Android
+        /// </summary>
+        public static void SetAssetRemoteBaseAddressGetter(Func<string> getter)
+        {
+            if (getter == null)
+            {
+                _assetRemoteAddressGetter = null;
+                return;
+            }
+
+            _assetRemoteAddressGetter = () => BuildAssetRemoteAddress(getter());
+        }
+
+        public static string GetAssetRemoteAddress()
+        {
+            if (_assetRemoteAddressGetter != null)
+            {
+                return NormalizeAssetRemoteAddress(_assetRemoteAddressGetter());
+            }
+
+            return NormalizeAssetRemoteAddress(LocalGameVersion.AssetRemoteAddress);
+        }
+
+        private static string NormalizeAssetRemoteAddress(string assetRemoteAddress)
+        {
+            if (string.IsNullOrEmpty(assetRemoteAddress))
+            {
+                return string.Empty;
+            }
+
+            return FileTools.FormatToUnityPath(assetRemoteAddress.Trim()).TrimEnd('/');
+        }
+
+        public static string BuildAssetRemoteAddress(string assetRemoteBaseAddress)
+        {
+            if (string.IsNullOrEmpty(assetRemoteBaseAddress))
+            {
+                return string.Empty;
+            }
+
+            string address = NormalizeAssetRemoteAddress(assetRemoteBaseAddress);
+            string remotePlatformSuffix = "/Remote/" + URLSetting.GetPlatformName();
+            if (address.EndsWith(remotePlatformSuffix, StringComparison.OrdinalIgnoreCase))
+            {
+                return address;
+            }
+
+            if (address.EndsWith("/Remote", StringComparison.OrdinalIgnoreCase))
+            {
+                return CombineUrl(address, URLSetting.GetPlatformName());
+            }
+
+            return CombineUrl(address, "Remote", URLSetting.GetPlatformName());
+        }
+
+        public static string CombineAssetRemoteUrl(params string[] paths)
+        {
+            string assetRemoteAddress = GetAssetRemoteAddress();
+            if (string.IsNullOrEmpty(assetRemoteAddress))
+            {
+                return string.Empty;
+            }
+
+            if (paths == null || paths.Length == 0)
+            {
+                return assetRemoteAddress;
+            }
+
+            string[] urlParts = new string[paths.Length + 1];
+            urlParts[0] = assetRemoteAddress;
+            Array.Copy(paths, 0, urlParts, 1, paths.Length);
+            return CombineUrl(urlParts);
+        }
+
+        private static string CombineUrl(params string[] paths)
+        {
+            if (paths == null || paths.Length == 0)
+            {
+                return string.Empty;
+            }
+
+            string result = string.Empty;
+            foreach (string path in paths)
+            {
+                if (string.IsNullOrEmpty(path))
+                {
+                    continue;
+                }
+
+                string value = FileTools.FormatToUnityPath(path.Trim());
+                if (string.IsNullOrEmpty(result))
+                {
+                    result = value.TrimEnd('/');
+                }
+                else
+                {
+                    result = result.TrimEnd('/') + "/" + value.Trim('/');
+                }
+            }
+
+            return result;
+        }
+
         /// <summary>
         /// 判断版本号大小，1为version1大，-1为version2大，0为一样大
         /// </summary>

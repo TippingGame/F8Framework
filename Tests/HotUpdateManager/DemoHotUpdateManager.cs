@@ -8,6 +8,15 @@ namespace F8Framework.Tests
 {
     public class DemoHotUpdateManager : MonoBehaviour
     {
+        private static string GetHotfixUrl()
+        {
+#if TEST_VERSION
+            return "https://cdn-test.xxx.com/hotfix/";
+#else
+            return "https://cdn-prod.xxx.com/hotfix/";
+#endif
+        }
+
         IEnumerator Start()
         {
             // 启动必须要的模块，热更新版本管理-->使用了资产模块-->使用了下载模块
@@ -18,6 +27,9 @@ namespace F8Framework.Tests
             
             // 初始化本地版本
             FF8.HotUpdate.InitLocalVersion();
+
+            // 可选：用代码动态获取远程资产基础地址，框架会自动追加 Remote/平台
+            GameConfig.SetAssetRemoteBaseAddressGetter(GetHotfixUrl);
 
             // 初始化远程版本
             yield return FF8.HotUpdate.InitRemoteVersion();

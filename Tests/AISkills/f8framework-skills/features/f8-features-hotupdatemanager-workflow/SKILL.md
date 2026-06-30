@@ -30,10 +30,23 @@ description: Use when implementing or troubleshooting HotUpdate feature workflow
 |-------|------|
 | `HotUpdateManager` | Core module. Access via `FF8.HotUpdate`. |
 | `GameConfig` | Holds version info including `LocalGameVersion`. |
+| `GameConfig.SetAssetRemoteBaseAddressGetter` | Optional runtime CDN base URL provider. Appends `Remote/platform`. |
+| `GameConfig.SetAssetRemoteFinalAddressGetter` | Optional runtime final remote asset root provider. Does not append suffix. |
 
 ## API quick reference
 
 ```csharp
+// Optional remote URL provider.
+// Use this when test/prod/channel URLs should be selected by code.
+static string GetHotfixUrl()
+{
+#if TEST_VERSION
+    return "https://cdn-test.xxx.com/hotfix/";
+#else
+    return "https://cdn-prod.xxx.com/hotfix/";
+#endif
+}
+
 // Required module initialization order
 FF8.HotUpdate = ModuleCenter.CreateModule<HotUpdateManager>();
 FF8.Asset = ModuleCenter.CreateModule<AssetManager>();
@@ -42,6 +55,7 @@ yield return AssetBundleManager.Instance.LoadAssetBundleManifest();
 
 // Initialize versions
 FF8.HotUpdate.InitLocalVersion();
+GameConfig.SetAssetRemoteBaseAddressGetter(GetHotfixUrl);
 yield return FF8.HotUpdate.InitRemoteVersion();
 yield return FF8.HotUpdate.InitAssetVersion();
 
@@ -72,18 +86,19 @@ FF8.HotUpdate.StartPackageUpdate(packageDownloadTasks,
 ## Workflow
 
 1. Initialize modules in strict order: HotUpdate → Asset → Download → LoadManifest.
-2. Initialize local version, then remote version, then asset version.
-3. Call `CheckHotUpdate()` to get prepared download infos and the actual remaining download size.
-4. Show update dialog with size info to user.
-5. Call `StartHotUpdate()` directly with the returned `downloadInfos` and success/failure/progress callbacks.
-6. Read overall downloaded bytes from `eventArgs.TotalDownloadedLength`; `eventArgs.DownloadInfo.DownloadedLength` is only for the current file.
-7. For sub-packages (DLC), use `CheckPackageUpdate(GameConfig.LocalGameVersion.SubPackage)` to prepare `DownloadTaskInfo` items and pass them directly to `StartPackageUpdate()`.
+2. Initialize local version. If the remote URL should be selected by code, call `GameConfig.SetAssetRemoteBaseAddressGetter(...)` before remote version initialization.
+3. Initialize remote version, then asset version.
+4. Call `CheckHotUpdate()` to get prepared download infos and the actual remaining download size.
+5. Show update dialog with size info to user.
+6. Call `StartHotUpdate()` directly with the returned `downloadInfos` and success/failure/progress callbacks.
+7. Read overall downloaded bytes from `eventArgs.TotalDownloadedLength`; `eventArgs.DownloadInfo.DownloadedLength` is only for the current file.
+8. For sub-packages (DLC), use `CheckPackageUpdate(GameConfig.LocalGameVersion.SubPackage)` to prepare `DownloadTaskInfo` items and pass them directly to `StartPackageUpdate()`.
 
 ## Common error handling
 
 | Error | Cause | Solution |
 |-------|-------|----------|
-| Remote version check fails | CDN unreachable | Check remote URL config in F5 build tool |
+| Remote version check fails | CDN unreachable or remote URL provider not registered early enough | Check remote URL config in F5 build tool, or call `GameConfig.SetAssetRemoteBaseAddressGetter(...)` before `InitRemoteVersion()` |
 | Module init order crash | Wrong initialization order | Must be HotUpdate → Asset → Download → Manifest |
 | Sub-package not found | Package naming wrong | Use `Package_ + identifier` folder naming |
 | Progress only shows current file | Read wrong field | Use `eventArgs.TotalDownloadedLength` for overall progress |
