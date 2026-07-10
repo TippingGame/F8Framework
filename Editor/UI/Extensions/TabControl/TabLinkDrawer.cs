@@ -40,8 +40,9 @@ namespace F8Framework.Core.Editor
             return EditorGUIUtility.singleLineHeight + 4;
         }
 
-        static public void OnLinkGUI(Rect position, TabGroup group, TabLink link, TabLinkObject focus)
+        static public bool OnLinkGUI(Rect position, TabGroup group, TabLink link, TabLinkObject focus)
         {
+            bool changed = false;
             if (link != null)
             {
                 float space = EditorGUIUtility.singleLineHeight;
@@ -89,18 +90,18 @@ namespace F8Framework.Core.Editor
                                 
                                 if (EditorUtility.DisplayDialog("tab Error", "This is a linked tab. Are you sure you want to remove and replace the existing connection?", "Yes", "No") == true)
                                 {
-                                    link.SetTab(tab);
+                                    changed |= SetLinkTab(group, link, tab);
                                 }
                             }
                             else
                             {
-                                link.SetTab(tab);
+                                changed |= SetLinkTab(group, link, tab);
                             }
                         }
                     }
                     else
                     {
-                        link.SetTab(tab);
+                        changed |= SetLinkTab(group, link, tab);
                     }
                 }
                 
@@ -138,24 +139,27 @@ namespace F8Framework.Core.Editor
                             
                             if (EditorUtility.DisplayDialog("tab Error", "This is a linked tab. Are you sure you want to remove and replace the existing connection?", "Yes", "No") == true)
                             {
-                                link.SetPage(page);
+                                changed |= SetLinkPage(group, link, page);
                             }
                         }
                         else
                         {
-                            link.SetPage(page);
+                            changed |= SetLinkPage(group, link, page);
                         }
                     }
                     else
                     {
-                        link.SetPage(page);
+                        changed |= SetLinkPage(group, link, page);
                     }
                 }
             }
+
+            return changed;
         }
 
-        static public void OnTabGUI(Rect rect, TabGroup group, Tab tab)
+        static public bool OnTabGUI(Rect rect, TabGroup group, Tab tab)
         {
+            bool changed = false;
             float x = rect.x;
             float space = EditorGUIUtility.singleLineHeight;
             float width = (rect.width - space * 3) * 0.5f;
@@ -184,19 +188,72 @@ namespace F8Framework.Core.Editor
                         
                         if (EditorUtility.DisplayDialog("tab Error", "This is a linked tab. Are you sure you want to remove and replace the existing connection?", "Yes", "No") == true)
                         {
-                            tab.SetLinkPage(page);
+                            changed |= SetTabLinkPage(group, tab, page);
                         }
                     }
                     else
                     {
-                        tab.SetLinkPage(page);
+                        changed |= SetTabLinkPage(group, tab, page);
                     }
                 }
                 else
                 {
-                    tab.SetLinkPage(page);
+                    changed |= SetTabLinkPage(group, tab, page);
                 }
             }
+
+            return changed;
+        }
+
+        private static bool SetLinkTab(TabGroup group, TabLink link, Tab tab)
+        {
+            Tab oldTab = link.GetTab();
+            if (oldTab == tab)
+            {
+                return false;
+            }
+
+            TabEditorUtility.RecordLinkChange(group, oldTab, tab, "Change Tab Link");
+            TabEditorUtility.MarkLinkChangeDirty(group, oldTab, tab);
+            link.SetTab(tab);
+            TabEditorUtility.MarkLinkChangeDirty(group, oldTab, tab);
+            GUI.changed = true;
+            return true;
+        }
+
+        private static bool SetLinkPage(TabGroup group, TabLink link, TabPage page)
+        {
+            TabPage oldPage = link.GetPage();
+            if (oldPage == page)
+            {
+                return false;
+            }
+
+            TabEditorUtility.RecordLinkChange(group, oldPage, page, "Change Tab Page Link");
+            TabEditorUtility.MarkLinkChangeDirty(group, oldPage, page);
+            link.SetPage(page);
+            TabEditorUtility.MarkLinkChangeDirty(group, oldPage, page);
+            GUI.changed = true;
+            return true;
+        }
+
+        private static bool SetTabLinkPage(TabGroup group, Tab tab, TabPage page)
+        {
+            TabPage oldPage = tab.GetLinkedPage();
+            if (oldPage == page)
+            {
+                return false;
+            }
+
+            TabEditorUtility.RecordLinkChange(group, oldPage, page, "Change Tab Linked Page");
+            TabEditorUtility.RecordLinkObject(tab, "Change Tab Linked Page");
+            TabEditorUtility.MarkLinkChangeDirty(group, oldPage, page);
+            TabEditorUtility.MarkObjectDirty(tab);
+            tab.SetLinkPage(page);
+            TabEditorUtility.MarkLinkChangeDirty(group, oldPage, page);
+            TabEditorUtility.MarkObjectDirty(tab);
+            GUI.changed = true;
+            return true;
         }
     }
 }

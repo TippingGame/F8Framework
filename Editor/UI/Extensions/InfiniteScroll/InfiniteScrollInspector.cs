@@ -56,7 +56,7 @@ namespace F8Framework.Core.Editor
             EditorGUI.BeginChangeCheck();
             DrawPropertiesExcluding(serializedObject, "m_Script");
             bool propertyChanged = EditorGUI.EndChangeCheck();
-            serializedObject.ApplyModifiedProperties();
+            propertyChanged |= serializedObject.ApplyModifiedProperties();
 
             if (Application.isPlaying == false && propertyChanged)
             {

@@ -79,12 +79,16 @@ namespace F8Framework.Core.Editor
             int selectedLayout = EditorGUILayout.Popup(SELECTED_LAYOUT, multiLayout.layout.current, layerNumber);
             if (selectedLayout != multiLayout.layout.current)
             {
+                RecordMultiLayout(multiLayout, "Select MultiLayout", true);
                 multiLayout.layout.SelectLayout(selectedLayout);
+                MarkMultiLayoutDirty(multiLayout, true);
             }
 
             if (GUILayout.Button(SAVE, GUILayout.Width(MIDDLE_BUTTON_WIDTH)) == true)
             {
+                RecordMultiLayout(multiLayout, "Save MultiLayout Layer");
                 multiLayout.layout.SaveCurrentLayer();
+                MarkMultiLayoutDirty(multiLayout);
             }
 
             if (multiLayout.layout.count > 1)
@@ -102,15 +106,27 @@ namespace F8Framework.Core.Editor
         private void AddLayout()
         {
             MultiLayout multiLayout = target as MultiLayout;
+            if (multiLayout == null)
+            {
+                return;
+            }
 
+            RecordMultiLayout(multiLayout, "Add MultiLayout Layer");
             multiLayout.layout.AddLayout();
+            MarkMultiLayoutDirty(multiLayout);
         }
 
         private void RemoveLayout()
         {
             MultiLayout multiLayout = target as MultiLayout;
+            if (multiLayout == null)
+            {
+                return;
+            }
 
+            RecordMultiLayout(multiLayout, "Remove MultiLayout Layer");
             multiLayout.layout.RemoveCurrentLayout();
+            MarkMultiLayoutDirty(multiLayout);
         }
 
         private void DrawTarget()
@@ -131,7 +147,9 @@ namespace F8Framework.Core.Editor
             Vector2 targetSize = GUI.skin.label.CalcSize(new GUIContent(totalTarget));
             if (GUI.Button(new Rect(rect.x + targetSize.x + BUTTON_SPACE, rect.y, BIG_BUTTON_WIDTH, rect.height), ADD_TARGET) == true)
             {
+                RecordMultiLayout(multiLayout, "Add MultiLayout Target");
                 multiLayout.layout.AddTarget();
+                MarkMultiLayoutDirty(multiLayout);
             }
 
             GUILayout.EndHorizontal();
@@ -154,12 +172,16 @@ namespace F8Framework.Core.Editor
 
                     if (rectTransformNew != null && rectTransformNew.Equals(rectTransformOrigin) == false)
                     {
+                        RecordMultiLayout(multiLayout, "Change MultiLayout Target");
                         multiLayout.layout.SetTargetRectTransfrom(index, rectTransformNew);
+                        MarkMultiLayoutDirty(multiLayout);
                     }
 
                     if (GUILayout.Button(REMOVE, GUILayout.Width(SMALL_BUTTON_WIDTH)) == true)
                     {
+                        RecordMultiLayout(multiLayout, "Remove MultiLayout Target");
                         multiLayout.layout.RemoveTarget(index);
+                        MarkMultiLayoutDirty(multiLayout);
                     }
 
                     GUILayout.EndHorizontal();
@@ -174,6 +196,89 @@ namespace F8Framework.Core.Editor
             GUILayout.EndHorizontal();
 
             GUILayout.EndVertical();
+        }
+
+        private void RecordMultiLayout(MultiLayout multiLayout, string undoName, bool includeTargets = false)
+        {
+            if (multiLayout == null)
+            {
+                return;
+            }
+
+            Undo.RecordObject(multiLayout, undoName);
+            if (includeTargets == true)
+            {
+                RecordTargetObjects(multiLayout, undoName);
+            }
+        }
+
+        private void RecordTargetObjects(MultiLayout multiLayout, string undoName)
+        {
+            if (multiLayout == null ||
+                multiLayout.layout == null ||
+                multiLayout.layout.targets == null)
+            {
+                return;
+            }
+
+            for (int index = 0; index < multiLayout.layout.targets.Count; index++)
+            {
+                RectTransform rectTransform = multiLayout.layout.targets[index].rectTransform;
+                if (rectTransform == null)
+                {
+                    continue;
+                }
+
+                Undo.RecordObject(rectTransform, undoName);
+                Undo.RecordObject(rectTransform.gameObject, undoName);
+            }
+        }
+
+        private void MarkMultiLayoutDirty(MultiLayout multiLayout, bool includeTargets = false)
+        {
+            if (multiLayout == null)
+            {
+                return;
+            }
+
+            MarkObjectDirty(multiLayout);
+            if (includeTargets == true)
+            {
+                MarkTargetObjectsDirty(multiLayout);
+            }
+        }
+
+        private void MarkTargetObjectsDirty(MultiLayout multiLayout)
+        {
+            if (multiLayout == null ||
+                multiLayout.layout == null ||
+                multiLayout.layout.targets == null)
+            {
+                return;
+            }
+
+            for (int index = 0; index < multiLayout.layout.targets.Count; index++)
+            {
+                RectTransform rectTransform = multiLayout.layout.targets[index].rectTransform;
+                if (rectTransform == null)
+                {
+                    continue;
+                }
+
+                MarkObjectDirty(rectTransform);
+                MarkObjectDirty(rectTransform.gameObject);
+            }
+        }
+
+        private void MarkObjectDirty(Object obj)
+        {
+            if (obj == null)
+            {
+                return;
+            }
+
+            EditorUtility.SetDirty(obj);
+            PrefabUtility.RecordPrefabInstancePropertyModifications(obj);
         }
     }
 

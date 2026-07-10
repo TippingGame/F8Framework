@@ -23,6 +23,7 @@ namespace F8Framework.Core.Editor
             TabLinkObject tabObject = property.serializedObject.targetObject as TabLinkObject;
             if(tabObject != null)
             {
+                targetController = null;
                 float height = EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
 
                 TabGroup linkedGroup = tabObject.GetGroup();
@@ -34,7 +35,6 @@ namespace F8Framework.Core.Editor
                     }
                     else
                     {
-                        tabObject.UnLink();
                         linkedGroup = null;
                     }
                 }
@@ -102,8 +102,11 @@ namespace F8Framework.Core.Editor
                                 
                                 if (EditorUtility.DisplayDialog("tab Error", "This is a linked tap. Are you sure you want to disconnect?", "Yes", "No") == true)
                                 {
+                                    TabEditorUtility.RecordLinkChange(tabGroup, tabObject, null, "Disconnect Tab Link");
+                                    TabEditorUtility.MarkLinkChangeDirty(tabGroup, tabObject, null);
                                     isLinked = false;
                                     tabGroup.Release(tabObject);
+                                    TabEditorUtility.MarkLinkChangeDirty(tabGroup, tabObject, null);
                                     targetController = null;
                                     return;
                                 }
@@ -137,12 +140,18 @@ namespace F8Framework.Core.Editor
                             if (tabObject is Tab)
                             {
                                 Tab tab = tabObject as Tab;
+                                TabEditorUtility.RecordLinkChange(targetController.tabGroup, null, tab, "Add Tab Link");
+                                TabEditorUtility.MarkLinkChangeDirty(targetController.tabGroup, null, tab);
                                 targetController.tabGroup.Add(tab, null);
+                                TabEditorUtility.MarkLinkChangeDirty(targetController.tabGroup, null, tab);
                             }
                             else if(tabObject is TabPage)
                             {
                                 TabPage tabPage = tabObject as TabPage;
+                                TabEditorUtility.RecordLinkChange(targetController.tabGroup, null, tabPage, "Add Tab Page Link");
+                                TabEditorUtility.MarkLinkChangeDirty(targetController.tabGroup, null, tabPage);
                                 targetController.tabGroup.Add(null, tabPage);
+                                TabEditorUtility.MarkLinkChangeDirty(targetController.tabGroup, null, tabPage);
                             }
                         }
                     }

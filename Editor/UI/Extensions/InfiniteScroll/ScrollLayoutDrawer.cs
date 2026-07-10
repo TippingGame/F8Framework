@@ -21,6 +21,16 @@ namespace F8Framework.Core.Editor
         private float crossPadding = 0;
         private float crossSpace = 0;
 
+        private class ScrollLayoutDrawState
+        {
+            public ScrollAxis axis;
+            public Vector2 padding;
+            public Vector2 space;
+            public bool topToBotton;
+            public bool leftToRight;
+            public readonly List<float> values = new List<float>();
+        }
+
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
             float height = 0;
@@ -87,7 +97,7 @@ namespace F8Framework.Core.Editor
             return 1;
         }
 
-        public bool OnScrollGridValueGUI(Rect contentsPosition, ScrollLayout scrollLayout, ScrollAxis axis, bool leftToRight, bool topToBotton, List<float> gridList, float gridSize)
+        private bool OnScrollGridValueGUI(Rect contentsPosition, ScrollLayoutDrawState scrollLayout, ScrollAxis axis, bool leftToRight, bool topToBotton, List<float> gridList, float gridSize)
         {
             bool isUpdated = false;
             if (scrollLayout.values.Count > 1)
@@ -120,7 +130,7 @@ namespace F8Framework.Core.Editor
                 float crossPos = 0;
                 for (int i = 0; i < scrollLayout.values.Count; i++)
                 {
-                    float mainSize = gridSize * scrollLayout.values[i].value;
+                    float mainSize = gridSize * scrollLayout.values[i];
                     if (mainSize < 20)
                     {
                         mainSize = 20;
@@ -144,10 +154,10 @@ namespace F8Framework.Core.Editor
                     valuePosition.x += startX;
                     valuePosition.y += startY;
 
-                    float value = EditorGUI.FloatField(valuePosition, scrollLayout.values[i].value);
-                    if (scrollLayout.values[i].value != value)
+                    float value = EditorGUI.FloatField(valuePosition, scrollLayout.values[i]);
+                    if (Mathf.Approximately(scrollLayout.values[i], value) == false)
                     {
-                        scrollLayout.values[i].value = value;
+                        scrollLayout.values[i] = value;
                         isUpdated = true;
                     }
 
@@ -161,7 +171,7 @@ namespace F8Framework.Core.Editor
             return isUpdated;
         }
 
-        public bool OnContentsGUI(Rect areaPosition, ScrollLayout scrollLayout, ScrollAxis axis)
+        private bool OnContentsGUI(Rect areaPosition, ScrollLayoutDrawState scrollLayout, ScrollAxis axis)
         {
             bool isUpdated = false;
 
@@ -174,7 +184,7 @@ namespace F8Framework.Core.Editor
             List<float> gridList = new List<float>();
             foreach (var v in scrollLayout.values)
             {
-                gridList.Add(v.value);
+                gridList.Add(v);
             }
 
             GUI.Box(areaPosition, "", new GUIStyle(GUI.skin.window));
@@ -252,7 +262,7 @@ namespace F8Framework.Core.Editor
             return isUpdated;
         }
 
-        public void OnScrollItemGUI(Rect contentsPosition, ScrollAxis axis, bool leftToRight, bool topToBotton, List<float> gridList, float gridRateValue)
+        private void OnScrollItemGUI(Rect contentsPosition, ScrollAxis axis, bool leftToRight, bool topToBotton, List<float> gridList, float gridRateValue)
         {
             float gridPos = 0;
             float linePos = 0;
@@ -347,7 +357,7 @@ namespace F8Framework.Core.Editor
             }
         }
 
-        public bool OnScrollGUI(Rect areaPosition, ScrollLayout scrollLayout)
+        private bool OnScrollGUI(Rect areaPosition, ScrollLayoutDrawState scrollLayout)
         {
             bool isUpdated = false;
             
@@ -417,44 +427,112 @@ namespace F8Framework.Core.Editor
             return isUpdated;
         }
 
+        private static ScrollLayoutDrawState CreateState(SerializedProperty axisProp, SerializedProperty paddingProp, SerializedProperty spaceProp, SerializedProperty topToBottonProp, SerializedProperty leftToRightProp, SerializedProperty valuesProp)
+        {
+            ScrollLayoutDrawState state = new ScrollLayoutDrawState();
+            state.axis = (ScrollAxis)axisProp.enumValueIndex;
+            state.padding = paddingProp.vector2Value;
+            state.space = spaceProp.vector2Value;
+            state.topToBotton = topToBottonProp.boolValue;
+            state.leftToRight = leftToRightProp.boolValue;
+
+            for (int index = 0; index < valuesProp.arraySize; index++)
+            {
+                SerializedProperty valueProp = valuesProp.GetArrayElementAtIndex(index).FindPropertyRelative("value");
+                state.values.Add(valueProp.floatValue);
+            }
+
+            return state;
+        }
+
+        private static void WriteState(ScrollLayoutDrawState state, SerializedProperty axisProp, SerializedProperty paddingProp, SerializedProperty spaceProp, SerializedProperty topToBottonProp, SerializedProperty leftToRightProp, SerializedProperty valuesProp)
+        {
+            axisProp.enumValueIndex = (int)state.axis;
+            paddingProp.vector2Value = state.padding;
+            spaceProp.vector2Value = state.space;
+            topToBottonProp.boolValue = state.topToBotton;
+            leftToRightProp.boolValue = state.leftToRight;
+
+            if (valuesProp.arraySize != state.values.Count)
+            {
+                valuesProp.arraySize = state.values.Count;
+            }
+
+            for (int index = 0; index < state.values.Count; index++)
+            {
+                SerializedProperty valueProp = valuesProp.GetArrayElementAtIndex(index).FindPropertyRelative("value");
+                valueProp.floatValue = state.values[index];
+            }
+        }
+
+        private static void InitializeLayoutValue(SerializedProperty elementProp)
+        {
+            SerializedProperty valueTypeProp = elementProp.FindPropertyRelative("valueType");
+            SerializedProperty valueProp = elementProp.FindPropertyRelative("value");
+            valueTypeProp.enumValueIndex = (int)ScrollLayout.LayoutValue.ValueType.RATE;
+            valueProp.floatValue = 1.0f;
+        }
+
+        private static float GetMainValue(ScrollAxis axis, Vector2 vector)
+        {
+            return vector[ScrollLayout.IsVertical(axis) ? 1 : 0];
+        }
+
+        private static float GetCrossValue(ScrollAxis axis, Vector2 vector)
+        {
+            return vector[ScrollLayout.IsVertical(axis) ? 0 : 1];
+        }
+
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
+            EditorGUI.BeginProperty(position, label, property);
+
             float x = position.x;
             float y = position.y;
             Object obj = property.serializedObject.targetObject;
             if (obj is InfiniteScroll)
             {
                 InfiniteScroll scroll = obj as InfiniteScroll;
-                ScrollLayout scrollLayout = scroll.layout;
                 
                 Rect uiPos = new Rect(x, y, position.width, EditorGUIUtility.singleLineHeight);
 
-                if(scrollLayout.axis == ScrollAxis.DEFAULT)
-                {
-                    ScrollRect scrollRect = scroll.GetComponent<ScrollRect>();
-                    if(scrollRect != null)
-                    {
-                        scrollLayout.CheckAxis(scrollRect);
-                    }
-                }
-
-                mainPadding = scroll.GetMainPadding();
-                mainSpace = scroll.GetMainSpace();
-
-                crossPadding = scroll.GetCrossPadding();
-                crossSpace = scroll.GetCrossSpace();
-
                 var axisProp = property.FindPropertyRelative("axis");
+                var paddingProp = property.FindPropertyRelative("padding");
+                var spaceProp = property.FindPropertyRelative("space");
                 var topToBottonProp = property.FindPropertyRelative("topToBotton");
                 var leftToRightProp = property.FindPropertyRelative("leftToRight");
 
                 ScrollAxis axis = (ScrollAxis)axisProp.enumValueIndex;
-                bool topToBotton = topToBottonProp.boolValue;
-                bool leftToRight = leftToRightProp.boolValue;
+                if(axis == ScrollAxis.DEFAULT)
+                {
+                    ScrollRect scrollRect = scroll.GetComponent<ScrollRect>();
+                    if(scrollRect != null)
+                    {
+                        axis = scrollRect.vertical ? ScrollAxis.VERTICAL_TOP : ScrollAxis.HORIZONTAL_LEFT;
+                        axisProp.enumValueIndex = (int)axis;
+                        GUI.changed = true;
+                    }
+                }
 
                 var valuesProp = property.FindPropertyRelative("values");
 
-                scrollLayout.padding = EditorGUI.Vector2Field(uiPos, "Padding", scrollLayout.padding);
+                Vector2 padding = paddingProp.vector2Value;
+                Vector2 space = spaceProp.vector2Value;
+
+                mainPadding = GetMainValue(axis, padding);
+                mainSpace = GetMainValue(axis, space);
+
+                crossPadding = GetCrossValue(axis, padding);
+                crossSpace = GetCrossValue(axis, space);
+
+                EditorGUI.BeginChangeCheck();
+                padding = EditorGUI.Vector2Field(uiPos, "Padding", padding);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    paddingProp.vector2Value = padding;
+                    GUI.changed = true;
+                }
+
                 if (position.width < 309)
                 {
                     y += EditorGUIUtility.singleLineHeight;
@@ -464,7 +542,14 @@ namespace F8Framework.Core.Editor
                 y += EditorGUIUtility.standardVerticalSpacing;
 
                 uiPos = new Rect(x, y, position.width, EditorGUIUtility.singleLineHeight);
-                scrollLayout.space = EditorGUI.Vector2Field(uiPos, "Space", scrollLayout.space);
+                EditorGUI.BeginChangeCheck();
+                space = EditorGUI.Vector2Field(uiPos, "Space", space);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    spaceProp.vector2Value = space;
+                    GUI.changed = true;
+                }
+
                 if (position.width < 309)
                 {
                     y += EditorGUIUtility.singleLineHeight;
@@ -476,7 +561,12 @@ namespace F8Framework.Core.Editor
                 int arraySize = EditorGUI.IntField(uiPos, "Grid Count", valuesProp.arraySize);
                 if (arraySize >= 0)
                 {
+                    int oldArraySize = valuesProp.arraySize;
                     valuesProp.arraySize = arraySize;
+                    for (int index = oldArraySize; index < arraySize; index++)
+                    {
+                        InitializeLayoutValue(valuesProp.GetArrayElementAtIndex(index));
+                    }
                 }
 
                 y += EditorGUIUtility.singleLineHeight;
@@ -489,12 +579,17 @@ namespace F8Framework.Core.Editor
                 y += EditorGUIUtility.standardVerticalSpacing;
 
                 Rect areaPosition = new Rect(x, y, BOX_SIZE, BOX_SIZE);
-                bool bUpdated = OnScrollGUI(areaPosition, scrollLayout);
-                if (bUpdated == true)
+                ScrollLayoutDrawState state = CreateState(axisProp, paddingProp, spaceProp, topToBottonProp, leftToRightProp, valuesProp);
+                EditorGUI.BeginChangeCheck();
+                bool bUpdated = OnScrollGUI(areaPosition, state);
+                if (EditorGUI.EndChangeCheck() == true || bUpdated == true)
                 {
-                    EditorUtility.SetDirty(obj);
+                    WriteState(state, axisProp, paddingProp, spaceProp, topToBottonProp, leftToRightProp, valuesProp);
+                    GUI.changed = true;
                 }
             }
+
+            EditorGUI.EndProperty();
         }
     }
 }
