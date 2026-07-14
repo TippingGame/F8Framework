@@ -33,7 +33,16 @@ namespace F8Framework.Core
             onComplete = null;
         }
 
-        public void SetOnCompleted(Action onComplete) => this.onComplete = onComplete;
+        public void SetOnCompleted(Action onComplete)
+        {
+            if (LoaderSuccess)
+            {
+                onComplete?.Invoke();
+                return;
+            }
+
+            this.onComplete = onComplete;
+        }
         
         bool IEnumerator.MoveNext()
         {

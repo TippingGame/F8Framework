@@ -18,7 +18,16 @@ namespace F8Framework.Core
             onComplete?.Invoke();
             onComplete = null;
         }
-        public void SetOnCompleted(Action onComplete) => this.onComplete = onComplete;
+        public void SetOnCompleted(Action onComplete)
+        {
+            if (LoaderSuccess)
+            {
+                onComplete?.Invoke();
+                return;
+            }
+
+            this.onComplete = onComplete;
+        }
         
         public virtual T GetAssetObject<T>(string subAssetName = null) where T : Object
         {
