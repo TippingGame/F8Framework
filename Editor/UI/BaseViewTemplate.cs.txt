@@ -73,8 +73,8 @@ public class #SCRIPTNAME# : BaseView
         base.ValueChange<T>(ui, value);
     }
     
-    // 自动获取组件（自动生成，不能删除）
+    // Auto-generated component bindings below
     
-    // 自动获取组件（自动生成，不能删除）
+    // Auto-generated component bindings below
 }
 #ROOTNAMESPACEEND#
