@@ -246,7 +246,7 @@ namespace F8Framework.Core
                         return GetEditorCachedAsset<T>(assetPath, subAssetName);
                     }
 #endif
-                    return AssetBundleManager.Instance.GetAssetObject<T>(info.AssetBundlePath, info.AssetPath[0], subAssetName, out AssetBundleLoader loader);
+                    return GetLoadedAssetBundleObject<T>(info, subAssetName);
                 }
 
                 return null;
@@ -290,7 +290,7 @@ namespace F8Framework.Core
                         return GetEditorCachedAsset(assetPath, assetType, subAssetName);
                     }
 #endif
-                    return AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], assetType, subAssetName, out AssetBundleLoader loader);
+                    return GetLoadedAssetBundleObject(info, assetType, subAssetName);
                 }
 
                 return null;
@@ -332,10 +332,42 @@ namespace F8Framework.Core
                         return GetEditorCachedAsset<Object>(assetPath, subAssetName);
                     }
 #endif
-                    return AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, info.AssetPath[0], null, subAssetName, out AssetBundleLoader loader);
+                    return GetLoadedAssetBundleObject(info, null, subAssetName);
                 }
 
                 return null;
+            }
+
+            private T GetLoadedAssetBundleObject<T>(AssetInfo info, string subAssetName = null) where T : Object
+            {
+                return GetLoadedAssetBundleObject(info, typeof(T), subAssetName) as T;
+            }
+
+            private Object GetLoadedAssetBundleObject(AssetInfo info, System.Type assetType, string subAssetName = null)
+            {
+                if (info.AssetPath == null || info.AssetPath.Length <= 0 || info.AssetBundlePath.IsNullOrEmpty())
+                {
+                    return null;
+                }
+
+                string assetPath = info.AssetPath[0];
+                Object asset = AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, assetPath, assetType, subAssetName, out AssetBundleLoader loader);
+                if (asset != null)
+                {
+                    return asset;
+                }
+
+                loader ??= AssetBundleManager.Instance.GetAssetBundleLoader(info.AssetBundlePath);
+                if (loader == null ||
+                    loader.AssetBundleContent == null ||
+                    !loader.IsLoadFinished ||
+                    loader.GetDependentNamesLoadFinished() < loader.AddDependentNames())
+                {
+                    return null;
+                }
+
+                loader.Expand(assetPath, assetType, subAssetName);
+                return AssetBundleManager.Instance.GetAssetObject(info.AssetBundlePath, assetPath, assetType, subAssetName, out AssetBundleLoader loader2);
             }
             
             /// <summary>

@@ -575,14 +575,14 @@ namespace F8Framework.Core
                     {
                         if (loader2.TryGetAsset(assetPath, out Object asset))
                         {
-                            return asset;
+                            return assetType == null || assetType.IsInstanceOfType(asset) ? asset : null;
                         }
                     }
                     else
                     {
                         if (loader2.TryGetAsset(subAssetName, out Object subAsset))
                         {
-                            return subAsset;
+                            return assetType == null || assetType.IsInstanceOfType(subAsset) ? subAsset : null;
                         }
                     }
                 }
