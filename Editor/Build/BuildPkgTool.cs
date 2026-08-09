@@ -39,6 +39,8 @@ namespace F8Framework.Core.Editor
         public static string ExcelPathKey = "ExcelPath";
         public static string ConvertExcelToOtherFormatsKey = "ConvertExcelToOtherFormatsKey";
         public static string ForceRebuildAssetBundleKey = "ForceRebuildAssetBundleKey";
+        public static string AssetBundleNameSuffixKey = "AssetBundleNameSuffixKey";
+        public static string AppliedAssetBundleNameSuffixKey = "AppliedAssetBundleNameSuffixKey";
         public static string CleanBuildCacheKey = "CleanBuildCacheKey";
         public static string ExcelBinDataFolderKey = "ExcelBinDataFolderKey";
         
@@ -61,6 +63,7 @@ namespace F8Framework.Core.Editor
         private static bool _forceRebuildAssetBundle = false;
         private static bool _cleanBuildCache = false;
         private static bool _appendHashToAssetBundleName = false;
+        private static string _assetBundleNameSuffix = "";
         private static bool _forceRemoteAssetBundle = false;
         private static bool _disableUnityCacheOnWebGL = false;
         private static int _assetBundleOffset = 0;
@@ -880,8 +883,6 @@ namespace F8Framework.Core.Editor
                 F8EditorPrefs.SetBool(EnableFullPathExtensionAssetLoadingKey, _enableFullPathExtensionAssetLoading);
             }
             
-            GUILayout.Space(10);
-            
             bool appendHashToAssetBundleName = F8GamePrefs.GetBool(nameof(F8GameConfig.AppendHashToAssetBundleName));
             bool forceRemoteAssetBundle = F8GamePrefs.GetBool(nameof(F8GameConfig.ForceRemoteAssetBundle));
             bool disableUnityCacheOnWebGL = F8GamePrefs.GetBool(nameof(F8GameConfig.DisableUnityCacheOnWebGL));
@@ -905,10 +906,27 @@ namespace F8Framework.Core.Editor
                 F8GamePrefs.SetBool(nameof(F8GameConfig.DisableUnityCacheOnWebGL), _disableUnityCacheOnWebGL);
             }
             GUILayout.EndHorizontal();
+
+            GUILayout.Space(10);
+            GUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("自动AB名自定义后缀：", GUILayout.Width(180));
+            string assetBundleNameSuffix = F8EditorPrefs.GetString(AssetBundleNameSuffixKey, "") ?? "";
+            if (!F8EditorPrefs.HasKey(AppliedAssetBundleNameSuffixKey))
+            {
+                F8EditorPrefs.SetString(AppliedAssetBundleNameSuffixKey, assetBundleNameSuffix);
+            }
+            _assetBundleNameSuffix = EditorGUILayout.TextField(assetBundleNameSuffix, GUILayout.MinWidth(120));
+            F8EditorPrefs.SetString(AssetBundleNameSuffixKey, _assetBundleNameSuffix);
+            EditorGUILayout.LabelField("※ 如：.bundle，留空则不添加", EditorStyles.miniLabel);
+            GUILayout.EndHorizontal();
+            if (!ABBuildTool.TryValidateAssetBundleNameSuffix(_assetBundleNameSuffix, out string suffixError))
+            {
+                EditorGUILayout.HelpBox(suffixError, MessageType.Error);
+            }
             
             GUILayout.Space(10);
             GUILayout.BeginHorizontal();
-            GUILayout.Label("AssetBundle 偏移加密（Offset）[1-254]：", GUILayout.Width(240));
+            EditorGUILayout.LabelField("AssetBundle 偏移加密（Offset）[1-254]：", GUILayout.Width(240));
             int assetBundleOffset = F8GamePrefs.GetInt(nameof(F8GameConfig.AssetBundleOffset), 0);
             if (assetBundleOffset == 0)
             {
@@ -928,7 +946,7 @@ namespace F8Framework.Core.Editor
             GUILayout.Space(5);
             
             GUILayout.BeginHorizontal();
-            GUILayout.Label("AssetBundle 异或加密（XOR）   [1-254]：", GUILayout.Width(240));
+            EditorGUILayout.LabelField("AssetBundle 异或加密（XOR）   [1-254]：", GUILayout.Width(240));
             int assetBundleXorKey = F8GamePrefs.GetInt(nameof(F8GameConfig.AssetBundleXorKey), 0);
             if (assetBundleXorKey == 0)
             {
@@ -948,7 +966,7 @@ namespace F8Framework.Core.Editor
             
             GUILayout.Space(5);
             GUILayout.BeginHorizontal();
-            GUILayout.Label("资源清单加密（AES）：", GUILayout.Width(240));
+            EditorGUILayout.LabelField("资源清单加密（AES）：", GUILayout.Width(180));
             string assetManifestEncryptKeyValue = F8GamePrefs.GetString(nameof(F8GameConfig.AssetManifestEncryptKey), "");
             assetManifestEncryptKeyValue ??= "";
             if (string.IsNullOrEmpty(assetManifestEncryptKeyValue))
@@ -973,9 +991,13 @@ namespace F8Framework.Core.Editor
             GUILayout.Space(10);
             
             GUILayout.BeginHorizontal();
-            GUILayout.Label("资产远程地址/游戏远程版本，如：", GUILayout.Width(190));
-            EditorGUILayout.SelectableLabel("http://127.0.0.1:6789/", EditorStyles.textField,
-                GUILayout.Height(EditorGUIUtility.singleLineHeight), GUILayout.MinWidth(180));
+            EditorGUILayout.LabelField("资产远程地址/游戏远程版本，如：", GUILayout.Width(190));
+            const string remoteAddressExample = "http://127.0.0.1:6789/";
+            EditorGUILayout.LabelField(remoteAddressExample, GUILayout.MinWidth(180));
+            if (GUILayout.Button("复制", GUILayout.Width(45)))
+            {
+                GUIUtility.systemCopyBuffer = remoteAddressExample;
+            }
             GUILayout.EndHorizontal();
             
             GUILayout.BeginHorizontal();

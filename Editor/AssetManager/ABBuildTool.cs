@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using UnityEditor;
+using UnityEditor.Build;
 using UnityEngine;
 
 namespace F8Framework.Core.Editor
@@ -27,6 +29,7 @@ namespace F8Framework.Core.Editor
             bool forceRemoteAssetBundle = string.Equals(BuildPkgTool.GetArgValue(args, "ForceRemoteAssetBundle-"), "true", StringComparison.OrdinalIgnoreCase);
             bool disableUnityCacheOnWebGL = string.Equals(BuildPkgTool.GetArgValue(args, "DisableUnityCacheOnWebGL-"), "true", StringComparison.OrdinalIgnoreCase);
             string assetManifestEncryptKey = BuildPkgTool.GetArgValue(args, "AssetManifestEncryptKey-") ?? "";
+            string assetBundleNameSuffix = BuildPkgTool.GetArgValue(args, "AssetBundleNameSuffix-") ?? "";
             int assetBundleOffset = 0;
             if (int.TryParse(BuildPkgTool.GetArgValue(args, "AssetBundleOffset-"), out int intValue))
             {
@@ -46,20 +49,26 @@ namespace F8Framework.Core.Editor
             F8GamePrefs.SetInt(nameof(F8GameConfig.AssetBundleOffset), assetBundleOffset);
             F8GamePrefs.SetInt(nameof(F8GameConfig.AssetBundleXorKey), assetBundleXorKey);
             F8GamePrefs.SetString(nameof(F8GameConfig.AssetManifestEncryptKey), assetManifestEncryptKey);
+            F8EditorPrefs.SetString(BuildPkgTool.AssetBundleNameSuffixKey, assetBundleNameSuffix);
             BuildAllAB();
         }
 
         public static void BuildAllAB()
         {
             AssetDatabase.RemoveUnusedAssetBundleNames();
+
+            string assetBundleNameSuffix = GetValidatedAssetBundleNameSuffix();
             
             // 获取“StreamingAssets”文件夹路径（不一定这个文件夹，可自定义）
             string strABOutPAthDir = URLSetting.GetAssetBundlesOutPath();
             
             GenerateAssetNames();
+            F8EditorPrefs.SetString(BuildPkgTool.AppliedAssetBundleNameSuffixKey, assetBundleNameSuffix);
             GenerateResourceNames();
             LogF8.LogAsset("自动设置AssetBundleName（AB名为空时）");
             AssetDatabase.Refresh();
+
+            ValidateAssetBundleNamesOrThrow(strABOutPAthDir);
             
             FileTools.CheckDirAndCreateWhenNeeded(strABOutPAthDir);
             AssetDatabase.Refresh();
@@ -105,6 +114,169 @@ namespace F8Framework.Core.Editor
             AssetDatabase.Refresh();
             
             LogF8.LogAsset("资产打包成功!");
+        }
+
+        private static void ValidateAssetBundleNamesOrThrow(string outputPath)
+        {
+            string[] bundleNames = AssetDatabase.GetAllAssetBundleNames();
+            List<KeyValuePair<string, string>> pathConflicts = FindAssetBundlePathConflicts(bundleNames);
+            List<string> mixedSceneBundleNames = new List<string>();
+
+            foreach (string bundleName in bundleNames)
+            {
+                string[] assetPaths = AssetDatabase.GetAssetPathsFromAssetBundle(bundleName)
+                    .Where(path => !AssetDatabase.IsValidFolder(path))
+                    .ToArray();
+                bool hasScene = assetPaths.Any(path => path.EndsWith(".unity", StringComparison.OrdinalIgnoreCase));
+                bool hasNonSceneAsset = assetPaths.Any(path => !path.EndsWith(".unity", StringComparison.OrdinalIgnoreCase));
+                if (hasScene && hasNonSceneAsset)
+                {
+                    mixedSceneBundleNames.Add(bundleName);
+                }
+            }
+
+            if (pathConflicts.Count == 0 && mixedSceneBundleNames.Count == 0)
+            {
+                return;
+            }
+
+            StringBuilder message = new StringBuilder();
+            message.AppendLine("AssetBundle打包预检失败，已停止打包。");
+
+            if (pathConflicts.Count > 0)
+            {
+                message.AppendLine("检测到AB文件与文件夹路径冲突：");
+                foreach (KeyValuePair<string, string> conflict in pathConflicts)
+                {
+                    string conflictOutputPath = FileTools.FormatToUnityPath(Path.Combine(outputPath, conflict.Key));
+                    message.AppendLine($"- AB文件：{conflict.Key}");
+                    message.AppendLine($"  目录内AB：{conflict.Value}");
+                    message.AppendLine($"  冲突路径：{conflictOutputPath}");
+                    message.AppendLine("  原因：该路径既需要作为AB文件，又需要作为其他AB的输出目录。");
+                    AppendAssetBundlePaths(message, conflict.Key, "  AB文件资源");
+                    AppendAssetBundlePaths(message, conflict.Value, "  目录内AB资源");
+                }
+
+                message.AppendLine("解决建议：在打包工具的“自动生成AB名的自定义后缀”中填写“.bundle”，或调整AB名，避免一个完整AB名成为另一个AB名的目录前缀。必要时请清理旧的手动/文件夹AB名后重试。");
+            }
+
+            if (mixedSceneBundleNames.Count > 0)
+            {
+                message.AppendLine("检测到场景与普通资源被分配到同一个AB：");
+                foreach (string bundleName in mixedSceneBundleNames)
+                {
+                    message.AppendLine($"- AB名：{bundleName}");
+                    AppendAssetBundlePaths(message, bundleName, "  包内资源");
+                }
+
+                message.AppendLine("解决建议：Unity不允许把显式标记的场景和普通资源打进同一个AB，请为它们设置不同的AB名，并检查文件夹上的AB名是否被子资源继承。");
+            }
+
+            string errorMessage = message.ToString();
+            LogF8.LogError(errorMessage);
+            throw new BuildFailedException(errorMessage);
+        }
+
+        private static List<KeyValuePair<string, string>> FindAssetBundlePathConflicts(IEnumerable<string> bundleNames)
+        {
+            string[] normalizedBundleNames = bundleNames
+                .Where(name => !string.IsNullOrWhiteSpace(name))
+                .Select(name => FileTools.FormatToUnityPath(name).Trim('/'))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(name => name, StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+            HashSet<string> bundleNameSet = new HashSet<string>(normalizedBundleNames, StringComparer.OrdinalIgnoreCase);
+            List<KeyValuePair<string, string>> conflicts = new List<KeyValuePair<string, string>>();
+
+            foreach (string bundleName in normalizedBundleNames)
+            {
+                int separatorIndex = bundleName.IndexOf('/');
+                while (separatorIndex >= 0)
+                {
+                    string parentPath = bundleName.Substring(0, separatorIndex);
+                    if (bundleNameSet.Contains(parentPath))
+                    {
+                        conflicts.Add(new KeyValuePair<string, string>(parentPath, bundleName));
+                    }
+
+                    separatorIndex = bundleName.IndexOf('/', separatorIndex + 1);
+                }
+            }
+
+            return conflicts;
+        }
+
+        private static void AppendAssetBundlePaths(StringBuilder message, string bundleName, string title)
+        {
+            string[] assetPaths = AssetDatabase.GetAssetPathsFromAssetBundle(bundleName)
+                .Where(path => !AssetDatabase.IsValidFolder(path))
+                .ToArray();
+            const int maxDisplayedAssetCount = 5;
+            foreach (string assetPath in assetPaths.Take(maxDisplayedAssetCount))
+            {
+                message.AppendLine($"{title}：{assetPath}");
+            }
+
+            if (assetPaths.Length > maxDisplayedAssetCount)
+            {
+                message.AppendLine($"{title}：还有{assetPaths.Length - maxDisplayedAssetCount}个资源未显示");
+            }
+        }
+
+        public static bool TryValidateAssetBundleNameSuffix(string suffix, out string errorMessage)
+        {
+            suffix ??= "";
+            errorMessage = null;
+            if (suffix.Length == 0)
+            {
+                return true;
+            }
+
+            if (string.IsNullOrWhiteSpace(suffix) || !suffix.Equals(suffix.Trim(), StringComparison.Ordinal))
+            {
+                errorMessage = "自动AB名后缀不能只包含空白，也不能以空白开头或结尾。";
+                return false;
+            }
+
+            if (suffix.Contains('/') || suffix.Contains('\\') || suffix.Contains(".."))
+            {
+                errorMessage = "自动AB名后缀不能包含路径分隔符或连续的点号。";
+                return false;
+            }
+
+            char[] invalidFileNameChars = Path.GetInvalidFileNameChars();
+            const string crossPlatformInvalidFileNameChars = "<>:\"|?*";
+            if (suffix.IndexOfAny(invalidFileNameChars) >= 0 ||
+                suffix.IndexOfAny(crossPlatformInvalidFileNameChars.ToCharArray()) >= 0 ||
+                suffix.EndsWith(".", StringComparison.Ordinal))
+            {
+                errorMessage = "自动AB名后缀包含文件名不允许使用的字符。";
+                return false;
+            }
+
+            string extension = Path.GetExtension("asset" + suffix);
+            if (extension.Equals(".manifest", StringComparison.OrdinalIgnoreCase) ||
+                extension.Equals(".meta", StringComparison.OrdinalIgnoreCase) ||
+                extension.Equals(".ds_store", StringComparison.OrdinalIgnoreCase))
+            {
+                errorMessage = $"自动AB名后缀不能以保留扩展名 {extension} 结尾。";
+                return false;
+            }
+
+            return true;
+        }
+
+        private static string GetValidatedAssetBundleNameSuffix()
+        {
+            string suffix = F8EditorPrefs.GetString(BuildPkgTool.AssetBundleNameSuffixKey, "") ?? "";
+            if (TryValidateAssetBundleNameSuffix(suffix, out string errorMessage))
+            {
+                return suffix;
+            }
+
+            string message = "AssetBundle打包预检失败，已停止打包。\n" + errorMessage;
+            LogF8.LogError(message);
+            throw new BuildFailedException(message);
         }
 
         public static void DeleteRemovedAssetBundles()
@@ -279,11 +451,17 @@ namespace F8Framework.Core.Editor
         public static string SetAssetBundleName(string path)
         {
             AssetImporter ai = AssetImporter.GetAtPath(path);
-            // 使用 Path.ChangeExtension 去掉扩展名
-            string bundleName = Path.ChangeExtension(path, null).Replace(URLSetting.AssetBundlesPath, "").ToLower();
+            string defaultBundleName = Path.ChangeExtension(path, null).Replace(URLSetting.AssetBundlesPath, "").ToLowerInvariant();
+            string assetBundleNameSuffix = GetValidatedAssetBundleNameSuffix();
+            string bundleName = (defaultBundleName + assetBundleNameSuffix).ToLowerInvariant();
             if (!ai.assetBundleName.Equals(bundleName))
             {
-                if (ai.assetBundleName.IsNullOrEmpty())
+                string appliedSuffix = F8EditorPrefs.GetString(BuildPkgTool.AppliedAssetBundleNameSuffixKey, "") ?? "";
+                string previousAutoBundleName = (defaultBundleName + appliedSuffix).ToLowerInvariant();
+                bool isDefaultAutoBundleName = ai.assetBundleName.Equals(defaultBundleName, StringComparison.OrdinalIgnoreCase) ||
+                                               F8EditorPrefs.HasKey(BuildPkgTool.AppliedAssetBundleNameSuffixKey) &&
+                                               ai.assetBundleName.Equals(previousAutoBundleName, StringComparison.OrdinalIgnoreCase);
+                if (ai.assetBundleName.IsNullOrEmpty() || isDefaultAutoBundleName)
                 {
                     ai.assetBundleName = bundleName;
                     EditorUtility.SetDirty(ai);
@@ -299,6 +477,14 @@ namespace F8Framework.Core.Editor
                 }
             }
             return ai.assetBundleName;
+        }
+
+        public static string GetAutoAssetBundleName(string path)
+        {
+            string defaultBundleName = Path.ChangeExtension(path, null)
+                .Replace(URLSetting.AssetBundlesPath, "")
+                .ToLowerInvariant();
+            return (defaultBundleName + GetValidatedAssetBundleNameSuffix()).ToLowerInvariant();
         }
         
         //得到上级路径

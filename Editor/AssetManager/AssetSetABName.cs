@@ -89,8 +89,7 @@ namespace F8Framework.Core.Editor
                     AssetImporter ai = AssetImporter.GetAtPath(assetPath);
                     if (FirstName == null)
                     {
-                        // 使用 Path.ChangeExtension 去掉扩展名
-                        string bundleName = Path.ChangeExtension(assetPath, null).Replace(URLSetting.AssetBundlesPath, "");
+                        string bundleName = ABBuildTool.GetAutoAssetBundleName(assetPath);
                         ai.assetBundleName = bundleName;
                         FirstName = bundleName;
                     }
@@ -114,8 +113,7 @@ namespace F8Framework.Core.Editor
                         AssetImporter ai = AssetImporter.GetAtPath(getAssetPath);
                         if (FirstName == null)
                         {
-                            // 使用 Path.ChangeExtension 去掉扩展名
-                            string bundleName = Path.ChangeExtension(getAssetPath, null).Replace(URLSetting.AssetBundlesPath, "");
+                            string bundleName = ABBuildTool.GetAutoAssetBundleName(getAssetPath);
                             ai.assetBundleName = bundleName;
                             FirstName = bundleName;
                         }
