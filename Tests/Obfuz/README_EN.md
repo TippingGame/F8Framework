@@ -15,12 +15,7 @@ Method 2: Unity -> Click Menu Bar -> Window -> Package Manager -> Click + -> Add
 2. Open the ObfuzSettings window
 	* Add `Assembly-CSharp`、`F8Framework.Core`、`F8Framework.Launcher`、`F8Framework.F8ExcelDataClass` to the `AssemblySettings.AssembliesToObfuscate` list
     * Add `F8Framework.Core.Editor`, `F8Framework.Tests`, and `F8Framework.ExcelData.Runtime` to the `AssemblySettings.NonObfuscatedButReferencingObfuscatedAssemblies` list. `F8Framework.ExcelData.Runtime` references the obfuscated `F8Framework.Core` assembly without being obfuscated itself, so it must be listed here; do not also add it to `AssembliesToObfuscate`.
-
-      ```yaml
-      nonObfuscatedButReferencingObfuscatedAssemblies:
-      - F8Framework.ExcelData.Runtime
-      ```
-      ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/Obfuz/ui_1772175480597.png)  
+      ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/Obfuz/ui_1772175480597_2.png)  
 
 ### Working with HybridCLR:
 1. Use this[ official tutorial (Working with HybridCLR) ](https://www.obfuz.com/docs/manual/hybridclr/work-with-hybridclr)to resolve dnlib plugin conflicts after installing the obfuz4hybridclr extension package.

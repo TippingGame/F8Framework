@@ -15,12 +15,7 @@
 2. 打开ObfuzSettings设置窗口
 	* 将 `Assembly-CSharp`、`F8Framework.Core`、`F8Framework.Launcher`、`F8Framework.F8ExcelDataClass`加入到`AssemblySettings.AssembliesToObfuscate`列表
     * 将 `F8Framework.Core.Editor`、`F8Framework.Tests`、`F8Framework.ExcelData.Runtime`加入到`AssemblySettings.NonObfuscatedButReferencingObfuscatedAssemblies`列表。`F8Framework.ExcelData.Runtime`引用了参与混淆的`F8Framework.Core`，但自身不参与混淆，因此必须加入该列表；不要同时加入`AssembliesToObfuscate`。
-
-      ```yaml
-      nonObfuscatedButReferencingObfuscatedAssemblies:
-      - F8Framework.ExcelData.Runtime
-      ```
-      ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/Obfuz/ui_1772175480597.png)  
+      ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/Obfuz/ui_1772175480597_2.png)  
 
 ### 与HybridCLR协同工作：
 1. 使用这个[ 官方教程（与HybridCLR协同工作） ](https://www.obfuz.com/docs/manual/hybridclr/work-with-hybridclr)解决dnlib插件冲突，安装obfuz4hybridclr扩展包后。
