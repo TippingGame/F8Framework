@@ -29,7 +29,8 @@ description: Use when implementing or troubleshooting Localization feature workf
 
 | Class | Role |
 |-------|------|
-| `LocalizationManager` | Core module. Access via `FF8.Local`. |
+| `Localization` | Core module. Access via `FF8.Local`. |
+| `ILocalizationItem` | AOT-safe row contract implemented automatically by generated `LocalizedStringsItem`. |
 | Localization components | Text, TextMeshPro, Font, Image, RawImage, SpriteRenderer, Material, Audio, Timeline |
 
 ## Supported component types
@@ -66,10 +67,11 @@ FF8.Local.InjectAll();
 ## Excel setup
 
 1. Create `Localization.xlsx` in `StreamingAssets/config/`.
-2. Rename the Sheet to `LocalizedStrings`.
-3. Column layout: ID | Language1 | Language2 | ...
+2. Rename the Sheet exactly to the case-sensitive name `LocalizedStrings`.
+3. Column layout: exactly one `id` | exactly one `TextID` | Language1 | Language2 | ...
 4. Supports 42 languages.
 5. Alternative: use ExcelTool `variant<name,variantName>` for lightweight localization.
+6. Treat every valid column after excluding `id` and `TextID` as a language column; preserve the sheet order.
 
 ## Workflow
 
@@ -88,12 +90,14 @@ FF8.Local.InjectAll();
 |-------|-------|----------|
 | Text shows ID instead of translation | ID not found in Excel | Check ID spelling in Excel table |
 | Language not available | Missing column in Excel | Add language column to Localization.xlsx |
+| Localization import rejects the schema | The Sheet name casing is wrong, or `id`/`TextID` has a casing duplicate | Use the exact Sheet name `LocalizedStrings` and keep exactly one `id` and one `TextID` column |
+| Item does not implement `ILocalizationItem` | Generated configuration code is stale | Run Excel import again and wait for script compilation |
 | Font rendering wrong | Font doesn't support target language | Use font that covers target language character set |
 | Android Excel read fails | StreamingAssets access on Android | Use binary cache or `SyncStreamingAssetsLoader` |
 
 ## Cross-module dependencies
 
-- **ExcelTool**: Translation tables use Excel infrastructure. Alternative: use ExcelTool variants.
+- **ExcelTool**: Translation tables use Excel infrastructure. Its generator implements `ILocalizationItem`; keep `F8Framework.Core` independent of `F8DataManager` and generated types.
 - **AssetManager**: Localized assets (images, audio) loaded via AssetManager.
 - **UI**: Localization components attach to UI elements.
 

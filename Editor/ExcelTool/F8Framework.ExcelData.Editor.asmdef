@@ -1,14 +1,12 @@
 {
-    "name": "F8Framework.Core.Editor",
-    "rootNamespace": "",
+    "name": "F8Framework.ExcelData.Editor",
+    "rootNamespace": "F8Framework.ExcelData.Editor",
     "references": [
-        "Unity.TextMeshPro",
+        "F8Framework.Core.Editor",
         "F8Framework.Core",
-        "ICSharpCode.SharpZipLib",
-        "LitJson",
-        "HybridCLR.Editor",
-        "Obfuz.Editor",
-        "Obfuz4HybridCLR.Editor"
+        "F8Framework.ExcelData.Runtime",
+        "Excel",
+        "LitJson"
     ],
     "includePlatforms": [
         "Editor"

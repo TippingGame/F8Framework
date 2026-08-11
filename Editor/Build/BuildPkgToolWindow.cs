@@ -37,33 +37,37 @@ namespace F8Framework.Core.Editor
 
         private void OnGUI()
         {
-            EditorGUI.BeginDisabledGroup(EditorApplication.isCompiling || BuildPipeline.isBuildingPlayer);
+            Vector2 newScroll = scrollPosition;
+            using (new EditorGUI.DisabledScope(
+                       EditorApplication.isCompiling || BuildPipeline.isBuildingPlayer))
+            using (EditorGUILayout.ScrollViewScope scrollView =
+                   new EditorGUILayout.ScrollViewScope(
+                       scrollPosition,
+                       GUILayout.Height(Mathf.Min(1080, position.height))))
+            {
+                using (new GUILayout.HorizontalScope())
+                {
+                    GUILayout.Space(20);
+                    using (new GUILayout.VerticalScope())
+                    {
+                        BuildPkgTool.SetBuildTarget();
+                        BuildPkgTool.DrawRootDirectory();
+                        BuildPkgTool.DrawVersion();
+                        F8BuildPipeline.DrawExtensionSettings();
+                        BuildPkgTool.DrawAssetSetting();
+                        BuildPkgTool.DrawHotUpdate();
+                        BuildPkgTool.DrawBuildPkg();
+                    }
+                }
 
-            var newScroll = EditorGUILayout.BeginScrollView(
-                scrollPosition,
-                GUILayout.Height(Mathf.Min(1080, position.height)));
-
-            GUILayout.BeginHorizontal();
-            GUILayout.Space(20);
-            GUILayout.BeginVertical();
-            BuildPkgTool.SetBuildTarget();
-            BuildPkgTool.DrawRootDirectory();
-            BuildPkgTool.DrawVersion();
-            BuildPkgTool.DrawAssetSetting();
-            BuildPkgTool.DrawHotUpdate();
-            BuildPkgTool.DrawBuildPkg();
-            GUILayout.EndVertical();
-            GUILayout.EndHorizontal();
-
-            EditorGUILayout.EndScrollView();
+                newScroll = scrollView.scrollPosition;
+            }
 
             if (newScroll != scrollPosition)
             {
                 scrollPosition = newScroll;
                 SessionState.SetVector3(ScrollKey, new Vector3(scrollPosition.x, scrollPosition.y, 0));
             }
-
-            EditorGUI.EndDisabledGroup();
         }
     }
 }

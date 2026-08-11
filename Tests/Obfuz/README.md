@@ -14,7 +14,12 @@
 1. 使用这个[ 官方教程（快速上手） ](https://www.obfuz.com/docs/beginner/quick-start)生成密钥，挂载初始化代码后。  
 2. 打开ObfuzSettings设置窗口
 	* 将 `Assembly-CSharp`、`F8Framework.Core`、`F8Framework.Launcher`、`F8Framework.F8ExcelDataClass`加入到`AssemblySettings.AssembliesToObfuscate`列表
-    * 将 `F8Framework.Core.Editor`、`F8Framework.Tests`加入到`AssemblySettings.NonObfuscatedButReferenceingObfuscatedAssemblies`列表
+    * 将 `F8Framework.Core.Editor`、`F8Framework.Tests`、`F8Framework.ExcelData.Runtime`加入到`AssemblySettings.NonObfuscatedButReferencingObfuscatedAssemblies`列表。`F8Framework.ExcelData.Runtime`引用了参与混淆的`F8Framework.Core`，但自身不参与混淆，因此必须加入该列表；不要同时加入`AssembliesToObfuscate`。
+
+      ```yaml
+      nonObfuscatedButReferencingObfuscatedAssemblies:
+      - F8Framework.ExcelData.Runtime
+      ```
       ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/Obfuz/ui_1772175480597.png)  
 
 ### 与HybridCLR协同工作：
@@ -42,6 +47,7 @@
 ### 常见报错：
 * Api Compatability Level 切换为 .Net Framework
 * 尝试将 F8Framework 所有程序集设为不混淆
+* 如果提示`F8Framework.ExcelData.Runtime references to obfuscated assembly:F8Framework.Core`，将`F8Framework.ExcelData.Runtime`加入`NonObfuscatedButReferencingObfuscatedAssemblies`
 * 实时读取 Excel 需要改用 FF8.Config.RuntimeLoadAll
     ```C#
   // 实时读取Excel

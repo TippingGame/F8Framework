@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using UnityEditor;
 using UnityEngine;
 
@@ -7,18 +6,6 @@ namespace F8Framework.Core.Editor
 {
     public class F8Helper : ScriptableObject
     {
-        [MenuItem("开发工具/设置Excel存放目录", false, 104)]
-        public static void SetExcelPath()
-        {
-            string lastExcelPath = URLSetting.AddRootPath(F8EditorPrefs.GetString(BuildPkgTool.ExcelPathKey, default));
-            string tempExcelPath = EditorUtility.OpenFolderPanel("设置Excel存放目录", lastExcelPath ?? Application.dataPath, "");
-            if (!tempExcelPath.IsNullOrEmpty())
-            {
-                F8EditorPrefs.SetString(BuildPkgTool.ExcelPathKey, URLSetting.RemoveRootPath(tempExcelPath));
-            }
-            LogF8.LogConfig("设置Excel存放目录：" + tempExcelPath);
-        }
-        
         [MenuItem("开发工具/编辑器模式（勾选）", true)]
         public static bool SetIsEditorMode()
         {
@@ -49,9 +36,7 @@ namespace F8Framework.Core.Editor
                 EditorUtility.DisplayDialog("提示", "游戏正在运行中，不能运行F8流程", "确定");
                 return;
             }
-            LoadAllExcelData();
-            SessionState.SetBool("compilationFinishedHotUpdateDll", true);
-            SessionState.SetBool("compilationFinishedBuildAB", true);
+            F8BuildPipeline.Start(F8BuildRequest.CreateF8Run());
         }
 
         // 补充元数据，不会热更新此处的dll，一般在{project}/HybridCLRData/AssembliesPostIl2CppStrip/{target}目录下
@@ -68,57 +53,48 @@ namespace F8Framework.Core.Editor
         [MenuItem("开发工具/3: 生成并复制热更新Dll-F8", false, 210)]
         public static void GenerateCopyHotUpdateDll()
         {
-            // SessionState.SetBool("compilationFinishedHotUpdateDll", false);
-            //
-            // // 只使用HybridCLR执行的命令（二选一）
+            // 只使用HybridCLR执行的命令（二选一）
             // HybridCLR.Editor.Commands.PrebuildCommand.GenerateAll();
-            // // 使用HybridCLR的同时也使用Obfuz执行的命令（二选一）
-            // // Obfuz4HybridCLR.PrebuildCommandExt.GenerateAll();
-            //
-            // string outpath = Application.dataPath + "/AssetBundles/Code/";
-            //
-            // FileTools.SafeClearDir(outpath);
-            // FileTools.CheckDirAndCreateWhenNeeded(outpath);
-            // foreach (var dll in HybridCLR.Editor.SettingsUtil.HotUpdateAssemblyNamesIncludePreserved) // 获取HybridCLR设置面板的dll名称
-            // {
-            //     var path = HybridCLR.Editor.SettingsUtil.GetHotUpdateDllsOutputDirByTarget(
-            //         EditorUserBuildSettings.activeBuildTarget) + "/" + dll + ".dll";
-            //
-            //     // 使用HybridCLR的同时也使用Obfuz解除注释
-            //     // if (Obfuz.Settings.ObfuzSettings.Instance.assemblySettings.GetObfuscationRelativeAssemblyNames().Contains(dll))
-            //     // {
-            //     //     path = Obfuz4HybridCLR.PrebuildCommandExt.GetObfuscatedHotUpdateAssemblyOutputPath(
-            //     //         EditorUserBuildSettings.activeBuildTarget) + "/" + dll + ".dll";
-            //     // }
-            //     
-            //     FileTools.SafeCopyFile(path, outpath + dll + ".bytes");
-            //     LogF8.LogAsset("生成并复制热更新dll：" + dll);
-            // }
-            //
-            // foreach (var aotDllName in F8Helper.AOTDllList)
-            // {
-            //     var mscorlibsouPath = HybridCLR.Editor.SettingsUtil.GetAssembliesPostIl2CppStripDir(
-            //         EditorUserBuildSettings.activeBuildTarget) + "/" + aotDllName;
-            //     
-            //     FileTools.SafeCopyFile(
-            //         mscorlibsouPath,
-            //         outpath + aotDllName + "by.bytes");
-            //     LogF8.LogAsset("生成并复制补充元数据dll：" + aotDllName);
-            // }
-            //
-            // AssetDatabase.Refresh();
-        }
-
-        [MenuItem("开发工具/2: Excel导表-F8", false, 205)]
-        public static void LoadAllExcelData()
-        {
-            ExcelDataTool.LoadAllExcelData();
+            // 使用HybridCLR的同时也使用Obfuz执行的命令（二选一）
+            Obfuz4HybridCLR.PrebuildCommandExt.GenerateAll();
+            
+            string outpath = Application.dataPath + "/AssetBundles/Code/";
+            
+            FileTools.SafeClearDir(outpath);
+            FileTools.CheckDirAndCreateWhenNeeded(outpath);
+            foreach (var dll in HybridCLR.Editor.SettingsUtil.HotUpdateAssemblyNamesIncludePreserved) // 获取HybridCLR设置面板的dll名称
+            {
+                var path = HybridCLR.Editor.SettingsUtil.GetHotUpdateDllsOutputDirByTarget(
+                    EditorUserBuildSettings.activeBuildTarget) + "/" + dll + ".dll";
+            
+                // 使用HybridCLR的同时也使用Obfuz解除注释
+                if (Obfuz.Settings.ObfuzSettings.Instance.assemblySettings.GetObfuscationRelativeAssemblyNames().Contains(dll))
+                {
+                    path = Obfuz4HybridCLR.PrebuildCommandExt.GetObfuscatedHotUpdateAssemblyOutputPath(
+                        EditorUserBuildSettings.activeBuildTarget) + "/" + dll + ".dll";
+                }
+                
+                FileTools.SafeCopyFile(path, outpath + dll + ".bytes");
+                LogF8.LogAsset("生成并复制热更新dll：" + dll);
+            }
+            
+            foreach (var aotDllName in F8Helper.AOTDllList)
+            {
+                var mscorlibsouPath = HybridCLR.Editor.SettingsUtil.GetAssembliesPostIl2CppStripDir(
+                    EditorUserBuildSettings.activeBuildTarget) + "/" + aotDllName;
+                
+                FileTools.SafeCopyFile(
+                    mscorlibsouPath,
+                    outpath + aotDllName + "by.bytes");
+                LogF8.LogAsset("生成并复制补充元数据dll：" + aotDllName);
+            }
+            
+            AssetDatabase.Refresh();
         }
 
         [MenuItem("开发工具/4: 打包AssetBundles目录资源-F8", false, 215)]
         public static void BuildAssetBundles()
         {
-            SessionState.SetBool("compilationFinishedBuildAB", false);
             ABBuildTool.BuildAllAB();
         }
 
@@ -133,19 +109,6 @@ namespace F8Framework.Core.Editor
 
             TMPIntegrationSwitcher.EnsureIntegrationState();
             TimelineIntegrationSwitcher.EnsureIntegrationState();
-            
-            // 注册编辑器退出事件
-            EditorApplication.quitting += OnEditorQuit;
-        }
-        
-        private static void OnEditorQuit()
-        {
-            SessionState.SetBool("compilationFinished", false);
-            SessionState.SetBool("compilationFinishedHotUpdateDll", false);
-            SessionState.SetBool("compilationFinishedBuildAB", false);
-            SessionState.SetBool("compilationFinishedBuildPkg", false);
-            SessionState.SetBool("compilationFinishedBuildRun", false);
-            SessionState.SetBool("compilationFinishedBuildUpdate", false);
         }
 
         private static void ProjectWindowItemOnGUI(string guid, Rect selectionRect)
@@ -167,17 +130,5 @@ namespace F8Framework.Core.Editor
             }
         }
         
-        private static string GetScriptPath()
-        {
-            MonoScript monoScript = MonoScript.FromScriptableObject(CreateInstance<F8Helper>());
-
-            // 获取脚本在 Assets 中的相对路径
-            string scriptRelativePath = AssetDatabase.GetAssetPath(monoScript);
-
-            // 获取绝对路径并规范化
-            string scriptPath = Path.GetFullPath(Path.Combine(Application.dataPath, "..", scriptRelativePath));
-
-            return scriptPath;
-        }
     }
 }

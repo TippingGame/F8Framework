@@ -33,7 +33,7 @@ description: Use as the routing skill for selecting the correct F8Framework laye
 | `f8-features-audio-workflow` | Audio | BGM, voice, SFX playback and volume control |
 | `f8-features-download-workflow` | Download | HTTP downloads, resume, progress tracking |
 | `f8-features-event-workflow` | Event | Message dispatch, event listening, EventDispatcher |
-| `f8-features-exceltool-workflow` | ExcelTool | Config tables, Excel read/write, F8/F7 generation |
+| `f8-features-exceltool-workflow` | ExcelTool | Config tables, generated data, optional runtime source, and F7 reload |
 | `f8-features-fsm-workflow` | FSM | Finite state machine, states, transitions, blackboard |
 | `f8-features-gameobjectpool-workflow` | GameObjectPool | GameObject pooling, spawn/despawn, lifecycle events |
 | `f8-features-hotupdatemanager-workflow` | HotUpdateManager | Hot update version management, sub-packages |
@@ -58,8 +58,8 @@ description: Use as the routing skill for selecting the correct F8Framework laye
 | `f8-editor-assetmanager-workflow` | Asset editor tools: F8 generation, AB name management, asset inspector |
 | `f8-editor-componentbind-workflow` | Component binding code generation, inspector binding |
 | `f8-editor-event-workflow` | Event system monitor editor window |
-| `f8-editor-exceltool-workflow` | F8/F7 keybinds, Excel directory config, export settings |
-| `f8-editor-f8helper-workflow` | F8 main menu items and shortcuts |
+| `f8-editor-exceltool-workflow` | Excel-only import, F7 reload, F5 settings, and optional pipeline participation |
+| `f8-editor-f8helper-workflow` | F8Run pipeline, main menu items, and shortcuts |
 | `f8-editor-gameobjectpool-workflow` | Preload pool Inspector, PoolsPreset asset creation |
 | `f8-editor-localization-workflow` | F6 language switching, localization editor |
 | `f8-editor-log-workflow` | Log editor settings, LogViewer |
@@ -86,7 +86,7 @@ description: Use as the routing skill for selecting the correct F8Framework laye
 ### build (1)
 | Skill | When to use |
 |-------|------------|
-| `f8-build-buildpkg-workflow` | F5 packaging, release build, hot update build, Jenkins CI |
+| `f8-build-buildpkg-workflow` | F8/F5 pipeline, release and hot update builds, recovery, and Jenkins CI |
 
 ## Workflow
 

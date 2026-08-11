@@ -1,0 +1,24 @@
+{
+    "name": "F8Framework.ExcelData.Editor.Tests",
+    "rootNamespace": "F8Framework.ExcelData.Editor.Tests",
+    "references": [
+        "F8Framework.Core",
+        "F8Framework.Core.Editor",
+        "F8Framework.ExcelData.Runtime",
+        "F8Framework.ExcelData.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false,
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
+}

@@ -7,11 +7,12 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using Excel;
+using F8Framework.Core;
 using LitJson;
 using UnityEngine;
 using Assembly = System.Reflection.Assembly;
 
-namespace F8Framework.Core
+namespace F8Framework.ExcelData
 {
     public class SupportType
     {
@@ -70,7 +71,7 @@ namespace F8Framework.Core
         private string ExcelPath = "config"; //需要导表的目录
         private Dictionary<string, List<ConfigData[]>> dataDict; //存放所有数据表内的数据，key：类名  value：数据
         
-        public void LoadAllExcelData(Dictionary<string, object> excelData = null)
+        public void LoadAllExcelData(IDictionary<string, object> excelData = null)
         {
 #if UNITY_EDITOR
         string INPUT_PATH = URLSetting.AddRootPath(F8EditorPrefs.GetString("ExcelPath", null)) ?? URLSetting.CS_STREAMINGASSETS_URL + ExcelPath;
@@ -93,15 +94,20 @@ namespace F8Framework.Core
             }
             
 #if !UNITY_EDITOR && UNITY_ANDROID
-            var files = SyncStreamingAssetsLoader.Instance.ReadAllLines(INPUT_PATH + "/fileindex.txt");
+            var files = (SyncStreamingAssetsLoader.Instance
+                .ReadAllLines(INPUT_PATH + "/fileindex.txt") ?? Array.Empty<string>())
+                .Where(IsExcelFile)
+                .OrderBy(path => path, StringComparer.Ordinal)
+                .ToArray();
 #else
-            var files = Directory.GetFiles(INPUT_PATH, "*.*", SearchOption.AllDirectories)
-                .Where(s => (s.EndsWith(".xls") || s.EndsWith(".xlsx")) && !Path.GetFileName(s).StartsWith("~$"))
+            var files = Directory.EnumerateFiles(INPUT_PATH, "*.*", SearchOption.AllDirectories)
+                .Where(IsExcelFile)
+                .OrderBy(path => path, StringComparer.Ordinal)
                 .ToArray();
 #endif
             if (files == null || files.Length == 0)
             {
-                throw new Exception("暂无可以导入的数据表！首次F8请手动导入，【DemoWorkSheet.xlsx / Localization.xlsx】两个表格！" + INPUT_PATH + " 目录");
+                throw new Exception("暂无可以导入的数据表！请检查 Excel 目录和 fileindex.txt：" + INPUT_PATH);
             }
 
             if (dataDict == null)
@@ -153,6 +159,14 @@ namespace F8Framework.Core
             LogF8.LogConfig("<color=green>运行时导表成功！</color>");
         }
 
+        private static bool IsExcelFile(string path)
+        {
+            string extension = Path.GetExtension(path);
+            return (string.Equals(extension, ".xls", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(extension, ".xlsx", StringComparison.OrdinalIgnoreCase)) &&
+                   !Path.GetFileName(path).StartsWith("~$", StringComparison.Ordinal);
+        }
+
         //数据表内每一格数据
         public class ConfigData
         {
@@ -174,14 +188,16 @@ namespace F8Framework.Core
             IExcelDataReader excelReader = null;
             try
             {
+                string extension = Path.GetExtension(inputPath);
 #if !UNITY_EDITOR && UNITY_ANDROID
-                inputPath = ExcelPath + "/" + inputPath;
-                if (inputPath.EndsWith(".xls"))
+                inputPath = ExcelPath.TrimEnd('/') + "/" +
+                            inputPath.Replace('\\', '/').TrimStart('/');
+                if (string.Equals(extension, ".xls", StringComparison.OrdinalIgnoreCase))
                 {
                     byte[] excelData = SyncStreamingAssetsLoader.Instance.LoadBytes(inputPath);
                     excelReader = ExcelReaderFactory.CreateBinaryReader(excelData);
                 }
-                else if (inputPath.EndsWith(".xlsx"))
+                else if (string.Equals(extension, ".xlsx", StringComparison.OrdinalIgnoreCase))
                 {
                     byte[] excelData = SyncStreamingAssetsLoader.Instance.LoadBytes(inputPath);
                     excelReader = ExcelReaderFactory.CreateOpenXmlReader(excelData);
@@ -189,10 +205,12 @@ namespace F8Framework.Core
 #else
                 stream = File.Open(inputPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
-                if (inputPath.EndsWith(".xls")) excelReader = ExcelReaderFactory.CreateBinaryReader(stream);
-                else if (inputPath.EndsWith(".xlsx")) excelReader = ExcelReaderFactory.CreateOpenXmlReader(stream);
+                if (string.Equals(extension, ".xls", StringComparison.OrdinalIgnoreCase))
+                    excelReader = ExcelReaderFactory.CreateBinaryReader(stream);
+                else if (string.Equals(extension, ".xlsx", StringComparison.OrdinalIgnoreCase))
+                    excelReader = ExcelReaderFactory.CreateOpenXmlReader(stream);
 #endif
-                if (!excelReader.IsValid)
+                if (excelReader == null || !excelReader.IsValid)
                 {
                     throw new Exception("无法读取的文件:  " + inputPath);
                 }

@@ -20,23 +20,28 @@ namespace F8Framework.Core.Editor
         
         public static void JenkinsBuildAllAB()
         {
-            SessionState.SetBool("compilationFinishedBuildAB", false);
             string[] args = Environment.GetCommandLineArgs();
-            bool enableFullPathAssetLoading = string.Equals(BuildPkgTool.GetArgValue(args, "EnableFullPathAssetLoading-"), "true", StringComparison.OrdinalIgnoreCase);
-            bool enableFullPathExtensionAssetLoading = string.Equals(BuildPkgTool.GetArgValue(args, "EnableFullPathExtensionAssetLoading-"), "true", StringComparison.OrdinalIgnoreCase);
-            bool forceRebuildAssetBundle = string.Equals(BuildPkgTool.GetArgValue(args, "ForceRebuildAssetBundle-"), "true", StringComparison.OrdinalIgnoreCase);
-            bool appendHashToAssetBundleName = string.Equals(BuildPkgTool.GetArgValue(args, "AppendHashToAssetBundleName-"), "true", StringComparison.OrdinalIgnoreCase);
-            bool forceRemoteAssetBundle = string.Equals(BuildPkgTool.GetArgValue(args, "ForceRemoteAssetBundle-"), "true", StringComparison.OrdinalIgnoreCase);
-            bool disableUnityCacheOnWebGL = string.Equals(BuildPkgTool.GetArgValue(args, "DisableUnityCacheOnWebGL-"), "true", StringComparison.OrdinalIgnoreCase);
-            string assetManifestEncryptKey = BuildPkgTool.GetArgValue(args, "AssetManifestEncryptKey-") ?? "";
-            string assetBundleNameSuffix = BuildPkgTool.GetArgValue(args, "AssetBundleNameSuffix-") ?? "";
+            ApplyCommandLineArguments(args);
+            BuildAllAB();
+        }
+
+        public static void ApplyCommandLineArguments(string[] args)
+        {
+            bool enableFullPathAssetLoading = F8EditorCommandLine.GetBool(args, "EnableFullPathAssetLoading-");
+            bool enableFullPathExtensionAssetLoading = F8EditorCommandLine.GetBool(args, "EnableFullPathExtensionAssetLoading-");
+            bool forceRebuildAssetBundle = F8EditorCommandLine.GetBool(args, "ForceRebuildAssetBundle-");
+            bool appendHashToAssetBundleName = F8EditorCommandLine.GetBool(args, "AppendHashToAssetBundleName-");
+            bool forceRemoteAssetBundle = F8EditorCommandLine.GetBool(args, "ForceRemoteAssetBundle-");
+            bool disableUnityCacheOnWebGL = F8EditorCommandLine.GetBool(args, "DisableUnityCacheOnWebGL-");
+            string assetManifestEncryptKey = F8EditorCommandLine.GetValue(args, "AssetManifestEncryptKey-") ?? "";
+            string assetBundleNameSuffix = F8EditorCommandLine.GetValue(args, "AssetBundleNameSuffix-") ?? "";
             int assetBundleOffset = 0;
-            if (int.TryParse(BuildPkgTool.GetArgValue(args, "AssetBundleOffset-"), out int intValue))
+            if (int.TryParse(F8EditorCommandLine.GetValue(args, "AssetBundleOffset-"), out int intValue))
             {
                 assetBundleOffset = Math.Clamp(intValue, 0, 245);
             }
             int assetBundleXorKey = 0;
-            if (int.TryParse(BuildPkgTool.GetArgValue(args, "AssetBundleXorKey-"), out int intValue2))
+            if (int.TryParse(F8EditorCommandLine.GetValue(args, "AssetBundleXorKey-"), out int intValue2))
             {
                 assetBundleXorKey = Math.Clamp(intValue2, 0, 245);
             }
@@ -50,7 +55,6 @@ namespace F8Framework.Core.Editor
             F8GamePrefs.SetInt(nameof(F8GameConfig.AssetBundleXorKey), assetBundleXorKey);
             F8GamePrefs.SetString(nameof(F8GameConfig.AssetManifestEncryptKey), assetManifestEncryptKey);
             F8EditorPrefs.SetString(BuildPkgTool.AssetBundleNameSuffixKey, assetBundleNameSuffix);
-            BuildAllAB();
         }
 
         public static void BuildAllAB()
@@ -89,7 +93,16 @@ namespace F8Framework.Core.Editor
                 options |= BuildAssetBundleOptions.ForceRebuildAssetBundle;
             }
             // 打包生成AB包 (目标平台自动根据当前平台设置，WebGL不可使用BuildAssetBundleOptions.None压缩)
-            BuildPipeline.BuildAssetBundles(strABOutPAthDir, options, EditorUserBuildSettings.activeBuildTarget);
+            AssetBundleManifest manifest = BuildPipeline.BuildAssetBundles(
+                strABOutPAthDir,
+                options,
+                EditorUserBuildSettings.activeBuildTarget);
+            if (manifest == null)
+            {
+                throw new InvalidOperationException(
+                    "AssetBundle 构建失败，未生成 Manifest：" + strABOutPAthDir);
+            }
+
             LogF8.LogAsset("打包AssetBundle：" + URLSetting.GetAssetBundlesOutPath() + "  当前打包平台：" + EditorUserBuildSettings.activeBuildTarget);
             
             AssetDatabase.Refresh();

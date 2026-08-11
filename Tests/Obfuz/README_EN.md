@@ -14,7 +14,12 @@ Method 2: Unity -> Click Menu Bar -> Window -> Package Manager -> Click + -> Add
 1. Use this[ Official Tutorial (Quick Start) ](https://www.obfuz.com/docs/beginner/quick-start)to generate a key, after mounting the initialization code.  
 2. Open the ObfuzSettings window
 	* Add `Assembly-CSharp`、`F8Framework.Core`、`F8Framework.Launcher`、`F8Framework.F8ExcelDataClass` to the `AssemblySettings.AssembliesToObfuscate` list
-    * Add `F8Framework.Core.Editor`、`F8Framework.Tests` to the `AssemblySettings.NonObfuscatedButReferenceingObfuscatedAssemblies` list
+    * Add `F8Framework.Core.Editor`, `F8Framework.Tests`, and `F8Framework.ExcelData.Runtime` to the `AssemblySettings.NonObfuscatedButReferencingObfuscatedAssemblies` list. `F8Framework.ExcelData.Runtime` references the obfuscated `F8Framework.Core` assembly without being obfuscated itself, so it must be listed here; do not also add it to `AssembliesToObfuscate`.
+
+      ```yaml
+      nonObfuscatedButReferencingObfuscatedAssemblies:
+      - F8Framework.ExcelData.Runtime
+      ```
       ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/Obfuz/ui_1772175480597.png)  
 
 ### Working with HybridCLR:
@@ -42,6 +47,7 @@ Method 2: Unity -> Click Menu Bar -> Window -> Package Manager -> Click + -> Add
 ### Common Errors:
 * Switch Api Compatibility Level to .Net Framework
 * Try setting all F8Framework assemblies to non-obfuscated
+* If the build reports that `F8Framework.ExcelData.Runtime references to obfuscated assembly:F8Framework.Core`, add `F8Framework.ExcelData.Runtime` to `NonObfuscatedButReferencingObfuscatedAssemblies`
 * To read Excel in real-time, you need to use FF8.Config.RuntimeLoadAll instead
     ```C#
   // Read Excel in real-time

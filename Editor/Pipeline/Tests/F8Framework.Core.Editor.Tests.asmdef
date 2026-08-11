@@ -1,0 +1,22 @@
+{
+    "name": "F8Framework.Core.Editor.Tests",
+    "rootNamespace": "F8Framework.Core.Editor.Tests",
+    "references": [
+        "F8Framework.Core",
+        "F8Framework.Core.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false,
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
+}

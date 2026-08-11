@@ -6,12 +6,17 @@ using UnityEngine;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using F8Framework.Core;
+using F8Framework.Core.Editor;
+using F8Framework.ExcelData;
 
 //脚本生成器
-namespace F8Framework.Core.Editor
+namespace F8Framework.ExcelData.Editor
 {
     public class ScriptGenerator
     {
+        private const string LocalizationTableName = "LocalizedStrings";
+
         private string[] Names;
         private string[] Types;
         private List<ReadExcel.ConfigData> ConfigDatas;
@@ -44,6 +49,12 @@ namespace F8Framework.Core.Editor
                                     "\n表名为空:" + (ClassName == null) +
                                     "\n字段类型为空:" + (Types == null) +
                                     "\n字段名为空:" + (Names == null));
+            }
+            if (!string.Equals(ClassName, LocalizationTableName, StringComparison.Ordinal) &&
+                string.Equals(ClassName, LocalizationTableName, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new InvalidOperationException(
+                    $"本地化表 Sheet 名大小写必须精确为 {LocalizationTableName}。");
             }
             // 使用LINQ的GroupBy和Any来找出重复的元素  
             var duplicates = Names
@@ -88,13 +99,23 @@ namespace F8Framework.Core.Editor
             classSource.Append("namespace " + ExcelDataTool.CODE_NAMESPACE + "\n");
             classSource.Append("{\n");
             classSource.Append("\t[Serializable]\n");
-            classSource.Append("\tpublic class " + ClassName + "Item\n"); //表里每一条数据的类型名为表类型名加Item
+            bool isLocalizationItem = string.Equals(
+                ClassName,
+                LocalizationTableName,
+                StringComparison.Ordinal);
+            classSource.Append("\tpublic class " + ClassName + "Item"); //表里每一条数据的类型名为表类型名加Item
+            if (isLocalizationItem)
+            {
+                classSource.Append(" : ILocalizationItem");
+            }
+            classSource.Append("\n");
             classSource.Append("\t{\n");
             enumDefinitions.Clear();
             enumDefinitionOrder.Clear();
 
-            string exportFormat = F8EditorPrefs.GetString(BuildPkgTool.ConvertExcelToOtherFormatsKey, BuildPkgTool.ExcelToOtherFormats[1]);
-            Dictionary<string, string> binaryRegisters = exportFormat == BuildPkgTool.ExcelToOtherFormats[1] ? new Dictionary<string, string>() : null;
+            string exportFormat = ExcelDataSettings.ExportFormat;
+            Dictionary<string, string> binaryRegisters = exportFormat == ExcelDataSettings.BinaryFormat ? new Dictionary<string, string>() : null;
+            List<string> generatedFields = new List<string>();
             bool hasVariant = false;
             //设置成员
             for (int i = 0; i < fields.Length; ++i)
@@ -112,11 +133,17 @@ namespace F8Framework.Core.Editor
                     classSource.Append("\t\t[Preserve]\n");
                     classSource.Append($"\t\tpublic {fieldType} {fields[i] } => _{fields[i]}Variants.GetValueOrDefault(!string.IsNullOrEmpty({ExcelDataTool.CODE_NAMESPACE}.{ClassName}.VariantName) ? {ExcelDataTool.CODE_NAMESPACE}.{ClassName}.VariantName : (F8DataManager.Instance.VariantName ?? string.Empty), _{fields[i]}Variants[string.Empty]);\n");
                     binaryRegisters?.TryAdd("System.Collections.Generic.Dictionary<System.String, " + fieldType + ">", SupportType.DICTIONARY);
+                    generatedFields.Add(fields[i]);
                 }
                 else
                 {
                     // 普通字段
-                    classSource.Append(PropertyString(types[i], fields[i], binaryRegisters));
+                    string propertySource = PropertyString(types[i], fields[i], binaryRegisters);
+                    classSource.Append(propertySource);
+                    if (!string.IsNullOrEmpty(propertySource))
+                    {
+                        generatedFields.Add(fields[i]);
+                    }
                 }
                 
                 // 枚举定义
@@ -124,6 +151,11 @@ namespace F8Framework.Core.Editor
                 {
                     PropertyEnum(types[i], ClassName, InputPath, true, binaryRegisters);
                 }
+            }
+
+            if (isLocalizationItem)
+            {
+                AppendLocalizationItemImplementation(classSource, ClassName, generatedFields);
             }
             
             classSource.Append("\t}\n");
@@ -249,6 +281,57 @@ namespace F8Framework.Core.Editor
                     }
                 }
              */
+        }
+
+        private static void AppendLocalizationItemImplementation(
+            StringBuilder classSource,
+            string className,
+            IReadOnlyList<string> generatedFields)
+        {
+            List<string> idFields = generatedFields
+                .Where(field => string.Equals(field, "id", StringComparison.OrdinalIgnoreCase))
+                .ToList();
+            List<string> textIdFields = generatedFields
+                .Where(field => string.Equals(field, "TextID", StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            if (idFields.Count != 1 || textIdFields.Count != 1)
+            {
+                throw new InvalidOperationException(
+                    $"本地化表 {className} 必须包含 id 和 TextID 字段，且两者都只能出现一次。");
+            }
+
+            string idField = idFields[0];
+            string textIdField = textIdFields[0];
+
+            List<string> languageFields = generatedFields
+                .Where(field =>
+                    !string.Equals(field, idField, StringComparison.OrdinalIgnoreCase) &&
+                    !string.Equals(field, textIdField, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+            if (languageFields.Count == 0)
+            {
+                throw new InvalidOperationException(
+                    $"本地化表 {className} 至少需要包含一个语言字段。");
+            }
+
+            classSource.Append("\n");
+            classSource.Append($"\t\tstring ILocalizationItem.Id => ((System.Object){idField})?.ToString() ?? string.Empty;\n");
+            classSource.Append($"\t\tstring ILocalizationItem.TextId => ((System.Object){textIdField})?.ToString();\n");
+            classSource.Append("\t\tIReadOnlyList<string> ILocalizationItem.LanguageNames => new string[]\n");
+            classSource.Append("\t\t{\n");
+            foreach (string languageField in languageFields)
+            {
+                classSource.Append($"\t\t\tnameof({languageField}),\n");
+            }
+            classSource.Append("\t\t};\n");
+            classSource.Append("\t\tIReadOnlyList<string> ILocalizationItem.LanguageValues => new string[]\n");
+            classSource.Append("\t\t{\n");
+            foreach (string languageField in languageFields)
+            {
+                classSource.Append($"\t\t\t((System.Object){languageField})?.ToString(),\n");
+            }
+            classSource.Append("\t\t};\n");
         }
 
         private string PropertyString(string type, string propertyName, Dictionary<string, string> binaryRegisters)
@@ -401,7 +484,7 @@ namespace F8Framework.Core.Editor
         }
         
         //创建数据管理器脚本
-        public static void CreateDataManager(Dictionary<string, ScriptGenerator> codeList)
+        public static bool CreateDataManager(Dictionary<string, ScriptGenerator> codeList)
         {
             List<string> list = new List<string>();
             list.AddRange(codeList.Keys);
@@ -462,7 +545,7 @@ namespace F8Framework.Core.Editor
                 source.Append("\t\t\tLogF8.LogError(\"未加载配置表： " + t + "\");\n");
                 source.Append("\t\t\treturn null;\n");
                 source.Append("\t\t}\n\n");
-                if (t == "LocalizedStrings")
+                if (t == LocalizationTableName)
                 {
                     hasLocalizedStrings = true;
                 }
@@ -508,8 +591,11 @@ namespace F8Framework.Core.Editor
             source.Append("\t\t{\n");
             source.Append("\t\t\tif (objs == null)\n");
             source.Append("\t\t\t{\n");
-            source.Append("\t\t\t\tobjs = new Dictionary<string, object>();\n");
-            source.Append("\t\t\t\tReadExcel.Instance.LoadAllExcelData(objs);\n");
+            source.Append("\t\t\t\tif (!ConfigDataSourceRegistry.TryLoadAll(out objs))\n");
+            source.Append("\t\t\t\t{\n");
+            source.Append("\t\t\t\t\tLogF8.LogError(\"没有可用的配置数据源。请安装并启用一个 IConfigDataSource 实现。\");\n");
+            source.Append("\t\t\t\t\treturn;\n");
+            source.Append("\t\t\t\t}\n");
             source.Append("\t\t\t}\n");
             foreach (string t in types)
             {
@@ -585,8 +671,8 @@ namespace F8Framework.Core.Editor
             source.Append("\t\t\t}\n");
             source.Append("\t\t\tUnloadAsset(name, false);\n");
             
-            string exportFormat = F8EditorPrefs.GetString(BuildPkgTool.ConvertExcelToOtherFormatsKey, BuildPkgTool.ExcelToOtherFormats[1]);
-            if (exportFormat == BuildPkgTool.ExcelToOtherFormats[1])
+            string exportFormat = ExcelDataSettings.ExportFormat;
+            if (exportFormat == ExcelDataSettings.BinaryFormat)
             {
                 source.Append("\t\t\tT obj = Util.BinarySerializer.Deserialize<T>(textAsset.bytes);\n");
             }else
@@ -604,7 +690,7 @@ namespace F8Framework.Core.Editor
             source.Append("\t\t\tif (textAsset != null)\n");
             source.Append("\t\t\t{\n");
             source.Append("\t\t\t\tUnloadAsset(name, false);\n");
-            if (exportFormat == BuildPkgTool.ExcelToOtherFormats[1])
+            if (exportFormat == ExcelDataSettings.BinaryFormat)
             {
                 source.Append("\t\t\t\tT obj = Util.BinarySerializer.Deserialize<T>(textAsset.bytes);\n");
             }else
@@ -624,7 +710,7 @@ namespace F8Framework.Core.Editor
             source.Append("\t\t\tif (textAsset != null)\n");
             source.Append("\t\t\t{\n");
             source.Append("\t\t\t\tUnloadAsset(name, false);\n");
-            if (exportFormat == BuildPkgTool.ExcelToOtherFormats[1])
+            if (exportFormat == ExcelDataSettings.BinaryFormat)
             {
                 source.Append("\t\t\t\tT obj = Util.BinarySerializer.Deserialize<T>(textAsset.bytes);\n");
             }else
@@ -676,17 +762,15 @@ namespace F8Framework.Core.Editor
             source.Append("\t\t}\n");
             source.Append("\t}\n");
             source.Append("}");
-            //保存脚本
+            // 保存脚本；内容未变化时保留文件时间戳和 Unity meta/GUID。
             string path = Application.dataPath + ExcelDataTool.DataManagerFolder;
             if (!Directory.Exists(path)) Directory.CreateDirectory(path);
-
-            // 使用 StreamWriter 的构造函数指定 Encoding 和 NewLine，确保行尾符一致
-            StreamWriter sw = new StreamWriter(path + "/" + ExcelDataTool.DataManagerName, false, System.Text.Encoding.UTF8);
-            sw.NewLine = "\n"; // 设置行尾符为 UNIX 风格
-
-            sw.WriteLine(source.ToString());
-            LogF8.LogConfig("已生成代码 " + path + "/<color=#FF9E59>" + ExcelDataTool.DataManagerName + "</color>");
-            sw.Close();
+            string dataManagerPath = path + "/" + ExcelDataTool.DataManagerName;
+            bool changed = ExcelDataTool.WriteTextIfChanged(dataManagerPath, source.ToString());
+            LogF8.LogConfig(
+                (changed ? "已生成代码 " : "代码无需更新 ") +
+                path + "/<color=#FF9E59>" + ExcelDataTool.DataManagerName + "</color>");
+            return changed;
 
             /*  //生成的数据管理类如下
                 using System;

@@ -37,7 +37,7 @@ description: Use when implementing or troubleshooting Obfuz feature workflows â€
 |------|----------|
 | Obfuz import | Import Obfuz first from `https://github.com/focus-creative-games/obfuz.git`. |
 | `AssembliesToObfuscate` | Add `Assembly-CSharp`, `F8Framework.Core`, `F8Framework.Launcher`, `F8Framework.F8ExcelDataClass`. |
-| `NonObfuscatedButReferenceingObfuscatedAssemblies` | Add `F8Framework.Core.Editor`, `F8Framework.Tests`. |
+| `NonObfuscatedButReferencingObfuscatedAssemblies` | Add `F8Framework.Core.Editor`, `F8Framework.Tests`, `F8Framework.ExcelData.Runtime`. Keep `F8Framework.ExcelData.Runtime` out of `AssembliesToObfuscate`. |
 | HybridCLR prebuild | Replace the HybridCLR-only prebuild command with `Obfuz4HybridCLR.PrebuildCommandExt.GenerateAll();`. |
 | Encryption init | Move Obfuz `EncryptionService` initialization code to the hot-update entry `LoadDll.cs`. |
 | API compatibility | Set `Api Compatibility Level` to `.NET Framework`. |
@@ -59,6 +59,7 @@ description: Use when implementing or troubleshooting Obfuz feature workflows â€
 | Error | Cause | Solution |
 |-------|-------|----------|
 | API compatibility errors | Compatibility level is too low | Switch `Api Compatibility Level` to `.NET Framework` |
+| `F8Framework.ExcelData.Runtime` references obfuscated `F8Framework.Core` | Excel Runtime is non-obfuscated but missing from Obfuz's referencing-assembly list | Add `F8Framework.ExcelData.Runtime` to `NonObfuscatedButReferencingObfuscatedAssemblies`; do not add it to both assembly lists |
 | F8Framework code breaks after obfuscation | Too many framework assemblies are obfuscated | Try setting all F8Framework assemblies to non-obfuscated first, then narrow scope |
 | Real-time Excel loading fails | Obfuz affects runtime config loading path | Use `FF8.Config.RuntimeLoadAll()` for runtime Excel reload |
 | `GeneratedEncryptionVirtualMachine.cs` init error | Generated file path is wrong | Fix the path in the `ObfuzSettings` window |

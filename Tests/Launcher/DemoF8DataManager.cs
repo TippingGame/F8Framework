@@ -99,8 +99,11 @@ namespace F8Framework.Tests
 		{
 			if (objs == null)
 			{
-				objs = new Dictionary<string, object>();
-				ReadExcel.Instance.LoadAllExcelData(objs);
+				if (!ConfigDataSourceRegistry.TryLoadAll(out objs))
+				{
+					LogF8.LogError("没有可用的配置数据源。请安装并启用一个 IConfigDataSource 实现。");
+					return;
+				}
 			}
 			p_Sheet1 = objs["Sheet1"] as DemoSheet1;
 			p_Sheet2 = objs["Sheet2"] as DemoSheet2;

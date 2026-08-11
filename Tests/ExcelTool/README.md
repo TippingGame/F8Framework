@@ -27,16 +27,16 @@ Unity 读取 Excel 的工具
 
 ## 初始化
 
-1. 在 `Assets` 下，创建 `StreamingAssets/config` 目录，按照下面 "Excel 示例" 创建你的 Excel[（Excel例子）](https://github.com/TippingGame/F8Framework/blob/main/Runtime/ExcelTool/StreamingAssets_config/DemoWorkSheet.xlsx)（首次F8后自动创建Excel）
+1. 在 `Assets` 下，创建 `StreamingAssets/config` 目录，按照下面 "Excel 示例" 创建你的 Excel[（Excel例子）](https://github.com/TippingGame/F8Framework/blob/main/Runtime/ExcelTool/StreamingAssets_config/DemoWorkSheet.xlsx)（首次导表后自动创建示例 Excel）
 
 
-2. 点击菜单的**开发工具**项 -> **导入配置表**\_F8（快捷键），在 `Assets/AssetBundles/Config/BinConfigData` 下生成 **binary** 文件（也可选择 **json** 文件）  
+2. 如果只想导出 Excel，点击菜单的**开发工具**项 -> **2: Excel导表-F8**，在 `Assets/AssetBundles/Config/BinConfigData` 下生成 **binary** 文件（也可选择 **json** 文件）。该菜单项名称中虽然包含 F8，但不绑定 F8 快捷键；键盘 **F8** 对应完整的 **F8Run** 流水线  
 
 
-3. **注意**：如果你不想生成在`AssetBundles`目录下，可在 F5 打包工具设置导表目录  
+3. **注意**：如果你不想生成在`AssetBundles`目录下，可在 F5 打包工具设置导表目录、导出格式，以及是否启用“构建前自动生成 Excel 配置”  
 
 
-4. 如无意外，根目录下会生成 `Assets/F8Framework/ConfigData/` 目录和相关文件，（注意：F8后会清除框架自带的，并重新生成，一切报错均来自这些代码的冲突）  
+4. 如无意外，根目录下会生成 `Assets/F8Framework/ConfigData/` 目录和相关文件。导表只会更新发生变化的生成代码，并清理生成目录中已经失效的生成文件；不要在生成目录内放置自定义代码，也不要为解决报错直接删除整个 `ConfigData/` 目录  
    ![image](https://tippinggame-1257018413.cos.ap-guangzhou.myqcloud.com/TippingGame/ExcelTool/ui_20241112212632.png)
 
 
@@ -44,6 +44,14 @@ Unity 读取 Excel 的工具
 
 
 6. （可选项）通过 Editor，可在运行时读取 Excel 数据：点击菜单的**开发工具**项 -> **运行时读取 Excel**\_F7（快捷键）
+
+## 与 F8/F5 构建流水线的关系
+
+- **F8** 启动通用 F8Run 流水线，不是 Excel 单独导表快捷键。“构建前自动生成 Excel 配置”默认开启；启用时，Excel 会作为可选步骤参与 F8Run。
+- F5 的**打包游戏**、**构建热更新包**和**打包游戏并运行**也会在启用时自动加入 Excel 代码生成与数据序列化步骤，无需提前手动导表。
+- 如果生成的 C# 代码发生变化，通用流水线会保存进度、请求脚本编译，并在 Domain Reload 后继续序列化和后续构建。
+- 关闭“构建前自动生成 Excel 配置”只会跳过新建流水线中的 Excel 步骤，不影响后面的热更新 DLL、AssetBundle、Player 或更新包构建。
+- 如果准备移除 Excel 模块，先取消仍包含 Excel 步骤的旧流水线，再启动新的构建任务。
 
 
 ## Excel 示例

@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEngine;
 
 namespace F8Framework.Core
@@ -34,6 +33,7 @@ namespace F8Framework.Core
                 return;
             }
             LocalizedStrings.Clear();
+            LanguageList.Clear();
             IDictionary tb = null;
             if (Application.isPlaying)
             {
@@ -51,7 +51,16 @@ namespace F8Framework.Core
             {
                 try
                 {
-                    ReadExcel.Instance.LoadAllExcelData();
+                    if (!ConfigDataSourceRegistry.TryLoadAll(out Dictionary<string, object> configData))
+                    {
+                        throw new InvalidOperationException("没有可用的配置数据源。");
+                    }
+
+                    Util.Assembly.InvokeMethod(
+                        "F8DataManager",
+                        "RuntimeLoadAll",
+                        "EditorInstance",
+                        new object[] { configData });
                     tb = Util.Assembly.InvokeMethod("F8DataManager", "GetLocalizedStrings", "EditorInstance", new object[] { }) as IDictionary;
                 }
                 catch
@@ -74,6 +83,7 @@ namespace F8Framework.Core
                 return;
             }
             LocalizedStrings.Clear();
+            LanguageList.Clear();
             
             // 必须先加载本地化配置表
             LoadSuccess(createParam);
@@ -88,79 +98,81 @@ namespace F8Framework.Core
             }
             LogF8.LogConfig("<color=green>获取本地化表格成功！</color>");
             
-            foreach (var item in tb.Values)
+            foreach (object value in tb.Values)
             {
-                // 反射获取 TextID 属性的值
-                Type itemType = item.GetType();
-                FieldInfo textIDProperty = itemType.GetField("TextID");
-                if (textIDProperty == null)
+                if (!(value is ILocalizationItem item))
                 {
-                    LogF8.LogError("无法获取 TextID 属性，请检查对象类型。");
+                    LogF8.LogError("本地化配置项未实现 ILocalizationItem，请重新生成配置代码。");
                     continue;
                 }
 
-                object textIDValue = textIDProperty.GetValue(item);
-                if (textIDValue == null)
+                string textID = item.TextId;
+                if (string.IsNullOrEmpty(textID))
                 {
+                    LogF8.LogError("本地化配置项的 TextID 不能为空。");
                     continue;
                 }
 
-                string id = string.Empty;
-                FieldInfo fieldInfoId = null;
-                foreach (var field in itemType.GetFields())
+                IReadOnlyList<string> languageNames = item.LanguageNames;
+                IReadOnlyList<string> languageValues = item.LanguageValues;
+                if (languageNames == null || languageValues == null)
                 {
-                    if (string.Equals(field.Name, "id", StringComparison.OrdinalIgnoreCase))
-                    {
-                        fieldInfoId = field;
-                        break;
-                    }  
+                    LogF8.LogError($"本地化表id：\"<b>{item.Id}</b>\"，字段：\"<b>{textID}</b>\" 缺少语言数据。");
+                    continue;
                 }
-                FieldInfo idProperty = fieldInfoId;
-                object idValue = idProperty?.GetValue(item);
-                if (idProperty != null && idValue != null)
+
+                if (languageNames.Count == 0 || languageNames.Count != languageValues.Count)
                 {
-                    id = idValue.ToString();
+                    LogF8.LogError($"本地化表id：\"<b>{item.Id}</b>\"，字段：\"<b>{textID}</b>\" 的语言名称和值数量不一致。");
+                    continue;
                 }
-                
-                string textID = textIDValue.ToString();
 
-                List<string> list = new List<string>();
-
-                Type type2 = item.GetType();
-                FieldInfo[] fields = type2.GetFields();
-
-                foreach (var field in fields)
+                if (LanguageList.Count == 0)
                 {
-                    // 排除 id 和 TextID 字段
-                    if (!field.Name.Equals("id", StringComparison.OrdinalIgnoreCase) && field.Name != "TextID")
+                    LanguageList.AddRange(languageNames);
+                }
+                else
+                {
+                    bool languageOrderMatches = LanguageList.Count == languageNames.Count;
+                    for (int i = 0; languageOrderMatches && i < languageNames.Count; i++)
                     {
-                        if (!LanguageList.Contains(field.Name))
-                        {
-                            LanguageList.Add(field.Name);
-                        }
+                        languageOrderMatches = string.Equals(
+                            LanguageList[i],
+                            languageNames[i],
+                            StringComparison.Ordinal);
+                    }
 
-                        object value = field.GetValue(item); // 这里传递的是 item 对象
-                        if (value != null)
-                        {
-                            list.Add(value.ToString());
-                        }
-                        else
-                        {
-                            // 如果字段的值为 null，你可以选择添加一个默认值，或者进行其他处理
-                            list.Add("");
-                            LogF8.LogConfig($"本地化表id：\"<b>{id}</b>\"，字段：\"<b>{textID}</b>\" 的值为空");
-                        }
+                    if (!languageOrderMatches)
+                    {
+                        LogF8.LogError($"本地化表id：\"<b>{item.Id}</b>\"，字段：\"<b>{textID}</b>\" 的语言顺序不一致。");
+                        continue;
                     }
                 }
 
                 if (LocalizedStrings.ContainsKey(textID))
                 {
-                    LogF8.LogError($"本地化表id：\"<b>{id}</b>\"，字段：\"<b>{textID}</b>\" 出现重复，请修改。");
+                    LogF8.LogError($"本地化表id：\"<b>{item.Id}</b>\"，字段：\"<b>{textID}</b>\" 出现重复，请修改。");
                     continue;
                 }
 
-                LocalizedStrings.TryAdd(textID, list);
+                List<string> localizedValues = new List<string>(languageValues.Count);
+                for (int i = 0; i < languageValues.Count; i++)
+                {
+                    string languageValue = languageValues[i];
+                    if (languageValue == null)
+                    {
+                        languageValue = string.Empty;
+                        LogF8.LogConfig($"本地化表id：\"<b>{item.Id}</b>\"，字段：\"<b>{textID}</b>\"，语言：\"<b>{languageNames[i]}</b>\" 的值为空");
+                    }
 
+                    localizedValues.Add(languageValue);
+                }
+
+                LocalizedStrings.Add(textID, localizedValues);
+            }
+
+            if (LanguageList.Count > 0)
+            {
                 LocalizationSettings.LoadLanguageSettings();
                 ChangeLanguage(CurrentLanguageName ?? "");
             }

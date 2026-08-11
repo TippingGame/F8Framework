@@ -10,7 +10,7 @@ using UnityEngine;
 namespace F8Framework.Tests
 {
 	[Serializable]
-	internal class DemoLocalizedStringsItem
+	internal class DemoLocalizedStringsItem : ILocalizationItem
 	{
 		[Preserve]
 		public System.Int32 id;
@@ -20,6 +20,19 @@ namespace F8Framework.Tests
 		public System.String ChineseSimplified;
 		[Preserve]
 		public System.String English;
+
+		string ILocalizationItem.Id => ((System.Object)id)?.ToString() ?? string.Empty;
+		string ILocalizationItem.TextId => ((System.Object)TextID)?.ToString();
+		IReadOnlyList<string> ILocalizationItem.LanguageNames => new string[]
+		{
+			nameof(ChineseSimplified),
+			nameof(English),
+		};
+		IReadOnlyList<string> ILocalizationItem.LanguageValues => new string[]
+		{
+			((System.Object)ChineseSimplified)?.ToString(),
+			((System.Object)English)?.ToString(),
+		};
 	}
 	
 	[Serializable]

@@ -6,7 +6,6 @@
         "Unity.TextMeshPro",
         "Unity.Timeline",
         "ICSharpCode.SharpZipLib",
-        "Excel",
         "LitJson",
         "kcp2k",
         "Telepathy",
