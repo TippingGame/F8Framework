@@ -53,43 +53,43 @@ namespace F8Framework.Core.Editor
         [MenuItem("开发工具/3: 生成并复制热更新Dll-F8", false, 210)]
         public static void GenerateCopyHotUpdateDll()
         {
-            // 只使用HybridCLR执行的命令（二选一）
+            // // 只使用HybridCLR执行的命令（二选一）
             // HybridCLR.Editor.Commands.PrebuildCommand.GenerateAll();
-            // 使用HybridCLR的同时也使用Obfuz执行的命令（二选一）
-            Obfuz4HybridCLR.PrebuildCommandExt.GenerateAll();
-            
-            string outpath = Application.dataPath + "/AssetBundles/Code/";
-            
-            FileTools.SafeClearDir(outpath);
-            FileTools.CheckDirAndCreateWhenNeeded(outpath);
-            foreach (var dll in HybridCLR.Editor.SettingsUtil.HotUpdateAssemblyNamesIncludePreserved) // 获取HybridCLR设置面板的dll名称
-            {
-                var path = HybridCLR.Editor.SettingsUtil.GetHotUpdateDllsOutputDirByTarget(
-                    EditorUserBuildSettings.activeBuildTarget) + "/" + dll + ".dll";
-            
-                // 使用HybridCLR的同时也使用Obfuz解除注释
-                if (Obfuz.Settings.ObfuzSettings.Instance.assemblySettings.GetObfuscationRelativeAssemblyNames().Contains(dll))
-                {
-                    path = Obfuz4HybridCLR.PrebuildCommandExt.GetObfuscatedHotUpdateAssemblyOutputPath(
-                        EditorUserBuildSettings.activeBuildTarget) + "/" + dll + ".dll";
-                }
-                
-                FileTools.SafeCopyFile(path, outpath + dll + ".bytes");
-                LogF8.LogAsset("生成并复制热更新dll：" + dll);
-            }
-            
-            foreach (var aotDllName in F8Helper.AOTDllList)
-            {
-                var mscorlibsouPath = HybridCLR.Editor.SettingsUtil.GetAssembliesPostIl2CppStripDir(
-                    EditorUserBuildSettings.activeBuildTarget) + "/" + aotDllName;
-                
-                FileTools.SafeCopyFile(
-                    mscorlibsouPath,
-                    outpath + aotDllName + "by.bytes");
-                LogF8.LogAsset("生成并复制补充元数据dll：" + aotDllName);
-            }
-            
-            AssetDatabase.Refresh();
+            // // 使用HybridCLR的同时也使用Obfuz执行的命令（二选一）
+            // // Obfuz4HybridCLR.PrebuildCommandExt.GenerateAll();
+            //
+            // string outpath = Application.dataPath + "/AssetBundles/Code/";
+            //
+            // FileTools.SafeClearDir(outpath);
+            // FileTools.CheckDirAndCreateWhenNeeded(outpath);
+            // foreach (var dll in HybridCLR.Editor.SettingsUtil.HotUpdateAssemblyNamesIncludePreserved) // 获取HybridCLR设置面板的dll名称
+            // {
+            //     var path = HybridCLR.Editor.SettingsUtil.GetHotUpdateDllsOutputDirByTarget(
+            //         EditorUserBuildSettings.activeBuildTarget) + "/" + dll + ".dll";
+            //
+            //     // 使用HybridCLR的同时也使用Obfuz解除注释
+            //     // if (Obfuz.Settings.ObfuzSettings.Instance.assemblySettings.GetObfuscationRelativeAssemblyNames().Contains(dll))
+            //     // {
+            //     //     path = Obfuz4HybridCLR.PrebuildCommandExt.GetObfuscatedHotUpdateAssemblyOutputPath(
+            //     //         EditorUserBuildSettings.activeBuildTarget) + "/" + dll + ".dll";
+            //     // }
+            //     
+            //     FileTools.SafeCopyFile(path, outpath + dll + ".bytes");
+            //     LogF8.LogAsset("生成并复制热更新dll：" + dll);
+            // }
+            //
+            // foreach (var aotDllName in F8Helper.AOTDllList)
+            // {
+            //     var mscorlibsouPath = HybridCLR.Editor.SettingsUtil.GetAssembliesPostIl2CppStripDir(
+            //         EditorUserBuildSettings.activeBuildTarget) + "/" + aotDllName;
+            //     
+            //     FileTools.SafeCopyFile(
+            //         mscorlibsouPath,
+            //         outpath + aotDllName + "by.bytes");
+            //     LogF8.LogAsset("生成并复制补充元数据dll：" + aotDllName);
+            // }
+            //
+            // AssetDatabase.Refresh();
         }
 
         [MenuItem("开发工具/4: 打包AssetBundles目录资源-F8", false, 215)]
