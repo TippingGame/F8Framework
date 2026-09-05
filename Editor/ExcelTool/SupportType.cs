@@ -483,12 +483,285 @@ namespace F8Framework.ExcelData.Editor
             enumDefinitionOrder.Add(enumName);
         }
         
+        private static void AppendSequentialLoadMethods(StringBuilder source, List<string> types)
+        {
+            // 加载所有配置表
+            source.Append("\t\t[Preserve]\n");
+            source.Append("\t\tpublic void LoadAll()\n");
+            source.Append("\t\t{\n");
+            foreach (string t in types)
+            {
+                source.Append("\t\t\tp_" + t + " = Load<" + t + ">(\"" + t + "\") as " + t + ";\n");
+            }
+
+            source.Append("\t\t}\n\n");
+
+            // 运行时加载所有配置表
+            source.Append("\t\t[Preserve]\n");
+            source.Append("\t\tpublic void RuntimeLoadAll(Dictionary<String, System.Object> objs = null)\n");
+            source.Append("\t\t{\n");
+            source.Append("\t\t\tif (objs == null)\n");
+            source.Append("\t\t\t{\n");
+            source.Append("\t\t\t\tif (!ConfigDataSourceRegistry.TryLoadAll(out objs))\n");
+            source.Append("\t\t\t\t{\n");
+            source.Append("\t\t\t\t\tLogF8.LogError(\"没有可用的配置数据源。请安装并启用一个 IConfigDataSource 实现。\");\n");
+            source.Append("\t\t\t\t\treturn;\n");
+            source.Append("\t\t\t\t}\n");
+            source.Append("\t\t\t}\n");
+            foreach (string t in types)
+            {
+                source.Append("\t\t\tp_" + t + " = objs[\"" + t + "\"] as " + t + ";\n");
+            }
+
+            source.Append("\t\t}\n\n");
+
+            // 异步加载所有配置表
+            source.Append("\t\t[Preserve]\n");
+            source.Append("\t\tpublic IEnumerable LoadAllAsync()\n");
+            source.Append("\t\t{\n");
+            foreach (string t in types)
+            {
+                source.Append("\t\t\tyield return LoadAsync<" + t + ">(\"" + t + "\", result => p_" + t + " = result as " + t + ");\n");
+            }
+            source.Append("#if UNITY_EDITOR\n");
+            source.Append("\t\t\tif (AssetManager.Instance.IsEditorMode)\n");
+            source.Append("\t\t\t{\n");
+            source.Append("\t\t\t\tRuntimeLoadAll();\n");
+            source.Append("\t\t\t}\n");
+            source.Append("#endif\n");
+            source.Append("\t\t}\n\n");
+
+            // 异步加载所有配置表
+            source.Append("\t\t[Preserve]\n");
+            source.Append("\t\tpublic async Task LoadAllAsyncTask()\n");
+            source.Append("\t\t{\n");
+            foreach (string t in types)
+            {
+                source.Append("\t\t\tawait LoadAsyncTask<" + t + ">(\"" + t + "\", result => p_" + t + " = result as " + t + ");\n");
+            }
+            source.Append("#if UNITY_EDITOR\n");
+            source.Append("\t\t\tif (AssetManager.Instance.IsEditorMode)\n");
+            source.Append("\t\t\t{\n");
+            source.Append("\t\t\t\tRuntimeLoadAll();\n");
+            source.Append("\t\t\t}\n");
+            source.Append("#endif\n");
+            source.Append("\t\t}\n\n");
+
+            // 异步加载所有配置表
+            source.Append("\t\t[Preserve]\n");
+            source.Append("\t\tpublic void LoadAllAsyncCallback(Action onLoadComplete = null)\n");
+            source.Append("\t\t{\n");
+            source.Append("\t\t\tUtil.Unity.StartCoroutine(LoadAllAsyncIEnumerator(onLoadComplete));\n");
+            source.Append("\t\t}\n\n");
+
+            // 异步加载所有配置表
+            source.Append("\t\t[Preserve]\n");
+            source.Append("\t\tpublic IEnumerator LoadAllAsyncIEnumerator(Action onLoadComplete = null)\n");
+            source.Append("\t\t{\n");
+            foreach (string t in types)
+            {
+                source.Append("\t\t\tyield return LoadAsync<" + t + ">(\"" + t + "\", result => p_" + t + " = result as " + t + ");\n");
+            }
+            source.Append("#if UNITY_EDITOR\n");
+            source.Append("\t\t\tif (AssetManager.Instance.IsEditorMode)\n");
+            source.Append("\t\t\t{\n");
+            source.Append("\t\t\t\tRuntimeLoadAll();\n");
+            source.Append("\t\t\t}\n");
+            source.Append("#endif\n");
+            source.Append("\t\t\tonLoadComplete?.Invoke();\n");
+            source.Append("\t\t}\n\n");
+        }
+
+        private static void AppendBatchLoadMethods(
+            StringBuilder source,
+            List<string> types,
+            string exportFormat)
+        {
+            string anchor = types.OrderBy(type => type, StringComparer.Ordinal).First();
+            source.Append("\t\tprivate const string ConfigBatchAnchor = \"" + anchor + "\";\n\n");
+
+            source.Append("\t\tprivate TextAsset FindConfigBatchAsset(Dictionary<string, TextAsset> assets, string name)\n");
+            source.Append("\t\t{\n");
+            source.Append("\t\t\tif (assets == null)\n");
+            source.Append("\t\t\t{\n");
+            source.Append("\t\t\t\treturn null;\n");
+            source.Append("\t\t\t}\n");
+            source.Append("\t\t\tif (assets.TryGetValue(name, out TextAsset asset))\n");
+            source.Append("\t\t\t{\n");
+            source.Append("\t\t\t\treturn asset;\n");
+            source.Append("\t\t\t}\n");
+            source.Append("\t\t\tforeach (KeyValuePair<string, TextAsset> pair in assets)\n");
+            source.Append("\t\t\t{\n");
+            source.Append("\t\t\t\tif (string.Equals(pair.Key, name, StringComparison.OrdinalIgnoreCase) ||\n");
+            source.Append("\t\t\t\t\t(pair.Value != null && string.Equals(pair.Value.name, name, StringComparison.OrdinalIgnoreCase)))\n");
+            source.Append("\t\t\t\t{\n");
+            source.Append("\t\t\t\t\treturn pair.Value;\n");
+            source.Append("\t\t\t\t}\n");
+            source.Append("\t\t\t}\n");
+            source.Append("\t\t\tLogF8.LogError(\"批量配置 AB 中找不到资源：\" + name);\n");
+            source.Append("\t\t\treturn null;\n");
+            source.Append("\t\t}\n\n");
+
+            source.Append("\t\tprivate T DeserializeConfigBatchAsset<T>(TextAsset textAsset)\n");
+            source.Append("\t\t{\n");
+            source.Append("\t\t\tif (textAsset == null)\n");
+            source.Append("\t\t\t{\n");
+            source.Append("\t\t\t\treturn default(T);\n");
+            source.Append("\t\t\t}\n");
+            if (exportFormat == ExcelDataSettings.BinaryFormat)
+            {
+                source.Append("\t\t\treturn Util.BinarySerializer.Deserialize<T>(textAsset.bytes);\n");
+            }
+            else
+            {
+                source.Append("\t\t\treturn Util.LitJson.ToObject<T>(textAsset.text);\n");
+            }
+            source.Append("\t\t}\n\n");
+
+            source.Append("\t\tprivate void ApplyConfigBatchAssets(Dictionary<string, TextAsset> assets)\n");
+            source.Append("\t\t{\n");
+            foreach (string t in types)
+            {
+                source.Append("\t\t\tp_" + t + " = DeserializeConfigBatchAsset<" + t +
+                              ">(FindConfigBatchAsset(assets, \"" + t + "\"));\n");
+            }
+            source.Append("\t\t}\n\n");
+
+            source.Append("\t\t[Preserve]\n");
+            source.Append("\t\tpublic void RuntimeLoadAll(Dictionary<String, System.Object> objs = null)\n");
+            source.Append("\t\t{\n");
+            source.Append("\t\t\tif (objs == null)\n");
+            source.Append("\t\t\t{\n");
+            source.Append("\t\t\t\tif (!ConfigDataSourceRegistry.TryLoadAll(out objs))\n");
+            source.Append("\t\t\t\t{\n");
+            source.Append("\t\t\t\t\tLogF8.LogError(\"没有可用的配置数据源。请安装并启用一个 IConfigDataSource 实现。\");\n");
+            source.Append("\t\t\t\t\treturn;\n");
+            source.Append("\t\t\t\t}\n");
+            source.Append("\t\t\t}\n");
+            foreach (string t in types)
+            {
+                source.Append("\t\t\tp_" + t + " = objs[\"" + t + "\"] as " + t + ";\n");
+            }
+            source.Append("\t\t}\n\n");
+
+            source.Append("\t\t[Preserve]\n");
+            source.Append("\t\tpublic void LoadAll()\n");
+            source.Append("\t\t{\n");
+            source.Append("#if UNITY_EDITOR\n");
+            source.Append("\t\t\tif (AssetManager.Instance.IsEditorMode)\n");
+            source.Append("\t\t\t{\n");
+            source.Append("\t\t\t\tRuntimeLoadAll();\n");
+            source.Append("\t\t\t\treturn;\n");
+            source.Append("\t\t\t}\n");
+            source.Append("#endif\n");
+            source.Append("\t\t\tDictionary<string, TextAsset> assets = AssetLoadTracker.LoadAll<TextAsset>(ConfigBatchAnchor);\n");
+            source.Append("\t\t\ttry\n");
+            source.Append("\t\t\t{\n");
+            source.Append("\t\t\t\tApplyConfigBatchAssets(assets);\n");
+            source.Append("\t\t\t}\n");
+            source.Append("\t\t\tfinally\n");
+            source.Append("\t\t\t{\n");
+            source.Append("\t\t\t\tUnloadAsset(ConfigBatchAnchor, false);\n");
+            source.Append("\t\t\t}\n");
+            source.Append("\t\t}\n\n");
+
+            source.Append("\t\t[Preserve]\n");
+            source.Append("\t\tpublic IEnumerable LoadAllAsync()\n");
+            source.Append("\t\t{\n");
+            source.Append("#if UNITY_EDITOR\n");
+            source.Append("\t\t\tif (AssetManager.Instance.IsEditorMode)\n");
+            source.Append("\t\t\t{\n");
+            source.Append("\t\t\t\tRuntimeLoadAll();\n");
+            source.Append("\t\t\t\tyield break;\n");
+            source.Append("\t\t\t}\n");
+            source.Append("#endif\n");
+            source.Append("\t\t\tDictionary<string, TextAsset> assets = null;\n");
+            source.Append("\t\t\tyield return AssetLoadTracker.LoadAllAsync<TextAsset>(ConfigBatchAnchor, result => assets = result);\n");
+            source.Append("\t\t\ttry\n");
+            source.Append("\t\t\t{\n");
+            source.Append("\t\t\t\tApplyConfigBatchAssets(assets);\n");
+            source.Append("\t\t\t}\n");
+            source.Append("\t\t\tfinally\n");
+            source.Append("\t\t\t{\n");
+            source.Append("\t\t\t\tUnloadAsset(ConfigBatchAnchor, false);\n");
+            source.Append("\t\t\t}\n");
+            source.Append("\t\t}\n\n");
+
+            source.Append("\t\t[Preserve]\n");
+            source.Append("\t\tpublic async Task LoadAllAsyncTask()\n");
+            source.Append("\t\t{\n");
+            source.Append("#if UNITY_EDITOR\n");
+            source.Append("\t\t\tif (AssetManager.Instance.IsEditorMode)\n");
+            source.Append("\t\t\t{\n");
+            source.Append("\t\t\t\tRuntimeLoadAll();\n");
+            source.Append("\t\t\t\treturn;\n");
+            source.Append("\t\t\t}\n");
+            source.Append("#endif\n");
+            source.Append("\t\t\tDictionary<string, TextAsset> assets = null;\n");
+            source.Append("\t\t\tBaseLoader loader = AssetLoadTracker.LoadAllAsync<TextAsset>(ConfigBatchAnchor, result => assets = result);\n");
+            source.Append("\t\t\tawait loader;\n");
+            source.Append("\t\t\ttry\n");
+            source.Append("\t\t\t{\n");
+            source.Append("\t\t\t\tApplyConfigBatchAssets(assets);\n");
+            source.Append("\t\t\t}\n");
+            source.Append("\t\t\tfinally\n");
+            source.Append("\t\t\t{\n");
+            source.Append("\t\t\t\tUnloadAsset(ConfigBatchAnchor, false);\n");
+            source.Append("\t\t\t}\n");
+            source.Append("\t\t}\n\n");
+
+            source.Append("\t\t[Preserve]\n");
+            source.Append("\t\tpublic void LoadAllAsyncCallback(Action onLoadComplete = null)\n");
+            source.Append("\t\t{\n");
+            source.Append("\t\t\tUtil.Unity.StartCoroutine(LoadAllAsyncIEnumerator(onLoadComplete));\n");
+            source.Append("\t\t}\n\n");
+
+            source.Append("\t\t[Preserve]\n");
+            source.Append("\t\tpublic IEnumerator LoadAllAsyncIEnumerator(Action onLoadComplete = null)\n");
+            source.Append("\t\t{\n");
+            source.Append("#if UNITY_EDITOR\n");
+            source.Append("\t\t\tif (AssetManager.Instance.IsEditorMode)\n");
+            source.Append("\t\t\t{\n");
+            source.Append("\t\t\t\tRuntimeLoadAll();\n");
+            source.Append("\t\t\t\tonLoadComplete?.Invoke();\n");
+            source.Append("\t\t\t\tyield break;\n");
+            source.Append("\t\t\t}\n");
+            source.Append("#endif\n");
+            source.Append("\t\t\tDictionary<string, TextAsset> assets = null;\n");
+            source.Append("\t\t\tyield return AssetLoadTracker.LoadAllAsync<TextAsset>(ConfigBatchAnchor, result => assets = result);\n");
+            source.Append("\t\t\ttry\n");
+            source.Append("\t\t\t{\n");
+            source.Append("\t\t\t\tApplyConfigBatchAssets(assets);\n");
+            source.Append("\t\t\t}\n");
+            source.Append("\t\t\tfinally\n");
+            source.Append("\t\t\t{\n");
+            source.Append("\t\t\t\tUnloadAsset(ConfigBatchAnchor, false);\n");
+            source.Append("\t\t\t}\n");
+            source.Append("\t\t\tonLoadComplete?.Invoke();\n");
+            source.Append("\t\t}\n\n");
+        }
+
         //创建数据管理器脚本
         public static bool CreateDataManager(Dictionary<string, ScriptGenerator> codeList)
         {
-            List<string> list = new List<string>();
-            list.AddRange(codeList.Keys);
-            IEnumerable types = list.FindAll(t => true);
+            if (ExcelDataSettings.BatchLoadEnabled &&
+                !ABBuildTool.TryGetConfigBatchAssetBundleName(
+                    ExcelDataSettings.OutputPath,
+                    out _,
+                    out string batchLoadError))
+            {
+                throw new InvalidOperationException("配置表批量加载设置无效：" + batchLoadError);
+            }
+
+            List<string> types = codeList.Keys
+                .OrderBy(type => type, StringComparer.Ordinal)
+                .ToList();
+            if (types.Count == 0)
+            {
+                throw new InvalidOperationException("没有可生成的数据表类型。");
+            }
+
+            string exportFormat = ExcelDataSettings.ExportFormat;
             
             StringBuilder source = new StringBuilder();
             source.Append("/*\n");
@@ -574,91 +847,14 @@ namespace F8Framework.ExcelData.Editor
                 source.Append("\t\t}\n\n");
             }
 
-            //加载所有配置表
-            source.Append("\t\t[Preserve]\n");
-            source.Append("\t\tpublic void LoadAll()\n");
-            source.Append("\t\t{\n");
-            foreach (string t in types)
+            if (ExcelDataSettings.BatchLoadEnabled)
             {
-                source.Append("\t\t\tp_" + t + " = Load<" + t + ">(" + '"' + t + '"' + ") as " + t + ";\n");
+                AppendBatchLoadMethods(source, types, exportFormat);
             }
-
-            source.Append("\t\t}\n\n");
-
-            //运行时加载所有配置表
-            source.Append("\t\t[Preserve]\n");
-            source.Append("\t\tpublic void RuntimeLoadAll(Dictionary<String, System.Object> objs = null)\n");
-            source.Append("\t\t{\n");
-            source.Append("\t\t\tif (objs == null)\n");
-            source.Append("\t\t\t{\n");
-            source.Append("\t\t\t\tif (!ConfigDataSourceRegistry.TryLoadAll(out objs))\n");
-            source.Append("\t\t\t\t{\n");
-            source.Append("\t\t\t\t\tLogF8.LogError(\"没有可用的配置数据源。请安装并启用一个 IConfigDataSource 实现。\");\n");
-            source.Append("\t\t\t\t\treturn;\n");
-            source.Append("\t\t\t\t}\n");
-            source.Append("\t\t\t}\n");
-            foreach (string t in types)
+            else
             {
-                source.Append("\t\t\tp_" + t + " = objs[" + '"' + t + '"' + "] as " + t + ";\n");
+                AppendSequentialLoadMethods(source, types);
             }
-
-            source.Append("\t\t}\n\n");
-
-            //异步加载所有配置表
-            source.Append("\t\t[Preserve]\n");
-            source.Append("\t\tpublic IEnumerable LoadAllAsync()\n");
-            source.Append("\t\t{\n");
-            foreach (string t in types)
-            {
-                source.Append("\t\t\tyield return LoadAsync<" + t + ">("+ '"' + t + '"' + ", result => " +  "p_" + t + " = result" + " as " + t + ");\n");
-            }
-            source.Append("#if UNITY_EDITOR\n");
-            source.Append("\t\t\tif (AssetManager.Instance.IsEditorMode)\n");
-            source.Append("\t\t\t{\n");
-            source.Append("\t\t\t\tRuntimeLoadAll();\n");
-            source.Append("\t\t\t}\n");
-            source.Append("#endif\n");
-            source.Append("\t\t}\n\n");
-            
-            //异步加载所有配置表
-            source.Append("\t\t[Preserve]\n");
-            source.Append("\t\tpublic async Task LoadAllAsyncTask()\n");
-            source.Append("\t\t{\n");
-            foreach (string t in types)
-            {
-                source.Append("\t\t\tawait LoadAsyncTask<" + t + ">("+ '"' + t + '"' + ", result => " +  "p_" + t + " = result" + " as " + t + ");\n");
-            }
-            source.Append("#if UNITY_EDITOR\n");
-            source.Append("\t\t\tif (AssetManager.Instance.IsEditorMode)\n");
-            source.Append("\t\t\t{\n");
-            source.Append("\t\t\t\tRuntimeLoadAll();\n");
-            source.Append("\t\t\t}\n");
-            source.Append("#endif\n");
-            source.Append("\t\t}\n\n");
-            
-            //异步加载所有配置表
-            source.Append("\t\t[Preserve]\n");
-            source.Append("\t\tpublic void LoadAllAsyncCallback(Action onLoadComplete = null)\n");
-            source.Append("\t\t{\n");
-            source.Append("\t\t\tUtil.Unity.StartCoroutine(LoadAllAsyncIEnumerator(onLoadComplete));\n");
-            source.Append("\t\t}\n\n");
-            
-            //异步加载所有配置表
-            source.Append("\t\t[Preserve]\n");
-            source.Append("\t\tpublic IEnumerator LoadAllAsyncIEnumerator(Action onLoadComplete = null)\n");
-            source.Append("\t\t{\n");
-            foreach (string t in types)
-            {
-                source.Append("\t\t\tyield return LoadAsync<" + t + ">("+ '"' + t + '"' + ", result => " +  "p_" + t + " = result" + " as " + t + ");\n");
-            }
-            source.Append("#if UNITY_EDITOR\n");
-            source.Append("\t\t\tif (AssetManager.Instance.IsEditorMode)\n");
-            source.Append("\t\t\t{\n");
-            source.Append("\t\t\t\tRuntimeLoadAll();\n");
-            source.Append("\t\t\t}\n");
-            source.Append("#endif\n");
-            source.Append("\t\t\tonLoadComplete?.Invoke();\n");
-            source.Append("\t\t}\n\n");
             
             //反序列化
             source.Append("\t\t[Preserve]\n");
@@ -671,7 +867,6 @@ namespace F8Framework.ExcelData.Editor
             source.Append("\t\t\t}\n");
             source.Append("\t\t\tUnloadAsset(name, false);\n");
             
-            string exportFormat = ExcelDataSettings.ExportFormat;
             if (exportFormat == ExcelDataSettings.BinaryFormat)
             {
                 source.Append("\t\t\tT obj = Util.BinarySerializer.Deserialize<T>(textAsset.bytes);\n");

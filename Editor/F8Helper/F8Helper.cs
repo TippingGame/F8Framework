@@ -95,6 +95,12 @@ namespace F8Framework.Core.Editor
         [MenuItem("开发工具/4: 打包AssetBundles目录资源-F8", false, 215)]
         public static void BuildAssetBundles()
         {
+            if (EditorApplication.isPlaying || EditorApplication.isPaused)
+            {
+                EditorUtility.DisplayDialog("提示", "游戏正在运行中，不能打包 AssetBundles", "确定");
+                return;
+            }
+
             ABBuildTool.BuildAllAB();
         }
 

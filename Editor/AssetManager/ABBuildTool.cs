@@ -55,6 +55,13 @@ namespace F8Framework.Core.Editor
             F8GamePrefs.SetInt(nameof(F8GameConfig.AssetBundleXorKey), assetBundleXorKey);
             F8GamePrefs.SetString(nameof(F8GameConfig.AssetManifestEncryptKey), assetManifestEncryptKey);
             F8EditorPrefs.SetString(BuildPkgTool.AssetBundleNameSuffixKey, assetBundleNameSuffix);
+            if (F8EditorCommandLine.TryGetBool(
+                    args,
+                    BuildPkgTool.ConfigBatchLoadCommandLineKey,
+                    out bool configBatchLoadEnabled))
+            {
+                BuildPkgTool.ConfigBatchLoadEnabled = configBatchLoadEnabled;
+            }
         }
 
         public static void BuildAllAB()
@@ -467,6 +474,16 @@ namespace F8Framework.Core.Editor
             string defaultBundleName = Path.ChangeExtension(path, null).Replace(URLSetting.AssetBundlesPath, "").ToLowerInvariant();
             string assetBundleNameSuffix = GetValidatedAssetBundleNameSuffix();
             string bundleName = (defaultBundleName + assetBundleNameSuffix).ToLowerInvariant();
+            string appliedConfigBundleName = F8EditorPrefs.GetString(
+                BuildPkgTool.ConfigBatchAppliedAssetBundleNameKey,
+                "") ?? "";
+            if (BuildPkgTool.ConfigBatchLoadEnabled &&
+                IsConfigDataAssetPath(path) &&
+                string.Equals(ai.assetBundleName, appliedConfigBundleName, StringComparison.OrdinalIgnoreCase))
+            {
+                return ai.assetBundleName;
+            }
+
             if (!ai.assetBundleName.Equals(bundleName))
             {
                 string appliedSuffix = F8EditorPrefs.GetString(BuildPkgTool.AppliedAssetBundleNameSuffixKey, "") ?? "";
@@ -505,6 +522,239 @@ namespace F8Framework.Core.Editor
         {
             int index = path.LastIndexOf('/');
             return index >= 0 ? path.Substring(0, index) : "";
+        }
+
+        private static bool IsConfigDataFile(string path)
+        {
+            string extension = Path.GetExtension(path);
+            return extension.Equals(".bytes", StringComparison.OrdinalIgnoreCase) ||
+                   extension.Equals(".json", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static string[] GetConfigDataFiles(string outputPath)
+        {
+            if (string.IsNullOrEmpty(outputPath) || !Directory.Exists(outputPath))
+            {
+                return Array.Empty<string>();
+            }
+
+            return Directory.GetFiles(outputPath, "*", SearchOption.TopDirectoryOnly)
+                .Where(IsConfigDataFile)
+                .ToArray();
+        }
+
+        private static bool IsConfigDataAssetPath(string assetPath)
+        {
+            if (!IsConfigDataFile(assetPath))
+            {
+                return false;
+            }
+
+            string outputAssetPath = URLSetting.RemoveRootPath(BuildPkgTool.ConfigDataOutputPath)?.TrimEnd('/');
+            if (string.IsNullOrEmpty(outputAssetPath))
+            {
+                return false;
+            }
+
+            string normalizedAssetPath = FileTools.FormatToUnityPath(assetPath);
+            string directory = FileTools.FormatToUnityPath(Path.GetDirectoryName(normalizedAssetPath) ?? "");
+            return string.Equals(directory, outputAssetPath, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool RestoreManagedConfigDataFiles(
+            string outputPath,
+            HashSet<string> managedBundleNames)
+        {
+            bool changed = false;
+            foreach (string filePath in GetConfigDataFiles(outputPath))
+            {
+                string assetPath = GetAssetPath(filePath);
+                AssetImporter importer = AssetImporter.GetAtPath(assetPath);
+                if (importer == null || !managedBundleNames.Contains(importer.assetBundleName))
+                {
+                    continue;
+                }
+
+                string desiredBundleName = GetAutoAssetBundleName(assetPath);
+                if (string.Equals(importer.assetBundleName, desiredBundleName, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                importer.assetBundleName = desiredBundleName;
+                EditorUtility.SetDirty(importer);
+                changed = true;
+            }
+
+            return changed;
+        }
+
+        /// <summary>
+        /// 计算配置表批量加载所使用的 AB 名，并验证导表目录位于 AssetBundles 根目录下。
+        /// </summary>
+        public static bool TryGetConfigBatchAssetBundleName(
+            string outputPath,
+            out string bundleName,
+            out string errorMessage)
+        {
+            bundleName = null;
+            errorMessage = null;
+            if (string.IsNullOrEmpty(outputPath))
+            {
+                errorMessage = "配置表导出目录为空，暂不支持启用同 AB 批量加载。";
+                return false;
+            }
+
+            string assetBundlesRoot = FileTools.FormatToUnityPath(
+                Path.GetFullPath(URLSetting.GetAssetBundlesFolder())).TrimEnd('/');
+            string normalizedOutputPath;
+            try
+            {
+                normalizedOutputPath = FileTools.FormatToUnityPath(
+                    Path.GetFullPath(URLSetting.AddRootPath(outputPath))).TrimEnd('/');
+            }
+            catch (Exception exception) when (exception is ArgumentException ||
+                                               exception is NotSupportedException ||
+                                               exception is PathTooLongException)
+            {
+                errorMessage = "配置表导出目录无效：" + exception.Message;
+                return false;
+            }
+
+            StringComparison pathComparison = Application.platform == RuntimePlatform.WindowsEditor
+                ? StringComparison.OrdinalIgnoreCase
+                : StringComparison.Ordinal;
+            if (!normalizedOutputPath.StartsWith(assetBundlesRoot + "/", pathComparison))
+            {
+                errorMessage = "配置表导出目录必须位于 " + URLSetting.AssetBundlesPath + " 下。";
+                return false;
+            }
+
+            string relativePath = normalizedOutputPath.Substring(assetBundlesRoot.Length).Trim('/');
+            if (string.IsNullOrEmpty(relativePath))
+            {
+                errorMessage = "配置表导出目录需要位于 AssetBundles 根目录的子目录中。";
+                return false;
+            }
+
+            string suffix = F8EditorPrefs.GetString(BuildPkgTool.AssetBundleNameSuffixKey, "") ?? "";
+            if (!TryValidateAssetBundleNameSuffix(suffix, out errorMessage))
+            {
+                return false;
+            }
+
+            // 批量包使用独立名称，避免占用配置目录及其子资源的输出路径。
+            bundleName = (relativePath + BuildPkgTool.ConfigBatchAssetBundleNameSuffix + suffix).ToLowerInvariant();
+            return true;
+        }
+
+        /// <summary>
+        /// 根据构建工具开关，把配置表文件归组到同一个 AB，或恢复为逐文件自动 AB 名。
+        /// </summary>
+        public static void ApplyConfigDataAssetBundleLayout()
+        {
+            bool enabled = BuildPkgTool.ConfigBatchLoadEnabled;
+            string outputPath = BuildPkgTool.ConfigDataOutputPath;
+            string previouslyAppliedOutputPath = URLSetting.AddRootPath(F8EditorPrefs.GetString(
+                BuildPkgTool.ConfigBatchAppliedOutputPathKey,
+                string.Empty));
+            string previouslyAppliedBundleName = F8EditorPrefs.GetString(
+                BuildPkgTool.ConfigBatchAppliedAssetBundleNameKey,
+                "") ?? "";
+            HashSet<string> managedBundleNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            if (!string.IsNullOrEmpty(previouslyAppliedBundleName))
+            {
+                managedBundleNames.Add(previouslyAppliedBundleName);
+            }
+
+            if (!TryGetConfigBatchAssetBundleName(outputPath, out string bundleName, out string errorMessage))
+            {
+                if (enabled)
+                {
+                    string message = "配置表批量加载设置无效：" + errorMessage;
+                    LogF8.LogError(message);
+                    throw new BuildFailedException(message);
+                }
+
+                bool restoredChanged = RestoreManagedConfigDataFiles(
+                    previouslyAppliedOutputPath,
+                    managedBundleNames);
+                F8EditorPrefs.SetString(BuildPkgTool.ConfigBatchAppliedAssetBundleNameKey, string.Empty);
+                F8EditorPrefs.SetString(BuildPkgTool.ConfigBatchAppliedOutputPathKey, string.Empty);
+                if (restoredChanged)
+                {
+                    AssetDatabase.SaveAssets();
+                }
+                return;
+            }
+
+            if (enabled)
+            {
+                managedBundleNames.Add(bundleName);
+            }
+            bool changed = false;
+            string normalizedPreviousOutputPath = FileTools.FormatToUnityPath(
+                previouslyAppliedOutputPath ?? "").TrimEnd('/');
+            string normalizedOutputPath = FileTools.FormatToUnityPath(outputPath ?? "").TrimEnd('/');
+            if (!string.IsNullOrEmpty(normalizedPreviousOutputPath) &&
+                !string.Equals(normalizedPreviousOutputPath, normalizedOutputPath, StringComparison.OrdinalIgnoreCase))
+            {
+                changed |= RestoreManagedConfigDataFiles(
+                    previouslyAppliedOutputPath,
+                    managedBundleNames);
+            }
+
+            string[] configFiles = GetConfigDataFiles(outputPath);
+            if (enabled && configFiles.Length == 0)
+            {
+                string message = "配置表批量加载已启用，但导表目录中没有 .bytes 或 .json 文件：" + outputPath;
+                LogF8.LogError(message);
+                throw new BuildFailedException(message);
+            }
+
+            foreach (string filePath in configFiles)
+            {
+                string assetPath = GetAssetPath(filePath);
+                AssetImporter importer = AssetImporter.GetAtPath(assetPath);
+                if (importer == null)
+                {
+                    if (enabled)
+                    {
+                        string message = "找不到配置表资源导入器，请先刷新 AssetDatabase：" + assetPath;
+                        LogF8.LogError(message);
+                        throw new BuildFailedException(message);
+                    }
+
+                    continue;
+                }
+
+                bool isManagedName = managedBundleNames.Contains(importer.assetBundleName);
+                if (!enabled && !isManagedName)
+                {
+                    continue;
+                }
+
+                string desiredBundleName = enabled ? bundleName : GetAutoAssetBundleName(assetPath);
+                if (string.Equals(importer.assetBundleName, desiredBundleName, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                importer.assetBundleName = desiredBundleName;
+                EditorUtility.SetDirty(importer);
+                changed = true;
+            }
+
+            F8EditorPrefs.SetString(
+                BuildPkgTool.ConfigBatchAppliedAssetBundleNameKey,
+                enabled ? bundleName : string.Empty);
+            F8EditorPrefs.SetString(
+                BuildPkgTool.ConfigBatchAppliedOutputPathKey,
+                enabled ? URLSetting.RemoveRootPath(outputPath) : string.Empty);
+            if (changed)
+            {
+                AssetDatabase.SaveAssets();
+            }
         }
         
         private static bool AssetPathsContainsDiscrepantAssetBundle(ICollection<string> assetPaths, string ab)
@@ -556,6 +806,8 @@ namespace F8Framework.Core.Editor
         {
             bool _enableFullPathAssetLoading = F8EditorPrefs.GetBool(BuildPkgTool.EnableFullPathAssetLoadingKey, false);
             bool _enableFullPathExtensionAssetLoading = F8EditorPrefs.GetBool(BuildPkgTool.EnableFullPathExtensionAssetLoadingKey, false);
+
+            ApplyConfigDataAssetBundleLayout();
             
             if (!isWrite)
                 DiscrepantAssetPathMapping.Clear();
@@ -719,7 +971,7 @@ namespace F8Framework.Core.Editor
                 }
             }
         }
-        
+
         private static void WriteAssetNames()
         {
             string assetMapPath = FileTools.FormatToUnityPath(FileTools.TruncatePath(GetScriptPath(), 3)) + "/AssetMap/Resources/" + nameof(AssetBundleMap) + ".json";

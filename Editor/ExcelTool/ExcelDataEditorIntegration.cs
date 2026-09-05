@@ -11,7 +11,7 @@ namespace F8Framework.ExcelData.Editor
         public const string EnabledKey = "UseExcelDataTool";
         public const string SourcePathKey = "ExcelPath";
         public const string ExportFormatKey = "ConvertExcelToOtherFormatsKey";
-        public const string OutputPathKey = "ExcelBinDataFolderKey";
+        public const string OutputPathKey = BuildPkgTool.ConfigDataOutputPathKey;
         public const string BinaryFormat = "binary";
         public const string JsonFormat = "json";
 
@@ -66,6 +66,12 @@ namespace F8Framework.ExcelData.Editor
                     : BinaryFormat);
         }
 
+        public static bool BatchLoadEnabled
+        {
+            get => BuildPkgTool.ConfigBatchLoadEnabled;
+            set => BuildPkgTool.ConfigBatchLoadEnabled = value;
+        }
+
         public static void EnsureDefaults()
         {
             if (F8EditorPrefs.GetString(SourcePathKey, string.Empty).IsNullOrEmpty())
@@ -89,6 +95,14 @@ namespace F8Framework.ExcelData.Editor
             if (F8EditorCommandLine.TryGetBool(arguments, "UseExcelDataTool-", out bool enabled))
             {
                 Enabled = enabled;
+            }
+
+            if (F8EditorCommandLine.TryGetBool(
+                    arguments,
+                    BuildPkgTool.ConfigBatchLoadCommandLineKey,
+                    out bool batchLoadEnabled))
+            {
+                BatchLoadEnabled = batchLoadEnabled;
             }
 
             string sourcePath = F8EditorCommandLine.GetValue(arguments, "ExcelPath-");
@@ -193,11 +207,36 @@ namespace F8Framework.ExcelData.Editor
             ExcelDataSettings.Enabled = EditorGUILayout.ToggleLeft(
                 "构建前自动生成 Excel 配置",
                 ExcelDataSettings.Enabled);
+
+            ExcelDataSettings.BatchLoadEnabled = EditorGUILayout.ToggleLeft(
+                "配置表使用同 AB 批量加载",
+                ExcelDataSettings.BatchLoadEnabled);
+            if (ExcelDataSettings.BatchLoadEnabled)
+            {
+                EditorGUILayout.HelpBox(
+                    "构建时会把导表目录中的配置文件归入同一个 AB，运行时执行 1 次 AB 加载、1 次 LoadAllAssetsAsync 和 N 次反序列化。配置表会共享 AB 的更新粒度，导表目录需要位于 Assets/AssetBundles 下。",
+                    MessageType.Info);
+                if (!ABBuildTool.TryGetConfigBatchAssetBundleName(
+                        ExcelDataSettings.OutputPath,
+                        out _,
+                        out string batchLoadError))
+                {
+                    EditorGUILayout.HelpBox(batchLoadError, MessageType.Error);
+                }
+            }
+
+            GUILayout.Space(10);
             if (!ExcelDataSettings.Enabled)
             {
                 EditorGUILayout.HelpBox(
                     "Excel 模块仍可保留在项目中，但不会参与 F8Run、Player 或热更新构建流水线。",
                     MessageType.Info);
+                if (ExcelDataSettings.BatchLoadEnabled)
+                {
+                    EditorGUILayout.HelpBox(
+                        "当前未启用 Excel 自动生成；批量加载开关会在下次生成 F8DataManager 时生效。",
+                        MessageType.Warning);
+                }
                 GUILayout.Space(5);
                 GUILayout.Box(string.Empty, GUILayout.Height(2), GUILayout.ExpandWidth(true));
                 GUILayout.Space(5);

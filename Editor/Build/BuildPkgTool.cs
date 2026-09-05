@@ -40,6 +40,31 @@ namespace F8Framework.Core.Editor
         public static string AssetBundleNameSuffixKey = "AssetBundleNameSuffixKey";
         public static string AppliedAssetBundleNameSuffixKey = "AppliedAssetBundleNameSuffixKey";
         public static string CleanBuildCacheKey = "CleanBuildCacheKey";
+
+        // Excel 配置表的批量加载策略由构建工具统一保存，供 Excel 生成器和 AB 构建器共同读取。
+        public const string ConfigDataOutputPathKey = "ExcelBinDataFolderKey";
+        public const string ConfigBatchLoadEnabledKey = "ConfigBatchLoadEnabledKey";
+        public const string ConfigBatchAppliedAssetBundleNameKey = "ConfigBatchAppliedAssetBundleNameKey";
+        public const string ConfigBatchAppliedOutputPathKey = "ConfigBatchAppliedOutputPathKey";
+        public const string ConfigBatchLoadCommandLineKey = "EnableConfigBatchLoad-";
+        public const string ConfigDataDefaultOutputPath = "Assets/AssetBundles/Config/BinConfigData";
+        public const string ConfigBatchAssetBundleNameSuffix = "_batch";
+
+        public static bool ConfigBatchLoadEnabled
+        {
+            get => F8EditorPrefs.GetBool(ConfigBatchLoadEnabledKey, false);
+            set => F8EditorPrefs.SetBool(ConfigBatchLoadEnabledKey, value);
+        }
+
+        public static string ConfigDataOutputPath
+        {
+            get
+            {
+                string outputPath = F8EditorPrefs.GetString(ConfigDataOutputPathKey, string.Empty);
+                return Path.GetFullPath(URLSetting.AddRootPath(
+                    string.IsNullOrEmpty(outputPath) ? ConfigDataDefaultOutputPath : outputPath));
+            }
+        }
         
         private static string _buildPath = "";
         private static string _toVersion = "1.0.0";

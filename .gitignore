@@ -70,3 +70,13 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# Local configuration and generated data. Existing tracked files stay in Git.
+/Editor/F8EditorConfig.asset
+/Editor/F8EditorConfig.asset.meta
+/Resources/
+/Resources.meta
+/AssetMap/
+/AssetMap.meta
+/ConfigData/
+/ConfigData.meta

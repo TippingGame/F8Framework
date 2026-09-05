@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Text;
 using F8Framework.Core;
+using F8Framework.Core.Editor;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -121,6 +123,105 @@ namespace F8Framework.ExcelData.Editor.Tests
 
             Assert.Throws<ArgumentException>(() =>
                 ExcelDataSettings.ApplyCommandLineArguments(arguments));
+        }
+
+        [Test]
+        public void CommandLineCanEnableConfigBatchLoading()
+        {
+            bool previousValue = ExcelDataSettings.BatchLoadEnabled;
+            try
+            {
+                ExcelDataSettings.BatchLoadEnabled = false;
+                ExcelDataSettings.ApplyCommandLineArguments(new[]
+                {
+                    BuildPkgTool.ConfigBatchLoadCommandLineKey,
+                    "true",
+                });
+
+                Assert.IsTrue(ExcelDataSettings.BatchLoadEnabled);
+            }
+            finally
+            {
+                ExcelDataSettings.BatchLoadEnabled = previousValue;
+            }
+        }
+
+        [TestCase(ExcelDataSettings.BinaryFormat, "Util.BinarySerializer.Deserialize<T>(textAsset.bytes)")]
+        [TestCase(ExcelDataSettings.JsonFormat, "Util.LitJson.ToObject<T>(textAsset.text)")]
+        public void BatchLoadGeneratorUsesOneAnchorAndBatchExpansion(string exportFormat, string deserializer)
+        {
+            MethodInfo method = typeof(ScriptGenerator).GetMethod(
+                "AppendBatchLoadMethods",
+                BindingFlags.Static | BindingFlags.NonPublic);
+            Assert.IsNotNull(method);
+
+            StringBuilder source = new StringBuilder();
+            method.Invoke(
+                null,
+                new object[]
+                {
+                    source,
+                    new List<string> { "SheetB", "SheetA" },
+                    exportFormat,
+                });
+
+            string generated = source.ToString();
+            StringAssert.Contains("ConfigBatchAnchor = \"SheetA\"", generated);
+            StringAssert.Contains(deserializer, generated);
+            StringAssert.Contains("public void RuntimeLoadAll", generated);
+            StringAssert.Contains("LoadAll<TextAsset>(ConfigBatchAnchor)", generated);
+            StringAssert.Contains("LoadAllAsync<TextAsset>(ConfigBatchAnchor", generated);
+            StringAssert.Contains("UnloadAsset(ConfigBatchAnchor, false)", generated);
+            StringAssert.DoesNotContain("LoadAsync<SheetA>", generated);
+            StringAssert.DoesNotContain("LoadAsync<SheetB>", generated);
+        }
+
+        [TestCase("", "config/binconfigdata_batch")]
+        [TestCase(".bundle", "config/binconfigdata_batch.bundle")]
+        [TestCase(".ab", "config/binconfigdata_batch.ab")]
+        public void ConfigBatchBundleNameFollowsAssetBundlesOutputDirectory(string suffix, string expectedBundleName)
+        {
+            string previousSuffix = F8EditorPrefs.GetString(BuildPkgTool.AssetBundleNameSuffixKey, string.Empty);
+            try
+            {
+                F8EditorPrefs.SetString(BuildPkgTool.AssetBundleNameSuffixKey, suffix);
+                string outputPath = Path.Combine(
+                    Application.dataPath,
+                    "AssetBundles",
+                    "Config",
+                    "BinConfigData");
+
+                bool valid = ABBuildTool.TryGetConfigBatchAssetBundleName(
+                    outputPath,
+                    out string bundleName,
+                    out string errorMessage);
+
+                Assert.IsTrue(valid, errorMessage);
+                Assert.AreEqual(expectedBundleName, bundleName);
+                Assert.AreEqual(suffix, F8EditorPrefs.GetString(BuildPkgTool.AssetBundleNameSuffixKey, string.Empty));
+            }
+            finally
+            {
+                F8EditorPrefs.SetString(BuildPkgTool.AssetBundleNameSuffixKey, previousSuffix);
+            }
+        }
+
+        [TestCase("Assets/AssetBundles")]
+        [TestCase("Assets/Resources/Config")]
+        [TestCase("Assets/AssetBundles/../Resources/Config")]
+        public void ConfigBatchRejectsOutputOutsideAssetBundles(string outputPath)
+        {
+            Assert.IsFalse(ABBuildTool.TryGetConfigBatchAssetBundleName(outputPath, out _, out string errorMessage));
+            Assert.IsNotEmpty(errorMessage);
+        }
+
+        [Test]
+        public void ConfigBatchRejectsAnotherProjectsAssetBundlesDirectory()
+        {
+            string outputPath = Path.Combine(testRoot, "OtherProject", "Assets", "AssetBundles", "Config");
+
+            Assert.IsFalse(ABBuildTool.TryGetConfigBatchAssetBundleName(outputPath, out _, out string errorMessage));
+            Assert.IsNotEmpty(errorMessage);
         }
 
         [Test]
